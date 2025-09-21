@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import './why-choose-amacar.css'
+import AuctionModal from '@/components/ui/AuctionYourRideModal'
 
 export default function WhyChooseAmacar() {
+    const [auctionOpen, setAuctionOpen] = useState(false);
     const benefits = [
         {
             id: 1,
@@ -139,6 +141,7 @@ export default function WhyChooseAmacar() {
                 >
                     <p className="cta-text">Ready to experience the difference?</p>
                     <motion.button
+                        onClick={() => setAuctionOpen(true)}
                         className="cta-button"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -147,6 +150,10 @@ export default function WhyChooseAmacar() {
                     </motion.button>
                 </motion.div>
             </div>
+            <AuctionModal
+                isOpen={auctionOpen}
+                onClose={setAuctionOpen}
+            />
         </section>
     )
 }

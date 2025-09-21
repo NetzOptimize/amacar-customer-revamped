@@ -22,6 +22,11 @@ import { AuthProvider } from './provider/AuthProvider'; // Updated Redux-based A
 import PrivateRoute from './components/Auth/PrivateRoute'; // Updated PrivateRoute
 import { SearchProvider } from './context/SearchContext';
 import BackToTop from './components/ui/back-to-top';
+import AboutUs from './Pages/AboutUs.jsx';
+import TermsOfService from './Pages/TermsOfService.jsx';
+import PrivacyPolicy from './Pages/PrivacyPolicy.jsx';
+import CookiesPolicy from './Pages/CookiesPolicy.jsx';
+import Testimonials from './Pages/Testimonials.jsx';
 
 function App() {
   const location = useLocation();
@@ -39,137 +44,141 @@ function App() {
     <AuthProvider>
       <SearchProvider>
         <div className="min-h-screen bg-slate-50">
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#363636',
-              color: '#fff',
-              borderRadius: '12px',
-              padding: '16px',
-              fontSize: '14px',
-              fontWeight: '500',
-            },
-            success: {
-              iconTheme: {
-                primary: '#10b981',
-                secondary: '#fff',
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#363636',
+                color: '#fff',
+                borderRadius: '12px',
+                padding: '16px',
+                fontSize: '14px',
+                fontWeight: '500',
               },
-            },
-            error: {
-              iconTheme: {
-                primary: '#ef4444',
-                secondary: '#fff',
+              success: {
+                iconTheme: {
+                  primary: '#10b981',
+                  secondary: '#fff',
+                },
               },
-            },
-          }}
-          containerStyle={{
-            marginTop: '60px',
-          }}
-        />
+              error: {
+                iconTheme: {
+                  primary: '#ef4444',
+                  secondary: '#fff',
+                },
+              },
+            }}
+            containerStyle={{
+              marginTop: '60px',
+            }}
+          />
 
-        {!hideHeaderFooter && <Header />}
+          {!hideHeaderFooter && <Header />}
 
-        <main className="pt-0 bg-white">
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/auction-page" element={<AuctionPage />} />
-            <Route path="/condition-assessment" element={<ConditionAssessment />} />
-            <Route path="/local-auction" element={<ExteriorPhotos />} />
-            <Route path="/national-auction" element={<ExteriorPhotos />} />
-            <Route path="/review" element={<ReviewPage />} />
-            <Route path="/unauthorized" element={<UnauthorizedPage />} />
-
-            {/* Protected Routes */}
-            <Route
-              path="/dashboard"
-              element={
-                <PrivateRoute>
-                  <DashboardLayout>
-                    <Dashboard />
-                  </DashboardLayout>
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/auctions"
-              element={
-                <PrivateRoute>
-                  <DashboardLayout>
-                    <LiveAuctionsPage />
-                  </DashboardLayout>
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/pending-offers"
-              element={
-                <PrivateRoute> 
-                  <DashboardLayout>
-                    <PendingOffersPage />
-                  </DashboardLayout>
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/offers"
-              element={
-                <PrivateRoute> 
-                  <DashboardLayout>
-                    <PreviousOffersPage />
-                  </DashboardLayout>
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/accepted"
-              element={
-                <PrivateRoute>   
-                  <DashboardLayout>
-                    <AcceptedOffersPage />
-                  </DashboardLayout>
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/appointments"
-              element={
-                <PrivateRoute> 
-                  <DashboardLayout>
-                    <MyAppointments />
-                  </DashboardLayout>
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <PrivateRoute> 
-                  <DashboardLayout>
-                    <ProfilePage />
-                  </DashboardLayout>
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/car-details"
-              element={
-                <PrivateRoute> 
+          <main className="pt-0 bg-white">
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<HomePage />} />
+              <Route path="/auction-page" element={<AuctionPage />} />
+              <Route path="/condition-assessment" element={<ConditionAssessment />} />
+              <Route path="/local-auction" element={<ExteriorPhotos />} />
+              <Route path="/national-auction" element={<ExteriorPhotos />} />
+              <Route path="/review" element={<ReviewPage />} />
+              <Route path="/unauthorized" element={<UnauthorizedPage />} />
+              <Route path="/about-us" element={<AboutUs />} />
+              <Route path="/testimonials" element={<Testimonials />} />
+              <Route path="/terms-of-service" element={<TermsOfService />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/cookies-policy" element={<CookiesPolicy />} />
+              {/* Protected Routes */}
+              <Route
+                path="/dashboard"
+                element={
+                  <PrivateRoute>
                     <DashboardLayout>
-                    <CarDetailsView />
-                  </DashboardLayout>
-                </PrivateRoute>
-              }
-            />
-          </Routes>
-        </main>
+                      <Dashboard />
+                    </DashboardLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/auctions"
+                element={
+                  <PrivateRoute>
+                    <DashboardLayout>
+                      <LiveAuctionsPage />
+                    </DashboardLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/pending-offers"
+                element={
+                  <PrivateRoute>
+                    <DashboardLayout>
+                      <PendingOffersPage />
+                    </DashboardLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/offers"
+                element={
+                  <PrivateRoute>
+                    <DashboardLayout>
+                      <PreviousOffersPage />
+                    </DashboardLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/accepted"
+                element={
+                  <PrivateRoute>
+                    <DashboardLayout>
+                      <AcceptedOffersPage />
+                    </DashboardLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/appointments"
+                element={
+                  <PrivateRoute>
+                    <DashboardLayout>
+                      <MyAppointments />
+                    </DashboardLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <PrivateRoute>
+                    <DashboardLayout>
+                      <ProfilePage />
+                    </DashboardLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/car-details"
+                element={
+                  <PrivateRoute>
+                    <DashboardLayout>
+                      <CarDetailsView />
+                    </DashboardLayout>
+                  </PrivateRoute>
+                }
+              />
+            </Routes>
+          </main>
 
-        {!hideHeaderFooter && <Footer />}
-        
-        {/* Back to Top Button - Only for public pages */}
-        {!hideHeaderFooter && <BackToTop />}
+          {!hideHeaderFooter && <Footer />}
+
+          {/* Back to Top Button - Only for public pages */}
+          {!hideHeaderFooter && <BackToTop />}
         </div>
       </SearchProvider>
     </AuthProvider>

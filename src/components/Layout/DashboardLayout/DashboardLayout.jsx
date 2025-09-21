@@ -23,12 +23,12 @@ const DashboardLayout = ({ children }) => {
   const notificationsRef = useRef(null);
 
   // Search context
-  const { 
-    searchQuery, 
-    setSearchQuery, 
-    isSearching, 
-    clearSearch, 
-    getSearchStats 
+  const {
+    searchQuery,
+    setSearchQuery,
+    isSearching,
+    clearSearch,
+    getSearchStats
   } = useSearch();
 
   // Get user data from Redux store
@@ -58,7 +58,7 @@ const DashboardLayout = ({ children }) => {
   };
 
   const handleConfirmLogout = async () => {
-    await dispatch(logout());   
+    await dispatch(logout());
     navigate('/');
   };
 
@@ -96,13 +96,9 @@ const DashboardLayout = ({ children }) => {
         icon: getActivityIcon(activity.type)
       }));
     }
-    
+
     // Fallback dummy data
-    return [
-      { id: 1, message: "New bid received on your vehicle!", time: "10 min ago", type: "bid", icon: DollarSign },
-      { id: 2, message: "Your auction is ending soon.", time: "1 hr ago", type: "auction", icon: Gavel },
-      { id: 3, message: "Profile updated successfully.", time: "2 hrs ago", type: "appointment", icon: Calendar },
-    ];
+    return [];
   };
 
   // Get appropriate icon for activity type
@@ -138,10 +134,10 @@ const DashboardLayout = ({ children }) => {
           >
             {isMobileMenuOpen ? <X className="w-5 h-5 text-neutral-600" /> : <Menu className="w-5 h-5 text-neutral-600" />}
           </button>
-          
+
           <h1 className="text-lg font-semibold text-neutral-800">Dashboard</h1>
-          
-          <button 
+
+          <button
             onClick={toggleNotificationsDropdown}
             className="relative p-2 hover:bg-neutral-100 rounded-lg transition-colors duration-200"
           >
@@ -155,23 +151,23 @@ const DashboardLayout = ({ children }) => {
 
       {/* Desktop Sidebar */}
       <div className="hidden lg:block">
-        <Sidebar 
-          isCollapsed={isSidebarCollapsed} 
-          onToggle={toggleSidebar} 
+        <Sidebar
+          isCollapsed={isSidebarCollapsed}
+          onToggle={toggleSidebar}
         />
       </div>
 
       {/* Mobile Sidebar Overlay */}
       {isMobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 z-40">
-          <div 
-            className="absolute inset-0 bg-black/50" 
+          <div
+            className="absolute inset-0 bg-black/50"
             onClick={toggleMobileMenu}
           />
           <div className="absolute left-0 top-0 bottom-0 w-64 bg-white">
-            <Sidebar 
-              isCollapsed={false} 
-              onToggle={toggleMobileMenu} 
+            <Sidebar
+              isCollapsed={false}
+              onToggle={toggleMobileMenu}
             />
           </div>
         </div>
@@ -182,12 +178,11 @@ const DashboardLayout = ({ children }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className={`flex-1 transition-all duration-300 ${
-          isSidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
-        } pt-16 lg:pt-0`}
+        className={`flex-1 transition-all duration-300 ${isSidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
+          } pt-16 lg:pt-0`}
       >
         {/* Desktop Header */}
-        <div className="fixed top-0 left-64 right-0 z-50 hidden h-20 lg:block bg-white border-b border-neutral-200 shadow-md ">
+        <div className={`fixed top-0 right-0 z-40 hidden h-20 lg:block bg-white border-b border-neutral-200 shadow-md transition-all duration-300 ${isSidebarCollapsed ? 'left-16' : 'left-64'}`}>
           <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-white to-neutral-50">
             {/* Left Side: Search Bar */}
             <div className="flex items-center flex-1 max-w-lg">
@@ -216,19 +211,6 @@ const DashboardLayout = ({ children }) => {
                 )}
               </div>
             </div>
-
-            {/* Search Results Indicator */}
-            {searchQuery && (
-              <div className="flex items-center space-x-2 px-3 py-1 bg-primary-50 rounded-lg border border-primary-200">
-                <span className="text-sm text-primary-700 font-medium">
-                  {getSearchStats().totalResults} results
-                </span>
-                <div className="w-1 h-1 bg-primary-400 rounded-full"></div>
-                <span className="text-xs text-primary-600">
-                  {isSearching ? 'Searching...' : 'Found'}
-                </span>
-              </div>
-            )}
 
             {/* Right Side: Icons */}
             <div className="flex items-center space-x-3">
@@ -264,18 +246,16 @@ const DashboardLayout = ({ children }) => {
                                 className="px-4 py-3 hover:bg-primary-50 transition-colors duration-200 border-b border-neutral-100 last:border-b-0"
                               >
                                 <div className="flex items-start space-x-3">
-                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                    notification.type === 'bid' ? 'bg-emerald-100' :
+                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${notification.type === 'bid' ? 'bg-emerald-100' :
                                     notification.type === 'auction' ? 'bg-orange-100' :
-                                    notification.type === 'appointment' ? 'bg-purple-100' :
-                                    'bg-blue-100'
-                                  }`}>
-                                    <IconComponent className={`w-4 h-4 ${
-                                      notification.type === 'bid' ? 'text-emerald-600' :
+                                      notification.type === 'appointment' ? 'bg-purple-100' :
+                                        'bg-blue-100'
+                                    }`}>
+                                    <IconComponent className={`w-4 h-4 ${notification.type === 'bid' ? 'text-emerald-600' :
                                       notification.type === 'auction' ? 'text-orange-600' :
-                                      notification.type === 'appointment' ? 'text-purple-600' :
-                                      'text-blue-600'
-                                    }`} />
+                                        notification.type === 'appointment' ? 'text-purple-600' :
+                                          'text-blue-600'
+                                      }`} />
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <p className="text-sm text-neutral-800">{notification.message}</p>
@@ -291,11 +271,6 @@ const DashboardLayout = ({ children }) => {
                             <p className="text-sm text-neutral-500">No recent activity</p>
                           </div>
                         )}
-                      </div>
-                      <div className="px-4 py-2 bg-neutral-50">
-                        <button className="w-full text-sm text-primary-600 hover:text-primary-700 font-medium text-left">
-                          View All Notifications
-                        </button>
                       </div>
                     </motion.div>
                   )}
@@ -327,7 +302,7 @@ const DashboardLayout = ({ children }) => {
                           <User className="w-4 h-4" />
                           <span>Profile</span>
                         </Link>
-                        <button 
+                        <button
                           onClick={handleLogoutClick}
                           className="w-full px-4 py-2 text-sm text-neutral-600 hover:bg-primary-50 hover:text-primary-600 transition-colors duration-200 flex items-center space-x-2"
                         >
@@ -346,7 +321,7 @@ const DashboardLayout = ({ children }) => {
         <div className="min-h-screen">
           {children}
         </div>
-        
+
         {/* Back to Top Button */}
         <BackToTop />
       </motion.main>

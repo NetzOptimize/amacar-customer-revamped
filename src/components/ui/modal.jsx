@@ -26,7 +26,7 @@ export default function Modal({
   const [errors, setErrors] = useState({ vin: "", zip: "" });
   const [phase, setPhase] = useState("form"); // form | loading | success | error
   const [stepIndex, setStepIndex] = useState(0);
-  const {vehicleDetails} = useSelector((state) => state.carDetailsAndQuestions);
+  const { vehicleDetails } = useSelector((state) => state.carDetailsAndQuestions);
 
   const steps = useMemo(
     () => [
@@ -71,7 +71,7 @@ export default function Modal({
     startProgress();
 
     const resultAction = await dispatch(
-      fetchVehicleDetails({vin, zip})
+      fetchVehicleDetails({ vin, zip })
     );
     dispatch(setZipState(zip))
     dispatch(setStateVin(vin))

@@ -10,14 +10,17 @@ import VideoSection from '@/components/Home/VideoSection/videoSection.jsx'
 import HeroCarousel from '@/components/Home/Carousel/Carousel.jsx'
 import { useSelector } from 'react-redux'
 import { useEffect } from 'react'
+import Seo from '@/components/SEO/Seo'
+import { seoData } from '@/config/seoConfig'
 
 export default function HomePage() {
-  const { userState, loading } = useSelector((state) => state.user);
+    const { userState, loading } = useSelector((state) => state.user);
     useEffect(() => {
         // console.log(userState); 
     })
     return (
         <>
+            <Seo title={seoData.home.title} description={seoData.home.description} />
             <Hero />
             <SectionHeader title="How Amacar works" highlight="Sell smarter, faster" />
             <VideoSection />

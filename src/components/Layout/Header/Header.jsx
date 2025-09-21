@@ -3,7 +3,7 @@ import "./header.css";
 import LoginModal from "@/components/ui/LoginModal";
 import { logout, setLoginRedirect } from "@/redux/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import LogoutModal from "@/components/ui/LogoutModal";
 import { persistor } from "@/redux/store";
 import { ArrowRight, Play } from "lucide-react";
@@ -84,15 +84,15 @@ export default function Header() {
               <a className="nav-link" href="/">
                 Home
               </a>
-              <a className="nav-link" href="#">
+              <a className="nav-link" href="/testimonials">
                 Testimonials
               </a>
-              <a className="nav-link" href="#">
+              <a className="nav-link" href="/join-our-dealer-network">
                 Join Our Dealer Network
               </a>
-              <a className="nav-link" href="#">
+              <Link className="nav-link" to="/about-us">
                 Our Vision
-              </a>
+              </Link>
             </nav>
 
             {/* right: actions */}
@@ -145,9 +145,9 @@ export default function Header() {
             style={{ paddingTop: 12, paddingBottom: 18 }}
           >
             <nav style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <a className="nav-link-mobile" href="#">
+              <Link className="nav-link-mobile" to="/">
                 Home
-              </a>
+              </Link>
               <a className="nav-link-mobile" href="#">
                 Testimonials
               </a>

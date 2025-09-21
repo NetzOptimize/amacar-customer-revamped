@@ -1,13 +1,13 @@
 import { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  Car, 
-  Clock, 
-  CheckCircle, 
-  Calendar, 
-  User, 
-  ChevronLeft, 
+import {
+  Car,
+  Clock,
+  CheckCircle,
+  Calendar,
+  User,
+  ChevronLeft,
   ChevronRight,
   LayoutDashboard,
   TrendingUp,
@@ -39,10 +39,10 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
     { name: 'Previous Offers', href: '/offers', icon: FileText },
     { name: 'Accepted Offers', href: '/accepted', icon: CheckCircle },
     { name: 'My Appointments', href: '/appointments', icon: Calendar },
-    { 
-      name: 'Add Vehicle', 
-      icon: Plus, 
-      action: () => setIsModalOpen(true) 
+    {
+      name: 'Add Vehicle',
+      icon: Plus,
+      action: () => setIsModalOpen(true)
     }
   ];
 
@@ -52,15 +52,15 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
 
   const handleConfirmLogout = async () => {
     // await persistor.purge();
-    await dispatch(logout());   
+    await dispatch(logout());
     navigate('/');
   };
 
   const bottomNavigation = [
     { name: 'Profile', href: '/profile', icon: User },
-    { 
-      name: 'Logout', 
-      icon: LogOut, 
+    {
+      name: 'Logout',
+      icon: LogOut,
       action: handleLogoutClick,
     }
   ];
@@ -80,15 +80,14 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
       <motion.aside
         variants={containerVariants}
         animate={isCollapsed ? 'closed' : 'open'}
-        className="fixed left-0 top-0 bottom-0 bg-white border-r border-neutral-200 z-40 shadow-sm"
+        className="fixed left-0 top-0 bottom-0 bg-white border-r border-neutral-200 z-[41] shadow-sm"
       >
         <div className="flex flex-col h-full relative">
           {/* Toggle Button - Fixed position */}
           <button
             onClick={onToggle}
-            className={`cursor-pointer absolute top-16 z-50 p-1.5 bg-white border border-neutral-200 rounded-sm  shadow-sm hover:bg-neutral-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-200 ${
-              isCollapsed ? 'right-[-12px]' : 'right-3'
-            }`}
+            className={`cursor-pointer absolute top-16 z-[51] p-1.5 bg-white border border-neutral-200 rounded-sm  shadow-sm hover:bg-neutral-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-200 ${isCollapsed ? 'right-[-12px]' : 'right-3'
+              }`}
           >
             {isCollapsed ? (
               <ChevronRight className="w-4 h-4 text-neutral-600" />
@@ -112,10 +111,10 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
                     animate="open"
                     exit="closed"
                   >
-                    <img 
-                      className="h-8 w-auto max-w-[120px]" 
-                      src="src/assets/original_logo.jpg" 
-                      alt="Amacar Logo" 
+                    <img
+                      className="h-8 w-auto max-w-[120px]"
+                      src="src/assets/original_logo.jpg"
+                      alt="Amacar Logo"
                     />
                   </motion.div>
                 </AnimatePresence>
@@ -128,17 +127,16 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
             {navigation.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.href;
-              
+
               return (
                 <div key={item.name}>
                   {item.action ? (
                     <button
                       onClick={item.action}
-                      className={`cursor-pointer group text-start flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 w-full ${
-                        isActive
-                          ? 'bg-primary-100 text-primary-700 font-semibold'
-                          : 'text-neutral-600 hover:text-primary-600 hover:bg-primary-50'
-                      }`}
+                      className={`cursor-pointer group text-start flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 w-full ${isActive
+                        ? 'bg-primary-100 text-primary-700 font-semibold'
+                        : 'text-neutral-600 hover:text-primary-600 hover:bg-primary-50'
+                        }`}
                     >
                       <Icon className="w-5 h-5 flex-shrink-0" />
                       <AnimatePresence>
@@ -158,11 +156,10 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
                   ) : (
                     <Link
                       to={item.href}
-                      className={`group flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${
-                        isActive
-                          ? 'bg-primary-100 text-primary-700 font-semibold'
-                          : 'text-neutral-600 hover:text-primary-600 hover:bg-primary-50'
-                      }`}
+                      className={`group flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${isActive
+                        ? 'bg-primary-100 text-primary-700 font-semibold'
+                        : 'text-neutral-600 hover:text-primary-600 hover:bg-primary-50'
+                        }`}
                     >
                       <Icon className="w-5 h-5 flex-shrink-0" />
                       <AnimatePresence>
@@ -220,11 +217,10 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`group flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${
-                    isActive
-                      ? "bg-primary-100 text-primary-700 font-semibold"
-                      : "text-neutral-600 hover:text-primary-600 hover:bg-primary-50"
-                  }`}
+                  className={`group flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${isActive
+                    ? "bg-primary-100 text-primary-700 font-semibold"
+                    : "text-neutral-600 hover:text-primary-600 hover:bg-primary-50"
+                    }`}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
                   <AnimatePresence>
@@ -261,11 +257,11 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-neutral-800 truncate">
-                      {user?.firstName && user?.lastName 
+                      {user?.firstName && user?.lastName
                         ? `${user.firstName} ${user.lastName}`
                         : user?.first_name && user?.last_name
-                        ? `${user.first_name} ${user.last_name}`
-                        : 'User Profile'
+                          ? `${user.first_name} ${user.last_name}`
+                          : 'User Profile'
                       }
                     </p>
                     <p className="text-xs text-neutral-500 truncate">

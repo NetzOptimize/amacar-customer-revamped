@@ -3,6 +3,8 @@ import './carousel.css'
 import img1 from '../../../assets/get_an_instant_offer_for_your_car.jpg'
 import img2 from '../../../assets/seize_the_opportunity.jpg'
 import img3 from '../../../assets/driving_the_future_of_your_car.jpg'
+import AuctionModal from '@/components/ui/AuctionYourRideModal'
+import Modal from '@/components/ui/modal'
 
 const slides = [
     {
@@ -40,6 +42,8 @@ export default function Carousel() {
     const [direction, setDirection] = useState('next') // 'next' or 'prev'
     const [isHovered, setIsHovered] = useState(false)
     const intervalRef = useRef(null)
+    const [auctionOpen, setAuctionOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Permanent autoplay functionality
     useEffect(() => {
@@ -84,7 +88,7 @@ export default function Carousel() {
     return (
         <div className="carousel w-full">
             <div className="max-w-6xl mx-auto px-6 py-12 carousel-outer-div">
-                <div 
+                <div
                     className="relative overflow-hidden rounded-lg carousel-inner-div"
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
@@ -105,7 +109,7 @@ export default function Carousel() {
                                         ))}
                                     </div>
                                     <div className="mt-6">
-                                        <button className="btn-primary" aria-label={s.cta} style={{ animationDelay: `420ms` }}>{s.cta}</button>
+                                        {s.cta === 'Get Instant Offer' ? <button onClick={() => setIsModalOpen(true)} className="btn-primary" aria-label={s.cta} style={{ animationDelay: `420ms` }}>{s.cta}</button> : <button onClick={() => setAuctionOpen(true)} className="btn-primary" aria-label={s.cta} style={{ animationDelay: `420ms` }}>{s.cta}</button>}
                                     </div>
                                 </div>
 
@@ -134,6 +138,16 @@ export default function Carousel() {
                     </div>
                 </div>
             </div>
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title="Get Instant Offer"
+                description="Enter your vehicle details to start the offer process"
+            />
+            <AuctionModal
+                isOpen={auctionOpen}
+                onClose={setAuctionOpen}
+            />
         </div>
     )
 }

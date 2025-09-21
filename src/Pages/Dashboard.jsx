@@ -4,21 +4,23 @@ import { motion } from 'framer-motion';
 import { Car, DollarSign, Calendar, TrendingUp, Clock, Users, Bell, ArrowRight, Eye } from 'lucide-react';
 import { formatCurrency, formatDate } from '../lib/utils';
 import StatsCards from '../components/ui/StatsCards';
-import { 
-  fetchLiveAuctions, 
-  fetchAcceptedOffers, 
+import {
+  fetchLiveAuctions,
+  fetchAcceptedOffers,
   fetchAppointments,
   fetchDashboardSummary,
-  selectLiveAuctions, 
-  selectAcceptedOffers, 
+  selectLiveAuctions,
+  selectAcceptedOffers,
   selectAppointments,
   selectDashboardSummary,
-  selectOffersLoading, 
-  selectOffersError 
+  selectOffersLoading,
+  selectOffersError
 } from '../redux/slices/offersSlice';
+import { clearUserExists } from '../redux/slices/carDetailsAndQuestionsSlice';
 import DashboardSkeleton from '../components/skeletons/DashboardSkeleton';
 import { Link, useNavigate } from 'react-router-dom';
 import Modal from '../components/ui/modal';
+import PasswordResetRequestModal from '../components/ui/PasswordResetRequestModal';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -30,7 +32,9 @@ const Dashboard = () => {
   const dashboardSummary = useSelector(selectDashboardSummary);
   const loading = useSelector(selectOffersLoading);
   const error = useSelector(selectOffersError);
+  const userExists = useSelector((state) => state.carDetailsAndQuestions?.userExists);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showPasswordResetModal, setShowPasswordResetModal] = useState(false);
   // Calculate stats from dashboard summary data
   const stats = {
     acceptedOffers: dashboardSummary?.accepted_offers || 0,
@@ -50,6 +54,15 @@ const Dashboard = () => {
     dispatch(fetchAcceptedOffers());
     dispatch(fetchAppointments());
   }, [dispatch]);
+
+  // Show password reset modal if user was just registered
+  useEffect(() => {
+    console.log("userExists: ", userExists);
+    if (userExists === false) {
+      setShowPasswordResetModal(true);
+    }
+    console.log("showPasswordResetModal: ", showPasswordResetModal);
+  }, [userExists]);
 
 
   const containerVariants = {
@@ -97,7 +110,7 @@ const Dashboard = () => {
             </div>
             <h3 className="text-xl font-semibold text-neutral-800 mb-2">Error Loading Dashboard</h3>
             <p className="text-neutral-600 mb-6">{error}</p>
-            <button 
+            <button
               onClick={() => {
                 dispatch(fetchDashboardSummary());
                 dispatch(fetchLiveAuctions());
@@ -133,7 +146,7 @@ const Dashboard = () => {
           </motion.div>
 
           {/* Stats Cards */}
-          <StatsCards 
+          <StatsCards
             data={dashboardSummary}
             loading={loading}
             className="mb-8"
@@ -172,12 +185,12 @@ const Dashboard = () => {
                               }
                               return auction.image_url || null;
                             };
-                            
+
                             const imageUrl = getFrontViewImage();
-                            
+
                             return imageUrl ? (
-                              <img 
-                                src={imageUrl} 
+                              <img
+                                src={imageUrl}
                                 alt={auction.title}
                                 className="w-full h-full object-cover"
                               />
@@ -196,7 +209,7 @@ const Dashboard = () => {
                             <span className="text-warning">{auction.time_remaining || 'Live'}</span>
                           </div>
                         </div>
-                        <button onClick={() => navigate('/car-details', {state: {productId: auction.product_id}})} className="btn-ghost p-2 cursor-pointer">
+                        <button onClick={() => navigate('/car-details', { state: { productId: auction.product_id } })} className="btn-ghost p-2 cursor-pointer">
                           <Eye className="w-4 h-4 " />
                         </button>
                       </motion.div>
@@ -229,12 +242,11 @@ const Dashboard = () => {
                         className="flex items-start space-x-3 p-3 hover:bg-neutral-50 rounded-lg transition-colors"
                         whileHover={{ scale: 1.02 }}
                       >
-                        <div className={`w-2 h-2 rounded-full mt-2 ${
-                          activity.type === 'bid' ? 'bg-emerald-500' :
+                        <div className={`w-2 h-2 rounded-full mt-2 ${activity.type === 'bid' ? 'bg-emerald-500' :
                           activity.type === 'auction' ? 'bg-orange-500' :
-                          activity.type === 'appointment' ? 'bg-purple-500' :
-                          'bg-neutral-400'
-                        }`} />
+                            activity.type === 'appointment' ? 'bg-purple-500' :
+                              'bg-neutral-400'
+                          }`} />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-neutral-800">{activity.message}</p>
                           <p className="text-xs text-neutral-500">
@@ -287,10 +299,10 @@ const Dashboard = () => {
                   className="flex items-center space-x-3 p-4 bg-neutral-50 rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 cursor-pointer transition-all duration-300"
                 >
                   <Link className='w-full flex items-center space-x-3' to={'/appointments'}>
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Calendar className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <span className="text-sm font-medium text-neutral-800">All Appointment</span>
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <Calendar className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <span className="text-sm font-medium text-neutral-800">All Appointment</span>
                   </Link>
                 </motion.div>
                 <motion.div
@@ -300,10 +312,10 @@ const Dashboard = () => {
                   className="flex items-center space-x-3 p-4 bg-neutral-50 rounded-xl hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100 cursor-pointer transition-all duration-300"
                 >
                   <Link className='w-full flex items-center space-x-3' to={'/auctions'}>
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Users className="w-5 h-5 text-green-600" />
-                  </div>
-                  <span className="text-sm font-medium text-neutral-800">All Auctions</span>
+                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                      <Users className="w-5 h-5 text-green-600" />
+                    </div>
+                    <span className="text-sm font-medium text-neutral-800">All Auctions</span>
                   </Link>
                 </motion.div>
               </div>
@@ -318,6 +330,15 @@ const Dashboard = () => {
         onClose={() => setIsModalOpen(false)}
         title="Add Your Vehicle"
         description="Enter your vehicle details to start the auction process"
+      />
+
+      {/* Password Reset Request Modal */}
+      <PasswordResetRequestModal
+        isOpen={showPasswordResetModal}
+        onClose={() => {
+          setShowPasswordResetModal(false);
+          dispatch(clearUserExists());
+        }}
       />
     </>
   );

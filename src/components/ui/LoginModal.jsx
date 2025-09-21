@@ -42,20 +42,20 @@ export default function LoginModal({
   const isCloseDisabled = phase === "loading" || phase === "verify-otp";
   function validate() {
     const newErrors = { email: "", firstName: "", lastName: "", phone: "", password: "", confirmPassword: "", otp: "", newPassword: "" };
-  
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!values.email) {
       newErrors.email = "Email is required";
     } else if (!emailRegex.test(values.email)) {
       newErrors.email = "Please enter a valid email address";
     }
-  
+
     if (isRegisterMode && !values.firstName) {
       newErrors.firstName = "First name is required";
     } else if (isRegisterMode && values.firstName?.length < 2) {
       newErrors.firstName = "First name must be at least 2 characters";
     }
-  
+
     if (isRegisterMode && !values.lastName) {
       newErrors.lastName = "Last name is required";
     } else if (isRegisterMode && values.lastName?.length < 2) {
@@ -67,13 +67,13 @@ export default function LoginModal({
     } else if (isRegisterMode && values.phone && !/^[\+]?[1-9][\d]{0,15}$/.test(values.phone.replace(/\s/g, ""))) {
       newErrors.phone = "Please enter a valid phone number";
     }
-  
+
     if ((isRegisterMode || !isForgotPasswordMode) && !values.password) {
       newErrors.password = "Password is required";
     } else if ((isRegisterMode || !isForgotPasswordMode) && values.password?.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
     }
-  
+
     if (phase === "reset-password" && !values.newPassword) {
       newErrors.newPassword = "New password is required";
     } else if (phase === "reset-password" && values.newPassword !== values.confirmPassword) {
@@ -82,27 +82,27 @@ export default function LoginModal({
     else if (phase === "reset-password" && values.newPassword?.length < 6) {
       newErrors.newPassword = "New password must be at least 6 characters";
     }
-    
+
     if ((isRegisterMode || phase === "reset-password") && !values.confirmPassword) {
       newErrors.confirmPassword = "Please confirm your password";
     } else if ((isRegisterMode) && values.confirmPassword !== values.password) {
       newErrors.confirmPassword = "Passwords do not match";
     }
-  
 
-    
+
+
     Object.keys(newErrors).forEach((key) => {
       if (newErrors[key]) setError(key, newErrors[key]);
       else setError(key, "");
     });
-    
+
     return Object.values(newErrors).every((error) => !error);
   }
-  
+
   useEffect(() => {
     console.log('password', values.newPassword);
     console.log('confirmPassword', values.confirmPassword);
-});
+  });
   function validateOtp() {
     const newErrors = { ...errors, otp: "" };
     if (!values.otp) {
@@ -137,7 +137,7 @@ export default function LoginModal({
         setPhase("verify-otp");
       }
     } else if (phase === "reset-password") {
-      await handleAction(resetPassword, { token: resetToken,otp: values.otp, newPassword: values.newPassword, confirmPassword: values.confirmPassword });
+      await handleAction(resetPassword, { token: resetToken, otp: values.otp, newPassword: values.newPassword, confirmPassword: values.confirmPassword });
     } else {
       await handleAction(loginUser, { username: values.email, password: values.password });
     }
@@ -149,7 +149,7 @@ export default function LoginModal({
 
     console.log("Starting OTP verification with:", { email: values.email, otp: values.otp });
     console.log("OTP verification attempted at:", new Date().toLocaleTimeString());
-    
+
     // Clear any existing OTP error before making the API call
     setError("otp", "");
     dispatch(clearError()); // Clear Redux error state
@@ -240,6 +240,7 @@ export default function LoginModal({
 
   // Prefill email when modal opens and user info is available
   useEffect(() => {
+    console.log("userInfo from login modal: ", userInfo);
     if (isOpen && userInfo?.user_email && !values.email) {
       setValue("email", userInfo.user_email);
     }
@@ -261,23 +262,23 @@ export default function LoginModal({
                 {isRegisterMode
                   ? "Create Your Account"
                   : isForgotPasswordMode && phase === "forgot"
-                  ? "Forgot Password"
-                  : isForgotPasswordMode && phase === "verify-otp"
-                  ? "Verify OTP"
-                  : isForgotPasswordMode && phase === "reset-password"
-                  ? "Reset Password"
-                  : title}
+                    ? "Forgot Password"
+                    : isForgotPasswordMode && phase === "verify-otp"
+                      ? "Verify OTP"
+                      : isForgotPasswordMode && phase === "reset-password"
+                        ? "Reset Password"
+                        : title}
               </DialogTitle>
               <DialogDescription className="text-sm text-slate-600">
                 {isRegisterMode
                   ? "Fill in the details to register a new account"
                   : phase === "forgot"
-                  ? "Enter your email to receive a verification OTP"
-                  : phase === "verify-otp"
-                  ? `We’ve sent a 6-digit OTP to ${values.email}. Please enter it below.`
-                  : phase === "reset-password"
-                  ? "Enter your new password"
-                  : description}
+                    ? "Enter your email to receive a verification OTP"
+                    : phase === "verify-otp"
+                      ? `We’ve sent a 6-digit OTP to ${values.email}. Please enter it below.`
+                      : phase === "reset-password"
+                        ? "Enter your new password"
+                        : description}
               </DialogDescription>
             </DialogHeader>
           </div>
@@ -301,9 +302,8 @@ export default function LoginModal({
                         Email Address
                       </label>
                       <div className="relative">
-                        <div className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 ${
-                          isEmailPrefilled ? 'text-orange-500' : 'text-slate-400'
-                        }`}>
+                        <div className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 ${isEmailPrefilled ? 'text-orange-500' : 'text-slate-400'
+                          }`}>
                           <Mail className="h-4 w-4" />
                         </div>
                         <input
@@ -313,14 +313,13 @@ export default function LoginModal({
                           onChange={(e) => setValue("email", e.target.value)}
                           placeholder="user@example.com"
                           disabled={isEmailPrefilled}
-                          className={`h-11 w-full rounded-xl border pl-9 pr-3 text-sm outline-none ring-0 transition-shadow ${
-                            isEmailPrefilled
-                              ? 'border-orange-200 bg-orange-50 text-orange-800 cursor-not-allowed'
-                              : 'border-slate-200 bg-white focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]'
-                          }`}
+                          className={`h-11 w-full rounded-xl border pl-9 pr-3 text-sm outline-none ring-0 transition-shadow ${isEmailPrefilled
+                            ? 'border-orange-200 bg-orange-50 text-orange-800 cursor-not-allowed'
+                            : 'border-slate-200 bg-white focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]'
+                            }`}
                         />
                       </div>
-                    
+
                       {errors.email && (
                         <motion.p
                           initial={{ opacity: 0, y: -4 }}
@@ -587,19 +586,19 @@ export default function LoginModal({
                           {isRegisterMode
                             ? "Registering..."
                             : phase === "forgot"
-                            ? "Sending OTP..."
-                            : phase === "reset-password"
-                            ? "Updating Password..."
-                            : "Signing In..."}
+                              ? "Sending OTP..."
+                              : phase === "reset-password"
+                                ? "Updating Password..."
+                                : "Signing In..."}
                         </div>
                       ) : (
                         isRegisterMode
                           ? "Register"
                           : phase === "forgot"
-                          ? "Send OTP"
-                          : phase === "reset-password"
-                          ? "Update Password"
-                          : "Login"
+                            ? "Send OTP"
+                            : phase === "reset-password"
+                              ? "Update Password"
+                              : "Login"
                       )}
                     </button>
                   </div>
@@ -657,8 +656,8 @@ export default function LoginModal({
                         {isRegisterMode
                           ? "Processing registration..."
                           : isForgotPasswordMode && phase === "reset-password"
-                          ? "Updating password..."
-                          : "Authenticating your credentials..."}
+                            ? "Updating password..."
+                            : "Authenticating your credentials..."}
                       </span>
                     </div>
                     <div className="h-1 w-full bg-slate-200">
@@ -675,8 +674,8 @@ export default function LoginModal({
                     {isRegisterMode
                       ? "process your registration"
                       : isForgotPasswordMode && phase === "reset-password"
-                      ? "update your password"
-                      : "verify your account"}
+                        ? "update your password"
+                        : "verify your account"}
                     ...
                   </div>
                 </motion.div>
@@ -707,15 +706,15 @@ export default function LoginModal({
                       {isRegisterMode
                         ? "Account Created!"
                         : isForgotPasswordMode
-                        ? "Password Updated!"
-                        : "Welcome back!"}
+                          ? "Password Updated!"
+                          : "Welcome back!"}
                     </h3>
                     <p className="text-sm text-slate-600">
                       {isRegisterMode
                         ? "Your account has been successfully created."
                         : isForgotPasswordMode
-                        ? "Your password has been successfully updated."
-                        : "You have been successfully logged in."}
+                          ? "Your password has been successfully updated."
+                          : "You have been successfully logged in."}
                     </p>
                   </div>
                 </motion.div>
@@ -814,7 +813,7 @@ export default function LoginModal({
                     {errors.otp}
                   </motion.p>
                 )}
-                
+
               </div>
               <button
                 type="submit"

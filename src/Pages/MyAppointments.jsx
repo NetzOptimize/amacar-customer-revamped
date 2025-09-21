@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Clock, MapPin, Phone, Video, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown, ChevronDown, RefreshCw } from 'lucide-react';
+import { Calendar, Clock, MapPin, Phone, Video, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown, ChevronDown, RefreshCw, Eye } from 'lucide-react';
 import { formatDate, formatTimeRemaining } from '../lib/utils';
 import { fetchAppointments, selectAppointments, selectOffersLoading, selectOffersError, cancelAppointment } from '../redux/slices/offersSlice';
 import MyAppointmentsSkeleton from '../components/skeletons/MyAppointmentsSkeleton';
@@ -9,11 +9,13 @@ import MyAppointmentsSortingSkeleton from '../components/skeletons/MyAppointment
 import LoadMore from '../components/ui/load-more';
 import useLoadMore from '../hooks/useLoadMore';
 import AppointmentDetailsModal from '../components/ui/AppointmentDetailsModal';
+import { useNavigate } from 'react-router-dom';
 
 const MyAppointments = () => {
   const dispatch = useDispatch();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'pending', 'confirmed', 'cancelled', 'completed'
+  const navigate = useNavigate();
 
   // Sorting state
   const [sortBy, setSortBy] = useState('date-asc');
@@ -142,7 +144,7 @@ const MyAppointments = () => {
   const handleReschedule = async (appointment) => {
     setIsProcessing(true);
     setProcessingAction('reschedule');
-    
+
     // Simulate API call
     setTimeout(() => {
       console.log('Rescheduling appointment:', appointment.id);
@@ -158,7 +160,7 @@ const MyAppointments = () => {
         appointmentId: appointment.id,
         notes: notes
       }));
-      
+
       if (response.payload && response.payload.success) {
         console.log('Appointment cancelled successfully:', response.payload);
         // Refresh appointments list
@@ -174,15 +176,15 @@ const MyAppointments = () => {
   // Handle status filter selection with loading animation
   const handleStatusFilter = (value) => {
     if (value === statusFilter) return;
-    
+
     setIsFiltering(true);
     setFilterProgress(0);
     setFilteringTab(value); // Set the tab being filtered
-    
+
     // Simulate filtering process with random delay and progress
     const randomDelay = Math.random() * 800 + 400; // 400-1200ms
     const progressInterval = 50; // Update progress every 50ms
-    
+
     const progressTimer = setInterval(() => {
       setFilterProgress(prev => {
         if (prev >= 90) {
@@ -192,12 +194,12 @@ const MyAppointments = () => {
         return prev + Math.random() * 15;
       });
     }, progressInterval);
-    
+
     setTimeout(() => {
       clearInterval(progressTimer);
       setFilterProgress(100);
       setStatusFilter(value);
-      
+
       // Reset after a short delay
       setTimeout(() => {
         setIsFiltering(false);
@@ -213,15 +215,15 @@ const MyAppointments = () => {
       setIsDropdownOpen(false);
       return;
     }
-    
+
     setIsSorting(true);
     setSortProgress(0);
     setIsDropdownOpen(false);
-    
+
     // Simulate sorting process with random delay and progress
     const randomDelay = Math.random() * 1000 + 500; // 500-1500ms
     const progressInterval = 50; // Update progress every 50ms
-    
+
     const progressTimer = setInterval(() => {
       setSortProgress(prev => {
         if (prev >= 90) {
@@ -231,12 +233,12 @@ const MyAppointments = () => {
         return prev + Math.random() * 15;
       });
     }, progressInterval);
-    
+
     setTimeout(() => {
       clearInterval(progressTimer);
       setSortProgress(100);
       setSortBy(value);
-      
+
       // Reset after a short delay
       setTimeout(() => {
         setIsSorting(false);
@@ -317,7 +319,7 @@ const MyAppointments = () => {
             </div>
             <h3 className="text-xl font-semibold text-neutral-800 mb-2">Error Loading Appointments</h3>
             <p className="text-neutral-600 mb-6">{error}</p>
-            <button 
+            <button
               onClick={() => dispatch(fetchAppointments())}
               className="btn-primary"
             >
@@ -357,26 +359,24 @@ const MyAppointments = () => {
                 key={option.value}
                 onClick={() => handleStatusFilter(option.value)}
                 disabled={isFiltering}
-                className={`relative px-4 py-2.5 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 ${
-                  statusFilter === option.value
-                    ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25'
-                    : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 hover:border-slate-300'
-                } ${isFiltering && filteringTab === option.value ? 'opacity-75 cursor-not-allowed' : 'cursor-pointer'}`}
+                className={`relative px-4 py-2.5 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 ${statusFilter === option.value
+                  ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25'
+                  : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 hover:border-slate-300'
+                  } ${isFiltering && filteringTab === option.value ? 'opacity-75 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 {isFiltering && filteringTab === option.value && (
                   <RefreshCw className="w-4 h-4 animate-spin" />
                 )}
                 <span>{option.label}</span>
-                <span className={`px-2 py-0.5 text-xs rounded-full ${
-                  statusFilter === option.value 
-                    ? 'bg-white/20 text-white' 
-                    : option.color
-                }`}>
+                <span className={`px-2 py-0.5 text-xs rounded-full ${statusFilter === option.value
+                  ? 'bg-white/20 text-white'
+                  : option.color
+                  }`}>
                   {option.count}
                 </span>
                 {isFiltering && filteringTab === option.value && (
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/30 rounded-b-xl overflow-hidden">
-                    <div 
+                    <div
                       className="h-full bg-white/60 transition-all duration-100 ease-out"
                       style={{ width: `${filterProgress}%` }}
                     />
@@ -398,17 +398,17 @@ const MyAppointments = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold text-neutral-800 mb-1">
-                  {statusFilter === 'all' ? 'All Appointments' : 
-                   statusFilter === 'pending' ? 'Pending Appointments' :
-                   statusFilter === 'confirmed' ? 'Confirmed Appointments' :
-                   statusFilter === 'cancelled' ? 'Cancelled Appointments' :
-                   statusFilter === 'completed' ? 'Completed Appointments' : 'Appointments'}
+                  {statusFilter === 'all' ? 'All Appointments' :
+                    statusFilter === 'pending' ? 'Pending Appointments' :
+                      statusFilter === 'confirmed' ? 'Confirmed Appointments' :
+                        statusFilter === 'cancelled' ? 'Cancelled Appointments' :
+                          statusFilter === 'completed' ? 'Completed Appointments' : 'Appointments'}
                 </h2>
                 <p className="text-sm text-neutral-600">
                   {filteredAndSortedAppointments.length} {statusFilter === 'all' ? 'scheduled' : statusFilter} appointments
                 </p>
               </div>
-              
+
               {/* Modern Sort Dropdown */}
               <motion.div
                 variants={containerVariants}
@@ -419,9 +419,8 @@ const MyAppointments = () => {
                 <button
                   onClick={() => !isSorting && setIsDropdownOpen(!isDropdownOpen)}
                   disabled={isSorting}
-                  className={`cursor-pointer flex items-center gap-3 bg-white border border-neutral-200 rounded-xl px-4 py-3 hover:border-neutral-300 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent group ${
-                    isSorting ? 'opacity-75 cursor-not-allowed' : ''
-                  }`}
+                  className={`cursor-pointer flex items-center gap-3 bg-white border border-neutral-200 rounded-xl px-4 py-3 hover:border-neutral-300 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent group ${isSorting ? 'opacity-75 cursor-not-allowed' : ''
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     {isSorting ? (
@@ -436,10 +435,9 @@ const MyAppointments = () => {
                     </div>
                   </div>
                   {!isSorting && (
-                    <ChevronDown 
-                      className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${
-                        isDropdownOpen ? 'rotate-180' : ''
-                      }`} 
+                    <ChevronDown
+                      className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''
+                        }`}
                     />
                   )}
                 </button>
@@ -457,26 +455,22 @@ const MyAppointments = () => {
                       {sortOptions.map((option, index) => {
                         const IconComponent = option.icon;
                         const isSelected = option.value === sortBy;
-                        
+
                         return (
                           <button
                             key={option.value}
                             onClick={() => handleSortSelect(option.value)}
-                            className={`cursor-pointer w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-neutral-50 transition-colors duration-150 ${
-                              isSelected ? 'bg-orange-50 text-orange-700' : 'text-neutral-700'
-                            } ${index !== sortOptions.length - 1 ? 'border-b border-neutral-100' : ''}`}
+                            className={`cursor-pointer w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-neutral-50 transition-colors duration-150 ${isSelected ? 'bg-orange-50 text-orange-700' : 'text-neutral-700'
+                              } ${index !== sortOptions.length - 1 ? 'border-b border-neutral-100' : ''}`}
                           >
-                            <div className={`p-1.5 rounded-lg ${
-                              isSelected ? 'bg-orange-100' : 'bg-neutral-100'
-                            }`}>
-                              <IconComponent className={`w-3.5 h-3.5 ${
-                                isSelected ? 'text-orange-600' : 'text-neutral-500'
-                              }`} />
+                            <div className={`p-1.5 rounded-lg ${isSelected ? 'bg-orange-100' : 'bg-neutral-100'
+                              }`}>
+                              <IconComponent className={`w-3.5 h-3.5 ${isSelected ? 'text-orange-600' : 'text-neutral-500'
+                                }`} />
                             </div>
                             <div className="flex-1">
-                              <div className={`text-sm font-medium ${
-                                isSelected ? 'text-orange-700' : 'text-neutral-700'
-                              }`}>
+                              <div className={`text-sm font-medium ${isSelected ? 'text-orange-700' : 'text-neutral-700'
+                                }`}>
                                 {option.label}
                               </div>
                             </div>
@@ -523,106 +517,104 @@ const MyAppointments = () => {
                     <h2 className="text-xl font-bold text-neutral-800 mb-4">Today's Appointments</h2>
                     <div className="space-y-4">
                       {getSortedTodaysAppointments().map((appointment) => (
-                <motion.div
-                  key={appointment.id}
-                  className="card p-6 border-l-4 border-primary-500"
-                  whileHover={{ scale: 1.02 }}  
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                        <Calendar className="w-6 h-6 text-primary-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-neutral-800">
-                          Appointment with {appointment.dealer_name}
-                        </h3>
-                        <p className="text-sm text-neutral-600">{appointment.dealer_email}</p>
-                        <div className="flex items-center space-x-4 text-sm text-neutral-500">
-                          <span className="flex items-center space-x-1">
-                            <Clock className="w-4 h-4" />
-                            <span>{appointment.formatted_time} ({appointment.duration} min)</span>
-                          </span>
-                          <span className="flex items-center space-x-1">
-                            <span className={`px-2 py-1 text-xs rounded-full ${
-                              appointment.status === 'completed' ? 'bg-emerald-100 text-emerald-800' :
-                              appointment.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                              appointment.status === 'pending' ? 'bg-blue-100 text-blue-800' :
-                              appointment.status === 'confirmed' ? 'bg-green-100 text-green-800' :
-                              'bg-slate-100 text-slate-800'
-                            }`}>
-                              {appointment.formatted_status}
-                            </span>
-                          </span>
-                        </div>
-                      </div>
+                        <motion.div
+                          key={appointment.id}
+                          className="card p-6 border-l-4 border-primary-500"
+                          whileHover={{ scale: 1.02 }}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-4">
+                              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+                                <Calendar className="w-6 h-6 text-primary-600" />
+                              </div>
+                              <div>
+                                <h3 className="font-semibold text-neutral-800">
+                                  Appointment with {appointment.dealer_name}
+                                </h3>
+                                <p className="text-sm text-neutral-600">{appointment.dealer_email}</p>
+                                <div className="flex items-center space-x-4 text-sm text-neutral-500">
+                                  <span className="flex items-center space-x-1">
+                                    <Clock className="w-4 h-4" />
+                                    <span>{appointment.formatted_time} ({appointment.duration} min)</span>
+                                  </span>
+                                  <span className="flex items-center space-x-1">
+                                    <span className={`px-2 py-1 text-xs rounded-full ${appointment.status === 'completed' ? 'bg-emerald-100 text-emerald-800' :
+                                      appointment.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                                        appointment.status === 'pending' ? 'bg-blue-100 text-blue-800' :
+                                          appointment.status === 'confirmed' ? 'bg-green-100 text-green-800' :
+                                            'bg-slate-100 text-slate-800'
+                                      }`}>
+                                      {appointment.formatted_status}
+                                    </span>
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleViewDetails(appointment)}
+                                className="btn-primary flex items-center space-x-2"
+                              >
+                                <Calendar className="w-4 h-4" />
+                                <span>View Details</span>
+                              </button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
                     </div>
-                    <div className="flex space-x-2">
-                      <button 
-                        onClick={() => handleViewDetails(appointment)}
-                        className="btn-primary flex items-center space-x-2"
-                      >
-                        <Calendar className="w-4 h-4" />
-                        <span>View Details</span>
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
+                  </motion.div>
+                )}
 
                 {/* Upcoming Appointments */}
                 <motion.div variants={itemVariants}>
                   <h2 className="text-xl font-bold text-neutral-800 mb-4">Upcoming Appointments</h2>
                   <div className="space-y-4">
                     {getSortedUpcomingAppointments().map((appointment) => (
-              <motion.div
-                key={appointment.id}
-                className="card p-6 hover:shadow-medium transition-all duration-300"
-                whileHover={{ scale: 1.01 }}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-neutral-100 rounded-lg flex items-center justify-center">
-                      <Calendar className="w-6 h-6 text-neutral-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-neutral-800">
-                        Appointment with {appointment.dealer_name}
-                      </h3>
-                      <p className="text-sm text-neutral-600">{appointment.dealer_email}</p>
-                      <div className="flex items-center space-x-4 text-sm text-neutral-500">
-                        <span className="flex items-center space-x-1">
-                          <Clock className="w-4 h-4" />
-                          <span>{appointment.formatted_date} at {appointment.formatted_time}</span>
-                        </span>
-                        <span className="flex items-center space-x-1">
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            appointment.status === 'completed' ? 'bg-emerald-100 text-emerald-800' :
-                            appointment.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                            appointment.status === 'pending' ? 'bg-blue-100 text-blue-800' :
-                            appointment.status === 'confirmed' ? 'bg-green-100 text-green-800' :
-                            'bg-slate-100 text-slate-800'
-                          }`}>
-                            {appointment.formatted_status}
-                          </span>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    <button 
-                      onClick={() => handleViewDetails(appointment)}
-                      className="btn-primary flex items-center space-x-2"
-                    >
-                      <Calendar className="w-4 h-4" />
-                      <span>View Details</span>
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
+                      <motion.div
+                        key={appointment.id}
+                        className="card p-6 hover:shadow-medium transition-all duration-300"
+                        whileHover={{ scale: 1.01 }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            <div className="w-12 h-12 bg-neutral-100 rounded-lg flex items-center justify-center">
+                              <Calendar className="w-6 h-6 text-neutral-600" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-neutral-800">
+                                Appointment with {appointment.dealer_name}
+                              </h3>
+                              <p className="text-sm text-neutral-600">{appointment.dealer_email}</p>
+                              <div className="flex items-center space-x-4 text-sm text-neutral-500">
+                                <span className="flex items-center space-x-1">
+                                  <Clock className="w-4 h-4" />
+                                  <span>{appointment.formatted_date} at {appointment.formatted_time}</span>
+                                </span>
+                                <span className="flex items-center space-x-1">
+                                  <span className={`px-2 py-1 text-xs rounded-full ${appointment.status === 'completed' ? 'bg-emerald-100 text-emerald-800' :
+                                    appointment.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                                      appointment.status === 'pending' ? 'bg-blue-100 text-blue-800' :
+                                        appointment.status === 'confirmed' ? 'bg-green-100 text-green-800' :
+                                          'bg-slate-100 text-slate-800'
+                                    }`}>
+                                    {appointment.formatted_status}
+                                  </span>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleViewDetails(appointment)}
+                              className="btn-primary flex items-center space-x-2"
+                            >
+                              <Calendar className="w-4 h-4" />
+                              <span>View Details</span>
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
                     ))}
                   </div>
                 </motion.div>
@@ -651,31 +643,86 @@ const MyAppointments = () => {
         {!loading && !error && filteredAndSortedAppointments.length === 0 && (
           <motion.div
             variants={itemVariants}
-            className="text-center py-16"
+            className="flex -mt-8 items-center justify-center min-h-[60vh]"
           >
-            <div className="w-24 h-24 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Calendar className="w-12 h-12 text-neutral-400" />
+            <div className="text-center max-w-md mx-auto">
+              {/* Modern Icon Container */}
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="relative mb-4"
+              >
+                <div className="w-20 h-20 bg-gradient-to-br from-primary-50 to-primary-100 rounded-3xl flex items-center justify-center mx-auto shadow-soft border border-primary-200">
+                  <Calendar className="w-8 h-8 text-primary-500" />
+                </div>
+                {/* Decorative elements */}
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-warning/20 rounded-full animate-pulse-slow"></div>
+                <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-accent/20 rounded-full animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+              </motion.div>
+
+              {/* Content */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+                className="space-y-4"
+              >
+                <h3 className="text-2xl font-bold text-neutral-800 font-display">
+                  {statusFilter === 'all' ? 'No Appointments' :
+                    statusFilter === 'pending' ? 'No Pending Appointments' :
+                      statusFilter === 'confirmed' ? 'No Confirmed Appointments' :
+                        statusFilter === 'cancelled' ? 'No Cancelled Appointments' :
+                          statusFilter === 'completed' ? 'No Completed Appointments' : 'No Appointments'}
+                </h3>
+                <p className="text-neutral-600 text-lg leading-relaxed">
+                  {statusFilter === 'all' ? 'You don\'t have any scheduled appointments at the moment.' :
+                    statusFilter === 'pending' ? 'You don\'t have any pending appointments.' :
+                      statusFilter === 'confirmed' ? 'You don\'t have any confirmed appointments.' :
+                        statusFilter === 'cancelled' ? 'You don\'t have any cancelled appointments.' :
+                          statusFilter === 'completed' ? 'You don\'t have any completed appointments.' :
+                            'You don\'t have any appointments in this category.'}
+                </p>
+              </motion.div>
+
+              {/* Action Buttons */}
+              {statusFilter === 'all' && (
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
+                  className="flex flex-col sm:flex-row gap-4 mt-4"
+                >
+                  <motion.button
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                    onClick={() => { navigate('/accepted') }}
+                    className="cursor-pointer w-60 px-4 h-16 group relative bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:shadow-xl hover:shadow-primary-500/25 focus:outline-none focus:ring-4 focus:ring-primary-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    <div className="flex items-center justify-between">
+                      <Calendar className="transition-transform duration-300 group-hover:scale-110" />
+                      <span className="text-md">Schedule Appointment</span>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                    onClick={() => navigate('/dashboard')}
+                    className="cursor-pointer w-60 px-4 h-16 group relative overflow-hidden bg-white hover:bg-neutral-50 text-neutral-700 font-semibold py-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-300 transition-all duration-300 transform hover:shadow-lg hover:shadow-neutral-500/10 focus:outline-none focus:ring-4 focus:ring-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    <div className="flex items-center justify-center space-x-3">
+                      <Eye className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+                      <span className="text-lg">View Dashboard</span>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-neutral-100/0 via-neutral-100/50 to-neutral-100/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
+                  </motion.button>
+                </motion.div>
+              )}
             </div>
-            <h3 className="text-xl font-semibold text-neutral-800 mb-2">
-              {statusFilter === 'all' ? 'No Appointments' : 
-               statusFilter === 'pending' ? 'No Pending Appointments' :
-               statusFilter === 'confirmed' ? 'No Confirmed Appointments' :
-               statusFilter === 'cancelled' ? 'No Cancelled Appointments' :
-               statusFilter === 'completed' ? 'No Completed Appointments' : 'No Appointments'}
-            </h3>
-            <p className="text-neutral-600 mb-6">
-              {statusFilter === 'all' ? 'You don\'t have any scheduled appointments at the moment.' :
-               statusFilter === 'pending' ? 'You don\'t have any pending appointments.' :
-               statusFilter === 'confirmed' ? 'You don\'t have any confirmed appointments.' :
-               statusFilter === 'cancelled' ? 'You don\'t have any cancelled appointments.' :
-               statusFilter === 'completed' ? 'You don\'t have any completed appointments.' : 
-               'You don\'t have any appointments in this category.'}
-            </p>
-            {statusFilter === 'all' && (
-              <button className="btn-primary">
-                Schedule Appointment
-              </button>
-            )}
           </motion.div>
         )}
       </div>

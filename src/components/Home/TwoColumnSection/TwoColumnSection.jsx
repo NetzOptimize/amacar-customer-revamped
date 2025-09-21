@@ -1,7 +1,9 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-
+import Modal from '@/components/ui/modal'
+import { useState } from 'react'
 export default function TwoColumnSection() {
+    const [isModalOpen, setisModalOpen] = useState(false);
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -52,16 +54,17 @@ export default function TwoColumnSection() {
                     >
 
                         <div className="text-center space-y-6">
-                            <h2 className="text-4xl lg:text-5xl xl:text-6xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent leading-tight">
+                            <h2 className="text-2xl lg:text-2xl xl:text-4xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent leading-tight">
                                 Experience a Smarter, More Rewarding Way to Sell Your Car
                             </h2>
-                            <p className="text-xl lg:text-2xl text-slate-600 leading-relaxed max-w-3xl mx-auto font-light">
+                            <p className="text-xl lg:text-xl text-slate-600 leading-relaxed max-w-3xl mx-auto font-light">
                                 Unlock The Best Offers And Streamline Your Selling Process With Just A Few Clicks.
                             </p>
                         </div>
-                        
+
                         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-6">
                             <motion.button
+                                onClick={() => setisModalOpen(true)}
                                 className="group relative w-full sm:w-auto cursor-pointer bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-10 py-5 rounded-2xl font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-2xl overflow-hidden"
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
@@ -79,6 +82,12 @@ export default function TwoColumnSection() {
                     </motion.div>
                 </motion.div>
             </div>
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setisModalOpen(false)}
+                title="Check Your Selling Options"
+                description="Enter your vehicle details to start the offer process"
+            />
         </section>
     )
 }

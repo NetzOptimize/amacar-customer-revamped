@@ -47,11 +47,13 @@ import BidConfirmationModal from "../components/ui/BidConfirmationModal";
 import BidsModal from "../components/ui/BidsModal";
 import StatsCards from "../components/ui/StatsCards";
 import { Carousel, CarouselContent, CarouselItem, CarouselDots } from "../components/ui/carousel";
+import Modal from "@/components/ui/modal";
 
 const LiveAuctionsPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const liveAuctionsData = useSelector(selectLiveAuctions);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const dashboardSummary = useSelector(selectDashboardSummary);
   const loading = useSelector(selectOffersLoading);
   const error = useSelector(selectOffersError);
@@ -101,9 +103,8 @@ const LiveAuctionsPage = () => {
       return {
         id: auction.product_id?.toString() || "unknown",
         product_id: auction.product_id, // Keep original product_id for navigation
-        vehicle: `${auction.year || "N/A"} ${auction.make || "Unknown"} ${
-          auction.model || "Vehicle"
-        }`,
+        vehicle: `${auction.year || "N/A"} ${auction.make || "Unknown"} ${auction.model || "Vehicle"
+          }`,
         year: parseInt(auction.year) || 0,
         make: auction.make || "Unknown",
         model: auction.model || "Unknown",
@@ -119,8 +120,8 @@ const LiveAuctionsPage = () => {
         images: auction.images && auction.images.length > 0
           ? auction.images.map(img => img.url)
           : auction.image_url
-          ? [auction.image_url]
-          : ["/api/placeholder/400/300"],
+            ? [auction.image_url]
+            : ["/api/placeholder/400/300"],
         description: auction.title || "Vehicle description not available",
         cashOffer: parseFloat(auction.cash_offer || "0"),
         cashOfferExpires: auction.cash_offer_expires_in || "",
@@ -638,9 +639,8 @@ const LiveAuctionsPage = () => {
                     !isSorting && setIsDropdownOpen(!isDropdownOpen)
                   }
                   disabled={isSorting}
-                  className={`flex items-center gap-3 bg-white border border-neutral-200 rounded-xl px-4 py-3 hover:border-neutral-300 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent group ${
-                    isSorting ? "opacity-75 cursor-not-allowed" : "cursor-pointer"
-                  }`}
+                  className={`flex items-center gap-3 bg-white border border-neutral-200 rounded-xl px-4 py-3 hover:border-neutral-300 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent group ${isSorting ? "opacity-75 cursor-not-allowed" : "cursor-pointer"
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     {isSorting ? (
@@ -656,9 +656,8 @@ const LiveAuctionsPage = () => {
                   </div>
                   {!isSorting && (
                     <ChevronDown
-                      className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${
-                        isDropdownOpen ? "rotate-180" : ""
-                      }`}
+                      className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""
+                        }`}
                     />
                   )}
                 </button>
@@ -681,36 +680,31 @@ const LiveAuctionsPage = () => {
                           <button
                             key={option.value}
                             onClick={() => handleSortSelect(option.value)}
-                            className={`cursor-pointer w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-neutral-50 transition-colors duration-150 ${
-                              isSelected
-                                ? "bg-orange-50 text-orange-700"
-                                : "text-neutral-700"
-                            } ${
-                              index !== sortOptions.length - 1
+                            className={`cursor-pointer w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-neutral-50 transition-colors duration-150 ${isSelected
+                              ? "bg-orange-50 text-orange-700"
+                              : "text-neutral-700"
+                              } ${index !== sortOptions.length - 1
                                 ? "border-b border-neutral-100"
                                 : ""
-                            }`}
+                              }`}
                           >
                             <div
-                              className={`p-1.5 rounded-lg ${
-                                isSelected ? "bg-orange-100" : "bg-neutral-100"
-                              }`}
+                              className={`p-1.5 rounded-lg ${isSelected ? "bg-orange-100" : "bg-neutral-100"
+                                }`}
                             >
                               <IconComponent
-                                className={`w-3.5 h-3.5 ${
-                                  isSelected
-                                    ? "text-orange-600"
-                                    : "text-neutral-500"
-                                }`}
+                                className={`w-3.5 h-3.5 ${isSelected
+                                  ? "text-orange-600"
+                                  : "text-neutral-500"
+                                  }`}
                               />
                             </div>
                             <div className="flex-1">
                               <div
-                                className={`text-sm font-medium ${
-                                  isSelected
-                                    ? "text-orange-700"
-                                    : "text-neutral-700"
-                                }`}
+                                className={`text-sm font-medium ${isSelected
+                                  ? "text-orange-700"
+                                  : "text-neutral-700"
+                                  }`}
                               >
                                 {option.label}
                               </div>
@@ -782,8 +776,8 @@ const LiveAuctionsPage = () => {
                       {/* Car Image Carousel */}
                       <div className="relative h-48 bg-neutral-200 overflow-hidden">
                         {auction.images && auction.images.length > 0 && auction.images[0] !== "/api/placeholder/400/300" ? (
-                          <Carousel className="w-full ">
-                            <CarouselContent className="">
+                          <Carousel className="w-full h-full">
+                            <CarouselContent className="h-full">
                               {auction.images.map((image, index) => (
                                 <CarouselItem key={index} className="h-full">
                                   <img
@@ -794,7 +788,7 @@ const LiveAuctionsPage = () => {
                                 </CarouselItem>
                               ))}
                             </CarouselContent>
-                            {auction.images.length > 1 && <CarouselDots />}
+                            {auction.images.length > 1 && <CarouselDots className="absolute bottom-4 left-1/2 transform -translate-x-1/2" />}
                           </Carousel>
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-center">
@@ -852,7 +846,7 @@ const LiveAuctionsPage = () => {
                                 Math.floor(
                                   ((auction.timeRemaining - currentTime) %
                                     (1000 * 60 * 60)) /
-                                    (1000 * 60)
+                                  (1000 * 60)
                                 )
                               )
                                 .toString()
@@ -870,7 +864,7 @@ const LiveAuctionsPage = () => {
                                 Math.floor(
                                   ((auction.timeRemaining - currentTime) %
                                     (1000 * 60)) /
-                                    1000
+                                  1000
                                 )
                               )
                                 .toString()
@@ -885,15 +879,15 @@ const LiveAuctionsPage = () => {
                           Accept now and secure the top offer before it expires!
                         </div>
 
-                         {/* Accept Button - Only for bids, not cash offers */}
-                         {auction.bidCount > 0 && (
-                             <button
-                               onClick={() => handleAcceptTopBid(auction)}
-                               className="cursor-pointer w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200"
-                             >
-                             Accept Top Bid
-                           </button>
-                         )}
+                        {/* Accept Button - Only for bids, not cash offers */}
+                        {auction.bidCount > 0 && (
+                          <button
+                            onClick={() => handleAcceptTopBid(auction)}
+                            className="cursor-pointer w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200"
+                          >
+                            Accept Top Bid
+                          </button>
+                        )}
                       </div>
                     </div>
 
@@ -914,7 +908,7 @@ const LiveAuctionsPage = () => {
                                 </CarouselItem>
                               ))}
                             </CarouselContent>
-                            {auction.images.length > 1 && <CarouselDots />}
+                            {auction.images.length > 1 && <CarouselDots className="absolute bottom-4 left-1/2 transform -translate-x-1/2" />}
                           </Carousel>
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-center">
@@ -923,11 +917,10 @@ const LiveAuctionsPage = () => {
                         )}
                         <div className="absolute top-4 left-4 z-10">
                           <span
-                            className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                              auction.status === "accepted"
-                                ? "bg-success text-white"
-                                : "bg-success text-white"
-                            }`}
+                            className={`px-2 py-1 rounded-full text-xs font-semibold ${auction.status === "accepted"
+                              ? "bg-success text-white"
+                              : "bg-success text-white"
+                              }`}
                           >
                             {auction.status === "accepted"
                               ? "ACCEPTED"
@@ -966,42 +959,41 @@ const LiveAuctionsPage = () => {
                           </p>
                         </div>
 
-                         {/* Bids and Offers Badges */}
-                         <div className="flex flex-wrap gap-2 mb-6">
-                           {/* Highest Bid Badge */}
-                           {auction.bidCount > 0 && (
-                             <div className="inline-flex items-center gap-2 bg-success/10 text-success px-3 py-2 rounded-full border border-success/20">
-                               <DollarSign className="w-4 h-4" />
-                               <span className="text-sm font-semibold">
-                                 {formatCurrency(auction.currentBid)}
-                               </span>
-                               <span className="text-xs bg-success/20 px-2 py-0.5 rounded-full">
-                                 {auction.bidCount} active
-                               </span>
-                             </div>
-                           )}
+                        {/* Bids and Offers Badges */}
+                        <div className="flex flex-wrap gap-2 mb-6">
+                          {/* Highest Bid Badge */}
+                          {auction.bidCount > 0 && (
+                            <div className="inline-flex items-center gap-2 bg-success/10 text-success px-3 py-2 rounded-full border border-success/20">
+                              <DollarSign className="w-4 h-4" />
+                              <span className="text-sm font-semibold">
+                                {formatCurrency(auction.currentBid)}
+                              </span>
+                              <span className="text-xs bg-success/20 px-2 py-0.5 rounded-full">
+                                {auction.bidCount} active
+                              </span>
+                            </div>
+                          )}
 
-                           {/* Cash Offer Badge */}
-                           <div
-                             className={`inline-flex items-center gap-2 px-3 py-2 rounded-full border ${
-                               auction.cashOffer > 0
-                                 ? "bg-primary/10 text-primary-600 border-primary/20"
-                                 : "bg-neutral-100 text-neutral-500 border-neutral-200"
-                             }`}
-                           >
-                             <DollarSign className="w-4 h-4" />
-                             <span className="text-sm font-semibold">
-                               {auction.cashOffer > 0
-                                 ? formatCurrency(auction.cashOffer)
-                                 : "No cash offer"}
-                             </span>
-                             {auction.cashOffer > 0 && (
-                               <span className="text-xs bg-primary/20 px-2 py-0.5 rounded-full">
-                                 Instant
-                               </span>
-                             )}
-                           </div>
-                         </div>
+                          {/* Cash Offer Badge */}
+                          <div
+                            className={`inline-flex items-center gap-2 px-3 py-2 rounded-full border ${auction.cashOffer > 0
+                              ? "bg-primary/10 text-primary-600 border-primary/20"
+                              : "bg-neutral-100 text-neutral-500 border-neutral-200"
+                              }`}
+                          >
+                            <DollarSign className="w-4 h-4" />
+                            <span className="text-sm font-semibold">
+                              {auction.cashOffer > 0
+                                ? formatCurrency(auction.cashOffer)
+                                : "No cash offer"}
+                            </span>
+                            {auction.cashOffer > 0 && (
+                              <span className="text-xs bg-primary/20 px-2 py-0.5 rounded-full">
+                                Instant
+                              </span>
+                            )}
+                          </div>
+                        </div>
 
 
                         {/* Time Remaining */}
@@ -1045,21 +1037,21 @@ const LiveAuctionsPage = () => {
                               <span>No bids</span>
                             </div>
                           )}
-                          
+
                         </div>
                       </div>
-                         {/* Single Accept Button - Only for bids, not cash offers */}
-                         {auction.bidCount > 0 && (
-                           <div className="mb-6 mx-4">
-                             <button
-                               onClick={() => handleAcceptTopBid(auction)}
-                               className="cursor-pointer w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
-                             >
-                               <CheckCircle className="w-5 h-5" />
-                               <span>Accept Top Bid</span>
-                             </button>
-                           </div>
-                         )}
+                      {/* Single Accept Button - Only for bids, not cash offers */}
+                      {auction.bidCount > 0 && (
+                        <div className="mb-6 mx-4">
+                          <button
+                            onClick={() => handleAcceptTopBid(auction)}
+                            className="cursor-pointer w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                          >
+                            <CheckCircle className="w-5 h-5" />
+                            <span>Accept Top Bid</span>
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 ))}
@@ -1086,17 +1078,76 @@ const LiveAuctionsPage = () => {
 
         {/* Empty State */}
         {!loading && !error && (!hasAuctions || auctions.length === 0) && (
-          <motion.div variants={itemVariants} className="text-center py-16">
-            <div className="w-24 h-24 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Car className="w-12 h-12 text-neutral-400" />
+          <motion.div
+            variants={itemVariants}
+            className="flex -mt-16 items-center justify-center min-h-[60vh]"
+          >
+            <div className="text-center max-w-md mx-auto">
+              {/* Modern Icon Container */}
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="relative mb-4"
+              >
+                <div className="w-20 h-20 bg-gradient-to-br from-primary-50 to-primary-100 rounded-3xl flex items-center justify-center mx-auto shadow-soft border border-primary-200">
+                  <Car className="w-8 h-8 text-primary-500" />
+                </div>
+                {/* Decorative elements */}
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-warning/20 rounded-full animate-pulse-slow"></div>
+                <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-accent/20 rounded-full animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+              </motion.div>
+
+              {/* Content */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+                className="space-y-4"
+              >
+                <h3 className="text-2xl font-bold text-neutral-800 font-display">
+                  No Active Auctions
+                </h3>
+              </motion.div>
+
+              {/* Action Buttons */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
+                className="flex flex-col sm:flex-row gap-4 mt-4"
+              >
+                <motion.button
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  onClick={() => {
+                    setIsModalOpen(true)
+                  }}
+                  className="cursor-pointer w-60 px-4 h-16 group relative bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:shadow-xl hover:shadow-primary-500/25 focus:outline-none focus:ring-4 focus:ring-primary-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                  <div className="flex items-center justify-between">
+                    <Car className="transition-transform duration-300 group-hover:scale-110" />
+                    <span className="text-md">Start New Auction</span>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  onClick={() => navigate('/dashboard')}
+                  className="cursor-pointer w-60 px-4 h-16 group relative overflow-hidden bg-white hover:bg-neutral-50 text-neutral-700 font-semibold py-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-300 transition-all duration-300 transform hover:shadow-lg hover:shadow-neutral-500/10 focus:outline-none focus:ring-4 focus:ring-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                  <div className="flex items-center justify-center space-x-3">
+                    <Eye className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+                    <span className="text-lg">View Dashboard</span>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-neutral-100/0 via-neutral-100/50 to-neutral-100/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
+                </motion.button>
+              </motion.div>
             </div>
-            <h3 className="text-xl font-semibold text-neutral-800 mb-2">
-              No Active Auctions
-            </h3>
-            <p className="text-neutral-600 mb-6">
-              Start a new auction to get the best offers for your vehicle.
-            </p>
-            <button className="cursor-pointer btn-primary">Start New Auction</button>
           </motion.div>
         )}
       </div>
@@ -1117,6 +1168,14 @@ const LiveAuctionsPage = () => {
         auctionData={selectedAuctionBids}
         isLoading={loading}
         error={error}
+      />
+
+      {/* Start new auction Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Start new auction"
+        description="Enter your vehicle details to start the auction process"
       />
 
       {/* Bid Confirmation Modal */}

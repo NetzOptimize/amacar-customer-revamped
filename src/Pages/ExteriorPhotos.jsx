@@ -39,15 +39,15 @@ export default function VehiclePhotos() {
       const auction_terms_accepted = termsAccepted ? "accepted" : "not_accepted";
       // Start the auction
       const result = await dispatch(startAuction({ productId, auction_terms_accepted })).unwrap();
-      
+
       // Show success toast
       toast.success(result.message || 'Auction started successfully!');
-      
+
       // Navigate to review page after a short delay
       setTimeout(() => {
         navigate('/dashboard');
       }, 1000);
-      
+
     } catch (error) {
       console.error('Failed to start auction:', error);
       toast.error(error || 'Failed to start auction. Please try again.');
@@ -95,11 +95,11 @@ export default function VehiclePhotos() {
   useEffect(() => {
     if (uploadedImages && uploadedImages.length > 0 && photos.length === 0 && accidentPhotos.length === 0) {
       console.log('Loading persisted images:', uploadedImages);
-      
+
       // Separate regular photos from accident photos
       const regularPhotos = uploadedImages.filter(img => !img.metaKey?.includes('accident'));
       const accidentPhotosFromRedux = uploadedImages.filter(img => img.metaKey?.includes('accident'));
-      
+
       // Convert Redux images to component format
       const convertedRegularPhotos = regularPhotos.map(img => ({
         id: `${img.metaKey}_${img.attachmentId}`,
@@ -112,7 +112,7 @@ export default function VehiclePhotos() {
         metaKey: img.metaKey,
         uploaded: true
       }));
-      
+
       const convertedAccidentPhotos = accidentPhotosFromRedux.map(img => ({
         id: img.metaKey?.replace('image_image_', '').replace('_view', ''),
         file: null, // File object not available after reload
@@ -129,78 +129,78 @@ export default function VehiclePhotos() {
         required: img.metaKey?.includes('accident_mandatory_'),
         isAccident: true
       }));
-      
+
       setPhotos(convertedRegularPhotos);
       setAccidentPhotos(convertedAccidentPhotos);
     }
   }, [uploadedImages, photos.length, accidentPhotos.length]);
 
   const photoRequirements = [
-    { 
-      id: 'front', 
-      label: 'Front View', 
-      icon: CarFront, 
-      description: 'Full front view of the vehicle', 
+    {
+      id: 'front',
+      label: 'Front View',
+      icon: CarFront,
+      description: 'Full front view of the vehicle',
       required: true,
       tip: 'Take the photo in daylight with the whole front clearly visible.'
     },
-    { 
-      id: 'rear', 
-      label: 'Rear View', 
-      icon: Car, 
-      description: 'Full rear view of the vehicle', 
+    {
+      id: 'rear',
+      label: 'Rear View',
+      icon: Car,
+      description: 'Full rear view of the vehicle',
       required: true,
       tip: 'Ensure the entire rear is visible and avoid dark shadows.'
     },
-    { 
-      id: 'side_driver', 
-      label: 'Driver Side', 
-      icon: ArrowRight, 
-      description: 'Complete driver side profile', 
+    {
+      id: 'side_driver',
+      label: 'Driver Side',
+      icon: ArrowRight,
+      description: 'Complete driver side profile',
       required: true,
       tip: 'Stand far enough so the whole side fits clearly in the frame.'
     },
-    { 
-      id: 'dashboard', 
-      label: 'Dashboard', 
-      icon: Gauge, 
-      description: 'Front dashboard and controls', 
+    {
+      id: 'dashboard',
+      label: 'Dashboard',
+      icon: Gauge,
+      description: 'Front dashboard and controls',
       required: true,
       tip: 'Switch on ignition so dashboard details are clearly lit.'
     },
-    { 
-      id: 'side_passenger', 
-      label: 'Passenger Side', 
-      icon: ArrowLeft, 
-      description: 'Complete passenger side profile', 
+    {
+      id: 'side_passenger',
+      label: 'Passenger Side',
+      icon: ArrowLeft,
+      description: 'Complete passenger side profile',
       required: false,
       tip: 'Capture the full side without cutting off wheels or mirrors.'
     },
-    { 
-      id: 'odometer', 
-      label: 'Odometer', 
-      icon: CircleGauge, 
-      description: 'Mileage reading clearly visible', 
+    {
+      id: 'odometer',
+      label: 'Odometer',
+      icon: CircleGauge,
+      description: 'Mileage reading clearly visible',
       required: false,
       tip: 'Focus closely so the numbers are sharp and readable.'
     },
-    { 
-      id: 'wheels', 
-      label: 'Wheels & Tires', 
-      icon: LifeBuoy, 
-      description: 'Close-up of wheels and tires', 
+    {
+      id: 'wheels',
+      label: 'Wheels & Tires',
+      icon: LifeBuoy,
+      description: 'Close-up of wheels and tires',
       required: false,
       tip: 'Make sure tread patterns and rims are in clear focus.'
     },
-    { 
-      id: 'front_seats', 
-      label: 'Front Seats', 
-      icon: Armchair, 
-      description: 'Front seats condition', 
+    {
+      id: 'front_seats',
+      label: 'Front Seats',
+      icon: Armchair,
+      description: 'Front seats condition',
       required: false,
       tip: 'Adjust lighting to avoid shadows on seat fabric.'
     },
-    
+
   ];
 
   // Initialize one mandatory accident photo card if hasAccident is true
@@ -219,7 +219,7 @@ export default function VehiclePhotos() {
 
   const requiredPhotos = photoRequirements.filter((req) => req.required);
   const totalRequired = requiredPhotos.length + (hasAccident ? 1 : 0); // Include mandatory accident photo
-  const uploadedRequiredCount = photos.filter((photo) => 
+  const uploadedRequiredCount = photos.filter((photo) =>
     requiredPhotos.some((req) => req.id === photo.requirement)
   ).length + (hasAccident && accidentPhotos.some(p => p.requirement?.startsWith('accident_mandatory_')) ? 1 : 0);
   const isComplete = uploadedRequiredCount >= totalRequired;
@@ -236,7 +236,7 @@ export default function VehiclePhotos() {
     try {
       // Create image name based on requirement ID
       const imageName = `image_${id}_view`;
-      
+
       // Create FormData
       const formData = new FormData();
       formData.append('image', file);
@@ -284,7 +284,7 @@ export default function VehiclePhotos() {
 
         if (id.startsWith('accident_')) {
           setAccidentPhotos((prev) => {
-            const updatedPhotos = prev.map(p => 
+            const updatedPhotos = prev.map(p =>
               p.id === id ? { ...p, ...newPhoto } : p
             );
             return updatedPhotos;
@@ -341,14 +341,14 @@ export default function VehiclePhotos() {
   const removePhoto = async (photoId, isAccidentPhoto = false) => {
     try {
       // Find the photo to get attachment ID
-      const photoToDelete = isAccidentPhoto 
+      const photoToDelete = isAccidentPhoto
         ? accidentPhotos.find(photo => photo.id === photoId)
         : photos.find(photo => photo.id === photoId);
 
       // If photo was uploaded to server, delete it via API
       if (photoToDelete && photoToDelete.attachmentId) {
         console.log('Deleting image from server:', photoToDelete.attachmentId);
-        
+
         const result = await dispatch(deleteVehicleImage({
           attachmentId: photoToDelete.attachmentId
         })).unwrap();
@@ -516,15 +516,14 @@ export default function VehiclePhotos() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1, duration: 0.4 }}
-                  className={`relative rounded-2xl overflow-hidden shadow-md backdrop-blur-sm bg-white/80 transition-all duration-300 ${
-                    photo.required
-                      ? hasPhoto
-                        ? 'border-2 border-green-300/50 bg-green-50/50'
-                        : 'border-2 border-[#f6851f]/30'
-                      : hasPhoto
+                  className={`relative rounded-2xl overflow-hidden shadow-md backdrop-blur-sm bg-white/80 transition-all duration-300 ${photo.required
+                    ? hasPhoto
+                      ? 'border-2 border-green-300/50 bg-green-50/50'
+                      : 'border-2 border-[#f6851f]/30'
+                    : hasPhoto
                       ? 'border-2 border-green-300/50 bg-green-50/50'
                       : 'border-2 border-slate-200/50 opacity-90'
-                  } hover:border-[#f6851f]/50 hover:shadow-lg hover:bg-orange-50/30`}
+                    } hover:border-[#f6851f]/50 hover:shadow-lg hover:bg-orange-50/30`}
                 >
                   {isUploadingThisPhoto ? (
                     <div className="aspect-square flex flex-col items-center justify-center p-5 text-center">
@@ -579,25 +578,25 @@ export default function VehiclePhotos() {
                         </div>
                       </div>
                     </div>
-                   ) : (
-                     <div className="aspect-square flex flex-col items-center justify-center p-5 text-center group">
-                       <div className="w-12 h-12 mb-3 text-slate-400 group-hover:text-[#f6851f] transition-colors flex items-center justify-center">
-                         <photo.icon className="w-8 h-8" />
-                       </div>
-                       <p className="text-sm font-semibold text-slate-800 mb-2">{photo.label}</p>
-                       <div className='border-2 border-slate-300 p-2 rounded-md'>
-                         <button
-                           onClick={() => {
-                             document.getElementById(`photo-upload-${photo.id}`).click();
-                           }}
-                           className="cursor-pointer w-full inline-flex items-center justify-center h-8 px-3 rounded-md text-black border-slate-200 border-2 text-sm font-medium transition-colors duration-200 "
-                         >
-                           Upload
-                         </button>
-                         <p className='text-xs mt-4 text-slate-500'>{photo.tip}</p>
-                       </div>
-                     </div>
-                   )}
+                  ) : (
+                    <div className="aspect-square flex flex-col items-center justify-center p-5 text-center group">
+                      <div className="w-12 h-12 mb-3 text-slate-400 group-hover:text-[#f6851f] transition-colors flex items-center justify-center">
+                        <photo.icon className="w-8 h-8" />
+                      </div>
+                      <p className="text-sm font-semibold text-slate-800 mb-2">{photo.label}</p>
+                      <div className='border-2 border-slate-300 p-2 rounded-md'>
+                        <button
+                          onClick={() => {
+                            document.getElementById(`photo-upload-${photo.id}`).click();
+                          }}
+                          className="cursor-pointer w-full inline-flex items-center justify-center h-8 px-3 rounded-md text-black border-slate-200 border-2 text-sm font-medium transition-colors duration-200 "
+                        >
+                          Upload
+                        </button>
+                        <p className='text-xs mt-4 text-slate-500'>{photo.tip}</p>
+                      </div>
+                    </div>
+                  )}
                   <input
                     type="file"
                     accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
@@ -608,9 +607,11 @@ export default function VehiclePhotos() {
                         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
                         if (!allowedTypes.includes(file.type)) {
                           toast.error('Invalid file type. Only JPG, JPEG, PNG, GIF, and WEBP are allowed.');
+                          e.target.value = ''; // Clear input value
                           return;
                         }
                         handleSinglePhotoUpload(file, photo.id);
+                        e.target.value = ''; // Clear input value to allow re-uploading same file
                       }
                     }}
                     className="hidden"
@@ -654,15 +655,14 @@ export default function VehiclePhotos() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1, duration: 0.4 }}
-                    className={`relative rounded-2xl overflow-hidden shadow-md backdrop-blur-sm bg-white/80 transition-all duration-300 cursor-pointer ${
-                      photo.required
-                        ? hasPhoto
-                          ? 'border-2 border-green-300/50 bg-green-50/50'
-                          : 'border-2 border-[#f6851f]/30'
-                        : hasPhoto
+                    className={`relative rounded-2xl overflow-hidden shadow-md backdrop-blur-sm bg-white/80 transition-all duration-300 cursor-pointer ${photo.required
+                      ? hasPhoto
+                        ? 'border-2 border-green-300/50 bg-green-50/50'
+                        : 'border-2 border-[#f6851f]/30'
+                      : hasPhoto
                         ? 'border-2 border-green-300/50 bg-green-50/50'
                         : 'border-2 border-slate-200/50 hover:border-[#f6851f]/50 hover:bg-orange-50/30'
-                    } hover:shadow-lg`}
+                      } hover:shadow-lg`}
                     onClick={() => {
                       if (!hasPhoto && !uploadingMap[photo.id]) {
                         document.getElementById(`photo-upload-${photo.id}`).click();
@@ -725,17 +725,17 @@ export default function VehiclePhotos() {
                           </div>
                         </div>
                       </div>
-                     ) : (
-                       <div className="aspect-square flex flex-col items-center justify-center p-5 text-center group">
-                         <div className="w-12 h-12 mb-3 text-slate-400 group-hover:text-[#f6851f] transition-colors flex items-center justify-center">
-                           <photo.icon className="w-8 h-8" />
-                         </div>
-                         <p className="text-sm font-semibold text-slate-800 mb-2">{photo.label}</p>
-                         <div className="w-9 h-9 rounded-full border-2 border-dashed border-slate-300 group-hover:border-[#f6851f] group-hover:bg-orange-50/20 flex items-center justify-center transition-all">
-                           <span className="text-slate-400 group-hover:text-[#f6851f] text-xl">+</span>
-                         </div>
-                       </div>
-                     )}
+                    ) : (
+                      <div className="aspect-square flex flex-col items-center justify-center p-5 text-center group">
+                        <div className="w-12 h-12 mb-3 text-slate-400 group-hover:text-[#f6851f] transition-colors flex items-center justify-center">
+                          <photo.icon className="w-8 h-8" />
+                        </div>
+                        <p className="text-sm font-semibold text-slate-800 mb-2">{photo.label}</p>
+                        <div className="w-9 h-9 rounded-full border-2 border-dashed border-slate-300 group-hover:border-[#f6851f] group-hover:bg-orange-50/20 flex items-center justify-center transition-all">
+                          <span className="text-slate-400 group-hover:text-[#f6851f] text-xl">+</span>
+                        </div>
+                      </div>
+                    )}
                     <input
                       type="file"
                       accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
@@ -746,9 +746,11 @@ export default function VehiclePhotos() {
                           const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
                           if (!allowedTypes.includes(file.type)) {
                             alert('Invalid file type. Only JPG, JPEG, PNG, GIF, and WEBP are allowed.');
+                            e.target.value = ''; // Clear input value
                             return;
                           }
                           handleSinglePhotoUpload(file, photo.id);
+                          e.target.value = ''; // Clear input value to allow re-uploading same file
                         }
                       }}
                       className="hidden"
@@ -784,9 +786,8 @@ export default function VehiclePhotos() {
               onNext();
             }}
             disabled={!isComplete || auctionStartStatus === 'starting'}
-            className={`cursor-pointer inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#f6851f] to-[#e63946] px-8 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition-all ${
-              !isComplete || auctionStartStatus === 'starting' ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className={`cursor-pointer inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#f6851f] to-[#e63946] px-8 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition-all ${!isComplete || auctionStartStatus === 'starting' ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             whileHover={isComplete && auctionStartStatus !== 'starting' ? { scale: 1.03 } : {}}
             whileTap={isComplete && auctionStartStatus !== 'starting' ? { scale: 0.97 } : {}}
           >
@@ -837,7 +838,7 @@ export default function VehiclePhotos() {
                   title: "Final appraisal",
                   content: "This offer is an estimated online value, Participating Amacar dealers bid to win your car. Final values are subject to dealer inspection and may be adjusted. Amacar is not responsible if a dealer modifies or declines an offer after final appraisal. Dealers pay a fee to participate in this program. Terms and conditions apply."
                 },
-              
+
               ].map((term, index) => (
                 <motion.div
                   key={index}
@@ -855,7 +856,7 @@ export default function VehiclePhotos() {
               ))}
             </div>
 
-            
+
           </div>
 
           {/* Modal Footer */}
@@ -873,7 +874,7 @@ export default function VehiclePhotos() {
                   I have read and agree to the Terms & Conditions
                 </label>
               </div>
-              
+
               <div className="flex gap-3">
                 <button
                   onClick={handleModalClose}
@@ -884,20 +885,19 @@ export default function VehiclePhotos() {
                 <button
                   onClick={handleAcceptTerms}
                   disabled={!termsAccepted || auctionStartStatus === 'starting'}
-                  className={`cursor-pointer px-6 py-2 text-sm font-semibold text-white rounded-lg transition-all ${
-                    termsAccepted && auctionStartStatus !== 'starting'
-                      ? 'bg-gradient-to-r from-[#f6851f] to-[#e63946] hover:from-orange-600 hover:to-red-600 shadow-lg'
-                      : 'bg-slate-400 cursor-not-allowed'
-                  }`}
+                  className={`cursor-pointer px-6 py-2 text-sm font-semibold text-white rounded-lg transition-all ${termsAccepted && auctionStartStatus !== 'starting'
+                    ? 'bg-gradient-to-r from-[#f6851f] to-[#e63946] hover:from-orange-600 hover:to-red-600 shadow-lg'
+                    : 'bg-slate-400 cursor-not-allowed'
+                    }`}
                 >
                   {auctionStartStatus === 'starting' ? (
                     <div className="flex items-center gap-2">
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Starting Auction...
+                      Starting...
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2"><Rocket className="w-4 h-4"/>
-                    <p>Start</p></div>
+                    <div className="flex items-center gap-2"><Rocket className="w-4 h-4" />
+                      <p>Start</p></div>
                   )}
                 </button>
               </div>

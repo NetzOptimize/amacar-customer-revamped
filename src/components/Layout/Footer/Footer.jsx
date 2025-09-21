@@ -1,5 +1,6 @@
 import { Facebook, Instagram, Linkedin, Twitter, Youtube } from 'lucide-react'
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 export default function Footer() {
     return (
@@ -10,7 +11,7 @@ export default function Footer() {
                 <div className="absolute top-0 right-0 w-96 h-96 bg-primary-500/5 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-0 left-0 w-80 h-80 bg-primary-400/5 rounded-full blur-3xl"></div>
             </div>
-            
+
             <div className="relative z-10 max-w-8xl mx-auto px-8 py-20">
                 {/* Main Footer Content */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-28  mb-12">
@@ -29,11 +30,11 @@ export default function Footer() {
                                 The smartest way to sell your car. Get instant offers from verified dealers
                                 and watch them compete for your vehicle in real-time auctions.
                             </p>
-                            
+
                             {/* Social Links */}
                             <div className="flex space-x-4">
                                 <a href="https://www.youtube.com/@Amacar-ai" className="group w-12 h-12 bg-neutral-100 hover:bg-primary-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-glow">
-                                    <span className="text-lg font-bold text-neutral-600 group-hover:text-white"><Youtube/></span>
+                                    <span className="text-lg font-bold text-neutral-600 group-hover:text-white"><Youtube /></span>
                                 </a>
                                 <a href="https://x.com/Amacar_us" className="group w-12 h-12 bg-neutral-100 hover:bg-primary-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-glow">
                                     <span className="text-lg font-bold text-neutral-600 group-hover:text-white"><Twitter /></span>
@@ -67,31 +68,31 @@ export default function Footer() {
                                     How to sell with us
                                 </a>
                             </li>
-                         
+
                         </ul>
                     </div>
 
                     {/* Services */}
-                   
+
 
                     {/* Support & Legal */}
                     <div>
                         <h4 className="text-xl font-semibold mb-8 text-neutral-900">Support & Legal</h4>
                         <ul className="space-y-4">
                             <li>
-                                <a href="#" className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block">
-                                    Contact Us
-                                </a>
+                                <Link to="/cookies-policy" className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block">
+                                    Cookie Policy
+                                </Link>
                             </li>
                             <li>
-                                <a href="#" className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block">
+                                <Link to="/privacy-policy" className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block">
                                     Privacy Policy
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="#" className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block">
+                                <Link to="/terms-of-service" className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block">
                                     Terms of Service
-                                </a>
+                                </Link>
                             </li>
                             <li>
                                 <a href="#" className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block">
@@ -102,12 +103,12 @@ export default function Footer() {
                     </div>
                 </div>
 
-              
+
 
                 {/* Bottom Bar */}
                 <div className="border-t border-neutral-300 pt-8">
                     <div className="flex flex-col lg:flex-row justify-between items-center space-y-6 lg:space-y-0">
-                     
+
                         <div className="flex items-center space-x-8">
                             <span className="text-neutral-600 text-lg">Trusted by</span>
                             <div className="flex items-center space-x-4">
@@ -117,7 +118,7 @@ export default function Footer() {
                                 <div className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 backdrop-blur-sm border border-primary-500/20 px-4 py-2 rounded-full text-sm font-medium text-primary-600">
                                     500+ Dealers
                                 </div>
-                               
+
                             </div>
                         </div>
                     </div>

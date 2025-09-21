@@ -251,20 +251,6 @@ const ProfilePage = () => {
                     ? `Member since ${profile.joinDate}`
                     : "New member"}
                 </p>
-                <div className="flex items-center space-x-4 mt-2">
-                  <div className="flex items-center space-x-1">
-                    <span className="text-sm text-neutral-600">Rating:</span>
-                    <span className="font-semibold text-warning">
-                      {profile.rating}/5
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <span className="text-sm text-neutral-600">Auctions:</span>
-                    <span className="font-semibold text-primary-600">
-                      {profile.totalAuctions}
-                    </span>
-                  </div>
-                </div>
               </div>
             </div>
           </motion.div>
@@ -412,8 +398,8 @@ const ProfilePage = () => {
                   {offersLoading
                     ? "..."
                     : `$${(
-                        dashboardSummary?.total_bid_value || 0
-                      ).toLocaleString()}`}
+                      dashboardSummary?.total_bid_value || 0
+                    ).toLocaleString()}`}
                 </div>
                 <div className="text-sm text-neutral-600">Total Bid Value</div>
               </div>
@@ -427,7 +413,7 @@ const ProfilePage = () => {
             </h3>
 
             <div className="space-y-4">
-             
+
 
               <div className="flex items-center justify-between py-4 border-b border-neutral-200">
                 <div>

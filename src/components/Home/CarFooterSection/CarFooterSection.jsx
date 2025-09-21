@@ -1,8 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import carImage from '../../../assets/footer_image.png'
+import AuctionModal from '@/components/ui/AuctionYourRideModal'
+import Modal from '@/components/ui/modal'
 
 export default function CarFooterSection() {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [auctionOpen, setAuctionOpen] = useState(false);
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -125,6 +129,7 @@ export default function CarFooterSection() {
                 >
                     {/* Primary CTA */}
                     <motion.button
+                        onClick={() => setIsModalOpen(true)}
                         variants={buttonVariants}
                         whileHover="hover"
                         whileTap="tap"
@@ -141,6 +146,7 @@ export default function CarFooterSection() {
 
                     {/* Secondary CTA */}
                     <motion.button
+                        onClick={() => setAuctionOpen(true)}
                         variants={buttonVariants}
                         whileHover="hover"
                         whileTap="tap"
@@ -184,6 +190,16 @@ export default function CarFooterSection() {
 
             {/* Bottom fade effect */}
             <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-900 to-transparent" />
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title="Get Instant Offer"
+                description="Enter your vehicle details to start the offer process"
+            />
+            <AuctionModal
+                isOpen={auctionOpen}
+                onClose={setAuctionOpen}
+            />
         </section>
     )
 }
