@@ -41,12 +41,11 @@ const ProfilePage = () => {
   const [editData, setEditData] = useState({ ...profile });
 
   // Get 2FA status from user data
-  const isTwoFactorEnabled = user?.two_fa === 'enabled' || user?.two_fa === true;
+  const isTwoFactorEnabled = user?.two_fa === 'enabled' || user?.two_fa === true || user?.two_fa === 1;
 
   // Load user data from Redux state
   useEffect(() => {
     if (user) {
-
       const userProfile = {
         firstName: user.firstName || user.first_name || "",
         lastName: user.lastName || user.last_name || "",
@@ -101,6 +100,11 @@ const ProfilePage = () => {
 
   const handleTwoFactorToggle = () => {
     setShowTwoFactorModal(true);
+  };
+
+  const handleTwoFactorSuccess = () => {
+    // Force refresh user data after successful 2FA toggle
+    dispatch(loadUser());
   };
 
   const containerVariants = {
@@ -481,6 +485,7 @@ const ProfilePage = () => {
       <TwoFactorAuthModal
         isOpen={showTwoFactorModal}
         onClose={() => setShowTwoFactorModal(false)}
+        onSuccess={handleTwoFactorSuccess}
         isEnabled={isTwoFactorEnabled}
       />
     </div>

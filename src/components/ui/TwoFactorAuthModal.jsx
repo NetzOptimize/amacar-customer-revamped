@@ -23,6 +23,7 @@ import toast from 'react-hot-toast';
 export default function TwoFactorAuthModal({
   isOpen,
   onClose,
+  onSuccess,
   isEnabled = false,
 }) {
   const dispatch = useDispatch();
@@ -46,6 +47,11 @@ export default function TwoFactorAuthModal({
           `Two-Factor Authentication ${!isEnabled ? 'enabled' : 'disabled'} successfully!`,
           { duration: 3000 }
         );
+        
+        // Call success callback if provided
+        if (onSuccess) {
+          onSuccess();
+        }
         
         // Close modal after success - user remains logged in
         setTimeout(() => {

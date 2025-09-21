@@ -181,7 +181,13 @@ export const toggleTwoFactorAuth = createAsyncThunk(
     try {
       const response = await api.post('/user/twofa', { enabled });
       if (response.data.success) {
-        return response.data.user;
+        // After successful 2FA toggle, fetch updated user profile
+        const profileResponse = await api.get('/user/profile');
+        if (profileResponse.data.success) {
+          return profileResponse.data.user;
+        }
+        // If profile fetch fails, return the 2FA response data
+        return response.data.user || { two_fa: enabled ? 'enabled' : 'disabled' };
       }
       return rejectWithValue(response.data.message || 'Failed to update 2FA settings');
     } catch (error) {
