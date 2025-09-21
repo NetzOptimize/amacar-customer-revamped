@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Loader2, 
@@ -31,19 +31,29 @@ export default function TwoFactorAuthModal({
   
   const [phase, setPhase] = useState('confirmation'); // confirmation | loading | success | error
   const [error, setError] = useState('');
+  const [initialIsEnabled, setInitialIsEnabled] = useState(isEnabled);
 
   const isCloseDisabled = phase === 'loading';
   
-  // Determine the action being performed
-  const isDisabling = isEnabled; // If currently enabled, we're disabling
-  const isEnabling = !isEnabled; // If currently disabled, we're enabling
+  // Update initial state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setInitialIsEnabled(isEnabled);
+      setPhase('confirmation');
+      setError('');
+    }
+  }, [isOpen, isEnabled]);
+  
+  // Determine the action being performed based on initial state
+  const isDisabling = initialIsEnabled; // If initially enabled, we're disabling
+  const isEnabling = !initialIsEnabled; // If initially disabled, we're enabling
 
   const handleConfirm = async () => {
     setPhase('loading');
     setError('');
     
     try {
-      const resultAction = await dispatch(toggleTwoFactorAuth({ enabled: !isEnabled }));
+      const resultAction = await dispatch(toggleTwoFactorAuth({ enabled: !initialIsEnabled }));
       
       if (toggleTwoFactorAuth.fulfilled.match(resultAction)) {
         setPhase('success');
