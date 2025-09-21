@@ -10,6 +10,7 @@ import {
 } from "../redux/slices/offersSlice";
 import EditProfileModal from "../components/ui/EditProfileModal";
 import ChangePasswordModal from "../components/ui/ChangePasswordModal";
+import TwoFactorAuthModal from "../components/ui/TwoFactorAuthModal";
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
@@ -18,6 +19,7 @@ const ProfilePage = () => {
   const offersLoading = useSelector(selectOffersLoading);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [showTwoFactorModal, setShowTwoFactorModal] = useState(false);
 
   // Default profile data structure
   const defaultProfile = {
@@ -37,6 +39,9 @@ const ProfilePage = () => {
 
   const [profile, setProfile] = useState(defaultProfile);
   const [editData, setEditData] = useState({ ...profile });
+
+  // Get 2FA status from user data
+  const isTwoFactorEnabled = user?.two_fa === 'enabled' || user?.two_fa === true;
 
   // Load user data from Redux state
   useEffect(() => {
@@ -92,6 +97,10 @@ const ProfilePage = () => {
   const handleCancel = () => {
     setEditData({ ...profile });
     setShowEditModal(false);
+  };
+
+  const handleTwoFactorToggle = () => {
+    setShowTwoFactorModal(true);
   };
 
   const containerVariants = {
@@ -432,10 +441,22 @@ const ProfilePage = () => {
                     Two-Factor Authentication
                   </h4>
                   <p className="text-sm text-neutral-600">
-                    Add an extra layer of security to your account
+                    {isTwoFactorEnabled 
+                      ? 'An extra layer of security is enabled for your account'
+                      : 'Add an extra layer of security to your account'
+                    }
                   </p>
                 </div>
-                <button className="btn-secondary">Enable</button>
+                <button 
+                  onClick={handleTwoFactorToggle}
+                  className={`btn-secondary ${
+                    isTwoFactorEnabled 
+                      ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100' 
+                      : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
+                  }`}
+                >
+                  {isTwoFactorEnabled ? 'Disable' : 'Enable'}
+                </button>
               </div>
             </div>
           </motion.div>
@@ -454,6 +475,13 @@ const ProfilePage = () => {
         onClose={handleCancel}
         onSave={handleSave}
         initialData={editData}
+      />
+
+      {/* Two-Factor Authentication Modal */}
+      <TwoFactorAuthModal
+        isOpen={showTwoFactorModal}
+        onClose={() => setShowTwoFactorModal(false)}
+        isEnabled={isTwoFactorEnabled}
       />
     </div>
   );

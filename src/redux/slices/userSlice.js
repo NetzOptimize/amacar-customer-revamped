@@ -161,6 +161,21 @@ export const updateProfile = createAsyncThunk(
   }
 );
 
+export const toggleTwoFactorAuth = createAsyncThunk(
+  'user/toggleTwoFactorAuth',
+  async ({ enabled }, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/user/twofa', { enabled });
+      if (response.data.success) {
+        return response.data.user;
+      }
+      return rejectWithValue(response.data.message || 'Failed to update 2FA settings');
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to update 2FA settings');
+    }
+  }
+);
+
 // Auto-login with JWT token from offer response
 export const autoLoginWithToken = createAsyncThunk(
   'user/autoLoginWithToken',
@@ -351,6 +366,21 @@ const userSlice = createSlice({
         state.status = 'failed';
         state.error = action.payload;
       })
+      // Change Password
+      .addCase(changePassword.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(changePassword.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.user = action.payload;
+        // Update localStorage with new user data
+        localStorage.setItem('authUser', JSON.stringify(action.payload));
+      })
+      .addCase(changePassword.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      })
       .addCase(registerWithVin.pending, (state) => {
         state.status = 'loading';
         state.error = null;
@@ -377,6 +407,21 @@ const userSlice = createSlice({
         localStorage.setItem('authUser', JSON.stringify(action.payload));
       })
       .addCase(updateProfile.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      })
+      // Toggle Two-Factor Authentication
+      .addCase(toggleTwoFactorAuth.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(toggleTwoFactorAuth.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.user = action.payload;
+        // Update localStorage with new user data
+        localStorage.setItem('authUser', JSON.stringify(action.payload));
+      })
+      .addCase(toggleTwoFactorAuth.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
       })
