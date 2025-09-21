@@ -97,7 +97,11 @@ export default function TwoFactorAuthModal({
         className="sm:max-w-lg rounded-2xl shadow-xl p-0 overflow-hidden bg-white"
         showCloseButton={!isCloseDisabled}
       >
-        <div className="bg-gradient-to-br from-white via-slate-50 to-slate-100 p-6">
+        <div className={`p-6 ${
+          isEnabled 
+            ? 'bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50' 
+            : 'bg-gradient-to-br from-white via-slate-50 to-slate-100'
+        }`}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-semibold tracking-tight text-slate-900">
               {isEnabled ? 'Disable Two-Factor Authentication' : 'Enable Two-Factor Authentication'}
@@ -224,13 +228,17 @@ export default function TwoFactorAuthModal({
                 <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50 w-full">
                   <div className="flex items-center gap-3 p-4">
                     <Loader2 className="h-5 w-5 animate-spin text-slate-700" />
-                    <span className="text-sm text-slate-700">
+                    <span className={`text-sm ${
+                      isEnabled ? 'text-orange-700' : 'text-slate-700'
+                    }`}>
                       {isEnabled ? 'Disabling Two-Factor Authentication...' : 'Enabling Two-Factor Authentication...'}
                     </span>
                   </div>
                   <div className="h-1 w-full bg-slate-200">
                     <motion.div
-                      className="h-1 bg-slate-800"
+                      className={`h-1 ${
+                        isEnabled ? 'bg-orange-500' : 'bg-slate-800'
+                      }`}
                       initial={{ width: "0%" }}
                       animate={{ width: "100%" }}
                       transition={{ ease: "easeOut", duration: 1.5 }}
@@ -258,19 +266,29 @@ export default function TwoFactorAuthModal({
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: "spring", stiffness: 340, damping: 18 }}
                 >
-                  <div className="grid place-items-center rounded-2xl border border-green-200 bg-gradient-to-b from-white to-emerald-50 p-4 shadow-sm">
-                    <CheckCircle2 className="h-14 w-14 text-green-500" />
+                  <div className={`grid place-items-center rounded-2xl border p-4 shadow-sm ${
+                    isEnabled 
+                      ? 'border-orange-200 bg-gradient-to-b from-white to-orange-50' 
+                      : 'border-green-200 bg-gradient-to-b from-white to-emerald-50'
+                  }`}>
+                    <CheckCircle2 className={`h-14 w-14 ${
+                      isEnabled ? 'text-orange-500' : 'text-green-500'
+                    }`} />
                   </div>
                   <Sparkles className="absolute -right-2 -top-2 h-4 w-4 text-amber-500" />
                 </motion.div>
                 <div className="space-y-1">
-                  <h3 className="text-lg font-semibold text-slate-900">
+                  <h3 className={`text-lg font-semibold ${
+                    isEnabled ? 'text-orange-900' : 'text-slate-900'
+                  }`}>
                     {isEnabled ? '2FA Disabled Successfully!' : '2FA Enabled Successfully!'}
                   </h3>
-                  <p className="text-sm text-slate-600">
+                  <p className={`text-sm ${
+                    isEnabled ? 'text-orange-700' : 'text-slate-600'
+                  }`}>
                     {isEnabled 
-                      ? 'Two-Factor Authentication has been disabled for your account.'
-                      : 'Two-Factor Authentication has been enabled for your account.'
+                      ? 'Two-Factor Authentication has been disabled for your account. Your account security has been reduced.'
+                      : 'Two-Factor Authentication has been enabled for your account. Your account is now more secure.'
                     }
                   </p>
                 </div>
