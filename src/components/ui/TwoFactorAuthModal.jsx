@@ -42,7 +42,7 @@ export default function TwoFactorAuthModal({
       setPhase('confirmation');
       setError('');
     }
-  }, [isOpen, isEnabled]);
+  }, [isOpen]); // Remove isEnabled dependency to prevent reset during modal lifecycle
   
   // Determine the action being performed based on initial state
   const isDisabling = initialIsEnabled; // If initially enabled, we're disabling
@@ -282,27 +282,27 @@ export default function TwoFactorAuthModal({
                 >
                   <div className={`grid place-items-center rounded-2xl border p-4 shadow-sm ${
                     isDisabling 
-                      ? 'border-green-200 bg-gradient-to-b from-white to-emerald-50' 
-                      : 'border-orange-200 bg-gradient-to-b from-white to-orange-50'
+                      ? 'border-orange-200 bg-gradient-to-b from-white to-orange-50' 
+                      : 'border-green-200 bg-gradient-to-b from-white to-emerald-50'
                   }`}>
                     <CheckCircle2 className={`h-14 w-14 ${
-                      isDisabling ? 'text-green-500' : 'text-orange-500'
+                      isDisabling ? 'text-orange-500' : 'text-green-500'
                     }`} />
                   </div>
                   <Sparkles className="absolute -right-2 -top-2 h-4 w-4 text-amber-500" />
                 </motion.div>
                 <div className="space-y-1">
                   <h3 className={`text-lg font-semibold ${
-                    isDisabling ? 'text-slate-900' : 'text-orange-900'
+                    isDisabling ? 'text-orange-900' : 'text-slate-900'
                   }`}>
-                    {isDisabling ? '2FA Enabled Successfully!' : '2FA Disabled Successfully!'}
+                    {isDisabling ? '2FA Disabled Successfully!' : '2FA Enabled Successfully!'}
                   </h3>
                   <p className={`text-sm ${
-                    isDisabling ? 'text-slate-600' : 'text-orange-700'
+                    isDisabling ? 'text-orange-700' : 'text-slate-600'
                   }`}>
                     {isDisabling 
-                      ? 'Two-Factor Authentication has been enabled for your account. Your account is now more secure.'
-                      : 'Two-Factor Authentication has been disabled for your account. Your account security has been reduced.'
+                      ? 'Two-Factor Authentication has been disabled for your account. Your account security has been reduced.'
+                      : 'Two-Factor Authentication has been enabled for your account. Your account is now more secure.'
                     }
                   </p>
                 </div>
@@ -330,7 +330,7 @@ export default function TwoFactorAuthModal({
                 </motion.div>
                 <div className="space-y-1">
                   <h3 className="text-lg font-semibold text-slate-900">
-                    {isDisabling ? 'Failed to Enable 2FA' : 'Failed to Disable 2FA'}
+                    {isDisabling ? 'Failed to Disable 2FA' : 'Failed to Enable 2FA'}
                   </h3>
                   <p className="text-sm text-slate-600">
                     {error || 'An unexpected error occurred. Please try again.'}
