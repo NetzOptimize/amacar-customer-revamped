@@ -18,7 +18,7 @@ export default function VehiclePhotos() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const questions = useSelector((state) => state?.carDetailsAndQuestions?.questions);
-  const { uploadedImages, imageUploadStatus, imageUploadError, imageDeleteStatus, imageDeleteError, auctionStartStatus, auctionStartError, auctionData } = useSelector((state) => state?.carDetailsAndQuestions);
+  const { uploadedImages, imageUploadStatus, imageUploadError, imageDeleteStatus, imageDeleteError, auctionStartStatus, auctionStartError, auctionData, offer } = useSelector((state) => state?.carDetailsAndQuestions);
 
   // Mock data and handlers for standalone usage
   const data = { photos: [] };
@@ -76,10 +76,8 @@ export default function VehiclePhotos() {
     navigate('/auction-page');
   };
 
-  // Check if accident is Minor or Major
-  const hasAccident = questions.some(
-    (q) => q.key === 'accident' && (q.answer === 'Minor' || q.answer === 'Major')
-  );
+  // Check if accident is true from the offer state
+  const hasAccident = offer?.isAccident === true;
 
   const [photos, setPhotos] = useState(data.photos || []);
   const [accidentPhotos, setAccidentPhotos] = useState([]);

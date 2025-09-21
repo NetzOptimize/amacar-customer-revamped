@@ -70,6 +70,7 @@ export const getInstantCashOffer = createAsyncThunk(
           offerAmount: response.data.offer_amount,
           carSummary: response.data.car_summary,
           isAuctionable: response.data.is_auctionable,
+          isAccident: response.data.is_accident,
           productId: response.data.product_id,
           emailSent: response.data.email_sent,
           timestamp: response.data.timestamp,
@@ -313,6 +314,7 @@ const initialState = {
     offerAmount: null,
     carSummary: null,
     isAuctionable: null,
+    isAccident: null,
     productId: null,
     emailSent: null,
     timestamp: null,
@@ -468,6 +470,7 @@ const carDetailsAndQuestionsSlice = createSlice({
         offerAmount: null,
         carSummary: null,
         isAuctionable: null,
+        isAccident: null,
         productId: null,
         emailSent: null,
         timestamp: null,
@@ -588,6 +591,9 @@ const carDetailsAndQuestionsSlice = createSlice({
         state.productId = action.payload.productId;
         state.userExists = action.payload.userInfo.user_exists;
         state.userInfo = action.payload.userInfo;
+        
+        // Reset questions to initial state when offer is fulfilled
+        state.questions = initialQuestions.map((q) => ({ ...q }));
       })
       .addCase(getInstantCashOffer.rejected, (state, action) => {
         state.offerStatus = 'failed';
