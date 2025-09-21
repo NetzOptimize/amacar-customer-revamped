@@ -145,7 +145,7 @@ export default function CarFooterSection() {
                     </motion.button>
 
                     {/* Secondary CTA */}
-                    <motion.button
+                    {/* <motion.button
                         onClick={() => setAuctionOpen(true)}
                         variants={buttonVariants}
                         whileHover="hover"
@@ -159,7 +159,7 @@ export default function CarFooterSection() {
                             Start Live Auction
                         </span>
                         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </motion.button>
+                    </motion.button> */}
                 </motion.div>
 
                 {/* Trust Indicators */}

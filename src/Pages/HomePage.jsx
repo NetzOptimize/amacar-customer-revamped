@@ -8,6 +8,7 @@ import TestimonialCarousel from '@/components/Home/TestimonialCarousel/Testimoni
 import CarFooterSection from '@/components/Home/CarFooterSection/CarFooterSection.jsx'
 import VideoSection from '@/components/Home/VideoSection/videoSection.jsx'
 import HeroCarousel from '@/components/Home/Carousel/Carousel.jsx'
+import HowAmacarWorks from '@/components/AboutUs/HowAmacarWorks/HowAmacarWorks.jsx'
 import { useSelector } from 'react-redux'
 import { useEffect } from 'react'
 import Seo from '@/components/SEO/Seo'
@@ -27,7 +28,8 @@ export default function HomePage() {
             <HowItWorks />
             <HeroCarousel />
             <WhyChooseAmacar />
-            <WinWinAmacar />
+            {/* <WinWinAmacar /> */}
+            <HowAmacarWorks />
             <TwoColumnSection />
             <CarFooterSection />
             <TestimonialCarousel />

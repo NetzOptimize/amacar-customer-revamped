@@ -38,10 +38,6 @@ export default function EditProfileModal({
   
   // Debounce zipcode input
   const debouncedZipcode = useDebounce(formData.zipcode, 500);
-  // Debug useEffect to track form data changes
-  useEffect(() => {
-    console.log("Form data updated:", formData);
-  }, [formData]);
 
   // Initialize form data when modal opens
   useEffect(() => {
@@ -72,12 +68,11 @@ export default function EditProfileModal({
               city: result.payload.city,
               state: result.payload.state
             }));
-            console.log("Location data fetched:", result.payload);
           } else {
-            console.log("Failed to fetch location data:", result.payload);
+            // console.log("Failed to fetch location data:", result.payload);
           }
         } catch (error) {
-          console.error("Error fetching location data:", error);
+          // console.error("Error fetching location data:", error);
         }
       } else if (debouncedZipcode && debouncedZipcode.length < 5) {
         // Clear city and state when zipcode is incomplete
@@ -100,7 +95,7 @@ export default function EditProfileModal({
         city: location.city,
         state: location.state
       }));
-      console.log("Location data updated in form:", location);
+      // console.log("Location data updated in form:", location);
     }
   }, [location, locationStatus]);
 

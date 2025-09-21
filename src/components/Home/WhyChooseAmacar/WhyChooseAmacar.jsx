@@ -132,7 +132,7 @@ export default function WhyChooseAmacar() {
                 </motion.div>
 
                 {/* Bottom CTA */}
-                <motion.div
+                {/* <motion.div
                     className="cta-section"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -148,7 +148,7 @@ export default function WhyChooseAmacar() {
                     >
                         Get Started Today
                     </motion.button>
-                </motion.div>
+                </motion.div> */}
             </div>
             <AuctionModal
                 isOpen={auctionOpen}

@@ -41,13 +41,6 @@ const ProfilePage = () => {
   // Load user data from Redux state
   useEffect(() => {
     if (user) {
-      console.log("User data for zipcode debugging:", {
-        zipcode: user.zipcode,
-        "meta.zipcode": user.meta?.zipcode,
-        "meta.zip_code": user.meta?.zip_code,
-        zip_code: user.zip_code,
-        fullUser: user,
-      });
 
       const userProfile = {
         firstName: user.firstName || user.first_name || "",

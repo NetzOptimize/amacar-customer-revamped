@@ -8,9 +8,6 @@ export const fetchPreviousOffers = createAsyncThunk(
     try {
       // Use the axios instance which already handles auth headers
       const response = await api.get('/dashboard/previous-offers');
-      console.log('Previous offers response:', response);
-      console.log('Previous offers response data:', response.data);
-      
       if (!response.data.success) {
         throw new Error(response.data.message || 'Failed to fetch offers');
       }
@@ -29,8 +26,6 @@ export const fetchPendingOffers = createAsyncThunk(
     try {
       // Use the axios instance which already handles auth headers
       const response = await api.get('/dashboard/pending-offers');
-      console.log('Pending offers response:', response);
-      console.log('Pending offers response data:', response.data);
       
       if (!response.data.success) {
         throw new Error(response.data.message || 'Failed to fetch pending offers');
@@ -50,8 +45,6 @@ export const fetchAcceptedOffers = createAsyncThunk(
     try {
       // Use the axios instance which already handles auth headers
       const response = await api.get('/dashboard/accepted-offers');
-      console.log('Accepted offers response:', response);
-      console.log('Accepted offers response data:', response.data);
       
       if (!response.data.success) {
         throw new Error(response.data.message || 'Failed to fetch accepted offers');
@@ -71,8 +64,6 @@ export const fetchLiveAuctions = createAsyncThunk(
     try {
       // Use the axios instance which already handles auth headers
       const response = await api.get('/dashboard/live-auctions');
-      console.log('Live auctions response:', response);
-      console.log('Live auctions response data:', response.data);
       
       if (!response.data.success) {
         throw new Error(response.data.message || 'Failed to fetch live auctions');
@@ -92,8 +83,6 @@ export const fetchAppointments = createAsyncThunk(
     try {
       // Use the axios instance which already handles auth headers
       const response = await api.get('/dashboard/appointments');
-      console.log('Appointments response:', response);
-      console.log('Appointments response data:', response.data);
       
       if (!response.data.success) {
         throw new Error(response.data.message || 'Failed to fetch appointments');
@@ -113,8 +102,6 @@ export const fetchDashboardSummary = createAsyncThunk(
     try {
       // Use the axios instance which already handles auth headers
       const response = await api.get('/dashboard/summary');
-      console.log('Dashboard summary response:', response);
-      console.log('Dashboard summary response data:', response.data);
       
       if (!response.data.success) {
         throw new Error(response.data.message || 'Failed to fetch dashboard summary');
@@ -133,13 +120,7 @@ export const createAppointments = createAsyncThunk(
   async (appointmentData, { rejectWithValue }) => {
     try {
       // Use the axios instance which already handles auth headers
-      console.log("start_time", appointmentData.start_time);
-      console.log("notes", appointmentData.notes);
-      console.log("dealer_id", appointmentData.dealerId);
-      console.log("user_id", appointmentData.userId);
       const response = await api.post('/appointment/create', {dealer_id: appointmentData.dealerId, start_time: appointmentData.start_time, notes: appointmentData.notes});
-      console.log('Appointments create response:', response);
-      console.log('Appointments create response data:', response.data);
       
       if (!response.data.success) {
         throw new Error(response.data.message || 'Failed to create appointments');
@@ -157,13 +138,10 @@ export const cancelAppointment = createAsyncThunk(
   'offers/cancelAppointment',
   async (cancelData, { rejectWithValue }) => {
     try {
-      console.log("Cancelling appointment:", cancelData.appointmentId, "with notes:", cancelData.notes);
       const response = await api.post('/appointment/cancel', {
         appointment_id: cancelData.appointmentId,
         notes: cancelData.notes
       });
-      console.log('Cancel appointment response:', response);
-      console.log('Cancel appointment response data:', response.data);
       
       if (!response.data.success) {
         throw new Error(response.data.message || 'Failed to cancel appointment');
@@ -181,14 +159,11 @@ export const rescheduleAppointment = createAsyncThunk(
   'offers/rescheduleAppointment',
   async (rescheduleData, { rejectWithValue }) => {
     try {
-      console.log("Rescheduling appointment:", rescheduleData.appointmentId, "to:", rescheduleData.start_time);
       const response = await api.post('/appointment/reschedule', {
         appointment_id: rescheduleData.appointmentId,
         new_start_time: rescheduleData.start_time,
         notes: rescheduleData.notes
       });
-      console.log('Reschedule appointment response:', response);
-      console.log('Reschedule appointment response data:', response.data);
       
       if (!response.data.success) {
         throw new Error(response.data.message || 'Failed to reschedule appointment');
@@ -212,8 +187,6 @@ export const acceptBid = createAsyncThunk(
         bidder_id: bidData.bidderId
       });
       
-      console.log('Accept bid response:', response);
-      console.log('Accept bid response data:', response.data);
       
       if (!response.data.success) {
         throw new Error(response.data.message || 'Failed to accept bid');
@@ -237,8 +210,6 @@ export const rejectBid = createAsyncThunk(
         bidder_id: bidData.bidderId
       });
       
-      console.log('Reject bid response:', response);
-      console.log('Reject bid response data:', response.data);
       
       if (!response.data.success) {
         throw new Error(response.data.message || 'Failed to reject bid');
@@ -260,8 +231,6 @@ export const reAuctionVehicle = createAsyncThunk(
         product_id: productId
       });
       
-      console.log('Re-auction vehicle response:', response);
-      console.log('Re-auction vehicle response data:', response.data);
       
       if (!response.data.success) {
         // Handle specific error cases

@@ -99,10 +99,6 @@ export default function LoginModal({
     return Object.values(newErrors).every((error) => !error);
   }
 
-  useEffect(() => {
-    console.log('password', values.newPassword);
-    console.log('confirmPassword', values.confirmPassword);
-  });
   function validateOtp() {
     const newErrors = { ...errors, otp: "" };
     if (!values.otp) {
@@ -147,28 +143,21 @@ export default function LoginModal({
     e?.preventDefault();
     if (!validateOtp()) return;
 
-    console.log("Starting OTP verification with:", { email: values.email, otp: values.otp });
-    console.log("OTP verification attempted at:", new Date().toLocaleTimeString());
-
     // Clear any existing OTP error before making the API call
     setError("otp", "");
     dispatch(clearError()); // Clear Redux error state
     setPhase("loading");
     try {
       const token = await dispatch(verifyOTP({ email: values.email, otp: values.otp })).unwrap();
-      console.log("OTP verification successful, token:", token);
       // Clear any OTP error on success
       setError("otp", "");
       dispatch(clearError()); // Clear Redux error state on success
       setResetToken(token);
       setPhase("reset-password");
-      console.log("Phase changed to reset-password");
     } catch (error) {
-      console.log("OTP verification failed, error:", error);
       // Stay in verify-otp phase and show error inline
       setPhase("verify-otp");
       setError("otp", error || "Wrong OTP. Please try again.");
-      console.log("Phase changed to verify-otp, error set:", error);
       // Don't show toast for OTP errors as they're displayed inline
     }
   }
@@ -219,8 +208,6 @@ export default function LoginModal({
     setIsForgotPasswordMode(true);
     setPhase("forgot");
     resetForm();
-    // Log when OTP is requested for debugging
-    console.log("OTP requested at:", new Date().toLocaleTimeString());
   }
 
   function handleRegister() {
@@ -240,8 +227,7 @@ export default function LoginModal({
 
   // Prefill email when modal opens and user info is available
   useEffect(() => {
-    console.log("userInfo from login modal: ", userInfo);
-    if (isOpen && userInfo?.user_email && !values.email) {
+      if (isOpen && userInfo?.user_email && !values.email) {
       setValue("email", userInfo.user_email);
     }
   }, [isOpen, userInfo, setValue, values.email]);
