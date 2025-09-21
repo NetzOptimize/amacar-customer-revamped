@@ -9,7 +9,21 @@ export const loginUser = createAsyncThunk(
     try {
       const response = await api.post('/auth/login', credentials);
       if (response.data.success) {
-        return response.data; // { user, token, expires_in }
+        // If 2FA is not required, proceed with normal login
+        if (!response.data.requires_2fa) {
+          // Store auth tokens in localStorage for persistence
+          if (response.data.token) {
+            localStorage.setItem('authToken', response.data.token);
+          }
+          if (response.data.user) {
+            localStorage.setItem('authUser', JSON.stringify(response.data.user));
+          }
+          if (response.data.expires_in) {
+            const expirationTime = Date.now() + response.data.expires_in * 1000;
+            localStorage.setItem('authExpiration', expirationTime);
+          }
+        }
+        return response.data; // { user, token, expires_in, requires_2fa, user_id, username }
       }
       return rejectWithValue(response.data.message || 'Login failed');
     } catch (error) {
@@ -176,6 +190,32 @@ export const toggleTwoFactorAuth = createAsyncThunk(
   }
 );
 
+export const verifyLoginOTP = createAsyncThunk(
+  'user/verifyLoginOTP',
+  async ({ otp, username }, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/auth/verify-login-otp', { otp, username });
+      if (response.data.success) {
+        // Store auth tokens in localStorage for persistence
+        if (response.data.token) {
+          localStorage.setItem('authToken', response.data.token);
+        }
+        if (response.data.user) {
+          localStorage.setItem('authUser', JSON.stringify(response.data.user));
+        }
+        if (response.data.expires_in) {
+          const expirationTime = Date.now() + response.data.expires_in * 1000;
+          localStorage.setItem('authExpiration', expirationTime);
+        }
+        return response.data;
+      }
+      return rejectWithValue(response.data.message || 'OTP verification failed');
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'OTP verification failed');
+    }
+  }
+);
+
 // Auto-login with JWT token from offer response
 export const autoLoginWithToken = createAsyncThunk(
   'user/autoLoginWithToken',
@@ -276,13 +316,33 @@ const userSlice = createSlice({
       const storedUser = localStorage.getItem('authUser');
       const expiration = localStorage.getItem('authExpiration');
 
+      // Clean up any invalid data in localStorage
+      if (storedUser === 'undefined' || storedUser === 'null') {
+        localStorage.removeItem('authUser');
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('authExpiration');
+        state.user = null;
+        state.loading = false;
+        return;
+      }
+
       if (token && storedUser && expiration) {
-        const expTime = parseInt(expiration);
-        if (Date.now() < expTime) {
-          state.user = JSON.parse(storedUser);
-          state.loading = false;
-          // Note: Auto-logout timer is set in the component
-        } else {
+        try {
+          const expTime = parseInt(expiration);
+          if (Date.now() < expTime) {
+            state.user = JSON.parse(storedUser);
+            state.loading = false;
+            // Note: Auto-logout timer is set in the component
+          } else {
+            state.user = null;
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('authUser');
+            localStorage.removeItem('authExpiration');
+            state.loading = false;
+          }
+        } catch (error) {
+          // If JSON.parse fails, clear the invalid data and logout
+          console.error('Error parsing stored user data:', error);
           state.user = null;
           localStorage.removeItem('authToken');
           localStorage.removeItem('authUser');
@@ -304,11 +364,12 @@ const userSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.user = action.payload.user;
-        localStorage.setItem('authToken', action.payload.token);
-        localStorage.setItem('authUser', JSON.stringify(action.payload.user));
-        const expirationTime = Date.now() + action.payload.expires_in * 1000;
-        localStorage.setItem('authExpiration', expirationTime);
+        // Only set user and tokens if 2FA is not required
+        if (!action.payload.requires_2fa) {
+          state.user = action.payload.user;
+          // Tokens are already stored in localStorage by the thunk
+        }
+        // If 2FA is required, we don't set the user yet - wait for OTP verification
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.status = 'failed';
@@ -373,9 +434,13 @@ const userSlice = createSlice({
       })
       .addCase(changePassword.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.user = action.payload;
-        // Update localStorage with new user data
-        localStorage.setItem('authUser', JSON.stringify(action.payload));
+        // Only update user data if payload is valid
+        if (action.payload && typeof action.payload === 'object') {
+          state.user = action.payload;
+          // Update localStorage with new user data
+          localStorage.setItem('authUser', JSON.stringify(action.payload));
+        }
+        // If payload is invalid, keep existing user data
       })
       .addCase(changePassword.rejected, (state, action) => {
         state.status = 'failed';
@@ -402,9 +467,13 @@ const userSlice = createSlice({
       })
       .addCase(updateProfile.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.user = action.payload;
-        // Update localStorage with new user data
-        localStorage.setItem('authUser', JSON.stringify(action.payload));
+        // Only update user data if payload is valid
+        if (action.payload && typeof action.payload === 'object') {
+          state.user = action.payload;
+          // Update localStorage with new user data
+          localStorage.setItem('authUser', JSON.stringify(action.payload));
+        }
+        // If payload is invalid, keep existing user data
       })
       .addCase(updateProfile.rejected, (state, action) => {
         state.status = 'failed';
@@ -417,11 +486,29 @@ const userSlice = createSlice({
       })
       .addCase(toggleTwoFactorAuth.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.user = action.payload;
-        // Update localStorage with new user data
-        localStorage.setItem('authUser', JSON.stringify(action.payload));
+        // Only update user data if payload is valid
+        if (action.payload && typeof action.payload === 'object') {
+          state.user = action.payload;
+          // Update localStorage with new user data
+          localStorage.setItem('authUser', JSON.stringify(action.payload));
+        }
+        // If payload is invalid, keep existing user data
       })
       .addCase(toggleTwoFactorAuth.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      })
+      // Verify Login OTP
+      .addCase(verifyLoginOTP.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(verifyLoginOTP.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.user = action.payload.user;
+        // Tokens are already stored in localStorage by the thunk
+      })
+      .addCase(verifyLoginOTP.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
       })

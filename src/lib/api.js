@@ -24,10 +24,15 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('authUser');
-      localStorage.removeItem('authExpiration');
-    //   window.location.href = '/unauthorized';
+      // Don't auto-logout for 2FA toggle requests - let the component handle it
+      const isTwoFAToggle = error.config?.url?.includes('/user/twofa');
+      
+      if (!isTwoFAToggle) {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('authUser');
+        localStorage.removeItem('authExpiration');
+        //   window.location.href = '/unauthorized';
+      }
     }
     return Promise.reject(error);
   }

@@ -16,7 +16,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser, registerUser, forgotPassword, verifyOTP, resetPassword, clearError } from "@/redux/slices/userSlice";
+import { loginUser, registerUser, forgotPassword, verifyOTP, resetPassword, verifyLoginOTP, clearError } from "@/redux/slices/userSlice";
 import useAuth from "@/hooks/useAuth";
 
 export default function LoginModal({
@@ -33,13 +33,14 @@ export default function LoginModal({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [phase, setPhase] = useState("form"); // form | loading | success | failed | forgot | verify-otp | reset-password
+  const [phase, setPhase] = useState("form"); // form | loading | success | failed | forgot | verify-otp | reset-password | verify-2fa
   const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [isForgotPasswordMode, setIsForgotPasswordMode] = useState(false);
   const [resetToken, setResetToken] = useState(null); // State for resetToken
+  const [twoFactorData, setTwoFactorData] = useState(null); // Store 2FA data from login response
 
   const navigate = useNavigate();
-  const isCloseDisabled = phase === "loading" || phase === "verify-otp";
+  const isCloseDisabled = phase === "loading" || phase === "verify-otp" || phase === "verify-2fa";
   function validate() {
     const newErrors = { email: "", firstName: "", lastName: "", phone: "", password: "", confirmPassword: "", otp: "", newPassword: "" };
 
@@ -113,7 +114,18 @@ export default function LoginModal({
   async function handleAction(action, ...args) {
     setPhase("loading");
     try {
-      await dispatch(action(...args)).unwrap();
+      const result = await dispatch(action(...args)).unwrap();
+      
+      // Handle 2FA case for login
+      if (action === loginUser && result.requires_2fa) {
+        setTwoFactorData({
+          user_id: result.user_id,
+          username: result.username
+        });
+        setPhase("verify-2fa");
+        return;
+      }
+      
       setPhase("success");
     } catch (error) {
       setPhase("failed");
@@ -162,6 +174,36 @@ export default function LoginModal({
     }
   }
 
+  async function handle2FAOtpSubmit(e) {
+    e?.preventDefault();
+    if (!validateOtp()) return;
+
+    // Clear any existing OTP error before making the API call
+    setError("otp", "");
+    dispatch(clearError()); // Clear Redux error state
+    setPhase("loading");
+    try {
+      await dispatch(verifyLoginOTP({ 
+        otp: values.otp, 
+        username: twoFactorData.username 
+      })).unwrap();
+      
+      // Clear any OTP error on success
+      setError("otp", "");
+      dispatch(clearError()); // Clear Redux error state on success
+      setPhase("success");
+    } catch (error) {
+      // Stay in verify-2fa phase and show error inline
+      setPhase("verify-2fa");
+      setError("otp", error || "Invalid or expired OTP. Please try again.");
+      
+      // Handle rate limiting specifically
+      if (error.includes("rate limit") || error.includes("Too many")) {
+        toast.error("Too many attempts. Please try again later.", { duration: 5000 });
+      }
+    }
+  }
+
   function handleOtpModalClose(open) {
     if (!open && status !== "loading") {
       resetModalToLogin();
@@ -174,6 +216,7 @@ export default function LoginModal({
     setIsForgotPasswordMode(false);
     setPhase("form");
     setResetToken(null);
+    setTwoFactorData(null);
     resetForm();
     dispatch(clearError()); // Clear Redux error state
   }
@@ -253,7 +296,9 @@ export default function LoginModal({
                       ? "Verify OTP"
                       : isForgotPasswordMode && phase === "reset-password"
                         ? "Reset Password"
-                        : title}
+                        : phase === "verify-2fa"
+                          ? "Two-Factor Authentication"
+                          : title}
               </DialogTitle>
               <DialogDescription className="text-sm text-slate-600">
                 {isRegisterMode
@@ -261,26 +306,71 @@ export default function LoginModal({
                   : phase === "forgot"
                     ? "Enter your email to receive a verification OTP"
                     : phase === "verify-otp"
-                      ? `We’ve sent a 6-digit OTP to ${values.email}. Please enter it below.`
+                      ? `We've sent a 6-digit OTP to ${values.email}. Please enter it below.`
                       : phase === "reset-password"
                         ? "Enter your new password"
-                        : description}
+                        : phase === "verify-2fa"
+                          ? `We've sent a 6-digit OTP to ${twoFactorData?.username}. Please enter it below to complete your login.`
+                          : description}
               </DialogDescription>
             </DialogHeader>
           </div>
 
           <div className={`p-6 pt-0 ${isRegisterMode ? 'min-h-[480px]' : 'min-h-[420px]'}`}>
             <AnimatePresence mode="wait">
-              {(phase === "form" || phase === "forgot" || phase === "reset-password") && (
+              {(phase === "form" || phase === "forgot" || phase === "reset-password" || phase === "verify-2fa") && (
                 <motion.form
                   key="form"
-                  onSubmit={handleSubmit}
+                  onSubmit={phase === "verify-2fa" ? handle2FAOtpSubmit : handleSubmit}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.25, ease: "easeOut" }}
                   className={`grid ${isRegisterMode ? 'gap-4' : 'gap-5'}`}
                 >
+                  {/* 2FA OTP Field */}
+                  {phase === "verify-2fa" && (
+                    <div className="grid gap-2">
+                      <label htmlFor="otp" className="text-sm font-medium text-slate-800">
+                        Enter 6-digit OTP
+                      </label>
+                      <InputOTP
+                        id="otp"
+                        maxLength={6}
+                        value={values.otp || ""}
+                        onChange={(value) => {
+                          setValue("otp", value);
+                          // Clear OTP error when user starts typing
+                          if (errors.otp) {
+                            setError("otp", "");
+                          }
+                        }}
+                        className="flex gap-2"
+                      >
+                        <InputOTPGroup className="flex gap-2">
+                          {Array(6)
+                            .fill(null)
+                            .map((_, i) => (
+                              <InputOTPSlot
+                                key={i}
+                                index={i}
+                                className="h-11 w-11 rounded-lg border border-slate-200 bg-white text-center text-lg font-medium outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]"
+                              />
+                            ))}
+                        </InputOTPGroup>
+                      </InputOTP>
+                      {errors.otp && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="text-xs text-red-600"
+                        >
+                          {errors.otp}
+                        </motion.p>
+                      )}
+                    </div>
+                  )}
+
                   {/* Email Field */}
                   {(phase === "form" || phase === "forgot") && (
                     <div className="grid gap-2">
@@ -575,7 +665,9 @@ export default function LoginModal({
                               ? "Sending OTP..."
                               : phase === "reset-password"
                                 ? "Updating Password..."
-                                : "Signing In..."}
+                                : phase === "verify-2fa"
+                                  ? "Verifying OTP..."
+                                  : "Signing In..."}
                         </div>
                       ) : (
                         isRegisterMode
@@ -584,10 +676,25 @@ export default function LoginModal({
                             ? "Send OTP"
                             : phase === "reset-password"
                               ? "Update Password"
-                              : "Login"
+                              : phase === "verify-2fa"
+                                ? "Verify OTP"
+                                : "Login"
                       )}
                     </button>
                   </div>
+
+                  {/* Back to Login Link (2FA Mode Only) */}
+                  {phase === "verify-2fa" && (
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        onClick={handleBackToLogin}
+                        className="cursor-pointer text-sm text-slate-600 hover:text-slate-800 transition-colors underline underline-offset-2"
+                      >
+                        Back to Login
+                      </button>
+                    </div>
+                  )}
 
                   {/* Forgot Password Link (Login Mode Only) */}
                   {!isRegisterMode && phase === "form" && !isForgotPasswordMode && (
@@ -621,7 +728,10 @@ export default function LoginModal({
                   {/* Security Notice */}
                   <div className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
                     <ShieldCheck className="h-4 w-4 text-slate-700" />
-                    Your credentials are encrypted and secure
+                    {phase === "verify-2fa" 
+                      ? "Two-Factor Authentication provides enhanced security for your account"
+                      : "Your credentials are encrypted and secure"
+                    }
                   </div>
                 </motion.form>
               )}
@@ -643,7 +753,9 @@ export default function LoginModal({
                           ? "Processing registration..."
                           : isForgotPasswordMode && phase === "reset-password"
                             ? "Updating password..."
-                            : "Authenticating your credentials..."}
+                            : phase === "verify-2fa"
+                              ? "Verifying your OTP..."
+                              : "Authenticating your credentials..."}
                       </span>
                     </div>
                     <div className="h-1 w-full bg-slate-200">
@@ -661,7 +773,9 @@ export default function LoginModal({
                       ? "process your registration"
                       : isForgotPasswordMode && phase === "reset-password"
                         ? "update your password"
-                        : "verify your account"}
+                        : phase === "verify-2fa"
+                          ? "verify your OTP"
+                          : "verify your account"}
                     ...
                   </div>
                 </motion.div>

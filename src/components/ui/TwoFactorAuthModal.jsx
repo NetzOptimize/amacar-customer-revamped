@@ -47,7 +47,7 @@ export default function TwoFactorAuthModal({
           { duration: 3000 }
         );
         
-        // Close modal after success
+        // Close modal after success - user remains logged in
         setTimeout(() => {
           onClose();
           setPhase('confirmation');
