@@ -33,6 +33,10 @@ export default function TwoFactorAuthModal({
   const [error, setError] = useState('');
 
   const isCloseDisabled = phase === 'loading';
+  
+  // Determine the action being performed
+  const isDisabling = isEnabled; // If currently enabled, we're disabling
+  const isEnabling = !isEnabled; // If currently disabled, we're enabling
 
   const handleConfirm = async () => {
     setPhase('loading');
@@ -98,16 +102,16 @@ export default function TwoFactorAuthModal({
         showCloseButton={!isCloseDisabled}
       >
         <div className={`p-6 ${
-          isEnabled 
+          isDisabling 
             ? 'bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50' 
             : 'bg-gradient-to-br from-white via-slate-50 to-slate-100'
         }`}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-semibold tracking-tight text-slate-900">
-              {isEnabled ? 'Disable Two-Factor Authentication' : 'Enable Two-Factor Authentication'}
+              {isDisabling ? 'Disable Two-Factor Authentication' : 'Enable Two-Factor Authentication'}
             </DialogTitle>
             <DialogDescription className="text-sm text-slate-600">
-              {isEnabled 
+              {isDisabling 
                 ? 'This will remove the extra security layer from your account'
                 : 'Add an extra layer of security to protect your account'
               }
@@ -129,7 +133,7 @@ export default function TwoFactorAuthModal({
                 {/* Security Icon and Message */}
                 <div className="flex items-start space-x-4 p-4 rounded-xl border border-slate-200 bg-slate-50">
                   <div className="flex-shrink-0">
-                    {isEnabled ? (
+                    {isDisabling ? (
                       <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
                         <AlertTriangle className="w-5 h-5 text-red-600" />
                       </div>
@@ -141,10 +145,10 @@ export default function TwoFactorAuthModal({
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-slate-900 mb-2">
-                      {isEnabled ? 'Security Warning' : 'Enhanced Security'}
+                      {isDisabling ? 'Security Warning' : 'Enhanced Security'}
                     </h3>
                     <p className="text-sm text-slate-600 leading-relaxed">
-                      {isEnabled 
+                      {isDisabling 
                         ? 'Disabling Two-Factor Authentication will reduce your account security. You will no longer need to verify your identity with a second factor when signing in.'
                         : 'Enabling Two-Factor Authentication will require you to verify your identity with a second factor (like a mobile app or SMS) when signing in, significantly improving your account security.'
                       }
@@ -155,10 +159,10 @@ export default function TwoFactorAuthModal({
                 {/* Security Benefits/Consequences */}
                 <div className="space-y-3">
                   <h4 className="font-medium text-slate-900">
-                    {isEnabled ? 'What happens when disabled:' : 'Security benefits:'}
+                    {isDisabling ? 'What happens when disabled:' : 'Security benefits:'}
                   </h4>
                   <ul className="space-y-2 text-sm text-slate-600">
-                    {isEnabled ? (
+                    {isDisabling ? (
                       <>
                         <li className="flex items-center space-x-2">
                           <div className="w-1.5 h-1.5 rounded-full bg-red-400"></div>
@@ -205,12 +209,12 @@ export default function TwoFactorAuthModal({
                     onClick={handleConfirm}
                     disabled={status === 'loading'}
                     className={`flex-1 h-11 rounded-xl text-white text-sm font-semibold shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed ${
-                      isEnabled
+                      isDisabling
                         ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-500/20'
                         : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-green-500/20'
                     }`}
                   >
-                    {isEnabled ? 'Disable 2FA' : 'Enable 2FA'}
+                    {isDisabling ? 'Disable 2FA' : 'Enable 2FA'}
                   </button>
                 </div>
               </motion.div>
@@ -229,15 +233,15 @@ export default function TwoFactorAuthModal({
                   <div className="flex items-center gap-3 p-4">
                     <Loader2 className="h-5 w-5 animate-spin text-slate-700" />
                     <span className={`text-sm ${
-                      isEnabled ? 'text-orange-700' : 'text-slate-700'
+                      isDisabling ? 'text-orange-700' : 'text-slate-700'
                     }`}>
-                      {isEnabled ? 'Disabling Two-Factor Authentication...' : 'Enabling Two-Factor Authentication...'}
+                      {isDisabling ? 'Disabling Two-Factor Authentication...' : 'Enabling Two-Factor Authentication...'}
                     </span>
                   </div>
                   <div className="h-1 w-full bg-slate-200">
                     <motion.div
                       className={`h-1 ${
-                        isEnabled ? 'bg-orange-500' : 'bg-slate-800'
+                        isDisabling ? 'bg-orange-500' : 'bg-slate-800'
                       }`}
                       initial={{ width: "0%" }}
                       animate={{ width: "100%" }}
@@ -267,26 +271,26 @@ export default function TwoFactorAuthModal({
                   transition={{ type: "spring", stiffness: 340, damping: 18 }}
                 >
                   <div className={`grid place-items-center rounded-2xl border p-4 shadow-sm ${
-                    isEnabled 
+                    isDisabling 
                       ? 'border-orange-200 bg-gradient-to-b from-white to-orange-50' 
                       : 'border-green-200 bg-gradient-to-b from-white to-emerald-50'
                   }`}>
                     <CheckCircle2 className={`h-14 w-14 ${
-                      isEnabled ? 'text-orange-500' : 'text-green-500'
+                      isDisabling ? 'text-orange-500' : 'text-green-500'
                     }`} />
                   </div>
                   <Sparkles className="absolute -right-2 -top-2 h-4 w-4 text-amber-500" />
                 </motion.div>
                 <div className="space-y-1">
                   <h3 className={`text-lg font-semibold ${
-                    isEnabled ? 'text-orange-900' : 'text-slate-900'
+                    isDisabling ? 'text-orange-900' : 'text-slate-900'
                   }`}>
-                    {isEnabled ? '2FA Disabled Successfully!' : '2FA Enabled Successfully!'}
+                    {isDisabling ? '2FA Disabled Successfully!' : '2FA Enabled Successfully!'}
                   </h3>
                   <p className={`text-sm ${
-                    isEnabled ? 'text-orange-700' : 'text-slate-600'
+                    isDisabling ? 'text-orange-700' : 'text-slate-600'
                   }`}>
-                    {isEnabled 
+                    {isDisabling 
                       ? 'Two-Factor Authentication has been disabled for your account. Your account security has been reduced.'
                       : 'Two-Factor Authentication has been enabled for your account. Your account is now more secure.'
                     }
@@ -316,7 +320,7 @@ export default function TwoFactorAuthModal({
                 </motion.div>
                 <div className="space-y-1">
                   <h3 className="text-lg font-semibold text-slate-900">
-                    {isEnabled ? 'Failed to Disable 2FA' : 'Failed to Enable 2FA'}
+                    {isDisabling ? 'Failed to Disable 2FA' : 'Failed to Enable 2FA'}
                   </h3>
                   <p className="text-sm text-slate-600">
                     {error || 'An unexpected error occurred. Please try again.'}
