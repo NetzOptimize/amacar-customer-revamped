@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronRight, ChevronLeft, X, AlertCircle, Rocket, Car, CarFront, Gauge, Hash, Armchair, Camera, ArrowRight, ArrowLeft, LifeBuoy, CircleGauge } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { uploadVehicleImage, deleteVehicleImage, addUploadedImage, removeUploadedImage, clearImageUploadError, clearImageDeleteError, startAuction, clearAuctionStartError } from '@/redux/slices/carDetailsAndQuestionsSlice';
 import toast from 'react-hot-toast';
@@ -61,11 +61,12 @@ export default function VehiclePhotos() {
   const handleModalClose = () => {
     setShowTermsModal(false);
     setTermsAccepted(false);
+    setAccountTermsAccepted(false);
   };
 
   const handleAcceptTerms = async () => {
-    if (!termsAccepted) {
-      toast.error('Please accept the terms and conditions to continue');
+    if (!termsAccepted || !accountTermsAccepted) {
+      toast.error('Please accept both terms and conditions to continue');
       return;
     }
 
@@ -86,6 +87,7 @@ export default function VehiclePhotos() {
   const [dragActive, setDragActive] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [accountTermsAccepted, setAccountTermsAccepted] = useState(false);
 
   useEffect(() => {
     // console.log("questions", questions);
@@ -921,27 +923,29 @@ export default function VehiclePhotos() {
 
       {/* Terms and Conditions Modal */}
       <Dialog open={showTermsModal} onOpenChange={handleModalClose}>
-        <DialogContent className="sm:max-w-2xl rounded-2xl shadow-xl p-0 overflow-hidden bg-white">
-          <div className="bg-gradient-to-br from-white via-slate-50 to-slate-100 p-6">
+        <DialogContent className="w-[95vw] max-w-4xl h-[80vh] max-h-[800px] rounded-2xl shadow-xl p-0 overflow-hidden bg-white flex flex-col">
+          {/* Fixed Header */}
+          <div className="bg-gradient-to-br from-white via-slate-50 to-slate-100 p-4 sm:p-6 flex-shrink-0">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-semibold tracking-tight text-slate-900 flex items-center gap-3">
-                <div className="p-2 bg-purple-100 rounded-xl">
-                  <FileText className="h-6 w-6 text-purple-600" />
+              <DialogTitle className="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-slate-900 flex items-center gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2 bg-purple-100 rounded-xl">
+                  <FileText className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-purple-600" />
                 </div>
-                Your Car is Ready for Auction
+                <span className="break-words">Your Car is Ready for Auction</span>
               </DialogTitle>
-              <DialogDescription className="text-sm text-slate-600 mt-2">
+              <DialogDescription className="text-xs sm:text-sm text-slate-600 mt-1 sm:mt-2">
                 Please review and accept the terms before starting your auction
               </DialogDescription>
             </DialogHeader>
           </div>
 
-          <div className="p-6 max-h-96 overflow-y-auto">
-            <div className="space-y-4">
+          {/* Scrollable Content Area */}
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 min-h-0">
+            <div className="space-y-3 sm:space-y-4">
               {[
                 {
                   title: "Auction Agreement",
-                  content: "Once you confirm, your vehicle details will be shared with verified dealerships across the Amacar platform. Dealers will begin bidding in real time based on your car’s information and photos"
+                  content: "Once you confirm, your vehicle details will be shared with verified dealerships across the Amacar platform. Dealers will begin bidding in real time based on your car's information and photos"
                 },
                 {
                   title: "Vehicle Condition",
@@ -958,59 +962,74 @@ export default function VehiclePhotos() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="border border-slate-200 rounded-xl p-4 bg-slate-50/50"
+                  className="border border-slate-200 rounded-xl p-3 sm:p-4 bg-slate-50/50"
                 >
-                  <h3 className="text-sm font-semibold text-slate-800 mb-2 flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    {term.title}
+                  <h3 className="text-xs sm:text-sm font-semibold text-slate-800 mb-2 flex items-center gap-2">
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 flex-shrink-0" />
+                    <span className="break-words">{term.title}</span>
                   </h3>
-                  <p className="text-xs text-slate-600 leading-relaxed">{term.content}</p>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed break-words">{term.content}</p>
                 </motion.div>
               ))}
             </div>
-
-
           </div>
 
-          {/* Modal Footer */}
-          <div className="p-6 bg-slate-50 border-t border-slate-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  id="terms-checkbox"
-                  checked={termsAccepted}
-                  onChange={(e) => setTermsAccepted(e.target.checked)}
-                  className="h-4 w-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"
-                />
-                <label htmlFor="terms-checkbox" className="text-sm text-slate-700 cursor-pointer">
-                  I have read and agree to the Terms & Conditions
-                </label>
+          {/* Fixed Footer */}
+          <div className="p-4 sm:p-6 bg-slate-50 border-t border-slate-200 flex-shrink-0">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex flex-col gap-3 w-full sm:w-auto">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <input
+                    type="checkbox"
+                    id="terms-checkbox"
+                    checked={termsAccepted}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                    className="h-4 w-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500 flex-shrink-0"
+                  />
+                  <label htmlFor="terms-checkbox" className="text-xs sm:text-sm text-slate-700 cursor-pointer break-words">
+                    I have read and agree to the <Link to="/terms-of-service" className="text-[#f6851f] hover:text-[#e63946] font-medium">Terms & Conditions</Link>
+                  </label>
+                </div>
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <input
+                    type="checkbox"
+                    id="account-terms-checkbox"
+                    checked={accountTermsAccepted}
+                    onChange={(e) => setAccountTermsAccepted(e.target.checked)}
+                    className="h-4 w-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500 flex-shrink-0"
+                  />
+                  <label htmlFor="account-terms-checkbox" className="text-xs sm:text-sm text-slate-700 cursor-pointer break-words">
+                    I agree to the <Link to="/terms-of-service" className="text-[#f6851f] hover:text-[#e63946] font-medium">Account and Auction Terms for Customers</Link>
+                  </label>
+                </div>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
                 <button
                   onClick={handleModalClose}
-                  className="cursor-pointer px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+                  className="w-full sm:w-auto cursor-pointer px-4 py-2 text-xs sm:text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAcceptTerms}
-                  disabled={!termsAccepted || auctionStartStatus === 'starting'}
-                  className={`cursor-pointer px-6 py-2 text-sm font-semibold text-white rounded-lg transition-all ${termsAccepted && auctionStartStatus !== 'starting'
+                  disabled={!termsAccepted || !accountTermsAccepted || auctionStartStatus === 'starting'}
+                  className={`w-full sm:w-auto cursor-pointer px-4 sm:px-6 py-2 text-xs sm:text-sm font-semibold text-white rounded-lg transition-all ${termsAccepted && accountTermsAccepted && auctionStartStatus !== 'starting'
                     ? 'bg-gradient-to-r from-[#f6851f] to-[#e63946] hover:from-orange-600 hover:to-red-600 shadow-lg'
                     : 'bg-slate-400 cursor-not-allowed'
                     }`}
                 >
                   {auctionStartStatus === 'starting' ? (
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Starting...
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                      <span className="hidden sm:inline">Starting...</span>
+                      <span className="sm:hidden">Starting...</span>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2"><Rocket className="w-4 h-4" />
-                      <p>Start</p></div>
+                    <div className="flex items-center justify-center gap-2">
+                      <Rocket className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span>Start</span>
+                    </div>
                   )}
                 </button>
               </div>
