@@ -389,20 +389,20 @@ const PendingOffersPage = () => {
   }
 
   return (
-    <div className="lg:mt-16 min-h-screen bg-gradient-hero p-8 ">
+    <div className="lg:mt-16 min-h-screen bg-gradient-hero p-4 sm:p-6 lg:p-8">
       <div className="max-w-8xl mx-auto">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
-          <div className="flex items-center justify-between">
-            <div>
-              <motion.h1 variants={itemVariants} className="text-3xl font-bold text-neutral-800 mb-2">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+            <div className="flex-1 min-w-0">
+              <motion.h1 variants={itemVariants} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-800 mb-2">
                 Pending Offers
               </motion.h1>
-              <motion.p variants={itemVariants} className="text-neutral-600">
+              <motion.p variants={itemVariants} className="text-sm sm:text-base text-neutral-600">
                 Review and respond to offers from dealers on your vehicles.
               </motion.p>
             </div>
@@ -410,10 +410,10 @@ const PendingOffersPage = () => {
               variants={itemVariants}
               onClick={() => dispatch(fetchPendingOffers())}
               disabled={loading}
-              className="cursor-pointer btn-ghost flex items-center space-x-2"
+              className="cursor-pointer btn-ghost flex items-center justify-center space-x-2 w-full sm:w-auto px-4 py-2.5"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-              <span>Refresh</span>
+              <span className="text-sm sm:text-base">Refresh</span>
             </motion.button>
           </div>
         </motion.div>
@@ -437,19 +437,19 @@ const PendingOffersPage = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="mb-4"
+            className="mb-4 sm:mb-6"
           >
-            <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Search className="w-5 h-5 text-primary-600" />
-                  <span className="text-sm font-medium text-primary-800">
+            <div className="bg-primary-50 border border-primary-200 rounded-lg p-3 sm:p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <div className="flex items-center space-x-2 min-w-0">
+                  <Search className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm font-medium text-primary-800 truncate">
                     Showing {pendingOffers.length} results for "{searchQuery}"
                   </span>
                 </div>
                 <button
                   onClick={clearSearch}
-                  className="text-primary-600 hover:text-primary-800 text-sm font-medium"
+                  className="text-primary-600 hover:text-primary-800 text-xs sm:text-sm font-medium self-start sm:self-auto px-2 py-1 rounded hover:bg-primary-100 transition-colors"
                 >
                   Clear Search
                 </button>
@@ -464,42 +464,42 @@ const PendingOffersPage = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="mb-6"
+            className="mb-4 sm:mb-6"
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-neutral-800 mb-1">Pending Offers</h2>
-                <p className="text-sm text-neutral-600">{searchResults.length} offers pending review</p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-base sm:text-lg font-semibold text-neutral-800 mb-1">Pending Offers</h2>
+                <p className="text-xs sm:text-sm text-neutral-600">{searchResults.length} offers pending review</p>
               </div>
 
               {/* Modern Sort Dropdown */}
               <motion.div
                 variants={containerVariants}
-                className="relative w-[200px]"
+                className="relative w-full sm:w-[200px]"
                 ref={dropdownRef}
               >
                 {/* Dropdown Trigger */}
                 <button
                   onClick={() => !isSorting && setIsDropdownOpen(!isDropdownOpen)}
                   disabled={isSorting}
-                  className={`cursor-pointer flex items-center gap-3 bg-white border border-neutral-200 rounded-xl px-4 py-3 hover:border-neutral-300 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent group ${isSorting ? 'opacity-75 cursor-not-allowed' : ''
+                  className={`cursor-pointer flex items-center gap-2 sm:gap-3 bg-white border border-neutral-200 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 hover:border-neutral-300 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent group w-full ${isSorting ? 'opacity-75 cursor-not-allowed' : ''
                     }`}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
                     {isSorting ? (
-                      <RefreshCw className="w-4 h-4 text-orange-500 animate-spin" />
+                      <RefreshCw className="w-4 h-4 text-orange-500 animate-spin flex-shrink-0" />
                     ) : (
-                      <ArrowUpDown className="w-4 h-4 text-neutral-500 group-hover:text-orange-500 transition-colors" />
+                      <ArrowUpDown className="w-4 h-4 text-neutral-500 group-hover:text-orange-500 transition-colors flex-shrink-0" />
                     )}
-                    <div className="text-left">
-                      <div className="text-sm font-medium text-neutral-700">
+                    <div className="text-left flex-1 min-w-0">
+                      <div className="text-xs sm:text-sm font-medium text-neutral-700 truncate">
                         {isSorting ? 'Sorting...' : selectedOption.label}
                       </div>
                     </div>
                   </div>
                   {!isSorting && (
                     <ChevronDown
-                      className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''
+                      className={`w-4 h-4 text-neutral-400 transition-transform duration-200 flex-shrink-0 ${isDropdownOpen ? 'rotate-180' : ''
                         }`}
                     />
                   )}
@@ -523,22 +523,22 @@ const PendingOffersPage = () => {
                           <button
                             key={option.value}
                             onClick={() => handleSortSelect(option.value)}
-                            className={`cursor-pointer w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-neutral-50 transition-colors duration-150 ${isSelected ? 'bg-orange-50 text-orange-700' : 'text-neutral-700'
+                            className={`cursor-pointer w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-left hover:bg-neutral-50 transition-colors duration-150 ${isSelected ? 'bg-orange-50 text-orange-700' : 'text-neutral-700'
                               } ${index !== sortOptions.length - 1 ? 'border-b border-neutral-100' : ''}`}
                           >
-                            <div className={`p-1.5 rounded-lg ${isSelected ? 'bg-orange-100' : 'bg-neutral-100'
+                            <div className={`p-1 sm:p-1.5 rounded-lg flex-shrink-0 ${isSelected ? 'bg-orange-100' : 'bg-neutral-100'
                               }`}>
-                              <IconComponent className={`w-3.5 h-3.5 ${isSelected ? 'text-orange-600' : 'text-neutral-500'
+                              <IconComponent className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${isSelected ? 'text-orange-600' : 'text-neutral-500'
                                 }`} />
                             </div>
-                            <div className="flex-1">
-                              <div className={`text-sm font-medium ${isSelected ? 'text-orange-700' : 'text-neutral-700'
-                                }`}>
+                            <div className="flex-1 min-w-0">
+                              <div className={`text-xs sm:text-sm font-medium ${isSelected ? 'text-orange-700' : 'text-neutral-700'
+                                } truncate`}>
                                 {option.label}
                               </div>
                             </div>
                             {isSelected && (
-                              <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-orange-500 rounded-full flex-shrink-0"></div>
                             )}
                           </button>
                         );
@@ -557,7 +557,7 @@ const PendingOffersPage = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="space-y-6"
+            className="space-y-4 sm:space-y-6"
           >
             {/* Sorting Loading State - Show skeleton for offers list */}
             {isSorting && (
@@ -578,12 +578,12 @@ const PendingOffersPage = () => {
                   <motion.div
                     key={offer.id}
                     variants={itemVariants}
-                    className={`card p-6 border-l-4 ${offer.status === 'urgent' ? 'border-error' : 'border-warning'
+                    className={`card p-4 sm:p-6 border-l-4 ${offer.status === 'urgent' ? 'border-error' : 'border-warning'
                       }`}
                   >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-16 h-16 bg-neutral-200 rounded-lg flex items-center justify-center overflow-hidden">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
+                      <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 bg-neutral-200 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                           {(() => {
                             // Extract front view image from images array, fallback to first image, then to placeholder
                             const getFrontViewImage = () => {
@@ -603,19 +603,19 @@ const PendingOffersPage = () => {
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              <Car className="w-8 h-8 text-neutral-400" />
+                              <Car className="w-6 h-6 sm:w-8 sm:h-8 text-neutral-400" />
                             );
                           })()}
                         </div>
-                        <div>
-                          <h3 className="text-xl font-semibold text-neutral-800">{offer.vehicle}</h3>
-                          <p className="text-sm text-neutral-600">{offer.mileage} miles • {offer.description}</p>
-                          <div className="flex items-center space-x-4 mt-2">
-                            <span className="text-sm text-neutral-500">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-neutral-800 truncate">{offer.vehicle}</h3>
+                          <p className="text-xs sm:text-sm text-neutral-600 mt-1 line-clamp-2">{offer.mileage} miles • {offer.description}</p>
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-2 space-y-1 sm:space-y-0">
+                            <span className="text-xs sm:text-sm text-neutral-500">
                               {formatDate(offer.auctionEndTime)} • {offer.bidCount} active bids
                             </span>
                             {offer.totalBids > offer.bidCount && (
-                              <span className="text-sm text-neutral-400">
+                              <span className="text-xs sm:text-sm text-neutral-400">
                                 ({offer.totalBids - offer.bidCount} expired)
                               </span>
                             )}
@@ -623,7 +623,7 @@ const PendingOffersPage = () => {
                         </div>
                       </div>
 
-                      <div className="text-right">
+                      <div className="flex flex-col sm:flex-col items-start sm:items-end gap-2 sm:gap-0">
                         {/* Highest Bid or Cash Offer Badge */}
                         <div className="mb-2">
                           {(() => {
@@ -632,12 +632,12 @@ const PendingOffersPage = () => {
                             const showCashOffer = !hasActiveBids || cashOfferHigher;
 
                             return (
-                              <div className={`inline-flex items-center space-x-2 px-3 py-1.5 rounded-full text-sm font-semibold ${showCashOffer
+                              <div className={`inline-flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold ${showCashOffer
                                 ? 'bg-blue-100 text-blue-800 border border-blue-200'
                                 : 'bg-green-100 text-green-800 border border-green-200'
                                 }`}>
-                                <DollarSign className="w-4 h-4" />
-                                <span>
+                                <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                                <span className="truncate">
                                   {showCashOffer
                                     ? `Cash: ${formatCurrency(offer.cashOffer)}`
                                     : `Highest: ${formatCurrency(offer.highestBid)}`
@@ -656,23 +656,23 @@ const PendingOffersPage = () => {
                     </div>
 
                     {/* Dealer Information */}
-                    <div className="bg-neutral-50 rounded-lg p-4 mb-4">
-                      <h4 className="font-semibold text-neutral-800 mb-2">
+                    <div className="bg-neutral-50 rounded-lg p-3 sm:p-4 mb-4">
+                      <h4 className="font-semibold text-neutral-800 mb-2 text-sm sm:text-base">
                         {offer.bidCount > 0 ? 'Highest Bidder' : 'Offer Information'}
                       </h4>
-                      <div className="flex items-center justify-between">
-                        <div>
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                        <div className="flex-1 min-w-0">
                           {offer.bidCount > 0 ? (
                             <>
-                              <p className="font-medium text-neutral-700">{offer.dealer}</p>
-                              <div className="flex items-center space-x-2 text-sm text-neutral-600">
+                              <p className="font-medium text-neutral-700 text-sm sm:text-base truncate">{offer.dealer}</p>
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 text-xs sm:text-sm text-neutral-600 mt-1 space-y-1 sm:space-y-0">
                                 <span>Rating: {offer.dealerRating}/5</span>
-                                <span>•</span>
+                                <span className="hidden sm:inline">•</span>
                                 <span>{offer.dealerBidCount} bids placed</span>
                                 {offer.highestBidData?.bidder_email && (
                                   <>
-                                    <span>•</span>
-                                    <span>{offer.highestBidData.bidder_email}</span>
+                                    <span className="hidden sm:inline">•</span>
+                                    <span className="truncate">{offer.highestBidData.bidder_email}</span>
                                   </>
                                 )}
                               </div>
@@ -684,14 +684,14 @@ const PendingOffersPage = () => {
                             </>
                           ) : (
                             <>
-                              <p className="font-medium text-neutral-700">
+                              <p className="font-medium text-neutral-700 text-sm sm:text-base">
                                 {offer.cashOffer > 0 ? 'Cash Offer Available' : 'No Active Bids'}
                               </p>
-                              <div className="flex items-center space-x-2 text-sm text-neutral-600">
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 text-xs sm:text-sm text-neutral-600 mt-1 space-y-1 sm:space-y-0">
                                 <span>Total Bids: {offer.totalBids}</span>
                                 {offer.totalBids > 0 && (
                                   <>
-                                    <span>•</span>
+                                    <span className="hidden sm:inline">•</span>
                                     <span className="text-warning">All expired</span>
                                   </>
                                 )}
@@ -704,9 +704,9 @@ const PendingOffersPage = () => {
                             </>
                           )}
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm text-neutral-600">Auction Status</p>
-                          <p className="font-semibold text-warning">
+                        <div className="text-left sm:text-right flex-shrink-0">
+                          <p className="text-xs sm:text-sm text-neutral-600">Auction Status</p>
+                          <p className="font-semibold text-warning text-sm sm:text-base">
                             {offer.auctionStatus === 'active' ? formatTimeRemaining(offer.timeRemaining) : offer.auctionStatus}
                           </p>
                         </div>
@@ -714,74 +714,76 @@ const PendingOffersPage = () => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex space-x-2">
-                        <button onClick={() => navigate('/car-details', { state: { productId: offer.id } })} className="cursor-pointer btn-ghost flex items-center space-x-2">
-                          <Eye className="w-4 h-4" />
+                    <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
+                        <button 
+                          onClick={() => navigate('/car-details', { state: { productId: offer.id } })} 
+                          className="cursor-pointer btn-ghost flex items-center justify-center space-x-2 px-3 py-2 text-xs sm:text-sm"
+                        >
+                          <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                           <span>View Details</span>
                         </button>
                         <button
-                          className="cursor-pointer btn-secondary flex items-center space-x-2"
+                          className="cursor-pointer btn-secondary flex items-center justify-center space-x-2 px-3 py-2 text-xs sm:text-sm"
                           onClick={() => handleShowBids(offer)}
                           disabled={offer.totalBids === 0}
                         >
-                          View All Bids ({offer.totalBids})
+                          <span>View All Bids ({offer.totalBids})</span>
                         </button>
                       </div>
 
                       {/* Show different UI based on offer status */}
                       {offer.bidCount > 0 ? (
                         // Show accept/reject buttons when there are active bids
-                        <div className="flex space-x-2">
+                        <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
                           <button
                             onClick={() => handleRejectOffer(offer)}
-                            className="cursor-pointer btn-ghost text-error hover:bg-error/10 flex items-center space-x-2"
+                            className="cursor-pointer btn-ghost text-error hover:bg-error/10 flex items-center justify-center space-x-2 px-3 py-2 text-xs sm:text-sm"
                           >
-                            <X className="w-4 h-4" />
+                            <X className="w-3 h-3 sm:w-4 sm:h-4" />
                             <span>Reject</span>
                           </button>
                           <button
                             onClick={() => handleAcceptOffer(offer)}
-                            className="btn-primary flex items-center space-x-2"
+                            className="btn-primary flex items-center justify-center space-x-2 px-3 py-2 text-xs sm:text-sm"
                           >
-                            <CheckCircle className="w-4 h-4" />
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                             <span>Accept Bid</span>
                           </button>
                         </div>
                       ) : offer.cashOffer > 0 ? (
                         // Show cash offer info when only cash offer is available
-                        <div className="flex flex-col items-end space-y-2">
-
-                          <div className="flex space-x-2">
+                        <div className="flex flex-col items-stretch sm:items-end space-y-2">
+                          <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
                             <button
                               onClick={() => navigate('/car-details', { state: { productId: offer.id } })}
-                              className="cursor-pointer btn-ghost text-primary hover:bg-primary/10 flex items-center space-x-2"
+                              className="cursor-pointer btn-ghost text-primary hover:bg-primary/10 flex items-center justify-center space-x-2 px-3 py-2 text-xs sm:text-sm"
                             >
-                              <Eye className="w-4 h-4" />
+                              <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                               <span>View Details</span>
                             </button>
                           </div>
                         </div>
                       ) : (
                         // Show alternative UI when all bids are expired/rejected
-                        <div className="flex flex-col items-end space-y-2">
-                          <div className="flex items-center space-x-2 text-neutral-500">
-                            <Clock className="w-4 h-4" />
-                            <span className="text-sm">All offers expired</span>
+                        <div className="flex flex-col items-stretch sm:items-end space-y-2">
+                          <div className="flex items-center justify-center sm:justify-end space-x-2 text-neutral-500">
+                            <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span className="text-xs sm:text-sm">All offers expired</span>
                           </div>
-                          <div className="flex space-x-2">
+                          <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
                             <button
                               onClick={() => navigate('/car-details', { state: { productId: offer.id } })}
-                              className="cursor-pointer btn-ghost text-primary hover:bg-primary/10 flex items-center space-x-2"
+                              className="cursor-pointer btn-ghost text-primary hover:bg-primary/10 flex items-center justify-center space-x-2 px-3 py-2 text-xs sm:text-sm"
                             >
-                              <RefreshCw className="w-4 h-4" />
+                              <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />
                               <span>Relist Vehicle</span>
                             </button>
                             <button
                               onClick={() => navigate('/auction')}
-                              className="btn-primary flex items-center space-x-2"
+                              className="btn-primary flex items-center justify-center space-x-2 px-3 py-2 text-xs sm:text-sm"
                             >
-                              <Car className="w-4 h-4" />
+                              <Car className="w-3 h-3 sm:w-4 sm:h-4" />
                               <span>Start New Auction</span>
                             </button>
                           </div>
@@ -797,40 +799,42 @@ const PendingOffersPage = () => {
 
         {/* Load More Component */}
         {!loading && !error && searchResults.length > 0 && (
-          <LoadMore
-            items={sortedOffers}
-            itemsPerPage={itemsPerPage}
-            onLoadMore={handleLoadMore}
-            isLoadingMore={isLoadingMore}
-            hasMoreItems={hasMoreItems}
-            remainingItems={remainingItems}
-            SkeletonComponent={OffersListSkeleton}
-            buttonText="Load More Offers"
-            loadingText="Loading offers..."
-            showRemainingCount={true}
-          />
+          <div className="mt-6 sm:mt-8">
+            <LoadMore
+              items={sortedOffers}
+              itemsPerPage={itemsPerPage}
+              onLoadMore={handleLoadMore}
+              isLoadingMore={isLoadingMore}
+              hasMoreItems={hasMoreItems}
+              remainingItems={remainingItems}
+              SkeletonComponent={OffersListSkeleton}
+              buttonText="Load More Offers"
+              loadingText="Loading offers..."
+              showRemainingCount={true}
+            />
+          </div>
         )}
 
         {/* Empty State */}
         {!loading && !error && searchResults.length === 0 && (
           <motion.div
             variants={itemVariants}
-            className="flex -mt-16 items-center justify-center min-h-[60vh]"
+            className="flex -mt-8 sm:-mt-16 items-center justify-center min-h-[50vh] sm:min-h-[60vh] px-4"
           >
-            <div className="text-center max-w-md mx-auto">
+            <div className="text-center max-w-sm sm:max-w-md mx-auto">
               {/* Modern Icon Container */}
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
-                className="relative mb-4"
+                className="relative mb-4 sm:mb-6"
               >
-                <div className="w-20 h-20 bg-gradient-to-br from-primary-50 to-primary-100 rounded-3xl flex items-center justify-center mx-auto shadow-soft border border-primary-200">
-                  <Clock className="w-8 h-8 text-primary-500" />
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary-50 to-primary-100 rounded-3xl flex items-center justify-center mx-auto shadow-soft border border-primary-200">
+                  <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-primary-500" />
                 </div>
                 {/* Decorative elements */}
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-warning/20 rounded-full animate-pulse-slow"></div>
-                <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-accent/20 rounded-full animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+                <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-4 h-4 sm:w-6 sm:h-6 bg-warning/20 rounded-full animate-pulse-slow"></div>
+                <div className="absolute -bottom-1 -left-1 w-3 h-3 sm:w-4 sm:h-4 bg-accent/20 rounded-full animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
               </motion.div>
 
               {/* Content */}
@@ -838,11 +842,14 @@ const PendingOffersPage = () => {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-                className="space-y-4"
+                className="space-y-2 sm:space-y-4"
               >
-                <h3 className="text-2xl font-bold text-neutral-800 font-display">
+                <h3 className="text-xl sm:text-2xl font-bold text-neutral-800 font-display">
                   No Pending Offers
                 </h3>
+                <p className="text-sm sm:text-base text-neutral-600">
+                  You don't have any pending offers at the moment.
+                </p>
               </motion.div>
 
               {/* Action Buttons */}
@@ -850,18 +857,18 @@ const PendingOffersPage = () => {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-                className="flex flex-col sm:flex-row gap-4 mt-4"
+                className="flex flex-col gap-3 sm:gap-4 mt-6 sm:mt-8"
               >
                 <motion.button
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   onClick={() => navigate('/auction')}
-                  className="cursor-pointer w-60 px-4 h-16 group relative bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:shadow-xl hover:shadow-primary-500/25 focus:outline-none focus:ring-4 focus:ring-primary-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="cursor-pointer w-full sm:w-60 px-4 h-12 sm:h-16 group relative bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:shadow-xl hover:shadow-primary-500/25 focus:outline-none focus:ring-4 focus:ring-primary-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
-                  <div className="flex items-center justify-between ">
-                    <Car className="transition-transform duration-300 group-hover:scale-110" />
-                    <span className="text-md">Start New Auction</span>
+                  <div className="flex items-center justify-center space-x-2 sm:space-x-3">
+                    <Car className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110" />
+                    <span className="text-sm sm:text-base">Start New Auction</span>
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
                 </motion.button>
@@ -871,11 +878,11 @@ const PendingOffersPage = () => {
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   onClick={() => navigate('/dashboard')}
-                  className="cursor-pointer w-60 px-4 h-16 group relative overflow-hidden bg-white hover:bg-neutral-50 text-neutral-700 font-semibold py-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-300 transition-all duration-300 transform hover:shadow-lg hover:shadow-neutral-500/10 focus:outline-none focus:ring-4 focus:ring-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="cursor-pointer w-full sm:w-60 px-4 h-12 sm:h-16 group relative overflow-hidden bg-white hover:bg-neutral-50 text-neutral-700 font-semibold rounded-2xl border-2 border-neutral-200 hover:border-neutral-300 transition-all duration-300 transform hover:shadow-lg hover:shadow-neutral-500/10 focus:outline-none focus:ring-4 focus:ring-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
-                  <div className="flex items-center justify-center space-x-3">
-                    <Eye className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-                    <span className="text-lg">View Dashboard</span>
+                  <div className="flex items-center justify-center space-x-2 sm:space-x-3">
+                    <Eye className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110" />
+                    <span className="text-sm sm:text-base">View Dashboard</span>
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-r from-neutral-100/0 via-neutral-100/50 to-neutral-100/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
                 </motion.button>
