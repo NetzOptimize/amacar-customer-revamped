@@ -157,7 +157,7 @@ export default function Modal({
                       value={vin}
                       onChange={(e) => setVin(e.target.value.toUpperCase())}
                       placeholder="Enter 17‑character VIN"
-                      className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]"
+                      className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]"
                     />
                   </div>
                   {errors.vin && <p className="text-xs text-red-600">{errors.vin}</p>}
@@ -175,10 +175,11 @@ export default function Modal({
                       inputMode="numeric"
                       onChange={(e) => setZip(e.target.value.replace(/[^0-9]/g, "").slice(0, 5))}
                       placeholder="Enter 5‑digit ZIP"
-                      className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]"
+                      className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]"
                     />
                   </div>
                   {errors.zip && <p className="text-xs text-red-600">{errors.zip}</p>}
+                  <p> JTHBL46FX75021954 80226</p>
                 </div>
 
                 <div className="pt-1">

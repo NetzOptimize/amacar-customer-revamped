@@ -9,7 +9,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 import toast from "react-hot-toast"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { getInstantCashOffer } from "@/redux/slices/carDetailsAndQuestionsSlice"
 import { autoLoginWithToken } from "@/redux/slices/userSlice"
@@ -41,7 +41,11 @@ export default function AuctionSelectionModal({ isOpen, onClose, userFormData = 
       color: "from-blue-500 to-blue-600",
       borderColor: "border-blue-200",
       bgColor: "bg-blue-50/50",
-      consentText: "I have read Terms of Service and Privacy Policy and I agree to share my contact details with Amacar’s participating dealers, who may contact me by phone, text, or email about this offer..",
+      consentText: (
+        <span>
+          I have read <Link to="/terms-of-service" className="underline text-blue-600 hover:no-underline">Terms of Service</Link> and <Link to="/privacy-policy" className="underline text-blue-600 hover:no-underline">Privacy Policy</Link> and I agree to share my contact details with Amacar's participating dealers, who may contact me by phone, text, or email about this offer.
+        </span>
+      ),
       termsText: "I agree"
     },
     {
@@ -52,7 +56,11 @@ export default function AuctionSelectionModal({ isOpen, onClose, userFormData = 
       color: "from-orange-500 to-orange-600",
       borderColor: "border-orange-200",
       bgColor: "bg-orange-50/50",
-      consentText: "Additional dealerships on the Amacar platform may provide more competitive offers. By consenting, I authorize Amacar to share my details with member dealerships for this purpose. Dealers may contact me by phone, text, or email"
+      consentText: (
+        <span>
+          Additional dealerships on the Amacar platform may provide more competitive offers. By consenting, I authorize Amacar to share my details with member dealerships for this purpose. Dealers may contact me by phone, text, or email
+        </span>
+      )
     }
   ]
   // Build the API request payload for Instant Cash Offer
@@ -414,9 +422,9 @@ export default function AuctionSelectionModal({ isOpen, onClose, userFormData = 
 
                   {/* Consent Text */}
                   <div className="mb-4">
-                    <p className="text-sm text-slate-700 leading-relaxed">
+                    <div className="text-sm text-slate-700 leading-relaxed">
                       {option.consentText}
-                    </p>
+                    </div>
                   </div>
 
                 </motion.div>
@@ -434,7 +442,7 @@ export default function AuctionSelectionModal({ isOpen, onClose, userFormData = 
                   className="h-4 w-4 mt-1 disabled:cursor-not-allowed disabled:opacity-50"
                 />
                 <label className="text-sm text-slate-700 cursor-pointer">
-                  I have read and agree to the Terms of Use and Privacy Policy.
+                  I have read and agree to the <Link to="/terms-of-service" className="underline text-blue-600 hover:no-underline">Terms of Use</Link> and <Link to="/privacy-policy" className="underline text-blue-600 hover:no-underline">Privacy Policy</Link>.
                 </label>
               </div>
               

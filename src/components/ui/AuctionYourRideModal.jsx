@@ -20,7 +20,7 @@ import {
   resetModalState,
   setStateVin
 } from "@/redux/slices/carDetailsAndQuestionsSlice"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 
 export default function AuctionModal({
   isOpen,
@@ -253,7 +253,7 @@ export default function AuctionModal({
   return (
     <Dialog open={isOpen} onOpenChange={isCloseDisabled ? undefined : handleOpenChange}>
       <DialogContent
-        className="lg:mt-[1rem] mt-[2rem] sm:max-w-3xl rounded-xl shadow-xl p-0 overflow-hidden bg-white h-[70vh] md:h-[75vh] lg:h-auto lg:max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        className="lg:mt-[1rem] mt-[2rem] sm:max-w-2xl md:max-w-2xl lg:max-w-3xl rounded-xl shadow-xl p-0 overflow-hidden bg-white h-[70vh] md:h-[75vh] lg:h-auto lg:max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         showCloseButton={!isCloseDisabled}
       >
         <div className="bg-[#f6851f] p-4 sm:p-6 text-white">
@@ -629,9 +629,9 @@ export default function AuctionModal({
                 <div className="text-center mt-2">
                   <p className="text-xs text-slate-600 leading-relaxed">
                     By submitting this form, you agree to our{" "}
-                    <a href="#" className="underline text-[var(--brand-orange)] hover:no-underline">Terms of Service</a>{" "}
+                    <Link to="/terms-of-service" className="underline text-[var(--brand-orange)] hover:no-underline">Terms of Service</Link>{" "}
                     and{" "}
-                    <a href="#" className="underline text-[var(--brand-orange)] hover:no-underline">Privacy Policy</a>.
+                    <Link to="/privacy-policy" className="underline text-[var(--brand-orange)] hover:no-underline">Privacy Policy</Link>.
                   </p>
                 </div>
               </motion.form>
@@ -694,7 +694,7 @@ export default function AuctionModal({
                 </div>
                 <button
                   onClick={handleSuccessAction}
-                  className="cursor-pointer w-full h-10 sm:h-11 rounded-xl bg-slate-900 text-white text-base font-semibold shadow-lg shadow-slate-900/20 hover:bg-slate-800"
+                  className="cursor-pointer w-full h-12 sm:h-11 rounded-xl bg-slate-900 text-white text-base font-semibold shadow-lg shadow-slate-900/20 hover:bg-slate-800"
                 >
                   Continue
                 </button>
@@ -729,13 +729,13 @@ export default function AuctionModal({
                 <div className="flex flex-col sm:flex-row gap-3 w-full">
                   <button
                     onClick={() => dispatch(resetModalState())}
-                    className="cursor-pointer px-4 sm:px-6 h-10 sm:h-11 rounded-xl bg-slate-900 text-white text-base font-semibold shadow-lg shadow-slate-900/20 hover:bg-slate-800 flex-1"
+                    className="cursor-pointer px-4 sm:px-6 h-12 sm:h-11 rounded-xl bg-slate-900 text-white text-base font-semibold shadow-lg shadow-slate-900/20 hover:bg-slate-800 flex-1"
                   >
                     Try Again
                   </button>
                   <button
                     onClick={() => handleOpenChange(false)}
-                    className="cursor-pointer px-4 sm:px-6 h-10 sm:h-11 rounded-xl border border-slate-300 text-slate-700 text-base font-semibold hover:bg-slate-50 flex-1"
+                    className="cursor-pointer px-4 sm:px-6 h-12 sm:h-11 rounded-xl border border-slate-300 text-slate-700 text-base font-semibold hover:bg-slate-50 flex-1"
                   >
                     Cancel
                   </button>

@@ -106,11 +106,15 @@ export default function CarFooterSection() {
                 {/* Stats */}
                 <motion.div
                     variants={itemVariants}
-                    className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12 lg:mb-16"
+                    className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12 lg:mb-16"
                 >
                     <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
-                        <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2">10,000+</div>
+                        <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2">1000+</div>
                         <div className="text-sm sm:text-base text-slate-300">Cars Sold</div>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
+                        <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2">$25M+</div>
+                        <div className="text-sm sm:text-base text-slate-300">Total value</div>
                     </div>
                     <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
                         <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2">4.9★</div>
@@ -159,6 +163,8 @@ export default function CarFooterSection() {
                     </motion.button> */}
                 </motion.div>
             </motion.div>
+
+            
 
             {/* Bottom fade effect */}
             <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-900 to-transparent" />

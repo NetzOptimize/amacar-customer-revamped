@@ -301,24 +301,24 @@ useEffect(() => {
         
         {/* Step indicator */}
         {!showAll && (
-          <div className="mb-8 flex justify-center">
-            <div className="flex items-center space-x-4">
+          <div className="mb-6 sm:mb-8 flex justify-center">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               {stepperSteps.map((stepName, index) => (
                 <div key={stepName} className="flex items-center">
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium ${
+                  <div className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full text-xs sm:text-sm font-medium ${
                     index <= step 
                       ? "bg-[#f6851f] text-white" 
                       : "bg-slate-200 text-slate-600"
                   }`}>
                     {index + 1}
                   </div>
-                  <span className={`ml-2 text-sm font-medium ${
+                  <span className={`ml-1 sm:ml-2 text-xs sm:text-sm font-medium hidden sm:block ${
                     index <= step ? "text-[#f6851f]" : "text-slate-600"
                   }`}>
                     {stepName}
                   </span>
                   {index < stepperSteps.length - 1 && (
-                    <div className={`mx-4 h-0.5 w-8 ${
+                    <div className={`mx-2 sm:mx-4 h-0.5 w-4 sm:w-8 ${
                       index < step ? "bg-[#f6851f]" : "bg-slate-200"
                     }`} />
                   )}
@@ -613,7 +613,7 @@ useEffect(() => {
             <div className="sticky top-6">
               {/* Merged Vehicle Information and Live Preview Card */}
               <div className="rounded-2xl border border-white/60 bg-white/70 shadow-xl backdrop-blur-xl overflow-hidden">
-                <div className="h-[560px] overflow-y-auto">
+                <div className="h-auto lg:h-[560px] lg:overflow-y-auto">
                   <div className="p-6">
                     {/* Vehicle Information Section */}
                     <div className="mb-6">
