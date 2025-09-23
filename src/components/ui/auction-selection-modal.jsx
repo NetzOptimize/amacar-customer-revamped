@@ -35,7 +35,7 @@ export default function AuctionSelectionModal({ isOpen, onClose, userFormData = 
   const auctionOptions = [
     {
       id: "local",
-      title: "Local Auction",
+      title: "Local Dealers",
       subtitle: "Three verified dealers are actively interested in buying your car",
       icon: MapPin,
       color: "from-blue-500 to-blue-600",
