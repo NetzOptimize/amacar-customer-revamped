@@ -36,9 +36,10 @@ export default function VehiclePhotos() {
     try {
       // Clear any previous errors
       dispatch(clearAuctionStartError());
-      const auction_terms_accepted = termsAccepted ? "accepted" : "not_accepted";
+      const auction_page_privacy_check = termsAccepted ? "accepted" : "not_accepted";
+      const auction_page_terms = accountTermsAccepted ? "accepted" : "not_accepted";
       // Start the auction
-      const result = await dispatch(startAuction({ productId, auction_terms_accepted })).unwrap();
+      const result = await dispatch(startAuction({ productId, auction_page_privacy_check, auction_page_terms })).unwrap();
 
       // Show success toast
       toast.success(result.message || 'Auction started successfully!');
@@ -987,7 +988,7 @@ export default function VehiclePhotos() {
                     className="h-4 w-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500 flex-shrink-0"
                   />
                   <label htmlFor="terms-checkbox" className="text-xs sm:text-sm text-slate-700 cursor-pointer break-words">
-                    I have read and agree to the <Link to="/terms-of-service" className="text-[#f6851f] hover:text-[#e63946] font-medium">Terms & Conditions</Link>
+                    I have read and agree to the <Link to="/privacy-policy" className="text-[#f6851f] hover:text-[#e63946] font-medium">Privacy Policy</Link>
                   </label>
                 </div>
                 <div className="flex items-center gap-2 sm:gap-3">
