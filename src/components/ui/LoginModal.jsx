@@ -40,11 +40,12 @@ export default function LoginModal({
   const [resetToken, setResetToken] = useState(null); // State for resetToken
   const [twoFactorData, setTwoFactorData] = useState(null); // Store 2FA data from login response
   const [registerConsent, setRegisterConsent] = useState(false); // State for terms and privacy policy consent
+  const [privacyConsent, setPrivacyConsent] = useState(false); // State for privacy policy consent
 
   const navigate = useNavigate();
   const isCloseDisabled = phase === "loading" || phase === "verify-otp" || phase === "verify-2fa";
   function validate() {
-    const newErrors = { email: "", firstName: "", lastName: "", phone: "", password: "", confirmPassword: "", otp: "", newPassword: "", registerConsent: "" };
+    const newErrors = { email: "", firstName: "", lastName: "", phone: "", password: "", confirmPassword: "", otp: "", newPassword: "", registerConsent: "", privacyConsent: "" };
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!values.email) {
@@ -94,7 +95,11 @@ export default function LoginModal({
 
     // Register consent validation (only for registration mode)
     if (isRegisterMode && !registerConsent) {
-      newErrors.registerConsent = "You must agree to the Terms of Use and Privacy Policy";
+      newErrors.registerConsent = "You must agree to the Terms of Use";
+    }
+    
+    if (isRegisterMode && !privacyConsent) {
+      newErrors.privacyConsent = "You must agree to the Privacy Policy";
     }
 
     Object.keys(newErrors).forEach((key) => {
@@ -151,7 +156,8 @@ export default function LoginModal({
         lastName: values.lastName, 
         password: values.password, 
         confirmPassword: values.confirmPassword,
-        registerConsent: registerConsent
+        registerConsent: registerConsent,
+        privacyConsent: privacyConsent
       });
     } else if (isForgotPasswordMode && phase === "forgot") {
       await handleAction(forgotPassword, values.email);
@@ -232,6 +238,7 @@ export default function LoginModal({
     setResetToken(null);
     setTwoFactorData(null);
     setRegisterConsent(false);
+    setPrivacyConsent(false);
     resetForm();
     dispatch(clearError()); // Clear Redux error state
   }
@@ -676,36 +683,52 @@ export default function LoginModal({
 
                   {/* Terms and Privacy Policy Consent (Registration Mode Only) */}
                   {isRegisterMode && (
-                    <div className="flex items-start gap-3">
-                      <input
-                        type="checkbox"
-                        id="registerConsent"
-                        checked={registerConsent}
-                        onChange={(e) => setRegisterConsent(e.target.checked)}
-                        className="h-4 w-4 mt-1 flex-shrink-0 cursor-pointer"
-                      />
-                      <label htmlFor="registerConsent" className="text-xs text-slate-700 cursor-pointer leading-relaxed">
-                        By creating an account, you agree to Amacar's{" "}
-                        <Link 
-                          to="/terms-of-service" 
-                          className="underline text-blue-600 hover:no-underline cursor-pointer"
-                          onClick={() => onClose(false)}
-                        >
-                          Terms of Use
-                        </Link>{" "}
-                        and{" "}
-                        <Link 
-                          to="/privacy-policy" 
-                          className="underline text-blue-600 hover:no-underline cursor-pointer"
-                          onClick={() => onClose(false)}
-                        >
-                          Privacy Policy
-                        </Link>.
-                      </label>
+                    <div className="space-y-3">
+                      {/* Terms of Use Checkbox */}
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          id="registerConsent"
+                          checked={registerConsent}
+                          onChange={(e) => setRegisterConsent(e.target.checked)}
+                          className="h-4 w-4 mt-1 flex-shrink-0 cursor-pointer text-orange-600 border-slate-300 rounded focus:ring-orange-500"
+                        />
+                        <label htmlFor="registerConsent" className="text-xs text-slate-700 cursor-pointer leading-relaxed">
+                          I agree to the{" "}
+                          <Link 
+                            to="/terms-of-service" 
+                            className="text-[#f6851f] hover:text-[#e63946] font-medium no-underline"
+                            onClick={() => onClose(false)}
+                          >
+                            Account and Auction Terms for Customers
+                          </Link>
+                        </label>
+                      </div>
+                      
+                      {/* Privacy Policy Checkbox */}
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          id="privacyConsent"
+                          checked={privacyConsent}
+                          onChange={(e) => setPrivacyConsent(e.target.checked)}
+                          className="h-4 w-4 mt-1 flex-shrink-0 cursor-pointer text-orange-600 border-slate-300 rounded focus:ring-orange-500"
+                        />
+                        <label htmlFor="privacyConsent" className="text-xs text-slate-700 cursor-pointer leading-relaxed">
+                          I have read and agree to the{" "}
+                          <Link 
+                            to="/privacy-policy" 
+                            className="text-[#f6851f] hover:text-[#e63946] font-medium no-underline"
+                            onClick={() => onClose(false)}
+                          >
+                            Privacy Policy
+                          </Link>
+                        </label>
+                      </div>
                     </div>
                   )}
 
-                  {/* Register Consent Error */}
+                  {/* Register Consent Errors */}
                   {errors.registerConsent && (
                     <motion.p
                       initial={{ opacity: 0, y: -4 }}
@@ -715,12 +738,22 @@ export default function LoginModal({
                       {errors.registerConsent}
                     </motion.p>
                   )}
+                  
+                  {errors.privacyConsent && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-xs text-red-600"
+                    >
+                      {errors.privacyConsent}
+                    </motion.p>
+                  )}
 
                   {/* Submit Button */}
                   <div className="pt-1">
                     <button
                       type="submit"
-                      disabled={status === "loading"}
+                      disabled={status === "loading" || (isRegisterMode && (!registerConsent || !privacyConsent))}
                       className="cursor-pointer w-full h-11 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-sm font-semibold shadow-lg shadow-orange-500/20 transition hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {status === "loading" ? (
