@@ -232,10 +232,10 @@ export const uploadVehicleImage = createAsyncThunk(
 
       if (response.success) {
         return {
-          attachmentId: response.data.attachment_id,
-          imageUrl: response.data.image_url,
-          metaKey: response.data.meta_key,
-          productId: response.data.product_id,
+          attachmentId: response.attachment_id,
+          imageUrl: response.image_url,
+          metaKey: response.meta_key,
+          productId: response.product_id,
           imageName: imageName,
           localUrl: URL.createObjectURL(file), // Keep original file URL for immediate display
           compressedSize: compressedFile.size,
