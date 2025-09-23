@@ -15,7 +15,7 @@ import MyAppointments from './Pages/MyAppointments.jsx';
 import ProfilePage from './Pages/ProfilePage.jsx';
 import ConditionAssessment from './Pages/ConditionAssessment.jsx';
 import ExteriorPhotos from './Pages/ExteriorPhotos.jsx';
-import ReviewPage from './Pages/ReviewPage.jsx';
+import ReviewPageById from './Pages/ReviewPageById.jsx';
 import UnauthorizedPage from './Pages/UnauthorizedPage.jsx';
 import CarDetailsView from './Pages/CarDetailsView.jsx';
 import { AuthProvider } from './provider/AuthProvider'; // Updated Redux-based AuthProvider
@@ -29,7 +29,6 @@ import CookiesPolicy from './Pages/CookiesPolicy.jsx';
 import Testimonials from './Pages/Testimonials.jsx';
 import FAQ from './Pages/FAQ.jsx';
 import ScrollToTop from './components/ui/ScrollToTop.jsx';
-import ReviewPageById from './Pages/ReviewPageById.jsx';
 
 function App() {
   const location = useLocation();
@@ -88,8 +87,7 @@ function App() {
               <Route path="/condition-assessment" element={<ConditionAssessment />} />
               <Route path="/local-auction" element={<ExteriorPhotos />} />
               <Route path="/national-auction" element={<ExteriorPhotos />} />
-              <Route path="/review" element={<ReviewPage />} />
-              <Route path="/review/:id" element={<ReviewPageById />} />
+              <Route path="/review" element={<ReviewPageById />} />
               <Route path="/unauthorized" element={<UnauthorizedPage />} />
               <Route path="/about-us" element={<AboutUs />} />
               <Route path="/testimonials" element={<Testimonials />} />

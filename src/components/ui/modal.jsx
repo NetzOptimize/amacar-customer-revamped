@@ -179,7 +179,6 @@ export default function Modal({
                     />
                   </div>
                   {errors.zip && <p className="text-xs text-red-600">{errors.zip}</p>}
-                  <p> JTHBL46FX75021954 80226</p>
                 </div>
 
                 <div className="pt-1">

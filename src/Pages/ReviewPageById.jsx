@@ -12,16 +12,23 @@ import {
   Camera,
   User
 } from 'lucide-react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { getOfferByProductId } from '@/redux/slices/carDetailsAndQuestionsSlice';
 import AuctionSelectionModal from '@/components/ui/auction-selection-modal';
 import LoginModal from '@/components/ui/LoginModal';
+import ReviewPage from './ReviewPage';
+import ReviewPageSkeleton from '@/components/skeletons/ReviewPageSkeleton';
 
 export default function ReviewPageById() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { productId } = useParams();
+  const [searchParams] = useSearchParams();
+  // Try multiple possible parameter names
+  const productId = searchParams.get('appraised_auction_id') || 
+                   searchParams.get('id') || 
+                   searchParams.get('product_id') || 
+                   searchParams.get('auction_id');
   const [showAuctionModal, setShowAuctionModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   
@@ -37,12 +44,29 @@ export default function ReviewPageById() {
   // const userExists = offer?.userInfo?.user_exists;
   const isUserLoggedIn = userState && userState.id;
 
+  // Debug logging
+  useEffect(() => {
+    console.log('ReviewPageById Debug:', {
+      searchParams: searchParams.toString(),
+      productId,
+      allParams: Object.fromEntries(searchParams.entries()),
+      vehicleDetails,
+      offer
+    });
+  }, [searchParams, productId, vehicleDetails, offer]);
+
   // Fetch offer data when component mounts
   useEffect(() => {
     if (productId) {
+      console.log('Dispatching getOfferByProductId with:', productId);
       dispatch(getOfferByProductId(productId));
+      
+      // Hide the query parameter from URL immediately
+      navigate('/review', { replace: true });
+    } else {
+      console.log('No productId found in URL parameters');
     }
-  }, [dispatch, productId]);
+  }, [dispatch, productId, navigate]);
   
 
 
@@ -65,14 +89,7 @@ export default function ReviewPageById() {
 
   // Show loading state if data is not available
   if (loading || offerStatus === 'loading') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-slate-100">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading your offer...</p>
-        </div>
-      </div>
-    );
+    return <ReviewPageSkeleton />;
   }
 
   // Show error state if there's an error
@@ -96,16 +113,14 @@ export default function ReviewPageById() {
     );
   }
 
+  // If no productId, show the original ReviewPage content
+  if (!productId) {
+    return <ReviewPage />;
+  }
+
   // Show loading state if no data is available yet
   if (!hasVehicleData && !hasOfferData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-slate-100">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading your offer...</p>
-        </div>
-      </div>
-    );
+    return <ReviewPageSkeleton />;
   }
 
   return (
@@ -180,7 +195,7 @@ export default function ReviewPageById() {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
               {/* Show login button if user doesn't exist and is not logged in */}
-              {
+              {/* {
                 userExists && !isUserLoggedIn && (
                   <motion.button
                   onClick={() => setShowLoginModal(true)}
@@ -203,7 +218,7 @@ export default function ReviewPageById() {
                     whileTap={{ scale: 0.98 }}
                   >
                     <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
-                    Upload photos
+                    Auction your ride
                   </motion.button>
                 )
               }
@@ -216,8 +231,31 @@ export default function ReviewPageById() {
                     whileTap={{ scale: 0.98 }}
                   >
                     <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
-                    Upload photos
+                    Auction your ride
                   </motion.button>
+                )
+              }  */}
+              {
+                isUserLoggedIn ? (
+                  <motion.button
+                  onClick={handleLaunchAuction}
+                  className="cursor-pointer inline-flex h-10 sm:h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#f6851f] to-[#e63946] px-6 sm:px-8 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-orange-500/25 transition hover:scale-[1.02] hover:shadow-xl"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
+                  Auction your ride
+                </motion.button>
+                ) : (
+                  <motion.button
+                  onClick={() => setShowLoginModal(true)}
+                  className="cursor-pointer inline-flex h-10 sm:h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 px-6 sm:px-8 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition hover:scale-[1.02] hover:shadow-xl"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <User className="h-3 w-3 sm:h-4 sm:w-4" />
+                  Login to Continue
+                </motion.button>
                 )
               }
             </div>

@@ -185,7 +185,7 @@ export const getOfferByProductId = createAsyncThunk(
       const response = await api.get(`/offer/instant-cash?product_id=${productId}`);
       console.log('Get Offer by Product ID API response:', response.data);
 
-      if (response.data.status === 'success') {
+      if (response.data.success === true) {
         return {
           offerAmount: response.data.offer_amount,
           carSummary: response.data.car_summary,
@@ -195,10 +195,10 @@ export const getOfferByProductId = createAsyncThunk(
           emailSent: response.data.email_sent,
           timestamp: response.data.timestamp,
           userInfo: response.data.user_info,
-          vehicleDetails: response.data.vehicle_details || {},
+          vehicleDetails: response.data.car_summary || {}, // Use car_summary as vehicle details
         };
       } else {
-        console.log('API returned status:', response.data.status, 'message:', response.data.message);
+        console.log('API returned status:', response.data.success, 'message:', response.data.message);
         return rejectWithValue(response.data.message || 'Failed to get offer by product ID');
       }
     } catch (error) {
