@@ -173,10 +173,11 @@ const Dashboard = () => {
                     liveAuctions.slice(0, 3).map((auction) => (
                       <motion.div
                         key={auction.id}
-                        className="flex items-center space-x-4 p-4 bg-neutral-50 rounded-xl hover:bg-neutral-100 transition-colors"
+                        className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 p-4 bg-neutral-50 rounded-xl hover:bg-neutral-100 transition-colors"
                         whileHover={{ scale: 1.02 }}
                       >
-                        <div className="w-16 h-16 bg-neutral-200 rounded-lg flex items-center justify-center overflow-hidden">
+                        {/* Image Container - Responsive sizing */}
+                        <div className="w-full sm:w-16 h-32 sm:h-16 bg-neutral-200 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                           {(() => {
                             // Extract front view image from images array, fallback to image_url, then to null
                             const getFrontViewImage = () => {
@@ -200,18 +201,34 @@ const Dashboard = () => {
                             );
                           })()}
                         </div>
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-neutral-800">{auction.title}</h3>
-                          <div className="flex items-center space-x-4 text-sm text-neutral-600">
-                            <span>Current Bid: <span className="font-semibold text-success">{formatCurrency(parseFloat(auction.current_bid) || 0)}</span></span>
-                            <span>•</span>
-                            <span>{auction.bid_count || 0} bids</span>
-                            <span>•</span>
-                            <span className="text-warning">{auction.time_remaining || 'Live'}</span>
+                        
+                        {/* Content Container */}
+                        <div className="flex-1 w-full min-w-0">
+                          <h3 className="font-semibold text-neutral-800 text-sm sm:text-base mb-2 line-clamp-2">{auction.title}</h3>
+                          
+                          {/* Mobile: Stack info vertically, Desktop: Keep horizontal */}
+                          <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-xs sm:text-sm text-neutral-600">
+                            <div className="flex items-center space-x-2">
+                              <span>Current Bid:</span>
+                              <span className="font-semibold text-success">{formatCurrency(parseFloat(auction.current_bid) || 0)}</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <span className="hidden sm:inline">•</span>
+                              <span>{auction.bid_count || 0} bids</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <span className="hidden sm:inline">•</span>
+                              <span className="text-warning font-medium">{auction.time_remaining || 'Live'}</span>
+                            </div>
                           </div>
                         </div>
-                        <button onClick={() => navigate('/car-details', { state: { productId: auction.product_id } })} className="btn-ghost p-2 cursor-pointer">
-                          <Eye className="w-4 h-4 " />
+                        
+                        {/* Action Button */}
+                        <button 
+                          onClick={() => navigate('/car-details', { state: { productId: auction.product_id } })} 
+                          className="btn-ghost p-2 cursor-pointer self-end sm:self-auto flex-shrink-0"
+                        >
+                          <Eye className="w-4 h-4" />
                         </button>
                       </motion.div>
                     ))
@@ -230,9 +247,6 @@ const Dashboard = () => {
               <div className="card p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold text-neutral-800">Recent Activity</h2>
-                  <button className="p-2 text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg">
-                    <Bell className="w-4 h-4" />
-                  </button>
                 </div>
 
                 <div className="space-y-4">
