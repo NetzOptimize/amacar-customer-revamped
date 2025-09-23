@@ -25,10 +25,11 @@ export default function ReviewPageById() {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   // Try multiple possible parameter names
-  const productId = searchParams.get('appraised_auction_id') || 
-                   searchParams.get('id') || 
-                   searchParams.get('product_id') || 
-                   searchParams.get('auction_id');
+  const urlProductId = searchParams.get('appraised_auction_id') || 
+                      searchParams.get('id') || 
+                      searchParams.get('product_id') || 
+                      searchParams.get('auction_id');
+  const [productId, setProductId] = useState(urlProductId);
   const [showAuctionModal, setShowAuctionModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   
@@ -42,7 +43,7 @@ export default function ReviewPageById() {
   
   // Check if user exists from the offer response
   // const userExists = offer?.userInfo?.user_exists;
-  const isUserLoggedIn = userState && userState.id;
+  const isUserLoggedIn = Boolean(userState && userState.id);
 
   // Debug logging
   useEffect(() => {
@@ -51,16 +52,26 @@ export default function ReviewPageById() {
       productId,
       allParams: Object.fromEntries(searchParams.entries()),
       vehicleDetails,
-      offer
+      offer,
+      userState,
+      isUserLoggedIn,
+      userExists
     });
-  }, [searchParams, productId, vehicleDetails, offer]);
+  }, [searchParams, productId, vehicleDetails, offer, userState, isUserLoggedIn, userExists]);
+
+  // Update productId when URL changes
+  useEffect(() => {
+    if (urlProductId && urlProductId !== productId) {
+      setProductId(urlProductId);
+    }
+  }, [urlProductId, productId]);
 
   // Fetch offer data when component mounts
   useEffect(() => {
     if (productId) {
       console.log('Dispatching getOfferByProductId with:', productId);
       dispatch(getOfferByProductId(productId));
-      
+      console.log("isUserLoggedIn", isUserLoggedIn);
       // Hide the query parameter from URL immediately
       navigate('/review', { replace: true });
     } else {
@@ -235,9 +246,8 @@ export default function ReviewPageById() {
                   </motion.button>
                 )
               }  */}
-              {
-                isUserLoggedIn ? (
-                  <motion.button
+              {isUserLoggedIn === true ? (
+                <motion.button
                   onClick={handleLaunchAuction}
                   className="cursor-pointer inline-flex h-10 sm:h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#f6851f] to-[#e63946] px-6 sm:px-8 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-orange-500/25 transition hover:scale-[1.02] hover:shadow-xl"
                   whileHover={{ scale: 1.02 }}
@@ -246,8 +256,8 @@ export default function ReviewPageById() {
                   <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
                   Auction your ride
                 </motion.button>
-                ) : (
-                  <motion.button
+              ) : (
+                <motion.button
                   onClick={() => setShowLoginModal(true)}
                   className="cursor-pointer inline-flex h-10 sm:h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 px-6 sm:px-8 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition hover:scale-[1.02] hover:shadow-xl"
                   whileHover={{ scale: 1.02 }}
@@ -256,8 +266,7 @@ export default function ReviewPageById() {
                   <User className="h-3 w-3 sm:h-4 sm:w-4" />
                   Login to Continue
                 </motion.button>
-                )
-              }
+              )}
             </div>
           </motion.div>
 

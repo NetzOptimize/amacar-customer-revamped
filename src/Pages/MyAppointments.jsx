@@ -332,18 +332,18 @@ const MyAppointments = () => {
   }
 
   return (
-    <div className="lg:mt-16 min-h-screen bg-gradient-hero p-8 ">
+    <div className="lg:mt-16 min-h-screen bg-gradient-hero p-4 sm:p-6 lg:p-8">
       <div className="max-w-8xl mx-auto">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
-          <motion.h1 variants={itemVariants} className="text-3xl font-bold text-neutral-800 mb-2">
+          <motion.h1 variants={itemVariants} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-800 mb-2">
             My Appointments
           </motion.h1>
-          <motion.p variants={itemVariants} className="text-neutral-600">
+          <motion.p variants={itemVariants} className="text-sm sm:text-base text-neutral-600">
             Manage your scheduled appointments with dealers.
           </motion.p>
         </motion.div>
@@ -351,7 +351,7 @@ const MyAppointments = () => {
         {/* Status Filter Tabs */}
         <motion.div
           variants={itemVariants}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
           <div className="flex flex-wrap gap-2 sm:gap-3">
             {statusFilterOptions.map((option) => (
@@ -359,23 +359,23 @@ const MyAppointments = () => {
                 key={option.value}
                 onClick={() => handleStatusFilter(option.value)}
                 disabled={isFiltering}
-                className={`relative px-4 py-2.5 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 ${statusFilter === option.value
+                className={`relative px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-medium transition-all duration-200 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm ${statusFilter === option.value
                   ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25'
                   : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 hover:border-slate-300'
                   } ${isFiltering && filteringTab === option.value ? 'opacity-75 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 {isFiltering && filteringTab === option.value && (
-                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                 )}
-                <span>{option.label}</span>
-                <span className={`px-2 py-0.5 text-xs rounded-full ${statusFilter === option.value
+                <span className="truncate">{option.label}</span>
+                <span className={`px-1.5 sm:px-2 py-0.5 text-xs rounded-full flex-shrink-0 ${statusFilter === option.value
                   ? 'bg-white/20 text-white'
                   : option.color
                   }`}>
                   {option.count}
                 </span>
                 {isFiltering && filteringTab === option.value && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/30 rounded-b-xl overflow-hidden">
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/30 rounded-b-lg sm:rounded-b-xl overflow-hidden">
                     <div
                       className="h-full bg-white/60 transition-all duration-100 ease-out"
                       style={{ width: `${filterProgress}%` }}
@@ -393,18 +393,18 @@ const MyAppointments = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="mb-6"
+            className="mb-4 sm:mb-6"
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-neutral-800 mb-1">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-base sm:text-lg font-semibold text-neutral-800 mb-1 truncate">
                   {statusFilter === 'all' ? 'All Appointments' :
                     statusFilter === 'pending' ? 'Pending Appointments' :
                       statusFilter === 'confirmed' ? 'Confirmed Appointments' :
                         statusFilter === 'cancelled' ? 'Cancelled Appointments' :
                           statusFilter === 'completed' ? 'Completed Appointments' : 'Appointments'}
                 </h2>
-                <p className="text-sm text-neutral-600">
+                <p className="text-xs sm:text-sm text-neutral-600">
                   {filteredAndSortedAppointments.length} {statusFilter === 'all' ? 'scheduled' : statusFilter} appointments
                 </p>
               </div>
@@ -412,31 +412,31 @@ const MyAppointments = () => {
               {/* Modern Sort Dropdown */}
               <motion.div
                 variants={containerVariants}
-                className="relative w-[200px]"
+                className="relative w-full sm:w-[200px] flex-shrink-0"
                 ref={dropdownRef}
               >
                 {/* Dropdown Trigger */}
                 <button
                   onClick={() => !isSorting && setIsDropdownOpen(!isDropdownOpen)}
                   disabled={isSorting}
-                  className={`cursor-pointer flex items-center gap-3 bg-white border border-neutral-200 rounded-xl px-4 py-3 hover:border-neutral-300 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent group ${isSorting ? 'opacity-75 cursor-not-allowed' : ''
+                  className={`cursor-pointer flex items-center gap-2 sm:gap-3 bg-white border border-neutral-200 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 hover:border-neutral-300 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent group ${isSorting ? 'opacity-75 cursor-not-allowed' : ''
                     }`}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0">
                     {isSorting ? (
-                      <RefreshCw className="w-4 h-4 text-orange-500 animate-spin" />
+                      <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-500 animate-spin flex-shrink-0" />
                     ) : (
-                      <ArrowUpDown className="w-4 h-4 text-neutral-500 group-hover:text-orange-500 transition-colors" />
+                      <ArrowUpDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-neutral-500 group-hover:text-orange-500 transition-colors flex-shrink-0" />
                     )}
-                    <div className="text-left">
-                      <div className="text-sm font-medium text-neutral-700">
+                    <div className="text-left min-w-0 flex-1">
+                      <div className="text-xs sm:text-sm font-medium text-neutral-700 truncate">
                         {isSorting ? 'Sorting...' : selectedOption.label}
                       </div>
                     </div>
                   </div>
                   {!isSorting && (
                     <ChevronDown
-                      className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''
+                      className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-neutral-400 transition-transform duration-200 flex-shrink-0 ${isDropdownOpen ? 'rotate-180' : ''
                         }`}
                     />
                   )}
@@ -450,7 +450,7 @@ const MyAppointments = () => {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
                       transition={{ duration: 0.15, ease: "easeOut" }}
-                      className="absolute top-full left-0 right-0 mt-2 bg-white border border-neutral-200 rounded-xl shadow-lg z-50 overflow-hidden"
+                      className="absolute top-full left-0 right-0 mt-2 bg-white border border-neutral-200 rounded-lg sm:rounded-xl shadow-lg z-50 overflow-hidden"
                     >
                       {sortOptions.map((option, index) => {
                         const IconComponent = option.icon;
@@ -460,22 +460,22 @@ const MyAppointments = () => {
                           <button
                             key={option.value}
                             onClick={() => handleSortSelect(option.value)}
-                            className={`cursor-pointer w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-neutral-50 transition-colors duration-150 ${isSelected ? 'bg-orange-50 text-orange-700' : 'text-neutral-700'
+                            className={`cursor-pointer w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-left hover:bg-neutral-50 transition-colors duration-150 ${isSelected ? 'bg-orange-50 text-orange-700' : 'text-neutral-700'
                               } ${index !== sortOptions.length - 1 ? 'border-b border-neutral-100' : ''}`}
                           >
-                            <div className={`p-1.5 rounded-lg ${isSelected ? 'bg-orange-100' : 'bg-neutral-100'
+                            <div className={`p-1 sm:p-1.5 rounded-md sm:rounded-lg ${isSelected ? 'bg-orange-100' : 'bg-neutral-100'
                               }`}>
-                              <IconComponent className={`w-3.5 h-3.5 ${isSelected ? 'text-orange-600' : 'text-neutral-500'
+                              <IconComponent className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${isSelected ? 'text-orange-600' : 'text-neutral-500'
                                 }`} />
                             </div>
-                            <div className="flex-1">
-                              <div className={`text-sm font-medium ${isSelected ? 'text-orange-700' : 'text-neutral-700'
+                            <div className="flex-1 min-w-0">
+                              <div className={`text-xs sm:text-sm font-medium truncate ${isSelected ? 'text-orange-700' : 'text-neutral-700'
                                 }`}>
                                 {option.label}
                               </div>
                             </div>
                             {isSelected && (
-                              <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-orange-500 rounded-full flex-shrink-0"></div>
                             )}
                           </button>
                         );
@@ -513,28 +513,28 @@ const MyAppointments = () => {
               <>
                 {/* Today's Appointments */}
                 {getSortedTodaysAppointments().length > 0 && (
-                  <motion.div variants={itemVariants} className="mb-8">
-                    <h2 className="text-xl font-bold text-neutral-800 mb-4">Today's Appointments</h2>
-                    <div className="space-y-4">
+                  <motion.div variants={itemVariants} className="mb-6 sm:mb-8">
+                    <h2 className="text-lg sm:text-xl font-bold text-neutral-800 mb-4">Today's Appointments</h2>
+                    <div className="space-y-3 sm:space-y-4">
                       {getSortedTodaysAppointments().map((appointment) => (
                         <motion.div
                           key={appointment.id}
-                          className="card p-6 border-l-4 border-primary-500"
-                          whileHover={{ scale: 1.02 }}
+                          className="card p-4 sm:p-6 border-l-4 border-primary-500"
+                          whileHover={{ scale: 1.01 }}
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-4">
-                              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                                <Calendar className="w-6 h-6 text-primary-600" />
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex items-start sm:items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
+                              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-primary-600" />
                               </div>
-                              <div>
-                                <h3 className="font-semibold text-neutral-800">
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-neutral-800 text-sm sm:text-base truncate">
                                   Appointment with {appointment.dealer_name}
                                 </h3>
-                                <p className="text-sm text-neutral-600">{appointment.dealer_email}</p>
-                                <div className="flex items-center space-x-4 text-sm text-neutral-500">
-                                  <span className="flex items-center space-x-1">
-                                    <Clock className="w-4 h-4" />
+                                <p className="text-xs sm:text-sm text-neutral-600 truncate">{appointment.dealer_email}</p>
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2">
+                                  <span className="flex items-center space-x-1 text-xs sm:text-sm text-neutral-500">
+                                    <Clock className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                                     <span>{appointment.formatted_time} ({appointment.duration} min)</span>
                                   </span>
                                   <span className="flex items-center space-x-1">
@@ -550,13 +550,14 @@ const MyAppointments = () => {
                                 </div>
                               </div>
                             </div>
-                            <div className="flex space-x-2">
+                            <div className="flex space-x-2 w-full sm:w-auto">
                               <button
                                 onClick={() => handleViewDetails(appointment)}
-                                className="btn-primary flex items-center space-x-2"
+                                className="btn-primary flex items-center justify-center space-x-2 w-full sm:w-auto text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5"
                               >
-                                <Calendar className="w-4 h-4" />
-                                <span>View Details</span>
+                                <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                                <span className="hidden sm:inline">View Details</span>
+                                <span className="sm:hidden">Details</span>
                               </button>
                             </div>
                           </div>
@@ -568,28 +569,28 @@ const MyAppointments = () => {
 
                 {/* Upcoming Appointments */}
                 <motion.div variants={itemVariants}>
-                  <h2 className="text-xl font-bold text-neutral-800 mb-4">Upcoming Appointments</h2>
-                  <div className="space-y-4">
+                  <h2 className="text-lg sm:text-xl font-bold text-neutral-800 mb-4">Upcoming Appointments</h2>
+                  <div className="space-y-3 sm:space-y-4">
                     {getSortedUpcomingAppointments().map((appointment) => (
                       <motion.div
                         key={appointment.id}
-                        className="card p-6 hover:shadow-medium transition-all duration-300"
+                        className="card p-4 sm:p-6 hover:shadow-medium transition-all duration-300"
                         whileHover={{ scale: 1.01 }}
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
-                            <div className="w-12 h-12 bg-neutral-100 rounded-lg flex items-center justify-center">
-                              <Calendar className="w-6 h-6 text-neutral-600" />
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="flex items-start sm:items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neutral-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-neutral-600" />
                             </div>
-                            <div>
-                              <h3 className="font-semibold text-neutral-800">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-neutral-800 text-sm sm:text-base truncate">
                                 Appointment with {appointment.dealer_name}
                               </h3>
-                              <p className="text-sm text-neutral-600">{appointment.dealer_email}</p>
-                              <div className="flex items-center space-x-4 text-sm text-neutral-500">
-                                <span className="flex items-center space-x-1">
-                                  <Clock className="w-4 h-4" />
-                                  <span>{appointment.formatted_date} at {appointment.formatted_time}</span>
+                              <p className="text-xs sm:text-sm text-neutral-600 truncate">{appointment.dealer_email}</p>
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2">
+                                <span className="flex items-center space-x-1 text-xs sm:text-sm text-neutral-500">
+                                  <Clock className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                                  <span className="truncate">{appointment.formatted_date} at {appointment.formatted_time}</span>
                                 </span>
                                 <span className="flex items-center space-x-1">
                                   <span className={`px-2 py-1 text-xs rounded-full ${appointment.status === 'completed' ? 'bg-emerald-100 text-emerald-800' :
@@ -604,13 +605,14 @@ const MyAppointments = () => {
                               </div>
                             </div>
                           </div>
-                          <div className="flex space-x-2">
+                          <div className="flex space-x-2 w-full sm:w-auto">
                             <button
                               onClick={() => handleViewDetails(appointment)}
-                              className="btn-primary flex items-center space-x-2"
+                              className="btn-primary flex items-center justify-center space-x-2 w-full sm:w-auto text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5"
                             >
-                              <Calendar className="w-4 h-4" />
-                              <span>View Details</span>
+                              <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                              <span className="hidden sm:inline">View Details</span>
+                              <span className="sm:hidden">Details</span>
                             </button>
                           </div>
                         </div>
@@ -643,9 +645,9 @@ const MyAppointments = () => {
         {!loading && !error && filteredAndSortedAppointments.length === 0 && (
           <motion.div
             variants={itemVariants}
-            className="flex -mt-8 items-center justify-center min-h-[60vh]"
+            className="flex -mt-4 sm:-mt-8 items-center justify-center min-h-[50vh] sm:min-h-[60vh] px-4"
           >
-            <div className="text-center max-w-md mx-auto">
+            <div className="text-center max-w-sm sm:max-w-md mx-auto">
               {/* Modern Icon Container */}
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
@@ -653,12 +655,12 @@ const MyAppointments = () => {
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 className="relative mb-4"
               >
-                <div className="w-20 h-20 bg-gradient-to-br from-primary-50 to-primary-100 rounded-3xl flex items-center justify-center mx-auto shadow-soft border border-primary-200">
-                  <Calendar className="w-8 h-8 text-primary-500" />
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary-50 to-primary-100 rounded-2xl sm:rounded-3xl flex items-center justify-center mx-auto shadow-soft border border-primary-200">
+                  <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-primary-500" />
                 </div>
                 {/* Decorative elements */}
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-warning/20 rounded-full animate-pulse-slow"></div>
-                <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-accent/20 rounded-full animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+                <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-4 h-4 sm:w-6 sm:h-6 bg-warning/20 rounded-full animate-pulse-slow"></div>
+                <div className="absolute -bottom-1 -left-1 w-3 h-3 sm:w-4 sm:h-4 bg-accent/20 rounded-full animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
               </motion.div>
 
               {/* Content */}
@@ -666,16 +668,16 @@ const MyAppointments = () => {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-                className="space-y-4"
+                className="space-y-3 sm:space-y-4"
               >
-                <h3 className="text-2xl font-bold text-neutral-800 font-display">
+                <h3 className="text-xl sm:text-2xl font-bold text-neutral-800 font-display">
                   {statusFilter === 'all' ? 'No Appointments' :
                     statusFilter === 'pending' ? 'No Pending Appointments' :
                       statusFilter === 'confirmed' ? 'No Confirmed Appointments' :
                         statusFilter === 'cancelled' ? 'No Cancelled Appointments' :
                           statusFilter === 'completed' ? 'No Completed Appointments' : 'No Appointments'}
                 </h3>
-                <p className="text-neutral-600 text-lg leading-relaxed">
+                <p className="text-neutral-600 text-sm sm:text-base lg:text-lg leading-relaxed">
                   {statusFilter === 'all' ? 'You don\'t have any scheduled appointments at the moment.' :
                     statusFilter === 'pending' ? 'You don\'t have any pending appointments.' :
                       statusFilter === 'confirmed' ? 'You don\'t have any confirmed appointments.' :
@@ -691,18 +693,18 @@ const MyAppointments = () => {
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-                  className="flex flex-col sm:flex-row gap-4 mt-4"
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8"
                 >
                   <motion.button
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: "spring", stiffness: 400, damping: 17 }}
                     onClick={() => { navigate('/accepted') }}
-                    className="cursor-pointer w-60 px-4 h-16 group relative bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:shadow-xl hover:shadow-primary-500/25 focus:outline-none focus:ring-4 focus:ring-primary-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="cursor-pointer w-full sm:w-60 px-4 h-12 sm:h-16 group relative bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-xl sm:rounded-2xl transition-all duration-300 transform hover:shadow-xl hover:shadow-primary-500/25 focus:outline-none focus:ring-4 focus:ring-primary-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
-                    <div className="flex items-center justify-between">
-                      <Calendar className="transition-transform duration-300 group-hover:scale-110" />
-                      <span className="text-md">Schedule Appointment</span>
+                    <div className="flex items-center justify-center sm:justify-between gap-2">
+                      <Calendar className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110" />
+                      <span className="text-sm sm:text-base">Schedule Appointment</span>
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
                   </motion.button>
@@ -712,11 +714,11 @@ const MyAppointments = () => {
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: "spring", stiffness: 400, damping: 17 }}
                     onClick={() => navigate('/dashboard')}
-                    className="cursor-pointer w-60 px-4 h-16 group relative overflow-hidden bg-white hover:bg-neutral-50 text-neutral-700 font-semibold py-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-300 transition-all duration-300 transform hover:shadow-lg hover:shadow-neutral-500/10 focus:outline-none focus:ring-4 focus:ring-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="cursor-pointer w-full sm:w-60 px-4 h-12 sm:h-16 group relative overflow-hidden bg-white hover:bg-neutral-50 text-neutral-700 font-semibold py-3 sm:py-4 rounded-xl sm:rounded-2xl border-2 border-neutral-200 hover:border-neutral-300 transition-all duration-300 transform hover:shadow-lg hover:shadow-neutral-500/10 focus:outline-none focus:ring-4 focus:ring-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
-                    <div className="flex items-center justify-center space-x-3">
-                      <Eye className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-                      <span className="text-lg">View Dashboard</span>
+                    <div className="flex items-center justify-center space-x-2 sm:space-x-3">
+                      <Eye className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110" />
+                      <span className="text-sm sm:text-base">View Dashboard</span>
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-r from-neutral-100/0 via-neutral-100/50 to-neutral-100/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
                   </motion.button>

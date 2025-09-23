@@ -164,60 +164,60 @@ export default function AppointmentDetailsModal({
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
-        className="sm:max-w-[600px] w-full max-h-[90vh] rounded-2xl shadow-2xl p-0 bg-white border-0 flex flex-col"
+        className="sm:max-w-[600px] w-full max-h-[95vh] sm:max-h-[90vh] rounded-xl sm:rounded-2xl shadow-2xl p-0 bg-white border-0 flex flex-col mx-4 sm:mx-0"
         showCloseButton={!isCloseDisabled}
       >
         {/* Header - Fixed */}
-        <div className="relative bg-[#f6851f] p-6 text-white flex-shrink-0 rounded-t-2xl">
+        <div className="relative bg-[#f6851f] p-4 sm:p-6 text-white flex-shrink-0 rounded-t-xl sm:rounded-t-2xl">
           <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent"></div>
           <div className="relative z-10">
-            <DialogTitle className="text-lg font-bold mb-1">
+            <DialogTitle className="text-base sm:text-lg font-bold mb-1">
               Appointment Details
             </DialogTitle>
           
           </div>
           {/* Decorative elements */}
-          <div className="absolute -top-4 -right-4 w-20 h-20 bg-orange-500/10 rounded-full blur-xl"></div>
-          <div className="absolute -bottom-2 -left-2 w-12 h-12 bg-orange-500/20 rounded-full blur-lg"></div>
+          <div className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 w-16 h-16 sm:w-20 sm:h-20 bg-orange-500/10 rounded-full blur-xl"></div>
+          <div className="absolute -bottom-1 -left-1 sm:-bottom-2 sm:-left-2 w-8 h-8 sm:w-12 sm:h-12 bg-orange-500/20 rounded-full blur-lg"></div>
         </div>
 
         {/* Content Area - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-6 min-h-0 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 hover:scrollbar-thumb-slate-400 scroll-smooth rounded-b-2xl">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 min-h-0 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 hover:scrollbar-thumb-slate-400 scroll-smooth rounded-b-xl sm:rounded-b-2xl">
             {appointment ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
-                className="space-y-6 pb-4"
+                className="space-y-4 sm:space-y-6 pb-4"
               >
                 {/* Appointment Status */}
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                      <Calendar className="w-5 h-5 text-orange-600" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                      <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
                     </div>
                     <div>
-                    <div className="text-right text-sm text-slate-600">
-                      <p>Created: {appointment.created_at ? new Date(appointment.created_at).toLocaleDateString() : 'N/A'}</p>
-                    </div>
+                      <div className="text-xs sm:text-sm text-slate-600">
+                        <p>Created: {appointment.created_at ? new Date(appointment.created_at).toLocaleDateString() : 'N/A'}</p>
+                      </div>
                     </div>
                   </div>
-                      <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border}`}>
-                        <div className={`w-2 h-2 rounded-full ${statusStyle.bg.replace('100', '500')}`}></div>
-                        {appointment.status?.charAt(0).toUpperCase() + appointment.status?.slice(1) || 'Unknown'}
-                      </div>
+                  <div className={`inline-flex items-center gap-1.5 px-2 sm:px-3 py-1 rounded-full text-xs font-medium border ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border} self-start sm:self-auto`}>
+                    <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${statusStyle.bg.replace('100', '500')}`}></div>
+                    {appointment.status?.charAt(0).toUpperCase() + appointment.status?.slice(1) || 'Unknown'}
+                  </div>
                 </div>
 
                 {/* Date & Time Information */}
-                <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                  <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
+                <div className="bg-slate-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-slate-100">
+                  <h4 className="text-xs sm:text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                    <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                     Schedule Information
                   </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                       <p className="text-xs text-slate-600 mb-1">Date</p>
-                      <p className="text-sm font-medium text-slate-900">
+                      <p className="text-xs sm:text-sm font-medium text-slate-900">
                         {appointment.formatted_start_time?.includes("-0001") 
                           ? formatDate(appointment.start_time)
                           : appointment.formatted_start_time?.split(' at ')[0] || formatDate(appointment.start_time)
@@ -226,7 +226,7 @@ export default function AppointmentDetailsModal({
                     </div>
                     <div>
                       <p className="text-xs text-slate-600 mb-1">Time</p>
-                      <p className="text-sm font-medium text-slate-900">
+                      <p className="text-xs sm:text-sm font-medium text-slate-900">
                         {appointment.formatted_start_time?.includes("-0001")
                           ? formatTime(appointment.start_time)
                           : appointment.formatted_start_time?.split(' at ')[1] || formatTime(appointment.start_time)
@@ -237,27 +237,27 @@ export default function AppointmentDetailsModal({
                 </div>
 
                 {/* Dealer Information */}
-                <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                  <h4 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
-                    <User className="w-4 h-4" />
+                <div className="bg-slate-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-slate-100">
+                  <h4 className="text-xs sm:text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                    <User className="w-3 h-3 sm:w-4 sm:h-4" />
                     Dealer Information
                   </h4>
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                        <User className="w-4 h-4 text-orange-600" />
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <User className="w-3 h-3 sm:w-4 sm:h-4 text-orange-600" />
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-slate-900">{appointment.dealer_name}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs sm:text-sm font-medium text-slate-900 truncate">{appointment.dealer_name}</p>
                         <p className="text-xs text-slate-600">Dealer</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <Mail className="w-4 h-4 text-blue-600" />
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <Mail className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-slate-900">{appointment.dealer_email}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs sm:text-sm font-medium text-slate-900 truncate">{appointment.dealer_email}</p>
                         <p className="text-xs text-slate-600">Email</p>
                       </div>
                     </div>
@@ -266,27 +266,27 @@ export default function AppointmentDetailsModal({
 
                 {/* Notes Section */}
                 {appointment.notes && (
-                  <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                    <h4 className="text-sm font-semibold text-slate-800 mb-2 flex items-center gap-2">
-                      <FileText className="w-4 h-4" />
+                  <div className="bg-slate-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-slate-100">
+                    <h4 className="text-xs sm:text-sm font-semibold text-slate-800 mb-2 flex items-center gap-2">
+                      <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
                       Cancel Note
                     </h4>
-                    <p className="text-sm text-slate-700">{appointment.notes}</p>
+                    <p className="text-xs sm:text-sm text-slate-700">{appointment.notes}</p>
                   </div>
                 )}
 
                 {/* Action Buttons */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-semibold text-slate-800">Quick Actions</h4>
+                    <h4 className="text-xs sm:text-sm font-semibold text-slate-800">Quick Actions</h4>
                   </div>
 
                   {/* Cancelled Appointment Notice */}
                   {appointment.status === 'cancelled' && (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                       <div className="flex items-center gap-2">
-                        <XCircle className="w-4 h-4 text-red-600" />
-                        <p className="text-sm text-red-700">
+                        <XCircle className="w-3 h-3 sm:w-4 sm:h-4 text-red-600" />
+                        <p className="text-xs sm:text-sm text-red-700">
                           {/* This appointment is cancelled. Management actions are not available. */}
                           This appointment is cancelled.
                         </p>
@@ -308,10 +308,10 @@ export default function AppointmentDetailsModal({
                             <button
                               onClick={handleRescheduleClick}
                               disabled={isProcessing || (appointment.can_reschedule === false)}
-                              className="cursor-pointer flex items-center justify-center gap-2 h-10 bg-orange-50 text-orange-700 rounded-lg border border-orange-200 hover:bg-orange-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="cursor-pointer flex items-center justify-center gap-2 h-9 sm:h-10 bg-orange-50 text-orange-700 rounded-lg border border-orange-200 hover:bg-orange-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              <Edit3 className="w-4 h-4" />
-                              <span className="text-sm font-medium">
+                              <Edit3 className="w-3 h-3 sm:w-4 sm:h-4" />
+                              <span className="text-xs sm:text-sm font-medium">
                                 {isProcessing && processingAction === 'reschedule' ? 'Processing...' : 
                                  appointment.can_reschedule === false ? 'Cannot Reschedule' : 'Reschedule'}
                               </span>
@@ -324,7 +324,7 @@ export default function AppointmentDetailsModal({
                           </div>
                         )}
                         {/* Communication Actions */}
-                        <div className={`grid gap-2 ${appointment.status === 'cancelled' ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                        <div className={`grid gap-2 ${appointment.status === 'cancelled' ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
                           {/* <button
                             onClick={() => onCall && onCall(appointment)}
                             className="cursor-pointer flex items-center justify-center gap-2 h-10 bg-green-50 text-green-700 rounded-lg border border-green-200 hover:bg-green-100 transition-colors"
@@ -337,10 +337,10 @@ export default function AppointmentDetailsModal({
                             <button
                               onClick={handleCancelClick}
                               disabled={isProcessing || isCancelProcessing}
-                              className="cursor-pointer flex items-center justify-center gap-2 h-10 bg-red-50 text-red-700 rounded-lg border border-red-200 hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="cursor-pointer flex items-center justify-center gap-2 h-9 sm:h-10 bg-red-50 text-red-700 rounded-lg border border-red-200 hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              <Trash2 className="w-4 h-4" />
-                              <span className="text-sm font-medium">Cancel</span>
+                              <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                              <span className="text-xs sm:text-sm font-medium">Cancel</span>
                             </button>
                           )}
                         </div>
@@ -354,12 +354,12 @@ export default function AppointmentDetailsModal({
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-orange-50 border border-orange-200 rounded-lg p-4"
+                    className="bg-orange-50 border border-orange-200 rounded-lg p-3 sm:p-4"
                   >
-                    <div className="flex items-center gap-3">
-                      <Loader2 className="w-5 h-5 text-orange-600 animate-spin" />
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600 animate-spin" />
                       <div>
-                        <p className="text-sm font-medium text-orange-800">
+                        <p className="text-xs sm:text-sm font-medium text-orange-800">
                           {isCancelProcessing ? 'Cancelling appointment...' :
                            processingAction === 'reschedule' ? 'Processing reschedule...' : 
                            'Processing...'}
@@ -371,10 +371,10 @@ export default function AppointmentDetailsModal({
                 )}
 
                 {/* Footer Actions */}
-                <div className="flex gap-3 pt-4 border-t border-slate-200">
+                <div className="flex gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-slate-200">
                   <button
                     onClick={() => onClose(false)}
-                    className="flex-1 h-12 rounded-lg border-2 border-slate-200 text-slate-700 font-medium hover:bg-slate-50 transition-colors"
+                    className="flex-1 h-10 sm:h-12 rounded-lg border-2 border-slate-200 text-slate-700 font-medium hover:bg-slate-50 transition-colors text-sm sm:text-base"
                   >
                     Close
                   </button>
@@ -382,17 +382,17 @@ export default function AppointmentDetailsModal({
                 </div>
               </motion.div>
             ) : (
-              <div className="flex flex-col items-center justify-center text-center gap-4 py-8">
-                <div className="w-16 h-16 bg-slate-100 rounded-lg flex items-center justify-center">
-                  <AlertCircle className="w-8 h-8 text-slate-400" />
+              <div className="flex flex-col items-center justify-center text-center gap-3 sm:gap-4 py-6 sm:py-8">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-slate-100 rounded-lg flex items-center justify-center">
+                  <AlertCircle className="w-6 h-6 sm:w-8 sm:h-8 text-slate-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">No Appointment Data</h3>
-                  <p className="text-sm text-slate-600">Unable to load appointment details.</p>
+                  <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-2">No Appointment Data</h3>
+                  <p className="text-xs sm:text-sm text-slate-600">Unable to load appointment details.</p>
                 </div>
                 <button
                   onClick={() => onClose(false)}
-                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors"
+                  className="px-3 sm:px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors text-sm sm:text-base"
                 >
                   Close
                 </button>
