@@ -72,14 +72,14 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 lg:mb-8 text-neutral-900">
+            <h4 className="text-xl font-semibold mb-8 text-neutral-900">
               Quick Links
             </h4>
-            <ul className="space-y-3 sm:space-y-4">
+            <ul className="space-y-4">
               <li>
                 <Link
                   to="/about-us"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-sm sm:text-base lg:text-lg inline-block"
+                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
                 >
                   How to bid
                 </Link>
@@ -87,7 +87,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/about-us"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-sm sm:text-base lg:text-lg inline-block"
+                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
                 >
                   Our vision
                 </Link>
@@ -95,7 +95,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/about-us"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-sm sm:text-base lg:text-lg inline-block"
+                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
                 >
                   How to sell with us
                 </Link>
@@ -107,14 +107,14 @@ export default function Footer() {
 
           {/* Support & Legal */}
           <div>
-            <h4 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 lg:mb-8 text-neutral-900">
+            <h4 className="text-xl font-semibold mb-8 text-neutral-900">
               Support & Legal
             </h4>
-            <ul className="space-y-3 sm:space-y-4">
+            <ul className="space-y-4">
               <li>
                 <Link
                   to="/cookies-policy"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-sm sm:text-base lg:text-lg inline-block"
+                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
                 >
                   Cookie Policy
                 </Link>
@@ -122,7 +122,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/privacy-policy"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-sm sm:text-base lg:text-lg inline-block"
+                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
                 >
                   Privacy Policy
                 </Link>
@@ -130,7 +130,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/terms-of-service"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-sm sm:text-base lg:text-lg inline-block"
+                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
                 >
                   Terms of Service
                 </Link>
@@ -138,7 +138,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/faq"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-sm sm:text-base lg:text-lg inline-block"
+                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
                 >
                   FAQ
                 </Link>
@@ -148,15 +148,15 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-neutral-300 pt-6 sm:pt-8">
-          <div className="flex flex-col sm:flex-col lg:flex-row justify-between items-center space-y-4 sm:space-y-6 lg:space-y-0">
-            <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-6 lg:space-x-8">
-              <span className="text-neutral-600 text-sm sm:text-base lg:text-lg">Trusted by</span>
-              <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3 lg:space-x-4">
-                <div className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 backdrop-blur-sm border border-primary-500/20 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium text-primary-600">
+        <div className="border-t border-neutral-300 pt-8">
+          <div className="flex flex-col lg:flex-row justify-between items-center space-y-6 lg:space-y-0">
+            <div className="flex items-center space-x-8">
+              <span className="text-neutral-600  text-sm">Trusted by</span>
+              <div className="flex items-center space-x-4">
+                <div className="bg-gradient-to-r w-32 from-primary-500/10 to-primary-600/10 backdrop-blur-sm border border-primary-500/20 px-4 py-2 rounded-full text-xs font-medium text-primary-600">
                   10,000+ Sellers
                 </div>
-                <div className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 backdrop-blur-sm border border-primary-500/20 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium text-primary-600">
+                <div className="bg-gradient-to-r w-32 from-primary-500/10 to-primary-600/10 backdrop-blur-sm border border-primary-500/20 px-4 py-2 rounded-full text-xs font-medium text-primary-600">
                   500+ Dealers
                 </div>
               </div>
