@@ -166,7 +166,7 @@ const BidConfirmationModal = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4"
           onClick={onClose}
         >
           <motion.div
@@ -174,20 +174,20 @@ const BidConfirmationModal = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className={`bg-white rounded-2xl shadow-2xl max-w-md w-full border-2 ${config.accentColor} overflow-hidden`}
+            className={`bg-white rounded-2xl shadow-2xl max-w-md w-full mx-2 sm:mx-0 border-2 ${config.accentColor} overflow-hidden`}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header with gradient background */}
-            <div className={`bg-gradient-to-r ${config.bgGradient} p-6 border-b ${config.accentColor}`}>
+            <div className={`bg-gradient-to-r ${config.bgGradient} p-4 sm:p-6 border-b ${config.accentColor}`}>
               <div className="flex items-center justify-center mb-4">
                 <div className={`w-16 h-16 ${config.iconBg} rounded-full flex items-center justify-center`}>
                   <IconComponent className={`w-8 h-8 ${config.iconColor}`} />
                 </div>
               </div>
-              <h2 className="text-2xl font-bold text-neutral-800 text-center mb-2">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-neutral-800 text-center mb-2">
                 {config.title}
               </h2>
-              <p className="text-neutral-600 text-center text-sm leading-relaxed">
+              <p className="text-neutral-600 text-center text-xs sm:text-sm leading-relaxed">
                 {config.description}
               </p>
             </div>

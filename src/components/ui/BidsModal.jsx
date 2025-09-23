@@ -50,7 +50,7 @@ const BidsModal = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4"
           onClick={onClose}
         >
           <motion.div
@@ -58,25 +58,25 @@ const BidsModal = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden"
+            className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] sm:max-h-[80vh] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-neutral-200">
-              <div>
-                <h2 className="text-2xl font-bold text-neutral-800">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-neutral-200">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-neutral-800 truncate">
                   Bids for {auctionData.vehicle}
                 </h2>
-                <p className="text-sm text-neutral-600 mt-1">
+                <p className="text-xs sm:text-sm text-neutral-600 mt-1">
                   VIN: {auctionData.vin} • {auctionData.bids?.length || 0} total bids
                 </p>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-neutral-100 rounded-lg transition-colors flex-shrink-0 ml-2"
                 disabled={isLoading}
               >
-                <X className="w-6 h-6 text-neutral-500" />
+                <X className="w-5 h-5 sm:w-6 sm:h-6 text-neutral-500" />
               </button>
             </div>
 
@@ -95,7 +95,7 @@ const BidsModal = ({
             )}
 
             {/* Modal Content */}
-            <div className="p-6 overflow-y-auto max-h-[60vh]">
+            <div className="p-4 sm:p-6 overflow-y-auto max-h-[60vh]">
               {auctionData.bids && auctionData.bids.length > 0 ? (
                 <div className="space-y-4">
                   {[...auctionData.bids]

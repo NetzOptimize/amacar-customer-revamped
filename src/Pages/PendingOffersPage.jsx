@@ -389,7 +389,7 @@ const PendingOffersPage = () => {
   }
 
   return (
-    <div className="lg:mt-16 min-h-screen bg-gradient-hero p-4 sm:p-6 lg:p-8">
+    <div className="lg:mt-16 min-h-screen bg-gradient-hero p-2 sm:p-4 md:p-6 lg:p-8 mt-4 sm:mt-0">
       <div className="max-w-8xl mx-auto">
         <motion.div
           variants={containerVariants}
@@ -609,7 +609,7 @@ const PendingOffersPage = () => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-neutral-800 truncate">{offer.vehicle}</h3>
-                          <p className="text-xs sm:text-sm text-neutral-600 mt-1 line-clamp-2">{offer.mileage} miles • {offer.description}</p>
+                          <p className="text-xs sm:text-sm text-neutral-600 mt-1 line-clamp-2 break-words">{offer.mileage} miles • {offer.description}</p>
                           <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-2 space-y-1 sm:space-y-0">
                             <span className="text-xs sm:text-sm text-neutral-500">
                               {formatDate(offer.auctionEndTime)} • {offer.bidCount} active bids
@@ -821,7 +821,7 @@ const PendingOffersPage = () => {
             variants={itemVariants}
             className="flex -mt-8 sm:-mt-16 items-center justify-center min-h-[50vh] sm:min-h-[60vh] px-4"
           >
-            <div className="text-center max-w-sm sm:max-w-md mx-auto">
+            <div className="text-center md:max-w-lg sm:max-w-md mx-auto">
               {/* Modern Icon Container */}
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
@@ -857,18 +857,18 @@ const PendingOffersPage = () => {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-                className="flex flex-col gap-3 sm:gap-4 mt-6 sm:mt-8"
+                className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8"
               >
                 <motion.button
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   onClick={() => navigate('/auction')}
-                  className="cursor-pointer w-full sm:w-60 px-4 h-12 sm:h-16 group relative bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:shadow-xl hover:shadow-primary-500/25 focus:outline-none focus:ring-4 focus:ring-primary-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="cursor-pointer w-full sm:w-auto sm:flex-[1.3] px-4 h-12 sm:h-16 group relative bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:shadow-xl hover:shadow-primary-500/25 focus:outline-none focus:ring-4 focus:ring-primary-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   <div className="flex items-center justify-center space-x-2 sm:space-x-3">
                     <Car className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110" />
-                    <span className="text-sm sm:text-base">Start New Auction</span>
+                    <span className="text-sm sm:text-base">New Auction</span>
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
                 </motion.button>
@@ -878,11 +878,11 @@ const PendingOffersPage = () => {
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   onClick={() => navigate('/dashboard')}
-                  className="cursor-pointer w-full sm:w-60 px-4 h-12 sm:h-16 group relative overflow-hidden bg-white hover:bg-neutral-50 text-neutral-700 font-semibold rounded-2xl border-2 border-neutral-200 hover:border-neutral-300 transition-all duration-300 transform hover:shadow-lg hover:shadow-neutral-500/10 focus:outline-none focus:ring-4 focus:ring-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="cursor-pointer w-full sm:w-auto sm:flex-[1.1] px-4 h-12 sm:h-16 group relative overflow-hidden bg-white hover:bg-neutral-50 text-neutral-700 font-semibold rounded-2xl border-2 border-neutral-200 hover:border-neutral-300 transition-all duration-300 transform hover:shadow-lg hover:shadow-neutral-500/10 focus:outline-none focus:ring-4 focus:ring-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   <div className="flex items-center justify-center space-x-2 sm:space-x-3">
-                    <Eye className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110" />
-                    <span className="text-sm sm:text-base">View Dashboard</span>
+                    <Eye className="w-6 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110" />
+                    <span className="text-sm sm:text-base">Dashboard</span>
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-r from-neutral-100/0 via-neutral-100/50 to-neutral-100/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
                 </motion.button>
