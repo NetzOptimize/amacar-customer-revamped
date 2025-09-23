@@ -46,7 +46,7 @@ export default function VideoSection() {
         </p>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="border-2 w-48 border-[var(--brand-purple)] mt-4 px-[1rem] py-[0.6rem] transition ease-in-out duration-300 text-white font-bold hover:cursor-pointer hover:bg-black hover:border-[var(--brand-purple)] hover:text-white rounded-xl bg-[var(--brand-purple)]"
+          className="cursor-pointer btn-purple mt-4"
         >
           See your car value
         </button>
