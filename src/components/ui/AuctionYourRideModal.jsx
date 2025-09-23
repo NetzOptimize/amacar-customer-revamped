@@ -639,7 +639,7 @@ export default function AuctionModal({
                     </div>
                     <div className="flex-1">
                       <label htmlFor="auctionConsent" className="text-sm text-slate-700 cursor-pointer">
-                        I agree to Amacar's Account and Auction Terms for Customers, including arbitration and disclaimer clauses. *
+                        I agree to Amacar's <Link to="/terms-of-service" className="no-underline font-bold text-[#f6851f]">Account and Auction Terms for Customers</Link>, including arbitration and disclaimer clauses. *
                       </label>
                       {errors.auctionConsent && (
                         <motion.p 
@@ -685,7 +685,7 @@ export default function AuctionModal({
                 <div className="pt-2 mt-auto">
                   <button
                     type="submit"
-                    disabled={modalState.isLoading}
+                    disabled={modalState.isLoading || !auctionConsent || !registerConsent}
                     className="cursor-pointer w-full h-12 sm:h-11 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-base font-semibold shadow-lg shadow-orange-500/20  disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {modalState.isLoading ? (
