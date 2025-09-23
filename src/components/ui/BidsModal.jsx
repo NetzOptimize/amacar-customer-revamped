@@ -50,7 +50,7 @@ const BidsModal = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto"
           onClick={onClose}
         >
           <motion.div
@@ -58,22 +58,25 @@ const BidsModal = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] sm:max-h-[80vh] overflow-hidden"
+            className="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] min-h-[60vh] sm:min-h-[50vh] flex flex-col overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-neutral-200">
-              <div className="flex-1 min-w-0">
-                <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-neutral-800 truncate">
+            <div className="flex items-start sm:items-center justify-between p-3 sm:p-4 lg:p-6 border-b border-neutral-200 flex-shrink-0">
+              <div className="flex-1 min-w-0 pr-3">
+                <h2 className="text-base sm:text-lg lg:text-xl font-bold text-neutral-800 break-words">
                   Bids for {auctionData.vehicle}
                 </h2>
-                <p className="text-xs sm:text-sm text-neutral-600 mt-1">
-                  VIN: {auctionData.vin} • {auctionData.bids?.length || 0} total bids
+                <p className="text-xs sm:text-sm text-neutral-600 mt-1 break-words">
+                  VIN: {auctionData.vin}
+                </p>
+                <p className="text-xs sm:text-sm text-neutral-600">
+                  {auctionData.bids?.length || 0} total bids
                 </p>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-neutral-100 rounded-lg transition-colors flex-shrink-0 ml-2"
+                className="p-2 hover:bg-neutral-100 rounded-lg transition-colors flex-shrink-0"
                 disabled={isLoading}
               >
                 <X className="w-5 h-5 sm:w-6 sm:h-6 text-neutral-500" />
@@ -95,9 +98,9 @@ const BidsModal = ({
             )}
 
             {/* Modal Content */}
-            <div className="p-4 sm:p-6 overflow-y-auto max-h-[60vh]">
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6 min-h-0">
               {auctionData.bids && auctionData.bids.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4 pb-2">
                   {[...auctionData.bids]
                     .sort((a, b) => parseFloat(b.amount) - parseFloat(a.amount))
                     .map((bid, index) => (
@@ -106,30 +109,34 @@ const BidsModal = ({
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className={`bg-neutral-50 rounded-xl p-4 border ${
+                      className={`bg-neutral-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border ${
                         index === 0 ? 'border-success/30 bg-success/5' : 'border-neutral-200'
                       }`}
                     >
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      {/* Mobile-first layout */}
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+                        {/* Bidder Info */}
+                        <div className="flex items-start sm:items-center gap-3">
+                          <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
                             index === 0 ? 'bg-success/20 text-success' : 'bg-primary-100 text-primary-600'
                           }`}>
-                            <span className="font-semibold text-sm">
+                            <span className="font-semibold text-xs sm:text-sm">
                               {index + 1}
                             </span>
                           </div>
-                          <div>
-                            <h3 className="font-semibold text-neutral-800">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-sm sm:text-base text-neutral-800 break-words">
                               {bid.bidder_display_name || 'Unknown Bidder'}
                             </h3>
-                            <p className="text-sm text-neutral-600">
+                            <p className="text-xs sm:text-sm text-neutral-600 break-words">
                               {bid.bidder_email || 'N/A'}
                             </p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className={`text-2xl font-bold ${
+                        
+                        {/* Bid Amount and Status */}
+                        <div className="flex items-center justify-between sm:flex-col sm:items-end gap-2">
+                          <div className={`text-lg sm:text-xl lg:text-2xl font-bold ${
                             index === 0 ? 'text-success' : 'text-primary-600'
                           }`}>
                             {formatCurrency(parseFloat(bid.amount))}
@@ -150,44 +157,44 @@ const BidsModal = ({
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
                         <div>
-                          <span className="text-neutral-500">Bidder ID:</span>
-                          <p className="font-medium text-neutral-800">#{bid.bidder_id || 'N/A'}</p>
+                          <span className="text-neutral-500 text-xs">Bidder ID:</span>
+                          <p className="font-medium text-neutral-800 break-words">#{bid.bidder_id || 'N/A'}</p>
                         </div>
                         <div>
-                          <span className="text-neutral-500">Bid Date:</span>
-                          <p className="font-medium text-neutral-800">
+                          <span className="text-neutral-500 text-xs">Bid Date:</span>
+                          <p className="font-medium text-neutral-800 break-words">
                             {bid.created_at_raw ? new Date(bid.created_at_raw).toLocaleString() : 'N/A'}
                           </p>
                         </div>
                       </div>
                       
                       {bid.notes && (
-                        <div className="mt-3 p-3 bg-white rounded-lg border border-neutral-200">
-                          <span className="text-neutral-500 text-sm">Notes:</span>
-                          <p className="text-neutral-800 text-sm mt-1">{bid.notes}</p>
+                        <div className="mt-3 p-2 sm:p-3 bg-white rounded-lg border border-neutral-200">
+                          <span className="text-neutral-500 text-xs sm:text-sm">Notes:</span>
+                          <p className="text-neutral-800 text-xs sm:text-sm mt-1 break-words">{bid.notes}</p>
                         </div>
                       )}
 
                       {/* Action Buttons for Pending Bids */}
                       {!bid.is_accepted && !bid.is_expired && bid.status !== 'rejected' && (
-                        <div className="mt-4 flex items-center justify-end gap-2">
+                        <div className="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2">
                           <button
                             onClick={() => handleRejectBid(bid)}
                             disabled={isLoading}
-                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-2 text-xs sm:text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            <XCircle className="w-4 h-4" />
-                            Reject
+                            <XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                            <span>Reject</span>
                           </button>
                           <button
                             onClick={() => handleAcceptBid(bid)}
                             disabled={isLoading}
-                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-success bg-success/10 hover:bg-success/20 border border-success/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-2 text-xs sm:text-sm font-medium text-success bg-success/10 hover:bg-success/20 border border-success/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            <CheckCircle className="w-4 h-4" />
-                            Accept
+                            <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                            <span>Accept</span>
                           </button>
                         </div>
                       )}
@@ -195,20 +202,20 @@ const BidsModal = ({
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12">
-                  <DollarSign className="w-16 h-16 text-neutral-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-neutral-600 mb-2">No Bids Available</h3>
-                  <p className="text-neutral-500">This auction doesn't have any bids yet.</p>
+                <div className="text-center py-8 sm:py-12">
+                  <DollarSign className="w-12 h-12 sm:w-16 sm:h-16 text-neutral-300 mx-auto mb-3 sm:mb-4" />
+                  <h3 className="text-lg sm:text-xl font-semibold text-neutral-600 mb-2">No Bids Available</h3>
+                  <p className="text-sm sm:text-base text-neutral-500">This auction doesn't have any bids yet.</p>
                 </div>
               )}
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end gap-3 p-6 border-t border-neutral-200 bg-neutral-50">
+            <div className="flex items-center justify-end gap-3 p-3 sm:p-4 lg:p-6 border-t border-neutral-200 bg-neutral-50 flex-shrink-0">
               <button
                 onClick={onClose}
                 disabled={isLoading}
-                className="cursor-pointer btn-ghost disabled:opacity-50 disabled:cursor-not-allowed"
+                className="cursor-pointer btn-ghost disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base px-3 sm:px-4 py-2"
               >
                 Close
               </button>
