@@ -62,16 +62,17 @@ export default function TwoColumnSection() {
                             </p>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-6">
+                        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center pt-6">
                             <motion.button
                                 onClick={() => setisModalOpen(true)}
-                                className="group relative w-full sm:w-auto cursor-pointer bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-10 py-5 rounded-2xl font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-2xl overflow-hidden"
+                                className="group relative w-full sm:w-auto cursor-pointer bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-6 py-3 sm:px-8 sm:py-4 lg:px-10 lg:py-5 rounded-xl sm:rounded-2xl font-semibold text-base sm:text-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl sm:shadow-xl sm:hover:shadow-2xl overflow-hidden"
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                             >
                                 <span className="relative z-10 flex items-center justify-center gap-2">
-                                    Check Your Selling Options
-                                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <span className="hidden sm:inline">Check Your Selling Options</span>
+                                    <span className="sm:hidden">Check Selling Options</span>
+                                    <svg className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                     </svg>
                                 </span>

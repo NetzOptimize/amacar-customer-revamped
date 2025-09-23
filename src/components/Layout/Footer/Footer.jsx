@@ -12,57 +12,57 @@ export default function Footer() {
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-primary-400/5 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="relative z-10 max-w-8xl mx-auto px-8 py-20">
+      <div className="relative z-10 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-28  mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-12 lg:gap-16 xl:gap-28 mb-8 sm:mb-10 lg:mb-12">
           {/* Company Info */}
           <div className="lg:col-span-1">
-            <div className="mb-8">
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center mr-4">
-                  <span className="text-2xl font-bold text-white">A</span>
+            <div className="mb-6 sm:mb-8">
+              <div className="flex items-center mb-4 sm:mb-6">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center mr-3 sm:mr-4">
+                  <span className="text-xl sm:text-2xl font-bold text-white">A</span>
                 </div>
-                <h3 className="text-3xl font-bold bg-gradient-to-r from-neutral-900 to-neutral-600 bg-clip-text text-transparent">
+                <h3 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-neutral-900 to-neutral-600 bg-clip-text text-transparent">
                   Amacar
                 </h3>
               </div>
-              <p className="text-neutral-600 leading-relaxed mb-8 text-lg">
+              <p className="text-neutral-600 leading-relaxed mb-6 sm:mb-8 text-sm sm:text-base lg:text-lg">
                 The smartest way to sell your car. Get instant offers from
                 verified dealers and watch them compete for your vehicle in
                 real-time auctions.
               </p>
 
               {/* Social Links */}
-              <div className="flex space-x-4">
+              <div className="flex space-x-3 sm:space-x-4">
                 <a
                   href="https://www.youtube.com/@Amacar-ai"
-                  className="group w-12 h-12 bg-neutral-100 hover:bg-primary-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-glow"
+                  className="group w-10 h-10 sm:w-12 sm:h-12 bg-neutral-100 hover:bg-primary-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-glow"
                 >
-                  <span className="text-lg font-bold text-neutral-600 group-hover:text-white">
+                  <span className="text-base sm:text-lg font-bold text-neutral-600 group-hover:text-white">
                     <Youtube />
                   </span>
                 </a>
                 <a
                   href="https://x.com/Amacar_us"
-                  className="group w-12 h-12 bg-neutral-100 hover:bg-primary-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-glow"
+                  className="group w-10 h-10 sm:w-12 sm:h-12 bg-neutral-100 hover:bg-primary-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-glow"
                 >
-                  <span className="text-lg font-bold text-neutral-600 group-hover:text-white">
+                  <span className="text-base sm:text-lg font-bold text-neutral-600 group-hover:text-white">
                     <Twitter />
                   </span>
                 </a>
                 <a
                   href="https://www.linkedin.com/company/amacar-ai/"
-                  className="group w-12 h-12 bg-neutral-100 hover:bg-primary-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-glow"
+                  className="group w-10 h-10 sm:w-12 sm:h-12 bg-neutral-100 hover:bg-primary-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-glow"
                 >
-                  <span className="text-lg font-bold text-neutral-600 group-hover:text-white">
+                  <span className="text-base sm:text-lg font-bold text-neutral-600 group-hover:text-white">
                     <Linkedin />
                   </span>
                 </a>
                 <a
                   href="https://www.instagram.com/amacar.ai/"
-                  className="group w-12 h-12 bg-neutral-100 hover:bg-primary-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-glow"
+                  className="group w-10 h-10 sm:w-12 sm:h-12 bg-neutral-100 hover:bg-primary-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-glow"
                 >
-                  <span className="text-lg font-bold text-neutral-600 group-hover:text-white">
+                  <span className="text-base sm:text-lg font-bold text-neutral-600 group-hover:text-white">
                     <Instagram />
                   </span>
                 </a>
@@ -72,14 +72,14 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-xl font-semibold mb-8 text-neutral-900">
+            <h4 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 lg:mb-8 text-neutral-900">
               Quick Links
             </h4>
-            <ul className="space-y-4">
+            <ul className="space-y-3 sm:space-y-4">
               <li>
                 <Link
                   to="/about-us"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
+                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-sm sm:text-base lg:text-lg inline-block"
                 >
                   How to bid
                 </Link>
@@ -87,7 +87,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/about-us"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
+                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-sm sm:text-base lg:text-lg inline-block"
                 >
                   Our vision
                 </Link>
@@ -95,7 +95,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/about-us"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
+                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-sm sm:text-base lg:text-lg inline-block"
                 >
                   How to sell with us
                 </Link>
@@ -107,14 +107,14 @@ export default function Footer() {
 
           {/* Support & Legal */}
           <div>
-            <h4 className="text-xl font-semibold mb-8 text-neutral-900">
+            <h4 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 lg:mb-8 text-neutral-900">
               Support & Legal
             </h4>
-            <ul className="space-y-4">
+            <ul className="space-y-3 sm:space-y-4">
               <li>
                 <Link
                   to="/cookies-policy"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
+                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-sm sm:text-base lg:text-lg inline-block"
                 >
                   Cookie Policy
                 </Link>
@@ -122,7 +122,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/privacy-policy"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
+                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-sm sm:text-base lg:text-lg inline-block"
                 >
                   Privacy Policy
                 </Link>
@@ -130,7 +130,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/terms-of-service"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
+                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-sm sm:text-base lg:text-lg inline-block"
                 >
                   Terms of Service
                 </Link>
@@ -138,7 +138,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/faq"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
+                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-sm sm:text-base lg:text-lg inline-block"
                 >
                   FAQ
                 </Link>
@@ -148,15 +148,15 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-neutral-300 pt-8">
-          <div className="flex flex-col lg:flex-row justify-between items-center space-y-6 lg:space-y-0">
-            <div className="flex items-center space-x-8">
-              <span className="text-neutral-600 text-lg">Trusted by</span>
-              <div className="flex items-center space-x-4">
-                <div className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 backdrop-blur-sm border border-primary-500/20 px-4 py-2 rounded-full text-sm font-medium text-primary-600">
+        <div className="border-t border-neutral-300 pt-6 sm:pt-8">
+          <div className="flex flex-col sm:flex-col lg:flex-row justify-between items-center space-y-4 sm:space-y-6 lg:space-y-0">
+            <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-6 lg:space-x-8">
+              <span className="text-neutral-600 text-sm sm:text-base lg:text-lg">Trusted by</span>
+              <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3 lg:space-x-4">
+                <div className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 backdrop-blur-sm border border-primary-500/20 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium text-primary-600">
                   10,000+ Sellers
                 </div>
-                <div className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 backdrop-blur-sm border border-primary-500/20 px-4 py-2 rounded-full text-sm font-medium text-primary-600">
+                <div className="bg-gradient-to-r from-primary-500/10 to-primary-600/10 backdrop-blur-sm border border-primary-500/20 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium text-primary-600">
                   500+ Dealers
                 </div>
               </div>

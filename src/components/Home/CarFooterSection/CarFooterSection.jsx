@@ -47,7 +47,7 @@ export default function CarFooterSection() {
     }
 
     return (
-        <section className="relative  flex items-center justify-center overflow-hidden">
+        <section className="relative flex items-center justify-center overflow-hidden min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh] xl:min-h-[90vh]">
             {/* Background Image */}
             <div
                 className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -80,52 +80,52 @@ export default function CarFooterSection() {
 
             {/* Content */}
             <motion.div
-                className="relative z-10 max-w-6xl mx-auto px-6 text-center"
+                className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 text-center py-8 sm:py-12"
                 variants={containerVariants}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
             >
                 {/* Main Heading */}
-                <motion.div variants={itemVariants} className="mb-8">
-                    <h2 className="mt-4 text-5xl lg:text-7xl font-black text-white mb-6 leading-tight">
+                <motion.div variants={itemVariants} className="mb-4 sm:mb-6 lg:mb-8">
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white mb-4 sm:mb-6 leading-tight">
                         Ready to <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-red-400 to-yellow-400">Transform</span> Your Car Sale?
                     </h2>
-                    <div className="w-32 h-1 bg-gradient-to-r from-blue-400 to-purple-400 mx-auto rounded-full" />
+                    <div className="w-20 sm:w-24 lg:w-32 h-0.5 sm:h-1 bg-gradient-to-r from-blue-400 to-purple-400 mx-auto rounded-full" />
                 </motion.div>
 
                 {/* Subheading */}
                 <motion.p
                     variants={itemVariants}
-                    className="text-xl lg:text-2xl text-slate-200 mb-12 max-w-4xl mx-auto leading-relaxed"
+                    className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-200 mb-6 sm:mb-8 lg:mb-12 max-w-4xl mx-auto leading-relaxed px-2"
                 >
-                    Join thousands of satisfied customers who've discovepurple the smartest way to sell their vehicles.
+                    Join thousands of satisfied customers who've discovered the smartest way to sell their vehicles.
                     Get instant offers, watch dealers compete, and walk away with the best deal possible.
                 </motion.p>
 
                 {/* Stats */}
                 <motion.div
                     variants={itemVariants}
-                    className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16"
+                    className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12 lg:mb-16"
                 >
-                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                        <div className="text-4xl font-bold text-white mb-2">10,000+</div>
-                        <div className="text-slate-300">Cars Sold</div>
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
+                        <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2">10,000+</div>
+                        <div className="text-sm sm:text-base text-slate-300">Cars Sold</div>
                     </div>
-                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                        <div className="text-4xl font-bold text-white mb-2">₹2.5Cr+</div>
-                        <div className="text-slate-300">Total Value</div>
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
+                        <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2">₹2.5Cr+</div>
+                        <div className="text-sm sm:text-base text-slate-300">Total Value</div>
                     </div>
-                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                        <div className="text-4xl font-bold text-white mb-2">4.9★</div>
-                        <div className="text-slate-300">Customer Rating</div>
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
+                        <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-2">4.9★</div>
+                        <div className="text-sm sm:text-base text-slate-300">Customer Rating</div>
                     </div>
                 </motion.div>
 
                 {/* CTA Buttons */}
                 <motion.div
                     variants={itemVariants}
-                    className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+                    className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center mb-6 sm:mb-8"
                 >
                     {/* Primary CTA */}
                     <motion.button
@@ -133,13 +133,14 @@ export default function CarFooterSection() {
                         variants={buttonVariants}
                         whileHover="hover"
                         whileTap="tap"
-                        className="group cursor-pointer relative bg-[#f6851f] hover:to-orange-600 text-white px-12 py-6 rounded-2xl font-bold text-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 overflow-hidden"
+                        className="group cursor-pointer relative w-full sm:w-auto bg-[#f6851f] hover:to-orange-600 text-white px-6 py-4 sm:px-8 sm:py-5 lg:px-12 lg:py-6 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg lg:text-xl shadow-xl sm:shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 overflow-hidden"
                     >
-                        <span className="relative z-10 flex items-center gap-3">
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <span className="relative z-10 flex items-center justify-center gap-2 sm:gap-3">
+                            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                             </svg>
-                            Get Instant Offer Now
+                            <span className="hidden sm:inline">Get Instant Offer Now</span>
+                            <span className="sm:hidden">Get Instant Offer</span>
                         </span>
                         <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </motion.button>
@@ -165,25 +166,25 @@ export default function CarFooterSection() {
                 {/* Trust Indicators */}
                 <motion.div
                     variants={itemVariants}
-                    className="mt-16 mb-10 flex flex-wrap justify-center items-center gap-8 text-slate-300"
+                    className="mt-8 sm:mt-12 lg:mt-16 mb-6 sm:mb-8 lg:mb-10 flex flex-wrap justify-center items-center gap-4 sm:gap-6 lg:gap-8 text-slate-300"
                 >
-                    <div className="flex items-center gap-2">
-                        <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
-                        <span>100% Secure</span>
+                        <span className="text-sm sm:text-base">100% Secure</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
-                        <span>No Hidden Fees</span>
+                        <span className="text-sm sm:text-base">No Hidden Fees</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
-                        <span>Instant Payment</span>
+                        <span className="text-sm sm:text-base">Instant Payment</span>
                     </div>
                 </motion.div>
             </motion.div>

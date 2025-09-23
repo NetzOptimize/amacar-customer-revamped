@@ -87,33 +87,36 @@ export default function Carousel() {
 
     return (
         <div className="carousel w-full">
-            <div className="max-w-6xl mx-auto px-6 py-12 carousel-outer-div">
+            <div className="carousel-container">
                 <div
-                    className="relative overflow-hidden rounded-lg carousel-inner-div"
+                    className="carousel-inner"
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                 >
                     {slides.map((s, i) => (
                         <section
                             key={i}
-                            className={`carousel-section slide ${i === index ? `active ${direction === 'next' ? 'from-right' : 'from-left'}` : 'inactive'}`}
+                            className={`carousel-slide ${i === index ? `active ${direction === 'next' ? 'from-right' : 'from-left'}` : 'inactive'}`}
                             aria-hidden={i !== index}
                             style={{ ['--slide-bg']: i % 2 === 0 ? '#f8fafc' : '#f1f5f9' }}
                         >
-                            <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-6">
-                                <div className={`p-6 md:p-12 slide-copy ${i === index ? 'in' : ''}`}>
+                            <div className="slide-content">
+                                <div className={`slide-text ${i === index ? 'in' : ''}`}>
                                     <h3 className="slide-heading" style={{ animationDelay: `120ms` }}>{s.heading}</h3>
-                                    <div className="mt-4 space-y-3 slide-body">
+                                    <div className="slide-body">
                                         {s.lines.map((l, idx) => (
                                             <p key={idx} className="slide-line" style={{ animationDelay: `${200 + idx * 100}ms` }}>{l}</p>
                                         ))}
                                     </div>
-                                    <div className="mt-6">
-                                        {s.cta === 'Get Instant Offer' ? <button onClick={() => setIsModalOpen(true)} className="btn-primary" aria-label={s.cta} style={{ animationDelay: `420ms` }}>{s.cta}</button> : <button onClick={() => setAuctionOpen(true)} className="btn-primary" aria-label={s.cta} style={{ animationDelay: `420ms` }}>{s.cta}</button>}
+                                    <div className="slide-cta">
+                                        {s.cta === 'Get Instant Offer' ? 
+                                            <button onClick={() => setIsModalOpen(true)} className="btn-primary" aria-label={s.cta} style={{ animationDelay: `420ms` }}>{s.cta}</button> : 
+                                            <button onClick={() => setAuctionOpen(true)} className="btn-primary" aria-label={s.cta} style={{ animationDelay: `420ms` }}>{s.cta}</button>
+                                        }
                                     </div>
                                 </div>
 
-                                <div className="p-6 md:p-12 flex justify-center md:justify-end">
+                                <div className="slide-image">
                                     <div className="slide-media">
                                         <img src={s.image} alt={s.heading} />
                                     </div>
@@ -122,18 +125,25 @@ export default function Carousel() {
                         </section>
                     ))}
 
-                    {/* arrows */}
-                    <button type="button" className="arrow left" onClick={() => goDelta(-1)} aria-label="Previous slide">
+                    {/* Navigation Arrows */}
+                    <button type="button" className="carousel-arrow carousel-arrow-left" onClick={() => goDelta(-1)} aria-label="Previous slide">
                         <span className="arrow-icon">←</span>
                     </button>
-                    <button type="button" className="arrow right" onClick={() => goDelta(1)} aria-label="Next slide">
+                    <button type="button" className="carousel-arrow carousel-arrow-right" onClick={() => goDelta(1)} aria-label="Next slide">
                         <span className="arrow-icon">→</span>
                     </button>
 
-                    {/* dots */}
-                    <div className="dots" role="tablist" aria-label="Carousel pagination">
+                    {/* Pagination Dots */}
+                    <div className="carousel-dots" role="tablist" aria-label="Carousel pagination">
                         {slides.map((_, i) => (
-                            <button type="button" key={i} className={`dot ${i === index ? 'active' : ''}`} onClick={() => goIndex(i)} aria-label={`Go to slide ${i + 1}`} aria-selected={i === index}></button>
+                            <button 
+                                type="button" 
+                                key={i} 
+                                className={`carousel-dot ${i === index ? 'active' : ''}`} 
+                                onClick={() => goIndex(i)} 
+                                aria-label={`Go to slide ${i + 1}`} 
+                                aria-selected={i === index}
+                            ></button>
                         ))}
                     </div>
                 </div>
