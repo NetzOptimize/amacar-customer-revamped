@@ -135,7 +135,13 @@ const DashboardLayout = ({ children }) => {
             {isMobileMenuOpen ? <X className="w-5 h-5 text-neutral-600" /> : <Menu className="w-5 h-5 text-neutral-600" />}
           </button>
 
-          <h1 className="text-lg font-semibold text-neutral-800">Dashboard</h1>
+          <Link to="/" className="flex items-center">
+            <img 
+              src="/src/assets/original_logo.jpg" 
+              alt="Amacar Logo" 
+              className="h-8 w-auto object-contain hover:opacity-80 transition-opacity duration-200"
+            />
+          </Link>
 
           <div className="relative" ref={notificationsRef}>
             <button
