@@ -176,6 +176,40 @@ export const getInstantCashOffer = createAsyncThunk(
   }
 );
 
+// Async thunk for fetching offer by product ID
+export const getOfferByProductId = createAsyncThunk(
+  'carDetailsAndQuestions/getOfferByProductId',
+  async (productId, { rejectWithValue }) => {
+    try {
+      console.log('Fetching offer by product ID:', productId);
+      const response = await api.get(`/offer/instant-cash?product_id=${productId}`);
+      console.log('Get Offer by Product ID API response:', response.data);
+
+      if (response.data.status === 'success') {
+        return {
+          offerAmount: response.data.offer_amount,
+          carSummary: response.data.car_summary,
+          isAuctionable: response.data.is_auctionable,
+          isAccident: response.data.is_accident,
+          productId: response.data.product_id,
+          emailSent: response.data.email_sent,
+          timestamp: response.data.timestamp,
+          userInfo: response.data.user_info,
+          vehicleDetails: response.data.vehicle_details || {},
+        };
+      } else {
+        console.log('API returned status:', response.data.status, 'message:', response.data.message);
+        return rejectWithValue(response.data.message || 'Failed to get offer by product ID');
+      }
+    } catch (error) {
+      console.log('Get Offer by Product ID API error:', error.response?.data || error.message);
+      console.log('Error status:', error.response?.status);
+      console.log('Error headers:', error.response?.headers);
+      return rejectWithValue(error.response?.data?.message || error.message || 'Failed to get offer by product ID');
+    }
+  }
+);
+
 // Async thunk for uploading vehicle images with compression and chunked upload
 export const uploadVehicleImage = createAsyncThunk(
   'carDetailsAndQuestions/uploadVehicleImage',
@@ -717,6 +751,38 @@ const carDetailsAndQuestionsSlice = createSlice({
       .addCase(getInstantCashOffer.rejected, (state, action) => {
         state.offerStatus = 'failed';
         state.offerError = action.payload;
+        state.userExists = null;
+        state.userInfo = null;
+      })
+      // Get Offer by Product ID reducers
+      .addCase(getOfferByProductId.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.offerStatus = 'loading';
+        state.offerError = null;
+      })
+      .addCase(getOfferByProductId.fulfilled, (state, action) => {
+        state.loading = false;
+        state.offerStatus = 'succeeded';
+        state.offer = action.payload;
+        state.offerError = null;
+        state.productId = action.payload.productId;
+        state.userExists = action.payload.userInfo?.user_exists || null;
+        state.userInfo = action.payload.userInfo;
+        
+        // Update vehicle details if provided
+        if (action.payload.vehicleDetails && Object.keys(action.payload.vehicleDetails).length > 0) {
+          state.vehicleDetails = {
+            ...state.vehicleDetails,
+            ...action.payload.vehicleDetails,
+          };
+        }
+      })
+      .addCase(getOfferByProductId.rejected, (state, action) => {
+        state.loading = false;
+        state.offerStatus = 'failed';
+        state.offerError = action.payload;
+        state.error = action.payload;
         state.userExists = null;
         state.userInfo = null;
       })

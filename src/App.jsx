@@ -29,6 +29,7 @@ import CookiesPolicy from './Pages/CookiesPolicy.jsx';
 import Testimonials from './Pages/Testimonials.jsx';
 import FAQ from './Pages/FAQ.jsx';
 import ScrollToTop from './components/ui/ScrollToTop.jsx';
+import ReviewPageById from './Pages/ReviewPageById.jsx';
 
 function App() {
   const location = useLocation();
@@ -88,6 +89,7 @@ function App() {
               <Route path="/local-auction" element={<ExteriorPhotos />} />
               <Route path="/national-auction" element={<ExteriorPhotos />} />
               <Route path="/review" element={<ReviewPage />} />
+              <Route path="/review/:id" element={<ReviewPageById />} />
               <Route path="/unauthorized" element={<UnauthorizedPage />} />
               <Route path="/about-us" element={<AboutUs />} />
               <Route path="/testimonials" element={<Testimonials />} />
