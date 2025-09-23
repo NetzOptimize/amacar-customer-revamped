@@ -397,13 +397,13 @@ export default function VehiclePhotos() {
   const progress = Math.round((uploadedRequiredCount / totalRequired) * 100);
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 pt-24 md:pt-28">
+    <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 pt-12 md:pt-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-4xl md:text-5xl font-bold text-slate-900 text-center mb-10 font-sans tracking-tight"
+          className="text-4xl md:text-5xl font-bold text-slate-900 text-center mb-6 font-sans tracking-tight"
         >
           Upload Your Vehicle Photos
         </motion.h1>
@@ -416,10 +416,10 @@ export default function VehiclePhotos() {
           className="border-2 border-[#f6851f]/20 rounded-2xl p-6 mb-10 bg-white/90 shadow-lg backdrop-blur-md"
         >
           <div className="flex items-center justify-between mb-4">
-            <span className="text-lg font-semibold text-slate-800">
+            <span className="text-md lg:text-lg font-semibold text-slate-800">
               Required Photos: {uploadedRequiredCount} of {totalRequired}
             </span>
-            <span className="text-lg font-semibold text-[#f6851f]">
+            <span className="text-md lg:text-lg font-semibold text-[#f6851f]">
               {progress}% Complete
             </span>
           </div>
@@ -504,7 +504,7 @@ export default function VehiclePhotos() {
           className="mb-12"
         >
           <h2 className="text-2xl font-semibold text-slate-800 mb-6 font-sans">Required & Optional Photos</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {photoRequirements.map((photo, index) => {
               const uploadedPhoto = photos.find((p) => p.requirement === photo.id);
               const hasPhoto = !!uploadedPhoto;
@@ -579,21 +579,21 @@ export default function VehiclePhotos() {
                       </div>
                     </div>
                   ) : (
-                    <div className="aspect-square flex flex-col items-center justify-center p-5 text-center group">
-                      <div className="w-12 h-12 mb-3 text-slate-400 group-hover:text-[#f6851f] transition-colors flex items-center justify-center">
-                        <photo.icon className="w-8 h-8" />
+                    <div className="aspect-square sm:aspect-[4/3] lg:aspect-square flex flex-col items-center justify-center p-5 text-center group">
+                      <div className="w-16 h-16 sm:w-14 sm:h-14 lg:w-12 lg:h-12 mb-3 text-slate-400 group-hover:text-[#f6851f] transition-colors flex items-center justify-center">
+                        <photo.icon className="w-10 h-10 sm:w-9 sm:h-9 lg:w-8 lg:h-8" />
                       </div>
-                      <p className="text-sm font-semibold text-slate-800 mb-2">{photo.label}</p>
-                      <div className='border-2 border-slate-300 p-2 rounded-md'>
+                      <p className="text-sm sm:text-sm lg:text-sm font-semibold text-slate-800 mb-2">{photo.label}</p>
+                      <div className='border-2 border-slate-300 p-2 sm:p-3 lg:p-2 rounded-md'>
                         <button
                           onClick={() => {
                             document.getElementById(`photo-upload-${photo.id}`).click();
                           }}
-                          className="cursor-pointer w-full inline-flex items-center justify-center h-8 px-3 rounded-md text-black border-slate-200 border-2 text-sm font-medium transition-colors duration-200 "
+                          className="cursor-pointer w-full inline-flex items-center justify-center h-10 sm:h-9 lg:h-8 px-3 rounded-md text-black border-slate-200 border-2 text-sm font-medium transition-colors duration-200 "
                         >
                           Upload
                         </button>
-                        <p className='text-xs mt-4 text-slate-500'>{photo.tip}</p>
+                        <p className='text-xs sm:text-xs lg:text-xs mt-4 text-slate-500'>{photo.tip}</p>
                       </div>
                     </div>
                   )}
@@ -643,7 +643,7 @@ export default function VehiclePhotos() {
                 <span className="text-lg ">+</span> Add Accident Photo
               </motion.button>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {accidentPhotos.map((photo, index) => {
                 const uploadedPhoto = accidentPhotos.find((p) => p.id === photo.id && p.file);
                 const hasPhoto = !!uploadedPhoto;
@@ -726,13 +726,13 @@ export default function VehiclePhotos() {
                         </div>
                       </div>
                     ) : (
-                      <div className="aspect-square flex flex-col items-center justify-center p-5 text-center group">
-                        <div className="w-12 h-12 mb-3 text-slate-400 group-hover:text-[#f6851f] transition-colors flex items-center justify-center">
-                          <photo.icon className="w-8 h-8" />
+                      <div className="aspect-square sm:aspect-[4/3] lg:aspect-square flex flex-col items-center justify-center p-5 text-center group">
+                        <div className="w-16 h-16 sm:w-14 sm:h-14 lg:w-12 lg:h-12 mb-3 text-slate-400 group-hover:text-[#f6851f] transition-colors flex items-center justify-center">
+                          <photo.icon className="w-10 h-10 sm:w-9 sm:h-9 lg:w-8 lg:h-8" />
                         </div>
                         <p className="text-sm font-semibold text-slate-800 mb-2">{photo.label}</p>
-                        <div className="w-9 h-9 rounded-full border-2 border-dashed border-slate-300 group-hover:border-[#f6851f] group-hover:bg-orange-50/20 flex items-center justify-center transition-all">
-                          <span className="text-slate-400 group-hover:text-[#f6851f] text-xl">+</span>
+                        <div className="w-12 h-12 sm:w-10 sm:h-10 lg:w-9 lg:h-9 rounded-full border-2 border-dashed border-slate-300 group-hover:border-[#f6851f] group-hover:bg-orange-50/20 flex items-center justify-center transition-all">
+                          <span className="text-slate-400 group-hover:text-[#f6851f] text-2xl sm:text-xl lg:text-xl">+</span>
                         </div>
                       </div>
                     )}
