@@ -26,6 +26,7 @@ import BidConfirmationModal from '../components/ui/BidConfirmationModal';
 import BidsModal from '../components/ui/BidsModal';
 import StatsCards from '../components/ui/StatsCards';
 import { useNavigate } from 'react-router-dom';
+import Modal from '@/components/ui/modal';
 
 const PendingOffersPage = () => {
   const dispatch = useDispatch();
@@ -36,6 +37,7 @@ const PendingOffersPage = () => {
   const bidOperationLoading = useSelector(selectBidOperationLoading);
   const bidOperationError = useSelector(selectBidOperationError);
   const bidOperationSuccess = useSelector(selectBidOperationSuccess);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Search context
   const { getSearchResults, searchQuery, clearSearch } = useSearch();
@@ -780,7 +782,9 @@ const PendingOffersPage = () => {
                               <span>Relist Vehicle</span>
                             </button>
                             <button
-                              onClick={() => navigate('/auction')}
+                              onClick={() => {
+                                setIsModalOpen(true)
+                              }}
                               className="btn-primary flex items-center justify-center space-x-2 px-3 py-2 text-xs sm:text-sm"
                             >
                               <Car className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -863,7 +867,9 @@ const PendingOffersPage = () => {
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                  onClick={() => navigate('/auction')}
+                  onClick={() => {
+                    setIsModalOpen(true)
+                  }}
                   className="cursor-pointer w-full sm:w-auto sm:flex-[1.3] px-4 h-12 sm:h-16 group relative bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:shadow-xl hover:shadow-primary-500/25 focus:outline-none focus:ring-4 focus:ring-primary-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   <div className="flex items-center justify-center space-x-2 sm:space-x-3">
@@ -909,6 +915,13 @@ const PendingOffersPage = () => {
         action={confirmationData?.action}
         bidData={confirmationData?.bid}
         auctionData={confirmationData?.offer}
+      />
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Start new auction"
+        description="Enter your vehicle details to start the auction process"
       />
     </div>
   );
