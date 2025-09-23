@@ -456,53 +456,53 @@ const PreviousOffersPage = () => {
   };
 
   return (
-    <div className="lg:mt-16 min-h-screen bg-gradient-hero p-8">
+    <div className="lg:mt-16 min-h-screen bg-gradient-hero p-2 sm:p-4 md:p-6 lg:p-8 mt-4 sm:mt-0">
       <div className="max-w-8xl mx-auto">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
-          <div className="flex flex-col items-center sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <motion.h1 variants={itemVariants} className="text-3xl font-bold text-neutral-800 mb-2">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+            <div className="flex-1 min-w-0">
+              <motion.h1 variants={itemVariants} className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-800 mb-2">
                 Previous Offers
               </motion.h1>
-              <motion.p variants={itemVariants} className="text-neutral-600">
+              <motion.p variants={itemVariants} className="text-sm sm:text-base text-neutral-600">
                 Review your past offers and auction results. {totalCount > 0 && `(${totalCount} total offers)`}
               </motion.p>
             </div>
-            <div className="mb-8 flex items-center justify-end">
+            <div className="flex items-center justify-end">
               {/* Modern Sort Dropdown */}
               {!loading && !error && searchResults.length > 0 && (
                 <motion.div
                   variants={itemVariants}
-                  className="relative w-[200px] left-6"
+                  className="relative w-full sm:w-[200px]"
                   ref={dropdownRef}
                 >
                   {/* Dropdown Trigger */}
                   <button
                     onClick={() => !isSorting && setIsDropdownOpen(!isDropdownOpen)}
                     disabled={isSorting}
-                    className={`cursor-pointer flex items-center gap-3 bg-white border border-neutral-200 rounded-xl px-4 py-3 hover:border-neutral-300 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent group ${isSorting ? 'opacity-75 cursor-not-allowed' : ''
+                    className={`cursor-pointer flex items-center gap-2 sm:gap-3 bg-white border border-neutral-200 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 hover:border-neutral-300 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent group w-full ${isSorting ? 'opacity-75 cursor-not-allowed' : ''
                       }`}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
                       {isSorting ? (
-                        <RefreshCw className="w-4 h-4 text-orange-500 animate-spin" />
+                        <RefreshCw className="w-4 h-4 text-orange-500 animate-spin flex-shrink-0" />
                       ) : (
-                        <ArrowUpDown className="w-4 h-4 text-neutral-500 group-hover:text-orange-500 transition-colors" />
+                        <ArrowUpDown className="w-4 h-4 text-neutral-500 group-hover:text-orange-500 transition-colors flex-shrink-0" />
                       )}
-                      <div className="text-left">
-                        <div className="text-sm font-medium text-neutral-700">
+                      <div className="text-left flex-1 min-w-0">
+                        <div className="text-xs sm:text-sm font-medium text-neutral-700 truncate">
                           {isSorting ? 'Sorting...' : selectedOption.label}
                         </div>
                       </div>
                     </div>
                     {!isSorting && (
                       <ChevronDown
-                        className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''
+                        className={`w-4 h-4 text-neutral-400 transition-transform duration-200 flex-shrink-0 ${isDropdownOpen ? 'rotate-180' : ''
                           }`}
                       />
                     )}
@@ -516,7 +516,7 @@ const PreviousOffersPage = () => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         transition={{ duration: 0.15, ease: "easeOut" }}
-                        className="absolute top-full left-0 right-6 mt-2 bg-white border border-neutral-200 rounded-xl shadow-lg z-50 overflow-hidden"
+                        className="absolute top-full left-0 right-0 mt-2 bg-white border border-neutral-200 rounded-xl shadow-lg z-50 overflow-hidden"
                       >
                         {sortOptions.map((option, index) => {
                           const IconComponent = option.icon;
@@ -526,23 +526,22 @@ const PreviousOffersPage = () => {
                             <button
                               key={option.value}
                               onClick={() => handleSortSelect(option.value)}
-                              className={`cursor-pointer w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-neutral-50 transition-colors duration-150 ${isSelected ? 'bg-orange-50 text-orange-700' : 'text-neutral-700'
+                              className={`cursor-pointer w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-left hover:bg-neutral-50 transition-colors duration-150 ${isSelected ? 'bg-orange-50 text-orange-700' : 'text-neutral-700'
                                 } ${index !== sortOptions.length - 1 ? 'border-b border-neutral-100' : ''}`}
                             >
-                              <div className={`p-1.5 rounded-lg ${isSelected ? 'bg-orange-100' : 'bg-neutral-100'
+                              <div className={`p-1 sm:p-1.5 rounded-lg flex-shrink-0 ${isSelected ? 'bg-orange-100' : 'bg-neutral-100'
                                 }`}>
-                                <IconComponent className={`w-3.5 h-3.5 ${isSelected ? 'text-orange-600' : 'text-neutral-500'
+                                <IconComponent className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${isSelected ? 'text-orange-600' : 'text-neutral-500'
                                   }`} />
                               </div>
-                              <div className="flex-1">
-                                <div className={`text-sm font-medium ${isSelected ? 'text-orange-700' : 'text-neutral-700'
-                                  }`}>
+                              <div className="flex-1 min-w-0">
+                                <div className={`text-xs sm:text-sm font-medium ${isSelected ? 'text-orange-700' : 'text-neutral-700'
+                                  } truncate`}>
                                   {option.label}
                                 </div>
-
                               </div>
                               {isSelected && (
-                                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-orange-500 rounded-full flex-shrink-0"></div>
                               )}
                             </button>
                           );
@@ -563,19 +562,19 @@ const PreviousOffersPage = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="mb-4"
+            className="mb-4 sm:mb-6"
           >
-            <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Search className="w-5 h-5 text-primary-600" />
-                  <span className="text-sm font-medium text-primary-800">
+            <div className="bg-primary-50 border border-primary-200 rounded-lg p-3 sm:p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <div className="flex items-center space-x-2 min-w-0">
+                  <Search className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm font-medium text-primary-800 truncate">
                     Showing {sortedOffers.length} results for "{searchQuery}"
                   </span>
                 </div>
                 <button
                   onClick={clearSearch}
-                  className="text-primary-600 hover:text-primary-800 text-sm font-medium"
+                  className="text-primary-600 hover:text-primary-800 text-xs sm:text-sm font-medium self-start sm:self-auto px-2 py-1 rounded hover:bg-primary-100 transition-colors"
                 >
                   Clear Search
                 </button>
@@ -609,22 +608,22 @@ const PreviousOffersPage = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex -mt-12 items-center justify-center min-h-[60vh]"
+            className="flex -mt-8 sm:-mt-12 items-center justify-center min-h-[50vh] sm:min-h-[60vh] px-4"
           >
-            <div className="text-center max-w-md mx-auto">
+            <div className="text-center max-w-sm sm:max-w-md mx-auto">
               {/* Modern Icon Container */}
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
-                className="relative mb-4"
+                className="relative mb-4 sm:mb-6"
               >
-                <div className="w-20 h-20 bg-gradient-to-br from-primary-50 to-primary-100 rounded-3xl flex items-center justify-center mx-auto shadow-soft border border-primary-200">
-                  <Car className="w-8 h-8 text-primary-500" />
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary-50 to-primary-100 rounded-3xl flex items-center justify-center mx-auto shadow-soft border border-primary-200">
+                  <Car className="w-6 h-6 sm:w-8 sm:h-8 text-primary-500" />
                 </div>
                 {/* Decorative elements */}
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-warning/20 rounded-full animate-pulse-slow"></div>
-                <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-accent/20 rounded-full animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+                <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-4 h-4 sm:w-6 sm:h-6 bg-warning/20 rounded-full animate-pulse-slow"></div>
+                <div className="absolute -bottom-1 -left-1 w-3 h-3 sm:w-4 sm:h-4 bg-accent/20 rounded-full animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
               </motion.div>
 
               {/* Content */}
@@ -632,11 +631,14 @@ const PreviousOffersPage = () => {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-                className="space-y-4"
+                className="space-y-2 sm:space-y-4"
               >
-                <h3 className="text-2xl font-bold text-neutral-800 font-display">
+                <h3 className="text-xl sm:text-2xl font-bold text-neutral-800 font-display">
                   No Previous Offers
                 </h3>
+                <p className="text-sm sm:text-base text-neutral-600">
+                  You don't have any previous offers at the moment.
+                </p>
               </motion.div>
 
               {/* Action Buttons */}
@@ -644,18 +646,18 @@ const PreviousOffersPage = () => {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-                className="flex flex-col sm:flex-row gap-4 mt-4"
+                className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8"
               >
                 <motion.button
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   onClick={() => navigate('/pending-offers')}
-                  className="cursor-pointer w-64 px-4 h-16 group relative bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:shadow-xl hover:shadow-primary-500/25 focus:outline-none focus:ring-4 focus:ring-primary-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="cursor-pointer w-full sm:w-auto sm:flex-[1.3] px-4 h-12 sm:h-16 group relative bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:shadow-xl hover:shadow-primary-500/25 focus:outline-none focus:ring-4 focus:ring-primary-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
-                  <div className="flex items-center gap-2 justify-between">
-                    <Car className="transition-transform duration-300 group-hover:scale-110" />
-                    <span className="text-md">View Pending offers</span>
+                  <div className="flex items-center justify-center space-x-2 sm:space-x-3">
+                    <Car className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110" />
+                    <span className="text-sm sm:text-base">Pending Offers</span>
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
                 </motion.button>
@@ -665,11 +667,11 @@ const PreviousOffersPage = () => {
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   onClick={() => navigate('/dashboard')}
-                  className="cursor-pointer w-64 px-4 h-16 group relative overflow-hidden bg-white hover:bg-neutral-50 text-neutral-700 font-semibold py-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-300 transition-all duration-300 transform hover:shadow-lg hover:shadow-neutral-500/10 focus:outline-none focus:ring-4 focus:ring-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="cursor-pointer w-full sm:w-auto sm:flex-[1.1] px-4 h-12 sm:h-16 group relative overflow-hidden bg-white hover:bg-neutral-50 text-neutral-700 font-semibold rounded-2xl border-2 border-neutral-200 hover:border-neutral-300 transition-all duration-300 transform hover:shadow-lg hover:shadow-neutral-500/10 focus:outline-none focus:ring-4 focus:ring-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
-                  <div className="flex items-center justify-center space-x-3">
-                    <Eye className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-                    <span className="text-lg">View Dashboard</span>
+                  <div className="flex items-center justify-center space-x-2 sm:space-x-3">
+                    <Eye className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110" />
+                    <span className="text-sm sm:text-base">Dashboard</span>
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-r from-neutral-100/0 via-neutral-100/50 to-neutral-100/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
                 </motion.button>
@@ -685,7 +687,7 @@ const PreviousOffersPage = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="space-y-6"
+            className="space-y-4 sm:space-y-6"
           >
             {/* Sorting Loading State - Show skeleton for offers list */}
             {isSorting && (
@@ -708,11 +710,11 @@ const PreviousOffersPage = () => {
                     <motion.div
                       key={formattedOffer.id}
                       variants={itemVariants}
-                      className="card p-6 hover:shadow-medium transition-all duration-300"
+                      className="card p-4 sm:p-6 hover:shadow-medium transition-all duration-300"
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-16 h-16 bg-neutral-200 rounded-lg flex items-center justify-center overflow-hidden">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                        <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">
+                          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-neutral-200 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                             {formattedOffer.imageUrl ? (
                               <img
                                 src={formattedOffer.imageUrl}
@@ -720,20 +722,20 @@ const PreviousOffersPage = () => {
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              <Car className="w-8 h-8 text-neutral-400" />
+                              <Car className="w-6 h-6 sm:w-8 sm:h-8 text-neutral-400" />
                             )}
                           </div>
-                          <div>
-                            <h3 className="text-lg font-semibold text-neutral-800">{formattedOffer.vehicle}</h3>
-                            <p className="text-sm text-neutral-600">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-base sm:text-lg font-semibold text-neutral-800 truncate">{formattedOffer.vehicle}</h3>
+                            <p className="text-xs sm:text-sm text-neutral-600 mt-1 line-clamp-2">
                               {formatDate(formattedOffer.date)} • VIN: {formattedOffer.vin}
                             </p>
-                            <p className="text-xs text-neutral-500 mt-1">{formattedOffer.title}</p>
+                            <p className="text-xs text-neutral-500 mt-1 line-clamp-1">{formattedOffer.title}</p>
                           </div>
                         </div>
 
-                        <div className="text-right">
-                          <div className="text-2xl font-bold text-neutral-800 mb-1">
+                        <div className="flex flex-col sm:flex-col items-start sm:items-end gap-2 sm:gap-0">
+                          <div className="text-lg sm:text-2xl font-bold text-neutral-800 mb-1">
                             {formatCurrency(formattedOffer.offerAmount)}
                           </div>
                           <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${formattedOffer.status === 'expired'
@@ -746,41 +748,44 @@ const PreviousOffersPage = () => {
                       </div>
 
                       <div className="mt-4 pt-4 border-t border-neutral-200">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
                           <div className="flex-1">
-                            <p className="text-sm text-neutral-600 mb-2">
+                            <p className="text-xs sm:text-sm text-neutral-600 mb-2">
                               <strong>Status:</strong> {formattedOffer.reason}
                             </p>
-                            <div className="flex space-x-2">
-                              <button onClick={() => navigate('/car-details', { state: { productId: offer.product_id } })} className="cursor-pointer btn-ghost flex items-center space-x-2">
-                                <Eye className="w-4 h-4" />
+                            <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
+                              <button 
+                                onClick={() => navigate('/car-details', { state: { productId: offer.product_id } })} 
+                                className="cursor-pointer btn-ghost flex items-center justify-center space-x-2 px-3 py-2 text-xs sm:text-sm"
+                              >
+                                <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                                 <span>View Details</span>
                               </button>
                               <button
                                 onClick={() => handleRelistVehicleClick(offer)}
-                                className="cursor-pointer btn-secondary flex items-center space-x-2"
+                                className="cursor-pointer btn-secondary flex items-center justify-center space-x-2 px-3 py-2 text-xs sm:text-sm"
                               >
-                                <RefreshCw className="w-4 h-4" />
+                                <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />
                                 <span>Relist Vehicle</span>
                               </button>
                             </div>
                           </div>
 
                           {/* Bids Button - Bottom Right */}
-                          <div className="ml-4">
+                          <div className="flex justify-center sm:justify-end mt-2 sm:mt-0 sm:ml-4">
                             {offer.bid && offer.bid.length > 0 ? (
                               <button
                                 onClick={() => handleShowBids(offer)}
-                                className="cursor-pointer group relative  hover:from-orange-600 hover:to-orange-700 text-[#f6851f] border-2 border-[#f6851f] px-6 py-3 rounded-xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2"
+                                className="cursor-pointer group relative hover:from-orange-600 hover:to-orange-700 text-[#f6851f] border-2 border-[#f6851f] px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2"
                               >
-                                <DollarSign className="w-4 h-4 group-hover:animate-pulse" />
-                                <span>View Bids</span>
-                                <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center animate-pulse">
+                                <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 group-hover:animate-pulse" />
+                                <span className="text-xs sm:text-sm">View Bids</span>
+                                <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center animate-pulse">
                                   {offer.bid.length}
                                 </div>
                               </button>
                             ) : (
-                              <p className="text-sm text-neutral-600">No bids</p>
+                              <p className="text-xs sm:text-sm text-neutral-600">No bids</p>
                             )}
                           </div>
                         </div>
@@ -795,18 +800,20 @@ const PreviousOffersPage = () => {
 
         {/* Load More Component */}
         {!loading && !error && searchResults.length > 0 && (
-          <LoadMore
-            items={sortedOffers}
-            itemsPerPage={itemsPerPage}
-            onLoadMore={handleLoadMore}
-            isLoadingMore={isLoadingMore}
-            hasMoreItems={hasMoreItems}
-            remainingItems={remainingItems}
-            SkeletonComponent={OffersListSkeleton}
-            buttonText="Load More Offers"
-            loadingText="Loading offers..."
-            showRemainingCount={true}
-          />
+          <div className="mt-6 sm:mt-8">
+            <LoadMore
+              items={sortedOffers}
+              itemsPerPage={itemsPerPage}
+              onLoadMore={handleLoadMore}
+              isLoadingMore={isLoadingMore}
+              hasMoreItems={hasMoreItems}
+              remainingItems={remainingItems}
+              SkeletonComponent={OffersListSkeleton}
+              buttonText="Load More Offers"
+              loadingText="Loading offers..."
+              showRemainingCount={true}
+            />
+          </div>
         )}
       </div>
 
@@ -817,7 +824,7 @@ const PreviousOffersPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4"
             onClick={handleCloseBidsModal}
           >
             <motion.div
@@ -825,31 +832,31 @@ const PreviousOffersPage = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden"
+              className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] sm:max-h-[80vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between p-6 border-b border-neutral-200">
-                <div>
-                  <h2 className="text-2xl font-bold text-neutral-800">
+              <div className="flex items-center justify-between p-4 sm:p-6 border-b border-neutral-200">
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-neutral-800 truncate">
                     Bids for {selectedOffer.year} {selectedOffer.make} {selectedOffer.model}
                   </h2>
-                  <p className="text-sm text-neutral-600 mt-1">
+                  <p className="text-xs sm:text-sm text-neutral-600 mt-1">
                     VIN: {selectedOffer.vin} • {selectedOffer.bid?.length || 0} bids
                   </p>
                 </div>
                 <button
                   onClick={handleCloseBidsModal}
-                  className="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-neutral-100 rounded-lg transition-colors flex-shrink-0 ml-2"
                 >
-                  <svg className="w-6 h-6 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
 
               {/* Modal Content */}
-              <div className="p-6 overflow-y-auto max-h-[60vh]">
+              <div className="p-4 sm:p-6 overflow-y-auto max-h-[60vh]">
                 {selectedOffer.bid && selectedOffer.bid.length > 0 ? (
                   <div className="space-y-4">
                     {selectedOffer.bid.map((bid, index) => (
@@ -858,26 +865,26 @@ const PreviousOffersPage = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="bg-neutral-50 rounded-xl p-4 border border-neutral-200"
+                        className="bg-neutral-50 rounded-xl p-3 sm:p-4 border border-neutral-200"
                       >
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                              <span className="text-orange-600 font-semibold text-sm">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3 sm:gap-0">
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                              <span className="text-orange-600 font-semibold text-xs sm:text-sm">
                                 {index + 1}
                               </span>
                             </div>
-                            <div>
-                              <h3 className="font-semibold text-neutral-800">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-neutral-800 text-sm sm:text-base truncate">
                                 {bid.bidder_display_name}
                               </h3>
-                              <p className="text-sm text-neutral-600">
+                              <p className="text-xs sm:text-sm text-neutral-600 truncate">
                                 {bid.bidder_email}
                               </p>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <div className="text-2xl font-bold text-orange-600">
+                          <div className="text-left sm:text-right flex-shrink-0">
+                            <div className="text-lg sm:text-2xl font-bold text-orange-600">
                               ${parseFloat(bid.amount).toLocaleString()}
                             </div>
                             <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${bid.status === 'rejected'
@@ -891,7 +898,7 @@ const PreviousOffersPage = () => {
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
                           <div>
                             <span className="text-neutral-500">Bid Date:</span>
                             <p className="font-medium text-neutral-800">
@@ -905,28 +912,28 @@ const PreviousOffersPage = () => {
                         </div>
 
                         {bid.notes && (
-                          <div className="mt-3 p-3 bg-white rounded-lg border border-neutral-200">
-                            <span className="text-neutral-500 text-sm">Notes:</span>
-                            <p className="text-neutral-800 text-sm mt-1">{bid.notes}</p>
+                          <div className="mt-3 p-2 sm:p-3 bg-white rounded-lg border border-neutral-200">
+                            <span className="text-neutral-500 text-xs sm:text-sm">Notes:</span>
+                            <p className="text-neutral-800 text-xs sm:text-sm mt-1">{bid.notes}</p>
                           </div>
                         )}
                       </motion.div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12">
-                    <DollarSign className="w-16 h-16 text-neutral-300 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-neutral-600 mb-2">No Bids Available</h3>
-                    <p className="text-neutral-500">You don't have any bids to this auction.</p>
+                  <div className="text-center py-8 sm:py-12">
+                    <DollarSign className="w-12 h-12 sm:w-16 sm:h-16 text-neutral-300 mx-auto mb-4" />
+                    <h3 className="text-lg sm:text-xl font-semibold text-neutral-600 mb-2">No Bids Available</h3>
+                    <p className="text-sm sm:text-base text-neutral-500">You don't have any bids to this auction.</p>
                   </div>
                 )}
               </div>
 
               {/* Modal Footer */}
-              <div className="flex items-center justify-end gap-3 p-6 border-t border-neutral-200 bg-neutral-50">
+              <div className="flex items-center justify-end gap-3 p-4 sm:p-6 border-t border-neutral-200 bg-neutral-50">
                 <button
                   onClick={handleCloseBidsModal}
-                  className="cursor-pointer px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                  className="cursor-pointer px-3 sm:px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm sm:text-base"
                 >
                   Close
                 </button>
