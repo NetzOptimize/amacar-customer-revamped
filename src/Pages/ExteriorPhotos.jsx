@@ -91,49 +91,47 @@ export default function VehiclePhotos() {
     // console.log("questions", questions);
   });
 
-  // Load persisted images from Redux state on component mount
+  // Load persisted images from Redux state whenever uploadedImages changes
   useEffect(() => {
-    if (uploadedImages && uploadedImages.length > 0 && photos.length === 0 && accidentPhotos.length === 0) {
-      console.log('Loading persisted images:', uploadedImages);
+    console.log('Redux uploadedImages changed:', uploadedImages);
 
-      // Separate regular photos from accident photos
-      const regularPhotos = uploadedImages.filter(img => !img.metaKey?.includes('accident'));
-      const accidentPhotosFromRedux = uploadedImages.filter(img => img.metaKey?.includes('accident'));
+    // Separate regular photos from accident photos
+    const regularPhotos = (uploadedImages || []).filter(img => !img.metaKey?.includes('accident'));
+    const accidentPhotosFromRedux = (uploadedImages || []).filter(img => img.metaKey?.includes('accident'));
 
-      // Convert Redux images to component format
-      const convertedRegularPhotos = regularPhotos.map(img => ({
-        id: `${img.metaKey}_${img.attachmentId}`,
-        file: null, // File object not available after reload
-        url: img.imageUrl, // Use server URL for display
-        serverUrl: img.imageUrl,
-        requirement: img.metaKey?.replace('image_image_', '').replace('_view', ''),
-        timestamp: new Date(),
-        attachmentId: img.attachmentId,
-        metaKey: img.metaKey,
-        uploaded: true
-      }));
+    // Convert Redux images to component format
+    const convertedRegularPhotos = regularPhotos.map(img => ({
+      id: `${img.metaKey}_${img.attachmentId}`,
+      file: null, // File object not available after reload
+      url: img.imageUrl, // Use server URL for display
+      serverUrl: img.imageUrl,
+      requirement: img.metaKey?.replace('image_image_', '').replace('_view', ''),
+      timestamp: new Date(),
+      attachmentId: img.attachmentId,
+      metaKey: img.metaKey,
+      uploaded: true
+    }));
 
-      const convertedAccidentPhotos = accidentPhotosFromRedux.map(img => ({
-        id: img.metaKey?.replace('image_image_', '').replace('_view', ''),
-        file: null, // File object not available after reload
-        url: img.imageUrl, // Use server URL for display
-        serverUrl: img.imageUrl,
-        requirement: img.metaKey?.replace('image_image_', '').replace('_view', ''),
-        timestamp: new Date(),
-        attachmentId: img.attachmentId,
-        metaKey: img.metaKey,
-        uploaded: true,
-        label: 'Accident Photo',
-        icon: '📸',
-        description: 'Photo of accident damage',
-        required: img.metaKey?.includes('accident_mandatory_'),
-        isAccident: true
-      }));
+    const convertedAccidentPhotos = accidentPhotosFromRedux.map(img => ({
+      id: img.metaKey?.replace('image_image_', '').replace('_view', ''),
+      file: null, // File object not available after reload
+      url: img.imageUrl, // Use server URL for display
+      serverUrl: img.imageUrl,
+      requirement: img.metaKey?.replace('image_image_', '').replace('_view', ''),
+      timestamp: new Date(),
+      attachmentId: img.attachmentId,
+      metaKey: img.metaKey,
+      uploaded: true,
+      label: 'Accident Photo',
+      icon: '📸',
+      description: 'Photo of accident damage',
+      required: img.metaKey?.includes('accident_mandatory_'),
+      isAccident: true
+    }));
 
-      setPhotos(convertedRegularPhotos);
-      setAccidentPhotos(convertedAccidentPhotos);
-    }
-  }, [uploadedImages, photos.length, accidentPhotos.length]);
+    setPhotos(convertedRegularPhotos);
+    setAccidentPhotos(convertedAccidentPhotos);
+  }, [uploadedImages]);
 
   const photoRequirements = [
     {
@@ -262,31 +260,8 @@ export default function VehiclePhotos() {
 
       console.log('Image upload successful:', result);
 
-      // Create local photo object for display
-      const newPhoto = {
-        id: `${id}_${Date.now()}`,
-        file,
-        url: result.localUrl, // Use local URL for immediate display
-        serverUrl: result.imageUrl, // Store server URL
-        requirement: id,
-        timestamp: new Date(),
-        attachmentId: result.attachmentId,
-        metaKey: result.metaKey,
-        uploaded: true,
-        compressedSize: result.compressedSize,
-        originalSize: result.originalSize
-      };
-
-      if (id.startsWith('accident_')) {
-        setAccidentPhotos((prev) => {
-          const updatedPhotos = prev.map(p =>
-            p.id === id ? { ...p, ...newPhoto } : p
-          );
-          return updatedPhotos;
-        });
-      } else {
-        setPhotos((prev) => [...prev, newPhoto]);
-      }
+      // Note: Image is automatically added to Redux state via uploadVehicleImage.fulfilled
+      // No need to manually add to local state as it will be loaded from Redux in useEffect
 
       // Show compression info if significant compression occurred
       if (result.compressedSize && result.originalSize && result.compressedSize < result.originalSize) {
@@ -378,24 +353,15 @@ export default function VehiclePhotos() {
       // Remove from Redux store
       dispatch(removeUploadedImage(photoToDelete.attachmentId));
 
-      // Remove from local state regardless of API success
-      if (isAccidentPhoto) {
-        setAccidentPhotos((prev) => prev.filter((photo) => photo.id !== photoId));
-      } else {
-        setPhotos((prev) => prev.filter((photo) => photo.id !== photoId));
-      }
+      // Note: Local state will be updated automatically via useEffect when Redux state changes
 
     } catch (error) {
       console.error('Image delete failed:', error);
-      // Still remove from Redux store and local state even if API call failed
+      // Still remove from Redux store even if API call failed
       if (photoToDelete && photoToDelete.attachmentId) {
         dispatch(removeUploadedImage(photoToDelete.attachmentId));
       }
-      if (isAccidentPhoto) {
-        setAccidentPhotos((prev) => prev.filter((photo) => photo.id !== photoId));
-      } else {
-        setPhotos((prev) => prev.filter((photo) => photo.id !== photoId));
-      }
+      // Note: Local state will be updated automatically via useEffect when Redux state changes
       // Show error to user
       toast.error(`Failed to delete image from server: ${error}. Image removed locally.`);
     } finally {
