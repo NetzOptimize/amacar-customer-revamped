@@ -86,7 +86,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
           {/* Toggle Button - Fixed position */}
           <button
             onClick={onToggle}
-            className={`cursor-pointer absolute top-16 z-[51] p-1.5 bg-white border border-neutral-200 rounded-sm  shadow-sm hover:bg-neutral-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-200 ${isCollapsed ? 'right-[-12px]' : 'right-3'
+            className={`hidden sm:block cursor-pointer absolute top-16 z-[51] p-1.5 bg-white border border-neutral-200 rounded-sm  shadow-sm hover:bg-neutral-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-200 ${isCollapsed ? 'right-[-12px]' : 'right-3'
               }`}
           >
             {isCollapsed ? (
