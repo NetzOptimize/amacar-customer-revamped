@@ -18,6 +18,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, registerUser, forgotPassword, verifyOTP, resetPassword, verifyLoginOTP, clearError } from "@/redux/slices/userSlice";
 import useAuth from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
 
 export default function LoginModal({
   isOpen,
@@ -38,11 +39,12 @@ export default function LoginModal({
   const [isForgotPasswordMode, setIsForgotPasswordMode] = useState(false);
   const [resetToken, setResetToken] = useState(null); // State for resetToken
   const [twoFactorData, setTwoFactorData] = useState(null); // Store 2FA data from login response
+  const [registerConsent, setRegisterConsent] = useState(false); // State for terms and privacy policy consent
 
   const navigate = useNavigate();
   const isCloseDisabled = phase === "loading" || phase === "verify-otp" || phase === "verify-2fa";
   function validate() {
-    const newErrors = { email: "", firstName: "", lastName: "", phone: "", password: "", confirmPassword: "", otp: "", newPassword: "" };
+    const newErrors = { email: "", firstName: "", lastName: "", phone: "", password: "", confirmPassword: "", otp: "", newPassword: "", registerConsent: "" };
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!values.email) {
@@ -90,7 +92,10 @@ export default function LoginModal({
       newErrors.confirmPassword = "Passwords do not match";
     }
 
-
+    // Register consent validation (only for registration mode)
+    if (isRegisterMode && !registerConsent) {
+      newErrors.registerConsent = "You must agree to the Terms of Use and Privacy Policy";
+    }
 
     Object.keys(newErrors).forEach((key) => {
       if (newErrors[key]) setError(key, newErrors[key]);
@@ -138,7 +143,16 @@ export default function LoginModal({
     if (!validate()) return;
 
     if (isRegisterMode) {
-      await handleAction(registerUser, { email: values.email, username: values.username, phone: values.phone, firstName: values.firstName, lastName: values.lastName, password: values.password, confirmPassword: values.confirmPassword });
+      await handleAction(registerUser, { 
+        email: values.email, 
+        username: values.username, 
+        phone: values.phone, 
+        firstName: values.firstName, 
+        lastName: values.lastName, 
+        password: values.password, 
+        confirmPassword: values.confirmPassword,
+        registerConsent: registerConsent
+      });
     } else if (isForgotPasswordMode && phase === "forgot") {
       await handleAction(forgotPassword, values.email);
       if (phase !== "failed") {
@@ -217,6 +231,7 @@ export default function LoginModal({
     setPhase("form");
     setResetToken(null);
     setTwoFactorData(null);
+    setRegisterConsent(false);
     resetForm();
     dispatch(clearError()); // Clear Redux error state
   }
@@ -647,6 +662,48 @@ export default function LoginModal({
                         </motion.p>
                       )}
                     </div>
+                  )}
+
+                  {/* Terms and Privacy Policy Consent (Registration Mode Only) */}
+                  {isRegisterMode && (
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        id="registerConsent"
+                        checked={registerConsent}
+                        onChange={(e) => setRegisterConsent(e.target.checked)}
+                        className="h-4 w-4 mt-1 flex-shrink-0 cursor-pointer"
+                      />
+                      <label htmlFor="registerConsent" className="text-xs text-slate-700 cursor-pointer leading-relaxed">
+                        By creating an account, you agree to Amacar's{" "}
+                        <Link 
+                          to="/terms-of-service" 
+                          className="underline text-blue-600 hover:no-underline cursor-pointer"
+                          onClick={() => onClose(false)}
+                        >
+                          Terms of Use
+                        </Link>{" "}
+                        and{" "}
+                        <Link 
+                          to="/privacy-policy" 
+                          className="underline text-blue-600 hover:no-underline cursor-pointer"
+                          onClick={() => onClose(false)}
+                        >
+                          Privacy Policy
+                        </Link>.
+                      </label>
+                    </div>
+                  )}
+
+                  {/* Register Consent Error */}
+                  {errors.registerConsent && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-xs text-red-600"
+                    >
+                      {errors.registerConsent}
+                    </motion.p>
                   )}
 
                   {/* Submit Button */}
