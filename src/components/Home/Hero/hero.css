@@ -19,10 +19,14 @@
     z-index: 1;
 }
 
+@media (min-width: 768px) {
+    .hero-content {
+        margin-left: 7.5%;
+    }
+}
 
 .hero-content {
     margin-top: 5%;
-    /* margin-left: 7.5%; */
     position: relative;
     z-index: 2;
     max-width: 1000px;
@@ -75,6 +79,10 @@
     background: var(--brand-purple);
     color: #fff;
     box-shadow: 0 8px 24px rgba(38, 81, 220, 0.3);
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
 }
 
 .btn-purple:hover {

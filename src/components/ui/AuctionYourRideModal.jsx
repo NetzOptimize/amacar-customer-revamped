@@ -253,20 +253,18 @@ export default function AuctionModal({
   return (
     <Dialog open={isOpen} onOpenChange={isCloseDisabled ? undefined : handleOpenChange}>
       <DialogContent
-        className="lg:mt-[1rem] mt-[2rem] sm:max-w-3xl rounded-xl shadow-xl p-0 overflow-hidden bg-white max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        className="lg:mt-[1rem] mt-[2rem] sm:max-w-3xl rounded-xl shadow-xl p-0 overflow-hidden bg-white h-[70vh] sm:h-auto sm:max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         showCloseButton={!isCloseDisabled}
       >
-        <div className="bg-[#f6851f] p-6 text-white">
+        <div className="bg-[#f6851f] p-4 sm:p-6 text-white">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-semibold tracking-tight">
+            <DialogTitle className="text-xl sm:text-2xl font-semibold tracking-tight">
               {title}
             </DialogTitle>
-            
-            
           </DialogHeader>
         </div>
 
-        <div className="p-6 pt-0 min-h-[520px]">
+        <div className="p-3 sm:p-6 pt-0 h-full flex flex-col">
           <AnimatePresence mode="wait">
             {modalState.phase === "form" && (
               <motion.form
@@ -276,11 +274,11 @@ export default function AuctionModal({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.25, ease: "easeOut" }}
-                className="rounded-xl bg-white shadow-lg p-6 space-y-4"
+                className="rounded-xl bg-white shadow-lg p-3 sm:p-6 space-y-3 sm:space-y-4 flex-1 flex flex-col"
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-10 flex-1">
                   {/* Left Column */}
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {/* VIN Field */}
                     <div className="grid gap-1">
                       <label htmlFor="vin" className="text-sm font-medium text-slate-800">
@@ -412,7 +410,7 @@ export default function AuctionModal({
                        {/* City Field */}
                     <div className="grid gap-1">
                       <label htmlFor="city" className="text-sm font-medium text-slate-800">
-                       
+                        City *
                       </label>
                       <div className="relative">
                         <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
@@ -440,7 +438,7 @@ export default function AuctionModal({
                   </div>
 
                   {/* Right Column */}
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
 
                       {/* Zip Code Field */}
                     <div className="grid gap-1">
@@ -591,7 +589,7 @@ export default function AuctionModal({
                     {/* State Field */}
                     <div className="grid gap-1">
                       <label htmlFor="state" className="text-sm font-medium text-slate-800">
-                       
+                        State *
                       </label>
                       <div className="relative">
                         <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
@@ -621,11 +619,11 @@ export default function AuctionModal({
                 </div>
 
                 {/* Auction Button */}
-                <div className="pt-2">
+                <div className="pt-2 mt-auto">
                   <button
                     type="submit"
                     disabled={modalState.isLoading}
-                    className="cursor-pointer w-full h-11 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-sm font-semibold shadow-lg shadow-orange-500/20 transition hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="cursor-pointer w-full h-10 sm:h-11 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-sm font-semibold shadow-lg shadow-orange-500/20 transition hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {modalState.isLoading ? (
                       <div className="flex items-center justify-center gap-2">
@@ -639,8 +637,8 @@ export default function AuctionModal({
                 </div>
 
                 {/* Disclaimer */}
-                <div className="text-center">
-                  <p className="text-xs text-slate-600">
+                <div className="text-center mt-2">
+                  <p className="text-xs text-slate-600 leading-relaxed">
                     By submitting this form, you agree to our{" "}
                     <a href="#" className="underline text-[var(--brand-orange)] hover:no-underline">Terms of Service</a>{" "}
                     and{" "}
@@ -657,7 +655,7 @@ export default function AuctionModal({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.25, ease: "easeOut" }}
-                className="grid gap-6 place-items-center text-center"
+                className="grid gap-4 sm:gap-6 place-items-center text-center h-full flex-1 justify-center"
               >
                 <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50 w-full">
                   <div className="flex items-center gap-3 p-4">
@@ -686,7 +684,7 @@ export default function AuctionModal({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                className="grid gap-5 place-items-center text-center"
+                className="grid gap-4 sm:gap-5 place-items-center text-center h-full flex-1 justify-center"
               >
                 <motion.div 
                   className="relative" 
@@ -707,7 +705,7 @@ export default function AuctionModal({
                 </div>
                 <button
                   onClick={handleSuccessAction}
-                  className="cursor-pointer w-full h-11 rounded-xl bg-slate-900 text-white text-sm font-semibold shadow-lg shadow-slate-900/20 hover:bg-slate-800"
+                  className="cursor-pointer w-full h-10 sm:h-11 rounded-xl bg-slate-900 text-white text-sm font-semibold shadow-lg shadow-slate-900/20 hover:bg-slate-800"
                 >
                   Continue
                 </button>
@@ -721,7 +719,7 @@ export default function AuctionModal({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                className="grid gap-5 place-items-center text-center"
+                className="grid gap-4 sm:gap-5 place-items-center text-center h-full flex-1 justify-center"
               >
                 <motion.div 
                   className="relative" 
@@ -739,16 +737,16 @@ export default function AuctionModal({
                     {modalState.error || "An error occurred during registration. Please try again."}
                   </p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3 w-full">
                   <button
                     onClick={() => dispatch(resetModalState())}
-                    className="cursor-pointer px-6 h-11 rounded-xl bg-slate-900 text-white text-sm font-semibold shadow-lg shadow-slate-900/20 hover:bg-slate-800"
+                    className="cursor-pointer px-4 sm:px-6 h-10 sm:h-11 rounded-xl bg-slate-900 text-white text-sm font-semibold shadow-lg shadow-slate-900/20 hover:bg-slate-800 flex-1"
                   >
                     Try Again
                   </button>
                   <button
                     onClick={() => handleOpenChange(false)}
-                    className="cursor-pointer px-6 h-11 rounded-xl border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50"
+                    className="cursor-pointer px-4 sm:px-6 h-10 sm:h-11 rounded-xl border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50 flex-1"
                   >
                     Cancel
                   </button>

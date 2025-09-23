@@ -75,9 +75,6 @@ export default function Header() {
               <Link className="nav-link" to="/testimonials">
                 Testimonials
               </Link>
-              <a className="nav-link" href="/join-our-dealer-network">
-                Join Our Dealer Network
-              </a>
               <Link className="nav-link" to="/about-us">
                 Our Vision
               </Link>

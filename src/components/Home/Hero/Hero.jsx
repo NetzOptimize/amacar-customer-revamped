@@ -67,7 +67,7 @@ export default function Hero() {
           Get top offers on your used car in minutes—without the usual hassle.
         </motion.p>
 
-        <motion.div className="hero-ctas text-left" variants={fadeUp} custom={0.4}>
+        <motion.div className="hero-ctas " variants={fadeUp} custom={0.4}>
          
             <a href="#" className="btn-white" onClick={(e) => {
               e.preventDefault()
@@ -81,7 +81,7 @@ export default function Hero() {
               e.preventDefault()
               setAuctionOpen(true)
             }}
-            className="cursor-pointer text-left btn-purple"
+            className="cursor-pointer sm:text-left sm:justify-left sm:align-left btn-purple"
           >
             Auction Your Ride
           </button  > : <Link to={'/dashboard'} className="cursor-pointer btn-purple">Dashboard</Link>
