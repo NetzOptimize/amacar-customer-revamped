@@ -356,10 +356,10 @@ export default function AuctionSelectionModal({ isOpen, onClose, userFormData = 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-4xl rounded-2xl shadow-xl p-0 overflow-hidden bg-white max-h-[90vh] flex flex-col">
-        <div className="bg-gradient-to-br from-white via-slate-50 to-slate-100 p-6">
+        <DialogContent className="sm:max-w-4xl rounded-2xl shadow-xl p-0 overflow-hidden bg-white h-[80vh] flex flex-col">
+        <div className="bg-gradient-to-br from-white via-slate-50 to-slate-100 p-4 sm:p-6 flex-shrink-0">
           <DialogHeader className="text-center">
-            <DialogTitle className="text-2xl font-semibold tracking-tight text-slate-900">
+            <DialogTitle className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900">
               Hi, {userFormData?.fullName || userState?.display_name || "User"}
             </DialogTitle>
             <DialogDescription className="text-sm text-slate-600 mt-2">
@@ -368,9 +368,9 @@ export default function AuctionSelectionModal({ isOpen, onClose, userFormData = 
           </DialogHeader>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 pt-0">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 pt-0">
           <motion.div 
-            className="space-y-6"
+            className="space-y-4 sm:space-y-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
@@ -386,7 +386,7 @@ export default function AuctionSelectionModal({ isOpen, onClose, userFormData = 
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
                   onClick={() => !isSubmitting && handleOptionSelect(option.id)}
-                  className={`relative rounded-2xl p-6 shadow-lg border-2 transition-all ${
+                  className={`relative rounded-2xl p-4 sm:p-6 shadow-lg border-2 transition-all ${
                     isSubmitting 
                       ? 'cursor-not-allowed opacity-60' 
                       : 'cursor-pointer'
@@ -397,32 +397,32 @@ export default function AuctionSelectionModal({ isOpen, onClose, userFormData = 
                   } ${option.bgColor}`}
                 >
                   {/* Header */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-3 rounded-xl bg-gradient-to-r ${option.color} text-white shadow-lg`}>
-                        <IconComponent className="h-6 w-6" />
+                  <div className="flex items-start justify-between mb-3 sm:mb-4">
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                      <div className={`p-2 sm:p-3 rounded-xl bg-gradient-to-r ${option.color} text-white shadow-lg flex-shrink-0`}>
+                        <IconComponent className="h-5 w-5 sm:h-6 sm:w-6" />
                       </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-slate-900">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-lg sm:text-xl font-bold text-slate-900">
                           {option.title}
                         </h3>
-                        <p className="text-sm text-slate-600 mt-1">
+                        <p className="text-xs sm:text-sm text-slate-600 mt-1">
                           {option.subtitle}
                         </p>
                       </div>
                     </div>
                     {isSelected ? (
-                      <div className="flex items-center gap-2 text-green-600">
-                        <Check className="h-5 w-5" />
+                      <div className="flex items-center gap-2 text-green-600 flex-shrink-0 ml-2">
+                        <Check className="h-4 w-4 sm:h-5 sm:w-5" />
                       </div>
                     ) : (
-                      <div className="h-5 w-5" />
+                      <div className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 ml-2" />
                     )}
                   </div>
 
                   {/* Consent Text */}
-                  <div className="mb-4">
-                    <div className="text-sm text-slate-700 leading-relaxed">
+                  <div className="mb-3 sm:mb-4">
+                    <div className="text-xs sm:text-sm text-slate-700 leading-relaxed">
                       {option.consentText}
                     </div>
                   </div>
@@ -432,16 +432,16 @@ export default function AuctionSelectionModal({ isOpen, onClose, userFormData = 
             })}
 
             {/* Common Terms Checkbox and Continue Button - Now inside scrollable area */}
-            <div className="border-t border-slate-200 pt-6 mt-6">
-              <div className="flex items-start gap-3 mb-4">
+            <div className="border-t border-slate-200 pt-4 sm:pt-6 mt-4 sm:mt-6">
+              <div className="flex items-start gap-2 sm:gap-3 mb-4">
                 <input
                   type="checkbox"
                   checked={termsConsent}
                   onChange={(e) => setTermsConsent(e.target.checked)}
                   disabled={isSubmitting}
-                  className="h-4 w-4 mt-1 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="h-4 w-4 mt-1 disabled:cursor-not-allowed disabled:opacity-50 flex-shrink-0"
                 />
-                <label className="text-sm text-slate-700 cursor-pointer">
+                <label className="text-xs sm:text-sm text-slate-700 cursor-pointer leading-relaxed">
                   I have read and agree to the <Link to="/terms-of-service" className="underline text-blue-600 hover:no-underline">Terms of Use</Link> and <Link to="/privacy-policy" className="underline text-blue-600 hover:no-underline">Privacy Policy</Link>.
                 </label>
               </div>
@@ -450,7 +450,7 @@ export default function AuctionSelectionModal({ isOpen, onClose, userFormData = 
                 <button
                   onClick={handleGo}
                   disabled={isSubmitting || !selectedOption || !termsConsent}
-                  className={`inline-flex h-12 items-center justify-center rounded-xl px-8 text-sm font-semibold text-white shadow-lg transition hover:scale-[1.02] ${
+                  className={`inline-flex h-10 sm:h-12 items-center justify-center rounded-xl px-6 sm:px-8 text-xs sm:text-sm font-semibold text-white shadow-lg transition hover:scale-[1.02] ${
                     !isSubmitting && selectedOption && termsConsent
                       ? 'bg-gradient-to-r from-[#f6851f] to-[#e63946] hover:from-orange-600 hover:to-red-600' 
                       : 'bg-slate-400 cursor-not-allowed'
@@ -458,11 +458,15 @@ export default function AuctionSelectionModal({ isOpen, onClose, userFormData = 
                 >
                   {isSubmitting ? (
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Setting up...
+                      <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span className="hidden sm:inline">Setting up...</span>
+                      <span className="sm:hidden">Setting...</span>
                     </div>
                   ) : (
-                    'See your offer →'
+                    <>
+                      <span className="hidden sm:inline">See your offer →</span>
+                      <span className="sm:hidden">See offer →</span>
+                    </>
                   )}
                 </button>
               </div>
