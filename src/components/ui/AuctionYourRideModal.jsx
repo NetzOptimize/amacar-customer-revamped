@@ -666,7 +666,7 @@ export default function AuctionModal({
                     </div>
                     <div className="flex-1">
                       <label htmlFor="registerConsent" className="text-sm text-slate-700 cursor-pointer">
-                        I agree to the Terms of Use and Privacy Policy. *
+                        I agree to the <Link to="/terms-of-service" className="no-underline font-bold text-[#f6851f]">Terms of Use</Link> and <Link to="/privacy-policy" className="no-underline font-bold text-[#f6851f]">Privacy Policy</Link>. *
                       </label>
                       {errors.registerConsent && (
                         <motion.p 
@@ -699,15 +699,6 @@ export default function AuctionModal({
                   </button>
                 </div>
 
-                {/* Disclaimer */}
-                <div className="text-center mt-2">
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    By submitting this form, you agree to our{" "}
-                    <Link to="/terms-of-service" className="underline text-[var(--brand-orange)] hover:no-underline">Terms of Service</Link>{" "}
-                    and{" "}
-                    <Link to="/privacy-policy" className="underline text-[var(--brand-orange)] hover:no-underline">Privacy Policy</Link>.
-                  </p>
-                </div>
               </motion.form>
             )}
 

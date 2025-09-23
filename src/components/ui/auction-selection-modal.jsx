@@ -43,7 +43,7 @@ export default function AuctionSelectionModal({ isOpen, onClose, userFormData = 
       bgColor: "bg-blue-50/50",
       consentText: (
         <span>
-          I have read <Link to="/terms-of-service" className="underline text-blue-600 hover:no-underline">Terms of Service</Link> and <Link to="/privacy-policy" className="underline text-blue-600 hover:no-underline">Privacy Policy</Link> and I agree to share my contact details with Amacar's participating dealers, who may contact me by phone, text, or email about this offer.
+          I have read <Link to="/terms-of-service" className="no-underline font-bold text-[#f6851f] hover:underline">Terms of Service</Link> and <Link to="/privacy-policy" className="no-underline font-bold text-[#f6851f] hover:underline">Privacy Policy</Link> and I agree to share my contact details with Amacar's participating dealers, who may contact me by phone, text, or email about this offer.
         </span>
       ),
       termsText: "I agree"
@@ -356,9 +356,9 @@ export default function AuctionSelectionModal({ isOpen, onClose, userFormData = 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-4xl rounded-2xl shadow-xl p-0 overflow-hidden bg-white h-[80vh] flex flex-col">
+        <DialogContent className="md:max-w-2xl lg:max-w-3xl rounded-2xl shadow-xl p-0 overflow-hidden bg-white max-h-[75vh] sm:max-h-[80vh] flex flex-col">
         <div className="bg-gradient-to-br from-white via-slate-50 to-slate-100 p-4 sm:p-6 flex-shrink-0">
-          <DialogHeader className="text-center">
+          <DialogHeader className="text-center ">
             <DialogTitle className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900">
               Hi, {userFormData?.fullName || userState?.display_name || "User"}
             </DialogTitle>
@@ -433,16 +433,16 @@ export default function AuctionSelectionModal({ isOpen, onClose, userFormData = 
 
             {/* Common Terms Checkbox and Continue Button - Now inside scrollable area */}
             <div className="border-t border-slate-200 pt-4 sm:pt-6 mt-4 sm:mt-6">
-              <div className="flex items-start gap-2 sm:gap-3 mb-4">
+              <div className="flex items-center gap-2 sm:gap-3 ">
                 <input
                   type="checkbox"
                   checked={termsConsent}
                   onChange={(e) => setTermsConsent(e.target.checked)}
                   disabled={isSubmitting}
-                  className="h-4 w-4 mt-1 disabled:cursor-not-allowed disabled:opacity-50 flex-shrink-0"
+                  className="h-4 w-4 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 flex-shrink-0 items-center"
                 />
                 <label className="text-xs sm:text-sm text-slate-700 cursor-pointer leading-relaxed">
-                  I have read and agree to the <Link to="/terms-of-service" className="underline text-blue-600 hover:no-underline">Terms of Use</Link> and <Link to="/privacy-policy" className="underline text-blue-600 hover:no-underline">Privacy Policy</Link>.
+                  I have read and agree to the <Link to="/terms-of-service" className="no-underline font-bold text-[#f6851f] hover:underline">Terms of Use</Link> and <Link to="/privacy-policy" className="no-underline font-bold text-[#f6851f] hover:underline">Privacy Policy</Link>.
                 </label>
               </div>
               
