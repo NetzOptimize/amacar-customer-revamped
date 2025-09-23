@@ -988,7 +988,7 @@ export default function VehiclePhotos() {
                     className="h-4 w-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500 flex-shrink-0"
                   />
                   <label htmlFor="terms-checkbox" className="text-xs sm:text-sm text-slate-700 cursor-pointer break-words">
-                    I have read and agree to the <Link to="/privacy-policy" className="text-[#f6851f] hover:text-[#e63946] font-medium">Privacy Policy</Link>
+                    I have read and agree to the <Link to="/terms-of-service" className="text-[#f6851f] hover:text-[#e63946] font-medium">Terms of services</Link>
                   </label>
                 </div>
                 <div className="flex items-center gap-2 sm:gap-3">
@@ -1000,7 +1000,7 @@ export default function VehiclePhotos() {
                     className="h-4 w-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500 flex-shrink-0"
                   />
                   <label htmlFor="account-terms-checkbox" className="text-xs sm:text-sm text-slate-700 cursor-pointer break-words">
-                    I agree to the <Link to="/terms-of-service" className="text-[#f6851f] hover:text-[#e63946] font-medium">Account and Auction Terms for Customers</Link>
+                    I agree to the <Link to="/privacy-policy" className="text-[#f6851f] hover:text-[#e63946] font-medium">Account and Auction Terms for Customers</Link>
                   </label>
                 </div>
               </div>

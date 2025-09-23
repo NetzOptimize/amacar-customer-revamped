@@ -319,10 +319,18 @@ export const deleteVehicleImage = createAsyncThunk(
 // Async thunk for starting auction
 export const startAuction = createAsyncThunk(
   'carDetailsAndQuestions/startAuction',
-  async ({ productId, termsAccepted }, { rejectWithValue }) => {
+  async ({ productId, auction_page_privacy_check, auction_page_terms }, { rejectWithValue }) => {
     try {
       console.log('Starting auction for product:', productId);
-      const response = await api.post('/auction/start', { product_id: productId, auction_terms: termsAccepted });
+      console.log('Privacy check status:', auction_page_privacy_check);
+      console.log('Terms status:', auction_page_terms);
+      const payload = { 
+        product_id: productId, 
+        auction_page_privacy_check: auction_page_privacy_check,
+        auction_page_terms: auction_page_terms
+      };
+      console.log('Sending payload to API:', payload);
+      const response = await api.post('/auction/start', payload);
       console.log('Auction start API response:', response.data);
       if (response.data.success) {
         return {

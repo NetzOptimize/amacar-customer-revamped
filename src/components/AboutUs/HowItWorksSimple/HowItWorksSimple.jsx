@@ -199,9 +199,6 @@ export default function HowItWorksSimple() {
                                 Join thousands of satisfied customers who have discovered the Amacar advantage. Get started with your instant estimate today!
                             </p>
                             <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                                <button onClick={() => setAuctionOpen(true)} className="btn-primary bg-white text-primary-600 hover:bg-neutral-50 px-10 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-                                    Start My Auction
-                                </button>
                                 <button onClick={() => setisModalOpen(true)} className="cursor-pointer btn-secondary bg-transparent border-2 border-white text-white hover:bg-white hover:text-primary-600 px-10 py-4 text-lg font-semibold rounded-xl transition-all duration-300">
                                     Get instant offer
                                 </button>
