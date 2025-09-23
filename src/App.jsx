@@ -27,6 +27,7 @@ import TermsOfService from './Pages/TermsOfService.jsx';
 import PrivacyPolicy from './Pages/PrivacyPolicy.jsx';
 import CookiesPolicy from './Pages/CookiesPolicy.jsx';
 import Testimonials from './Pages/Testimonials.jsx';
+import FAQ from './Pages/FAQ.jsx';
 
 function App() {
   const location = useLocation();
@@ -91,6 +92,7 @@ function App() {
               <Route path="/terms-of-service" element={<TermsOfService />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/cookies-policy" element={<CookiesPolicy />} />
+              <Route path="/faq" element={<FAQ />} />
               {/* Protected Routes */}
               <Route
                 path="/dashboard"

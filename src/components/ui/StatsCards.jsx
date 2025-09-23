@@ -89,7 +89,7 @@ const StatsCards = ({
       iconBg: 'bg-purple-100',
       iconColor: 'text-purple-600',
       textColor: 'text-purple-600',
-      description: 'Scheduled meetings',
+      description: 'Scheduled visits',
       subIcon: CalendarIcon
     },
     {
@@ -101,7 +101,7 @@ const StatsCards = ({
       iconBg: 'bg-emerald-100',
       iconColor: 'text-emerald-600',
       textColor: 'text-emerald-600',
-      description: 'bids',
+      description: 'total offers',
       subIcon: TrendingUp,
       isCurrency: true
     }

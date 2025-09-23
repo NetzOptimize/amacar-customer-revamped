@@ -287,7 +287,8 @@ export default function AppointmentDetailsModal({
                       <div className="flex items-center gap-2">
                         <XCircle className="w-4 h-4 text-red-600" />
                         <p className="text-sm text-red-700">
-                          This appointment is cancelled. Management actions are not available.
+                          {/* This appointment is cancelled. Management actions are not available. */}
+                          This appointment is cancelled.
                         </p>
                       </div>
                     </div>
@@ -324,13 +325,13 @@ export default function AppointmentDetailsModal({
                         )}
                         {/* Communication Actions */}
                         <div className={`grid gap-2 ${appointment.status === 'cancelled' ? 'grid-cols-1' : 'grid-cols-2'}`}>
-                          <button
+                          {/* <button
                             onClick={() => onCall && onCall(appointment)}
                             className="cursor-pointer flex items-center justify-center gap-2 h-10 bg-green-50 text-green-700 rounded-lg border border-green-200 hover:bg-green-100 transition-colors"
                           >
                             <Phone className="w-4 h-4" />
                             <span className="text-sm font-medium">Call</span>
-                          </button>
+                          </button> */}
                           
                           {appointment.status !== 'cancelled' && (
                             <button

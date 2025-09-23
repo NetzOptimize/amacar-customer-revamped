@@ -136,12 +136,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/faq"
                   className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
                 >
                   FAQ
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
