@@ -685,7 +685,7 @@ useEffect(() => {
                             </>
                           ) : (
                             <img 
-                              src="https://amacar.ai/wp-content/uploads/2024/10/amacar-placeholder2.png" 
+                              src="https://dealer.amacar.ai/wp-content/uploads/2024/10/amacar-placeholder2.png" 
                               alt="Vehicle placeholder" 
                               className="w-full h-full object-cover"
                             />

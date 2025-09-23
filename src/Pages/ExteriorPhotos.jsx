@@ -265,8 +265,7 @@ export default function VehiclePhotos() {
 
       // Show compression info if significant compression occurred
       if (result.compressedSize && result.originalSize && result.compressedSize < result.originalSize) {
-        const compressionRatio = ((result.originalSize - result.compressedSize) / result.originalSize * 100).toFixed(1);
-        toast.success(`Image compressed by ${compressionRatio}% for faster upload`);
+        toast.success(`Image uploaded successfully`);
       }
 
     } catch (error) {

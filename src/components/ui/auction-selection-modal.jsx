@@ -310,10 +310,10 @@ export default function AuctionSelectionModal({ isOpen, onClose, userFormData = 
         } catch (loginError) {
           console.error("Auto-login failed:", loginError);
           // Continue with the flow even if auto-login fails
-          toast.success("Auction setup successful! Redirecting to review...");
+          toast.success("Vehicle appraised successfully! Redirecting to see offer...");
         }
       } else {
-        toast.success("Auction setup successful! Redirecting to review...");
+        toast.success("Vehicle appraised successfully! Redirecting to see offer...");
       }
       
       setTimeout(() => {
