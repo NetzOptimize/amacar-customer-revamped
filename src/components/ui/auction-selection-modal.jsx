@@ -571,12 +571,12 @@ export default function AuctionSelectionModal({
                         <span className="sm:hidden">Setting...</span>
                       </div>
                     ) : (
-                      <>
+                      <div className="flex items-center gap-2 w-full justify-center">
                         <span className="hidden sm:inline">
                           See your offer →
                         </span>
                         <span className="sm:hidden">See offer</span>
-                      </>
+                      </div>
                     )}
                   </button>
                 </div>

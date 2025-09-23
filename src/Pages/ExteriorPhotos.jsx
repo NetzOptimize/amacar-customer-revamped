@@ -548,7 +548,25 @@ export default function VehiclePhotos() {
                         alt={photo.label}
                         className="w-full h-full object-cover"
                       />
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      
+                      {/* Mobile delete button - always visible in top-right corner */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removePhoto(uploadedPhoto.id);
+                        }}
+                        disabled={!!uploadingMap[uploadedPhoto.id]}
+                        className="absolute top-2 right-2 sm:hidden bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation z-10"
+                      >
+                        {uploadingMap[uploadedPhoto.id] ? (
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <X className="w-4 h-4" />
+                        )}
+                      </button>
+
+                      {/* Desktop delete button - hover overlay */}
+                      <div className="absolute inset-0 bg-black/60 opacity-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300 hidden sm:flex items-center justify-center">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -564,7 +582,8 @@ export default function VehiclePhotos() {
                           )}
                         </button>
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 sm:p-4">
                         <div className="flex items-center space-x-2 text-white">
                           <CheckCircle className="w-4 h-4 text-green-400" />
                           <span className="text-sm font-medium">{photo.label}</span>
@@ -737,7 +756,25 @@ export default function VehiclePhotos() {
                           alt={photo.label}
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        
+                        {/* Mobile delete button - always visible in top-right corner */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removePhoto(uploadedPhoto.id, true);
+                          }}
+                          disabled={!!uploadingMap[uploadedPhoto.id]}
+                          className="absolute top-2 right-2 sm:hidden bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation z-10"
+                        >
+                          {uploadingMap[uploadedPhoto.id] ? (
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          ) : (
+                            <X className="w-4 h-4" />
+                          )}
+                        </button>
+
+                        {/* Desktop delete button - hover overlay */}
+                        <div className="absolute inset-0 bg-black/60 opacity-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300 hidden sm:flex items-center justify-center">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -753,7 +790,8 @@ export default function VehiclePhotos() {
                             )}
                           </button>
                         </div>
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 sm:p-4">
                           <div className="flex items-center space-x-2 text-white">
                             <CheckCircle className="w-4 h-4 text-green-400" />
                             <span className="text-sm font-medium">{photo.label}</span>
