@@ -709,12 +709,12 @@ export default function LoginModal({
                       <div className="flex items-start gap-3">
                         <input
                           type="checkbox"
-                          id="privacyConsent"
+                          id="consentPrivacy"
                           checked={privacyConsent}
                           onChange={(e) => setPrivacyConsent(e.target.checked)}
                           className="h-4 w-4 mt-1 flex-shrink-0 cursor-pointer text-orange-600 border-slate-300 rounded focus:ring-orange-500"
                         />
-                        <label htmlFor="privacyConsent" className="text-xs text-slate-700 cursor-pointer leading-relaxed">
+                        <label htmlFor="consentPrivacy" className="text-xs text-slate-700 cursor-pointer leading-relaxed">
                           I have read and agree to the{" "}
                           <Link 
                             to="/privacy-policy" 
