@@ -112,17 +112,17 @@ const StatsCards = ({
 
   if (loading) {
     return (
-      <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${Math.min(visibleCards.length, 5)} gap-6 ${className}`}>
+      <div className={`grid grid-cols-2 md:grid-cols-2 lg:grid-cols-${Math.min(visibleCards.length, 5)} gap-4 md:gap-6 ${className}`}>
         {visibleCards.map((card) => (
-          <div key={card.key} className="card p-6 animate-pulse">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-gray-200 rounded-xl"></div>
-              <div className="text-right">
-                <div className="h-8 bg-gray-200 rounded w-16 mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-20"></div>
+          <div key={card.key} className="card p-4 md:p-6 animate-pulse">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3 md:mb-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-200 rounded-xl mb-2 md:mb-0"></div>
+              <div className="text-left md:text-right">
+                <div className="h-6 md:h-8 bg-gray-200 rounded w-12 md:w-16 mb-1 md:mb-2"></div>
+                <div className="h-3 md:h-4 bg-gray-200 rounded w-16 md:w-20"></div>
               </div>
             </div>
-            <div className="h-4 bg-gray-200 rounded w-24"></div>
+            <div className="h-3 md:h-4 bg-gray-200 rounded w-20 md:w-24"></div>
           </div>
         ))}
       </div>
@@ -134,20 +134,20 @@ const StatsCards = ({
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className={`grid grid-cols-1 md:grid-cols-5 lg:grid-cols-${Math.min(visibleCards.length, 5)} gap-6 ${className}`}
+      className={`grid grid-cols-2 md:grid-cols-2 lg:grid-cols-${Math.min(visibleCards.length, 5)} gap-4 md:gap-6 ${className}`}
     >
       {visibleCards.map((card) => {
         const IconComponent = card.icon;
         const SubIconComponent = card.subIcon;
         
         return (
-          <motion.div key={card.key} variants={itemVariants} className="card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className={`w-12 h-12 ${card.iconBg} rounded-xl flex items-center justify-center`}>
-                <IconComponent className={`w-6 h-6 ${card.iconColor}`} />
+          <motion.div key={card.key} variants={itemVariants} className="card p-4 md:p-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3 md:mb-4">
+              <div className={`w-10 h-10 md:w-12 md:h-12 ${card.iconBg} rounded-xl flex items-center justify-center mb-2 md:mb-0`}>
+                <IconComponent className={`w-5 h-5 md:w-6 md:h-6 ${card.iconColor}`} />
               </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-neutral-800">
+              <div className="text-left md:text-right">
+                <div className="text-lg md:text-2xl font-bold text-neutral-800">
                   {card.isCurrency ? (
                     <CountUp 
                       end={card.value} 
@@ -159,12 +159,12 @@ const StatsCards = ({
                     <CountUp end={card.value} duration={1} />
                   )}
                 </div>
-                <div className="text-sm text-neutral-600">{card.title}</div>
+                <div className="text-xs md:text-sm text-neutral-600">{card.title}</div>
               </div>
             </div>
-            <div className={`flex items-center text-sm ${card.textColor}`}>
-              <SubIconComponent className="w-4 h-4 mr-1" />
-              <span>{card.description}</span>
+            <div className={`flex items-center text-xs md:text-sm ${card.textColor}`}>
+              <SubIconComponent className="w-3 h-3 md:w-4 md:h-4 mr-1" />
+              <span className="truncate">{card.description}</span>
             </div>
           </motion.div>
         );
