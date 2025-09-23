@@ -22,7 +22,7 @@
 
 .hero-content {
     margin-top: 5%;
-    margin-left: 7.5%;
+    /* margin-left: 7.5%; */
     position: relative;
     z-index: 2;
     max-width: 1000px;
