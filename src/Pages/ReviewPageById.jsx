@@ -34,7 +34,7 @@ export default function ReviewPageById() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   
   // Get data from Redux state
-  const { vehicleDetails, offer, offerStatus, userExists, loading, error } = useSelector((state) => state.carDetailsAndQuestions);
+  const { vehicleDetails, offer, offerStatus, userExists, loading, error, userInfo } = useSelector((state) => state.carDetailsAndQuestions);
   const userState = useSelector((state) => state.user.user);
   
   // Check if we have the necessary data
@@ -55,9 +55,11 @@ export default function ReviewPageById() {
       offer,
       userState,
       isUserLoggedIn,
-      userExists
+      userExists,
+      userInfo,
+      userInfoEmail: userInfo?.user_email
     });
-  }, [searchParams, productId, vehicleDetails, offer, userState, isUserLoggedIn, userExists]);
+  }, [searchParams, productId, vehicleDetails, offer, userState, isUserLoggedIn, userExists, userInfo]);
 
   // Update productId when URL changes
   useEffect(() => {

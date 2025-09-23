@@ -12,7 +12,7 @@ import Seo from '@/components/SEO/Seo'
 import { seoData } from '@/config/seoConfig'
 export default function AboutUs() {
     return (
-        <>
+        <div className="overflow-x-hidden">
             <Seo title={seoData.about.title} description={seoData.about.description} />
             <AboutUsHero />
             <WhoWeAre />
@@ -23,6 +23,6 @@ export default function AboutUs() {
             <WhyTrustAmacar />
             <TestimonialCarousel />
             <ReadyToGetStarted />
-        </>
+        </div>
     )
 }

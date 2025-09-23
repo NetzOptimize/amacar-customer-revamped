@@ -20,7 +20,7 @@ export default function HomePage() {
         // console.log(userState); 
     })
     return (
-        <>
+        <div className="overflow-x-hidden">
             <Seo title={seoData.home.title} description={seoData.home.description} />
             <Hero />
             <SectionHeader title="How Amacar works" highlight="Sell smarter, faster" />
@@ -33,6 +33,6 @@ export default function HomePage() {
             <TwoColumnSection />
             <CarFooterSection />
             <TestimonialCarousel />
-        </>
+        </div>
     )
 }

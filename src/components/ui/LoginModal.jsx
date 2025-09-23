@@ -285,13 +285,23 @@ export default function LoginModal({
 
   // Prefill email when modal opens and user info is available
   useEffect(() => {
-      if (isOpen && userInfo?.user_email && !values.email) {
-      setValue("email", userInfo.user_email);
+    if (isOpen && userInfo && !values.email) {
+      console.log('LoginModal userInfo:', userInfo);
+      // Try different possible email field names from the API response
+      const email = userInfo.user_email || userInfo.email || userInfo.username;
+      console.log('LoginModal extracted email:', email);
+      if (email) {
+        console.log('LoginModal prefilling email:', email);
+        setValue("email", email);
+      } else {
+        console.log('LoginModal no email found in userInfo');
+      }
     }
   }, [isOpen, userInfo, setValue, values.email]);
 
   // Check if email is prefilled from user info
-  const isEmailPrefilled = userInfo?.user_email && values.email === userInfo.user_email;
+  const isEmailPrefilled = userInfo && (userInfo.user_email || userInfo.email || userInfo.username) && 
+    values.email === (userInfo.user_email || userInfo.email || userInfo.username);
 
   return (
     <>

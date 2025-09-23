@@ -432,7 +432,7 @@ export default function AuctionSelectionModal({ isOpen, onClose, userFormData = 
             })}
 
             {/* Common Terms Checkbox and Continue Button - Now inside scrollable area */}
-            <div className="border-t border-slate-200 pt-4 sm:pt-6 mt-4 sm:mt-6">
+            <div className="border-t border-slate-200 pt-4 sm:pt-6 mt-4 sm:mt-6 flex items-center justify-between">
               <div className="flex items-center gap-2 sm:gap-3 ">
                 <input
                   type="checkbox"

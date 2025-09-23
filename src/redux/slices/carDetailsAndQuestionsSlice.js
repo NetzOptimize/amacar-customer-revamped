@@ -194,7 +194,10 @@ export const getOfferByProductId = createAsyncThunk(
           productId: response.data.product_id,
           emailSent: response.data.email_sent,
           timestamp: response.data.timestamp,
-          userInfo: response.data.user_info,
+          userInfo: {
+            user_email: response.data.user_email,
+            user_exists: response.data.user_exists || null
+          },
           vehicleDetails: response.data.car_summary || {}, // Use car_summary as vehicle details
         };
       } else {
@@ -777,6 +780,8 @@ const carDetailsAndQuestionsSlice = createSlice({
             ...action.payload.vehicleDetails,
           };
         }
+        
+        console.log('getOfferByProductId.fulfilled - userInfo stored:', state.userInfo);
       })
       .addCase(getOfferByProductId.rejected, (state, action) => {
         state.loading = false;
