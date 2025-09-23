@@ -526,7 +526,7 @@ export default function VehiclePhotos() {
                     } hover:border-[#f6851f]/50 hover:shadow-lg hover:bg-orange-50/30`}
                 >
                   {isUploadingThisPhoto ? (
-                    <div className="aspect-square flex flex-col items-center justify-center p-5 text-center">
+                    <div className="aspect-square sm:aspect-[4/3] lg:aspect-square flex flex-col items-center justify-center p-5 text-center">
                       <motion.div
                         animate={{ rotate: 360 }}
                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -584,12 +584,12 @@ export default function VehiclePhotos() {
                         <photo.icon className="w-10 h-10 sm:w-9 sm:h-9 lg:w-8 lg:h-8" />
                       </div>
                       <p className="text-sm sm:text-sm lg:text-sm font-semibold text-slate-800 mb-2">{photo.label}</p>
-                      <div className='border-2 border-slate-300 p-2 sm:p-3 lg:p-2 rounded-md'>
+                      <div className='border-2 border-slate-300 p-2 sm:p-3 lg:p-2 rounded-md sm:h-36 lg:h-28 flex flex-col items-center justify-center'>
                         <button
                           onClick={() => {
                             document.getElementById(`photo-upload-${photo.id}`).click();
                           }}
-                          className="cursor-pointer w-full inline-flex items-center justify-center h-10 sm:h-9 lg:h-8 px-3 rounded-md text-black border-slate-200 border-2 text-sm font-medium transition-colors duration-200 "
+                          className="cursor-pointer w-full inline-flex items-center justify-center h-12 sm:h-14 lg:h-12 px-3 rounded-md text-black border-slate-200 border-2 text-sm font-medium transition-colors duration-200 "
                         >
                           Upload
                         </button>
