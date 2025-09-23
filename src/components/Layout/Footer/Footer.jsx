@@ -1,8 +1,18 @@
 import { Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function Footer() {
+  const location = useLocation();
+
+  // Function to check if a path is active
+  const isActive = (path) => {
+    if (path === "/") {
+      return location.pathname === "/";
+    }
+    return location.pathname.startsWith(path);
+  };
+
   return (
     <footer className="px-[3%] relative bg-gradient-to-br from-white via-neutral-50 to-white text-neutral-900 overflow-hidden">
       {/* Background Pattern */}
@@ -79,7 +89,11 @@ export default function Footer() {
               <li>
                 <Link
                   to="/about-us"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
+                  className={`text-lg inline-block transition-colors duration-300 ${
+                    isActive("/how-to-bid") 
+                      ? "text-primary-500 font-semibold" 
+                      : "text-neutral-600 hover:text-primary-500"
+                  }`}
                 >
                   How to bid
                 </Link>
@@ -87,7 +101,11 @@ export default function Footer() {
               <li>
                 <Link
                   to="/about-us"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
+                  className={`text-lg inline-block transition-colors duration-300 ${
+                    isActive("/about-us") 
+                      ? "text-primary-500 font-semibold" 
+                      : "text-neutral-600 hover:text-primary-500"
+                  }`}
                 >
                   Our vision
                 </Link>
@@ -95,7 +113,11 @@ export default function Footer() {
               <li>
                 <Link
                   to="/about-us"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
+                  className={`text-lg inline-block transition-colors duration-300 ${
+                    isActive("/how-to-sell") 
+                      ? "text-primary-500 font-semibold" 
+                      : "text-neutral-600 hover:text-primary-500"
+                  }`}
                 >
                   How to sell with us
                 </Link>
@@ -114,7 +136,11 @@ export default function Footer() {
               <li>
                 <Link
                   to="/cookies-policy"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
+                  className={`text-lg inline-block transition-colors duration-300 ${
+                    isActive("/cookies-policy") 
+                      ? "text-primary-500 font-semibold" 
+                      : "text-neutral-600 hover:text-primary-500"
+                  }`}
                 >
                   Cookie Policy
                 </Link>
@@ -122,7 +148,11 @@ export default function Footer() {
               <li>
                 <Link
                   to="/privacy-policy"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
+                  className={`text-lg inline-block transition-colors duration-300 ${
+                    isActive("/privacy-policy") 
+                      ? "text-primary-500 font-semibold" 
+                      : "text-neutral-600 hover:text-primary-500"
+                  }`}
                 >
                   Privacy Policy
                 </Link>
@@ -130,7 +160,11 @@ export default function Footer() {
               <li>
                 <Link
                   to="/terms-of-service"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
+                  className={`text-lg inline-block transition-colors duration-300 ${
+                    isActive("/terms-of-service") 
+                      ? "text-primary-500 font-semibold" 
+                      : "text-neutral-600 hover:text-primary-500"
+                  }`}
                 >
                   Terms of Service
                 </Link>
@@ -138,7 +172,11 @@ export default function Footer() {
               <li>
                 <Link
                   to="/faq"
-                  className="text-neutral-600 hover:text-primary-500 transition-colors duration-300 text-lg  inline-block"
+                  className={`text-lg inline-block transition-colors duration-300 ${
+                    isActive("/faq") 
+                      ? "text-primary-500 font-semibold" 
+                      : "text-neutral-600 hover:text-primary-500"
+                  }`}
                 >
                   FAQ
                 </Link>

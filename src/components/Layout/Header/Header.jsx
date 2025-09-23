@@ -3,7 +3,7 @@ import "./header.css";
 import LoginModal from "@/components/ui/LoginModal";
 import { logout, setLoginRedirect } from "@/redux/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import LogoutModal from "@/components/ui/LogoutModal";
 import { persistor } from "@/redux/store";
 import { ArrowRight, Play, Menu, X } from "lucide-react";
@@ -17,6 +17,15 @@ export default function Header() {
   const { productId } = useSelector((state) => state.carDetailsAndQuestions);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Function to check if a path is active
+  const isActive = (path) => {
+    if (path === "/") {
+      return location.pathname === "/";
+    }
+    return location.pathname.startsWith(path);
+  };
 
   const handleLoginClick = (e) => {
     e.preventDefault();
@@ -69,13 +78,22 @@ export default function Header() {
 
             {/* Desktop Navigation - Hidden on mobile/tablet */}
             <nav className="nav-desktop">
-              <Link className="nav-link" to="/">
+              <Link 
+                className={`nav-link ${isActive("/") ? "active" : ""}`} 
+                to="/"
+              >
                 Home
               </Link>
-              <Link className="nav-link" to="/testimonials">
+              <Link 
+                className={`nav-link ${isActive("/testimonials") ? "active" : ""}`} 
+                to="/testimonials"
+              >
                 Testimonials
               </Link>
-              <Link className="nav-link" to="/about-us">
+              <Link 
+                className={`nav-link ${isActive("/about-us") ? "active" : ""}`} 
+                to="/about-us"
+              >
                 Our Vision
               </Link>
             </nav>
@@ -123,28 +141,28 @@ export default function Header() {
           <div className="mobile-panel-content">
             <nav className="mobile-nav">
               <Link 
-                className="nav-link-mobile" 
+                className={`nav-link-mobile ${isActive("/") ? "active" : ""}`} 
                 to="/"
                 onClick={() => setOpen(false)}
               >
                 Home
               </Link>
               <Link 
-                className="nav-link-mobile" 
+                className={`nav-link-mobile ${isActive("/testimonials") ? "active" : ""}`} 
                 to="/testimonials"
                 onClick={() => setOpen(false)}
               >
                 Testimonials
               </Link>
               <a 
-                className="nav-link-mobile" 
+                className={`nav-link-mobile ${isActive("/join-our-dealer-network") ? "active" : ""}`} 
                 href="/join-our-dealer-network"
                 onClick={() => setOpen(false)}
               >
                 Join Our Dealer Network
               </a>
               <Link 
-                className="nav-link-mobile" 
+                className={`nav-link-mobile ${isActive("/about-us") ? "active" : ""}`} 
                 to="/about-us"
                 onClick={() => setOpen(false)}
               >

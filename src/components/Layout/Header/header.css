@@ -36,6 +36,13 @@
     }
 }
 
+.nav-link.active,
+.nav-link-mobile.active {
+  color: #f6851f; /* Your brand orange color */
+  font-weight: 600;
+  /* Add any other active state styling */
+}
+
 @media (min-width: 1024px) {
     .site-header .container {
         padding: 0 2rem;

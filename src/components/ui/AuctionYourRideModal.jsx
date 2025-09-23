@@ -41,9 +41,11 @@ export default function AuctionModal({
   const [state, setState] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [auctionConsent, setAuctionConsent] = useState(false)
+  const [registerConsent, setRegisterConsent] = useState(false)
   const [errors, setErrors] = useState({
     vin: "", firstName: "", lastName: "", email: "", phone: "",
-    password: "", confirmPassword: "", zipCode: "",
+    password: "", confirmPassword: "", zipCode: "", auctionConsent: "", registerConsent: "",
   })
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -99,7 +101,7 @@ export default function AuctionModal({
   function validate() {
     const newErrors = {
       vin: "", firstName: "", lastName: "", email: "", phone: "",
-      password: "", confirmPassword: "", zipCode: "",
+      password: "", confirmPassword: "", zipCode: "", auctionConsent: "", registerConsent: "",
     }
 
     // VIN validation
@@ -154,6 +156,15 @@ export default function AuctionModal({
       newErrors.zipCode = "Please enter a valid zip code."
     }
 
+    // Terms and Conditions validation
+    if (!auctionConsent) {
+      newErrors.auctionConsent = "You must agree to the Account and Auction Terms."
+    }
+
+    if (!registerConsent) {
+      newErrors.registerConsent = "You must agree to the Terms of Use and Privacy Policy."
+    }
+
     setErrors(newErrors)
     return Object.values(newErrors).every(error => !error)
   }
@@ -178,6 +189,8 @@ export default function AuctionModal({
         zip: zipCode,
         city,
         state,
+        auctionConsent,
+        registerConsent,
       };
   
       // Dispatch registerWithVin thunk
@@ -217,6 +230,8 @@ export default function AuctionModal({
     console.log("zip: ", zipCode)
     console.log("state: ", state)
     console.log("city: ", city)
+    console.log("auctionConsent: ", auctionConsent)
+    console.log("registerConsent: ", registerConsent)
     if (validate()) {
       startAction()
     }
@@ -240,6 +255,8 @@ export default function AuctionModal({
       setLastName("");
       setPhone("");
       setState("");
+      setAuctionConsent(false);
+      setRegisterConsent(false);
       setErrors({});
       
       // Reset Redux state
@@ -603,6 +620,63 @@ export default function AuctionModal({
                           }`}
                         />
                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Terms and Conditions Checkboxes */}
+                <div className="space-y-3 items-center pt-4 border-t border-slate-200">
+                  {/* Account and Auction Terms Checkbox */}
+                  <div className="flex items-center  gap-3">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="auctionConsent"
+                        type="checkbox"
+                        checked={auctionConsent}
+                        onChange={(e) => setAuctionConsent(e.target.checked)}
+                        className="h-4 w-4 cursor-pointer text-orange-600 border-slate-300 rounded focus:ring-orange-500 focus:ring-2"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label htmlFor="auctionConsent" className="text-sm text-slate-700 cursor-pointer">
+                        I agree to Amacar's Account and Auction Terms for Customers, including arbitration and disclaimer clauses. *
+                      </label>
+                      {errors.auctionConsent && (
+                        <motion.p 
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="text-xs text-red-500 mt-1"
+                        >
+                          {errors.auctionConsent}
+                        </motion.p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Terms of Use and Privacy Policy Checkbox */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center  h-5">
+                      <input
+                        id="registerConsent"
+                        type="checkbox"
+                        checked={registerConsent}
+                        onChange={(e) => setRegisterConsent(e.target.checked)}
+                        className="h-4 w-4 cursor-pointer text-orange-600 border-slate-300 rounded focus:ring-orange-500 focus:ring-2"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label htmlFor="registerConsent" className="text-sm text-slate-700 cursor-pointer">
+                        I agree to the Terms of Use and Privacy Policy. *
+                      </label>
+                      {errors.registerConsent && (
+                        <motion.p 
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="text-xs text-red-500 mt-1"
+                        >
+                          {errors.registerConsent}
+                        </motion.p>
+                      )}
                     </div>
                   </div>
                 </div>
