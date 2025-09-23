@@ -137,7 +137,7 @@ useEffect(() => {
         placeholder: "Select transmission",
         Icon: Cog,
         type: "select",
-        options: ["Automatic", "Manual", "CVT", "DCT", "Semi-automatic", "Tiptronic", "Automated manual", "DSG", "Torque Converter auto", "EV"],
+        options: ["Automatic", "Manual", "CVT"],
       },
       {
         key: "fuelType",
@@ -145,7 +145,7 @@ useEffect(() => {
         placeholder: "Select fuel type",
         Icon: Fuel,
         type: "select",
-        options: ["Gasoline", "Diesel", "Gas", "Electric", "Hybrid", "CNG", "LPG", "Flex-Fuel", "Ethanol", "Hydrogen Fuel Cell"],
+        options: ["Diesel", "Gas", "Electric", "Hybrid", "Hydrogen Fuel Cell"],
       },    
       {
         key: "engineType",

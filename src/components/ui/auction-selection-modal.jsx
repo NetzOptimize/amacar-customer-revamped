@@ -548,6 +548,7 @@ export default function AuctionSelectionModal({
                     .
                   </label>
                 </div>
+                
 
                 <div className="flex justify-end">
                   <button

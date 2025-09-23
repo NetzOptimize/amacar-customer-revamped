@@ -188,7 +188,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-neutral-300 pt-8 ">
           <div className="flex flex-col lg:flex-row justify-between items-center space-y-6 lg:space-y-0">
-            <div className="flex items-center space-x-8">
+            <div className="flex items-center space-x-8 sm:flex-row">
               <span className="text-neutral-600 text-sm">Trusted by</span>
               <div className="flex items-center space-x-4">
                 <div className="w-32 bg-gradient-to-r from-primary-500/10 to-primary-600/10 backdrop-blur-sm border border-primary-500/20 px-4 py-2 rounded-full text-sm font-medium text-primary-600">

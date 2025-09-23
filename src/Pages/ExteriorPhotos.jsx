@@ -976,8 +976,8 @@ export default function VehiclePhotos() {
 
           {/* Fixed Footer */}
           <div className="p-4 sm:p-6 bg-slate-50 border-t border-slate-200 flex-shrink-0">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex flex-col gap-3 w-full sm:w-auto">
+            <div className="flex flex-col items-start sm:items-center justify-between gap-4 flex-column">
+              <div className="flex flex-col gap-3 w-full">
                 <div className="flex items-center gap-2 sm:gap-3">
                   <input
                     type="checkbox"
@@ -1004,7 +1004,7 @@ export default function VehiclePhotos() {
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
                 <button
                   onClick={handleModalClose}
                   className="w-full sm:w-auto cursor-pointer px-4 py-2 text-xs sm:text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"

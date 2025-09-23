@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, Gavel, Car as CarIcon, Calendar as CalendarIcon, DollarSign as DollarIcon, TrendingUp, Clock, Car } from 'lucide-react';
+import { CheckCircle, Gavel, Car as CarIcon, Calendar as CalendarIcon, DollarSign as DollarIcon, TrendingUp, Clock, Car, GavelIcon } from 'lucide-react';
 import CountUp from 'react-countup';
 
 const StatsCards = ({ 
@@ -19,7 +19,7 @@ const StatsCards = ({
     activeAuctions: data?.active_auctions || 0,
     totalVehicles: data?.total_vehicles || 0,
     upcomingAppointments: data?.upcoming_appointments || 0,
-    totalBidValue: data?.total_bid_value || 0,
+    totalOffers: data?.total_offers || 0,
   };
 
   const containerVariants = {
@@ -95,15 +95,15 @@ const StatsCards = ({
     {
       key: 'totalBidValue',
       show: showTotalBidValue,
-      title: 'Total Bid Value',
-      value: stats.totalBidValue,
-      icon: DollarIcon,
+      title: 'Overall Bids',
+      value: stats.totalOffers,
+      icon: GavelIcon,
       iconBg: 'bg-emerald-100',
       iconColor: 'text-emerald-600',
       textColor: 'text-emerald-600',
-      description: 'total offers',
+      description: 'Total Offers',
       subIcon: TrendingUp,
-      isCurrency: true
+      isCurrency: false
     }
   ];
 

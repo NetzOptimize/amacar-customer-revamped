@@ -127,6 +127,12 @@ export default function ReviewPage() {
                 <p className="text-xs sm:text-sm text-green-700">Valid for 7 days</p>
               </div>
             </div>
+            {/* Persuasive Text */}
+            <div className="text-center mb-8">
+              <p className="text-lg text-slate-700 mb-4">
+                Looking for Competitive Offer?<br></br> Upload Photos of your car and Submit to Auction.
+              </p>
+            </div>
 
 
             {/* Action Buttons */}
@@ -155,7 +161,7 @@ export default function ReviewPage() {
                     whileTap={{ scale: 0.98 }}
                   >
                     <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
-                    Upload photos
+                    Upload Photos
                   </motion.button>
                 )
               }
@@ -168,7 +174,7 @@ export default function ReviewPage() {
                     whileTap={{ scale: 0.98 }}
                   >
                     <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
-                    Upload photos
+                    Upload Photos
                   </motion.button>
                 )
               }
