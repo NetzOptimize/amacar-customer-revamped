@@ -50,63 +50,63 @@ const FAQ = () => {
         }
       ]
     },
-    {
-      category: 'Reverse Bidding FAQs',
-      icon: <ArrowDown className="h-5 w-5" />,
-      color: 'from-green-500 to-emerald-500',
-      items: [
-        {
-          id: 'reverse-1',
-          question: 'What is Amacar\'s Reverse Bidding Process?',
-          answer: 'Amacar\'s reverse bidding process allows dealerships to compete by lowering their prices on a new or pre-owned vehicle you\'re interested in. Instead of customers driving dealer to dealer for the best price, verified dealers reduce their offers to win your business and helping you get the best deal.'
-        },
-        {
-          id: 'reverse-2',
-          question: 'How do I start a reverse bidding process?',
-          answer: 'Navigate through Amacar.ai online inventory list including make, model, trim, and any preferences — Send your request to Amacar\'s network of participating dealerships. The bidding window then opens and dealers begin lowering their prices in real time. Amacar may also offer you other alternative makes and models that can meet your standards to get you the most competitive deal across multiple brands.'
-        },
-        {
-          id: 'reverse-3',
-          question: 'How long does the bidding window last?',
-          answer: 'Each reverse bidding typically lasts between 1 to 4 hours, depending on the vehicle and region. You\'ll receive alerts as bids coming in, and you can choose to accept a final offer before the window closes. Keep in mind, the offer may expire with minutes, hours or days depending on the dealer\'s available incentives, bonus, or manufacturer\'s special programs and assigned discounts or expiration of the special offers or inventory availability.'
-        },
-        {
-          id: 'reverse-4',
-          question: 'Can I reject all the bids?',
-          answer: 'Yes. You are under no obligation to accept a bid. If you don\'t find a deal that fits your expectations, you can decline all offers or start the process again by searching the Amacar.ai online inventory. Keep in mind, the offers you receive may be the best offers in the market as dealers are competing to win your business.'
-        },
-        {
-          id: 'reverse-5',
-          question: 'How is the winning dealer selected?',
-          answer: 'The dealer offering the lowest qualifying price is shown as the leading bid or as top 5 offers. You choose whether to accept or decline it. If no action is taken, offers may expire automatically for several reasons mentioned earlier.'
-        },
-        {
-          id: 'reverse-6',
-          question: 'Do I need to visit the dealership in person?',
-          answer: 'Often yes—for test drives, paperwork, or trade-in inspections. Some dealers may offer remote paperwork or delivery, depending on your location and their capabilities and both party\'s agreement.'
-        },
-        {
-          id: 'reverse-7',
-          question: 'Are reverse bidding prices final?',
-          answer: 'The bid reflects the final offer before taxes and fees. Confirm the final "out-the-door" price with the dealer to include taxes, registration, DMV Electronic fee and other optional add-ons.'
-        },
-        {
-          id: 'reverse-8',
-          question: 'What fees are included in dealer offers?',
-          answer: 'Dealer offers shown on the Amacar platform reflect only the vehicle\'s sale price as submitted by the bidding dealership. Taxes, Doc fee, DMV fees, DMV Electronic fee, or any other charges including but not limit to any aftermarket products or dealer add-ons are not included in the bid amount. These additional costs, if applicable, are disclosed by the dealer after you accept the offer and proceed to finalize the transaction.'
-        },
-        {
-          id: 'reverse-9',
-          question: 'Does Amacar consider dealer promotions or incentives?',
-          answer: 'Amacar does not offer or apply any special incentives. Our platform simply facilitates the lowest sales price through dealer competition in the reverse bidding process. If a participating dealer chooses to offer additional bonuses, trade-in credits, or manufacturer incentives, they may communicate those details directly with you via email, chat, or during final negotiations'
-        },
-        {
-          id: 'reverse-10',
-          question: 'Can I opt out of extra offers, except for government fees?',
-          answer: 'Yes. You may purchase the car at the agreed-upon auction price and only pay the required government fees directly at the dealership.'
-        }
-      ]
-    }
+    // {
+    //   category: 'Reverse Bidding FAQs',
+    //   icon: <ArrowDown className="h-5 w-5" />,
+    //   color: 'from-green-500 to-emerald-500',
+    //   items: [
+    //     {
+    //       id: 'reverse-1',
+    //       question: 'What is Amacar\'s Reverse Bidding Process?',
+    //       answer: 'Amacar\'s reverse bidding process allows dealerships to compete by lowering their prices on a new or pre-owned vehicle you\'re interested in. Instead of customers driving dealer to dealer for the best price, verified dealers reduce their offers to win your business and helping you get the best deal.'
+    //     },
+    //     {
+    //       id: 'reverse-2',
+    //       question: 'How do I start a reverse bidding process?',
+    //       answer: 'Navigate through Amacar.ai online inventory list including make, model, trim, and any preferences — Send your request to Amacar\'s network of participating dealerships. The bidding window then opens and dealers begin lowering their prices in real time. Amacar may also offer you other alternative makes and models that can meet your standards to get you the most competitive deal across multiple brands.'
+    //     },
+    //     {
+    //       id: 'reverse-3',
+    //       question: 'How long does the bidding window last?',
+    //       answer: 'Each reverse bidding typically lasts between 1 to 4 hours, depending on the vehicle and region. You\'ll receive alerts as bids coming in, and you can choose to accept a final offer before the window closes. Keep in mind, the offer may expire with minutes, hours or days depending on the dealer\'s available incentives, bonus, or manufacturer\'s special programs and assigned discounts or expiration of the special offers or inventory availability.'
+    //     },
+    //     {
+    //       id: 'reverse-4',
+    //       question: 'Can I reject all the bids?',
+    //       answer: 'Yes. You are under no obligation to accept a bid. If you don\'t find a deal that fits your expectations, you can decline all offers or start the process again by searching the Amacar.ai online inventory. Keep in mind, the offers you receive may be the best offers in the market as dealers are competing to win your business.'
+    //     },
+    //     {
+    //       id: 'reverse-5',
+    //       question: 'How is the winning dealer selected?',
+    //       answer: 'The dealer offering the lowest qualifying price is shown as the leading bid or as top 5 offers. You choose whether to accept or decline it. If no action is taken, offers may expire automatically for several reasons mentioned earlier.'
+    //     },
+    //     {
+    //       id: 'reverse-6',
+    //       question: 'Do I need to visit the dealership in person?',
+    //       answer: 'Often yes—for test drives, paperwork, or trade-in inspections. Some dealers may offer remote paperwork or delivery, depending on your location and their capabilities and both party\'s agreement.'
+    //     },
+    //     {
+    //       id: 'reverse-7',
+    //       question: 'Are reverse bidding prices final?',
+    //       answer: 'The bid reflects the final offer before taxes and fees. Confirm the final "out-the-door" price with the dealer to include taxes, registration, DMV Electronic fee and other optional add-ons.'
+    //     },
+    //     {
+    //       id: 'reverse-8',
+    //       question: 'What fees are included in dealer offers?',
+    //       answer: 'Dealer offers shown on the Amacar platform reflect only the vehicle\'s sale price as submitted by the bidding dealership. Taxes, Doc fee, DMV fees, DMV Electronic fee, or any other charges including but not limit to any aftermarket products or dealer add-ons are not included in the bid amount. These additional costs, if applicable, are disclosed by the dealer after you accept the offer and proceed to finalize the transaction.'
+    //     },
+    //     {
+    //       id: 'reverse-9',
+    //       question: 'Does Amacar consider dealer promotions or incentives?',
+    //       answer: 'Amacar does not offer or apply any special incentives. Our platform simply facilitates the lowest sales price through dealer competition in the reverse bidding process. If a participating dealer chooses to offer additional bonuses, trade-in credits, or manufacturer incentives, they may communicate those details directly with you via email, chat, or during final negotiations'
+    //     },
+    //     {
+    //       id: 'reverse-10',
+    //       question: 'Can I opt out of extra offers, except for government fees?',
+    //       answer: 'Yes. You may purchase the car at the agreed-upon auction price and only pay the required government fees directly at the dealership.'
+    //     }
+    //   ]
+    // }
   ];
 
   const toggleItem = (itemId) => {
@@ -140,7 +140,7 @@ const FAQ = () => {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-purple-200/20 to-pink-200/20 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 py-16">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-16 mt-20">
         {/* Header Section */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl mb-6 shadow-lg">

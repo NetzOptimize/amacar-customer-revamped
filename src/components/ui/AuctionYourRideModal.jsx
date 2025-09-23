@@ -253,12 +253,12 @@ export default function AuctionModal({
   return (
     <Dialog open={isOpen} onOpenChange={isCloseDisabled ? undefined : handleOpenChange}>
       <DialogContent
-        className="lg:mt-[1rem] mt-[2rem] sm:max-w-3xl rounded-xl shadow-xl p-0 overflow-hidden bg-white h-[70vh] sm:h-auto sm:max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        className="lg:mt-[1rem] mt-[2rem] sm:max-w-3xl rounded-xl shadow-xl p-0 overflow-hidden bg-white h-[70vh] md:h-[75vh] lg:h-auto lg:max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         showCloseButton={!isCloseDisabled}
       >
         <div className="bg-[#f6851f] p-4 sm:p-6 text-white">
           <DialogHeader>
-            <DialogTitle className="text-xl sm:text-2xl font-semibold tracking-tight">
+            <DialogTitle className="text-lg sm:text-xl md:text-2xl font-semibold tracking-tight">
               {title}
             </DialogTitle>
           </DialogHeader>
@@ -277,7 +277,7 @@ export default function AuctionModal({
                 className="rounded-xl bg-white shadow-lg p-3 sm:p-6 space-y-3 sm:space-y-4 flex-1 flex flex-col"
               >
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-10 flex-1">
-                  {/* Left Column */}
+                  {/* Left Column - Desktop: VIN, First Name, Email, Password, City */}
                   <div className="space-y-3 sm:space-y-4">
                     {/* VIN Field */}
                     <div className="grid gap-1">
@@ -294,7 +294,7 @@ export default function AuctionModal({
                           value={vin}
                           onChange={(e) => setVin(e.target.value)}
                           placeholder="Enter your vehicle's VIN number"
-                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
+                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
                         />
                       </div>
                       {errors.vin && (
@@ -323,7 +323,7 @@ export default function AuctionModal({
                           value={firstName}
                           onChange={(e) => setFirstName(e.target.value)}
                           placeholder="Enter your first name"
-                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
+                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
                         />
                       </div>
                       {errors.firstName && (
@@ -337,9 +337,8 @@ export default function AuctionModal({
                       )}
                     </div>
 
-
-                      {/* Email Field */}
-                      <div className="grid gap-1">
+                    {/* Email Field */}
+                    <div className="grid gap-1">
                       <label htmlFor="email" className="text-sm font-medium text-slate-800">
                         Email Address *
                       </label>
@@ -353,7 +352,7 @@ export default function AuctionModal({
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="Enter your email address"
-                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
+                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
                         />
                       </div>
                       {errors.email && (
@@ -382,7 +381,7 @@ export default function AuctionModal({
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="Enter your password"
-                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
+                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
                         />
                         <button
                           type="button"
@@ -407,7 +406,7 @@ export default function AuctionModal({
                       )}
                     </div>
 
-                       {/* City Field */}
+                    {/* City Field */}
                     <div className="grid gap-1">
                       <label htmlFor="city" className="text-sm font-medium text-slate-800">
                         City *
@@ -423,7 +422,7 @@ export default function AuctionModal({
                           onChange={(e) => setCity(e.target.value)}
                           placeholder={locationStatus === 'loading' ? "Looking up city..." : "Enter your city"}
                           disabled={locationStatus === 'loading' || (locationStatus === 'succeeded' && city)}
-                          className={`h-11 w-full rounded-md border px-9 py-2 text-sm outline-none ring-0 transition-shadow ${
+                          className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow ${
                             locationStatus === 'loading' 
                               ? 'border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed' 
                               : locationStatus === 'succeeded' && city
@@ -433,14 +432,11 @@ export default function AuctionModal({
                         />
                       </div>
                     </div>
-
-                    
                   </div>
 
-                  {/* Right Column */}
+                  {/* Right Column - Desktop: Zip, Last Name, Phone, Confirm Password, State */}
                   <div className="space-y-3 sm:space-y-4">
-
-                      {/* Zip Code Field */}
+                    {/* Zip Code Field */}
                     <div className="grid gap-1">
                       <label htmlFor="zipCode" className="text-sm font-medium text-slate-800">
                         Zip Code *
@@ -456,7 +452,7 @@ export default function AuctionModal({
                           value={zipCode}
                           onChange={(e) => handleZipCodeChange(e.target.value)}
                           placeholder="Enter your zip code"
-                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
+                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
                         />
                         {locationStatus === 'loading' && (
                           <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
@@ -484,8 +480,8 @@ export default function AuctionModal({
                       )}
                     </div>
 
-                     {/* Last Name Field */}
-                     <div className="grid gap-1">
+                    {/* Last Name Field */}
+                    <div className="grid gap-1">
                       <label htmlFor="lastName" className="text-sm font-medium text-slate-800">
                         Last Name *
                       </label>
@@ -499,7 +495,7 @@ export default function AuctionModal({
                           value={lastName}
                           onChange={(e) => setLastName(e.target.value)}
                           placeholder="Enter your last name"
-                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
+                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
                         />
                       </div>
                       {errors.lastName && (
@@ -512,9 +508,6 @@ export default function AuctionModal({
                         </motion.p>
                       )}
                     </div>
-
-                    
-
 
                     {/* Phone Number Field */}
                     <div className="grid gap-1">
@@ -531,7 +524,7 @@ export default function AuctionModal({
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           placeholder="Enter your phone number"
-                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
+                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
                         />
                       </div>
                       {errors.phone && (
@@ -545,7 +538,6 @@ export default function AuctionModal({
                       )}
                     </div>
 
-                   
                     {/* Confirm Password Field */}
                     <div className="grid gap-1">
                       <label htmlFor="confirmPassword" className="text-sm font-medium text-slate-800">
@@ -561,7 +553,7 @@ export default function AuctionModal({
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           placeholder="Confirm your password"
-                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
+                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
                         />
                         <button
                           type="button"
@@ -602,7 +594,7 @@ export default function AuctionModal({
                           onChange={(e) => setState(e.target.value)}
                           placeholder={locationStatus === 'loading' ? "Looking up state..." : "Enter your state"}
                           disabled={locationStatus === 'loading' || (locationStatus === 'succeeded' && state)}
-                          className={`h-11 w-full rounded-md border px-9 py-2 text-sm outline-none ring-0 transition-shadow ${
+                          className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow ${
                             locationStatus === 'loading' 
                               ? 'border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed' 
                               : locationStatus === 'succeeded' && state
@@ -612,9 +604,6 @@ export default function AuctionModal({
                         />
                       </div>
                     </div>
-
-                    {/* Country Field */}
-                    
                   </div>
                 </div>
 
@@ -623,7 +612,7 @@ export default function AuctionModal({
                   <button
                     type="submit"
                     disabled={modalState.isLoading}
-                    className="cursor-pointer w-full h-10 sm:h-11 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-sm font-semibold shadow-lg shadow-orange-500/20 transition hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="cursor-pointer w-full h-12 sm:h-11 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-base font-semibold shadow-lg shadow-orange-500/20  disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {modalState.isLoading ? (
                       <div className="flex items-center justify-center gap-2">
@@ -705,7 +694,7 @@ export default function AuctionModal({
                 </div>
                 <button
                   onClick={handleSuccessAction}
-                  className="cursor-pointer w-full h-10 sm:h-11 rounded-xl bg-slate-900 text-white text-sm font-semibold shadow-lg shadow-slate-900/20 hover:bg-slate-800"
+                  className="cursor-pointer w-full h-10 sm:h-11 rounded-xl bg-slate-900 text-white text-base font-semibold shadow-lg shadow-slate-900/20 hover:bg-slate-800"
                 >
                   Continue
                 </button>
@@ -740,13 +729,13 @@ export default function AuctionModal({
                 <div className="flex flex-col sm:flex-row gap-3 w-full">
                   <button
                     onClick={() => dispatch(resetModalState())}
-                    className="cursor-pointer px-4 sm:px-6 h-10 sm:h-11 rounded-xl bg-slate-900 text-white text-sm font-semibold shadow-lg shadow-slate-900/20 hover:bg-slate-800 flex-1"
+                    className="cursor-pointer px-4 sm:px-6 h-10 sm:h-11 rounded-xl bg-slate-900 text-white text-base font-semibold shadow-lg shadow-slate-900/20 hover:bg-slate-800 flex-1"
                   >
                     Try Again
                   </button>
                   <button
                     onClick={() => handleOpenChange(false)}
-                    className="cursor-pointer px-4 sm:px-6 h-10 sm:h-11 rounded-xl border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50 flex-1"
+                    className="cursor-pointer px-4 sm:px-6 h-10 sm:h-11 rounded-xl border border-slate-300 text-slate-700 text-base font-semibold hover:bg-slate-50 flex-1"
                   >
                     Cancel
                   </button>
