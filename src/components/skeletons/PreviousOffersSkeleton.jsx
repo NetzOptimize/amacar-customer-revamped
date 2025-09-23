@@ -26,7 +26,7 @@ const PreviousOffersSkeleton = () => {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-6 mt-16"
+      className="space-y-6 md:mt-16"
     >
       {/* Header Skeleton */}
       <motion.div variants={itemVariants} className="mb-8">

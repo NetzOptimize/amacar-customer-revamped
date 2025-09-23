@@ -15,6 +15,9 @@ export default function Header() {
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const { user } = useSelector((state) => state.user);
   const { productId } = useSelector((state) => state.carDetailsAndQuestions);
+
+  // Debug modal state changes
+  console.log('Header state:', { open, loginModalOpen, logoutModalOpen, user });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,7 +31,10 @@ export default function Header() {
   };
 
   const handleLoginClick = (e) => {
-    e.preventDefault();
+    console.log('Login button clicked', { e, user });
+    if (e) {
+      e.preventDefault();
+    }
     dispatch(setLoginRedirect(null)); // Stay on current page
     setLoginModalOpen(true);
     setOpen(false);

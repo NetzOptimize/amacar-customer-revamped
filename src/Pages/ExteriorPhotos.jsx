@@ -219,88 +219,98 @@ export default function VehiclePhotos() {
 
   const requiredPhotos = photoRequirements.filter((req) => req.required);
   const totalRequired = requiredPhotos.length + (hasAccident ? 1 : 0); // Include mandatory accident photo
+  
+  // Count uploaded required photos more accurately
   const uploadedRequiredCount = photos.filter((photo) =>
-    requiredPhotos.some((req) => req.id === photo.requirement)
-  ).length + (hasAccident && accidentPhotos.some(p => p.requirement?.startsWith('accident_mandatory_')) ? 1 : 0);
+    requiredPhotos.some((req) => req.id === photo.requirement) && photo.uploaded
+  ).length + (hasAccident && accidentPhotos.some(p => p.uploaded && p.requirement?.startsWith('accident_mandatory_')) ? 1 : 0);
+  
   const isComplete = uploadedRequiredCount >= totalRequired;
 
   const handleSinglePhotoUpload = async (file, id) => {
+    console.log('=== handleSinglePhotoUpload START ===');
+    console.log('Upload parameters:', { file, id, productId });
+    
     if (!productId) {
       console.error('Product ID is required for image upload');
       return;
     }
 
+    console.log('Setting upload state for photo:', id);
     setUploadingMap((prev) => ({ ...prev, [id]: true }));
     setProgressMap((prev) => ({ ...prev, [id]: 0 }));
 
     try {
       // Create image name based on requirement ID
       const imageName = `image_${id}_view`;
+      console.log('Created image name:', imageName);
 
-      // Create FormData
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('product_id', productId);
-      formData.append('image_name', imageName);
+      // Progress callback for chunked uploads
+      const onProgress = (progress) => {
+        console.log(`Progress update for ${id}:`, progress);
+        setProgressMap((prev) => ({ ...prev, [id]: progress }));
+      };
 
-      // Upload with progress tracking
-      const response = await api.post('/vehicle/upload-image', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        onUploadProgress: (progressEvent) => {
-          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          setProgressMap((prev) => ({ ...prev, [id]: progress }));
-        }
-      });
+      console.log('Dispatching uploadVehicleImage thunk...');
+      // Use the Redux thunk for image upload with progress tracking
+      const result = await dispatch(uploadVehicleImage({ 
+        file, 
+        productId, 
+        imageName,
+        onProgress
+      })).unwrap();
 
-      console.log('Image upload API response:', response.data);
+      console.log('Image upload successful:', result);
 
-      if (response.data.success) {
-        const result = {
-          attachmentId: response.data.attachment_id,
-          imageUrl: response.data.image_url,
-          metaKey: response.data.meta_key,
-          productId: response.data.product_id,
-          imageName: imageName,
-          localUrl: URL.createObjectURL(file)
-        };
+      // Create local photo object for display
+      const newPhoto = {
+        id: `${id}_${Date.now()}`,
+        file,
+        url: result.localUrl, // Use local URL for immediate display
+        serverUrl: result.imageUrl, // Store server URL
+        requirement: id,
+        timestamp: new Date(),
+        attachmentId: result.attachmentId,
+        metaKey: result.metaKey,
+        uploaded: true,
+        compressedSize: result.compressedSize,
+        originalSize: result.originalSize
+      };
 
-        // Add to Redux store for persistence
-        dispatch(addUploadedImage(result));
-
-        // Create local photo object for display
-        const newPhoto = {
-          id: `${id}_${Date.now()}`,
-          file,
-          url: result.localUrl, // Use local URL for immediate display
-          serverUrl: result.imageUrl, // Store server URL
-          requirement: id,
-          timestamp: new Date(),
-          attachmentId: result.attachmentId,
-          metaKey: result.metaKey,
-          uploaded: true
-        };
-
-        if (id.startsWith('accident_')) {
-          setAccidentPhotos((prev) => {
-            const updatedPhotos = prev.map(p =>
-              p.id === id ? { ...p, ...newPhoto } : p
-            );
-            return updatedPhotos;
-          });
-        } else {
-          setPhotos((prev) => [...prev, newPhoto]);
-        }
+      if (id.startsWith('accident_')) {
+        setAccidentPhotos((prev) => {
+          const updatedPhotos = prev.map(p =>
+            p.id === id ? { ...p, ...newPhoto } : p
+          );
+          return updatedPhotos;
+        });
       } else {
-        throw new Error(response.data.message || 'Failed to upload image');
+        setPhotos((prev) => [...prev, newPhoto]);
+      }
+
+      // Show compression info if significant compression occurred
+      if (result.compressedSize && result.originalSize && result.compressedSize < result.originalSize) {
+        const compressionRatio = ((result.originalSize - result.compressedSize) / result.originalSize * 100).toFixed(1);
+        toast.success(`Image compressed by ${compressionRatio}% for faster upload`);
       }
 
     } catch (error) {
-      console.error('Image upload failed:', error);
+      console.error('=== Image upload failed ===');
+      console.error('Error details:', {
+        error,
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      console.error('File details at error time:', {
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size
+      });
       // Show error to user
       toast.error(`Failed to upload image: ${error.message || error}`);
     } finally {
+      console.log('Cleaning up upload state for photo:', id);
       setUploadingMap((prev) => {
         const next = { ...prev };
         delete next[id];
@@ -311,6 +321,7 @@ export default function VehiclePhotos() {
         delete next[id];
         return next;
       });
+      console.log('=== handleSinglePhotoUpload END ===');
     }
   };
 
@@ -345,8 +356,16 @@ export default function VehiclePhotos() {
         ? accidentPhotos.find(photo => photo.id === photoId)
         : photos.find(photo => photo.id === photoId);
 
+      if (!photoToDelete) {
+        console.error('Photo not found for deletion');
+        return;
+      }
+
+      // Set deleting state for this specific photo
+      setUploadingMap((prev) => ({ ...prev, [photoId]: true }));
+
       // If photo was uploaded to server, delete it via API
-      if (photoToDelete && photoToDelete.attachmentId) {
+      if (photoToDelete.attachmentId) {
         console.log('Deleting image from server:', photoToDelete.attachmentId);
 
         const result = await dispatch(deleteVehicleImage({
@@ -378,7 +397,14 @@ export default function VehiclePhotos() {
         setPhotos((prev) => prev.filter((photo) => photo.id !== photoId));
       }
       // Show error to user
-      alert(`Failed to delete image from server: ${error}. Image removed locally.`);
+      toast.error(`Failed to delete image from server: ${error}. Image removed locally.`);
+    } finally {
+      // Clear the deleting state for this specific photo
+      setUploadingMap((prev) => {
+        const next = { ...prev };
+        delete next[photoId];
+        return next;
+      });
     }
   };
 
@@ -544,6 +570,11 @@ export default function VehiclePhotos() {
                       <p className="text-xs text-slate-600 mt-2">
                         {progressMap[photo.id] || 0}% complete
                       </p>
+                      {progressMap[photo.id] > 0 && progressMap[photo.id] < 100 && (
+                        <p className="text-xs text-slate-500 mt-1">
+                          Chunked upload in progress...
+                        </p>
+                      )}
                     </div>
                   ) : hasPhoto ? (
                     <div className="relative group aspect-square">
@@ -558,10 +589,10 @@ export default function VehiclePhotos() {
                             e.stopPropagation();
                             removePhoto(uploadedPhoto.id);
                           }}
-                          disabled={imageDeleteStatus === 'deleting'}
+                          disabled={!!uploadingMap[uploadedPhoto.id]}
                           className="bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {imageDeleteStatus === 'deleting' ? (
+                          {uploadingMap[uploadedPhoto.id] ? (
                             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                           ) : (
                             <X className="w-5 h-5" />
@@ -599,17 +630,54 @@ export default function VehiclePhotos() {
                   )}
                   <input
                     type="file"
-                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,.jpg,.jpeg,.png,.gif,.webp"
                     onChange={(e) => {
+                      console.log('File input changed:', e.target.files);
                       if (e.target.files && e.target.files[0]) {
                         const file = e.target.files[0];
+                        console.log('Selected file details:', {
+                          name: file.name,
+                          type: file.type,
+                          size: file.size,
+                          lastModified: file.lastModified,
+                          webkitRelativePath: file.webkitRelativePath
+                        });
+                        
                         // Validate file type
                         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-                        if (!allowedTypes.includes(file.type)) {
-                          toast.error('Invalid file type. Only JPG, JPEG, PNG, GIF, and WEBP are allowed.');
+                        const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                        const fileTypeLower = file.type.toLowerCase();
+                        const fileExtension = file.name.split('.').pop()?.toLowerCase();
+                        const isValidType = allowedTypes.includes(fileTypeLower);
+                        const isValidExtension = allowedExtensions.includes(fileExtension);
+                        
+                        console.log('File type validation:', {
+                          originalType: file.type,
+                          lowerType: fileTypeLower,
+                          allowedTypes,
+                          isValidType,
+                          fileExtension,
+                          allowedExtensions,
+                          isValidExtension,
+                          finalValidation: isValidType || isValidExtension
+                        });
+                        
+                        if (!isValidType && !isValidExtension) {
+                          console.error('File type validation failed in component:', { 
+                            fileType: file.type, 
+                            fileName: file.name,
+                            fileExtension: fileExtension,
+                            allowedTypes,
+                            allowedExtensions,
+                            mimeTypeValid: isValidType,
+                            extensionValid: isValidExtension
+                          });
+                          toast.error('Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed.');
                           e.target.value = ''; // Clear input value
                           return;
                         }
+                        
+                        console.log('File validation passed, proceeding with upload...');
                         handleSinglePhotoUpload(file, photo.id);
                         e.target.value = ''; // Clear input value to allow re-uploading same file
                       }
@@ -691,6 +759,11 @@ export default function VehiclePhotos() {
                         <p className="text-xs text-slate-600 mt-2">
                           {progressMap[photo.id] || 0}% complete
                         </p>
+                        {progressMap[photo.id] > 0 && progressMap[photo.id] < 100 && (
+                          <p className="text-xs text-slate-500 mt-1">
+                            Chunked upload in progress...
+                          </p>
+                        )}
                       </div>
                     ) : hasPhoto ? (
                       <div className="relative group aspect-square">
@@ -705,10 +778,10 @@ export default function VehiclePhotos() {
                               e.stopPropagation();
                               removePhoto(uploadedPhoto.id, true);
                             }}
-                            disabled={imageDeleteStatus === 'deleting'}
+                            disabled={!!uploadingMap[uploadedPhoto.id]}
                             className="bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            {imageDeleteStatus === 'deleting' ? (
+                            {uploadingMap[uploadedPhoto.id] ? (
                               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                             ) : (
                               <X className="w-5 h-5" />
@@ -738,17 +811,54 @@ export default function VehiclePhotos() {
                     )}
                     <input
                       type="file"
-                      accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                      accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,.jpg,.jpeg,.png,.gif,.webp"
                       onChange={(e) => {
+                        console.log('Accident photo file input changed:', e.target.files);
                         if (e.target.files && e.target.files[0]) {
                           const file = e.target.files[0];
+                          console.log('Selected accident photo file details:', {
+                            name: file.name,
+                            type: file.type,
+                            size: file.size,
+                            lastModified: file.lastModified,
+                            webkitRelativePath: file.webkitRelativePath
+                          });
+                          
                           // Validate file type
                           const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-                          if (!allowedTypes.includes(file.type)) {
-                            alert('Invalid file type. Only JPG, JPEG, PNG, GIF, and WEBP are allowed.');
+                          const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                          const fileTypeLower = file.type.toLowerCase();
+                          const fileExtension = file.name.split('.').pop()?.toLowerCase();
+                          const isValidType = allowedTypes.includes(fileTypeLower);
+                          const isValidExtension = allowedExtensions.includes(fileExtension);
+                          
+                          console.log('Accident photo file type validation:', {
+                            originalType: file.type,
+                            lowerType: fileTypeLower,
+                            allowedTypes,
+                            isValidType,
+                            fileExtension,
+                            allowedExtensions,
+                            isValidExtension,
+                            finalValidation: isValidType || isValidExtension
+                          });
+                          
+                          if (!isValidType && !isValidExtension) {
+                            console.error('File type validation failed in accident photos:', { 
+                              fileType: file.type, 
+                              fileName: file.name,
+                              fileExtension: fileExtension,
+                              allowedTypes,
+                              allowedExtensions,
+                              mimeTypeValid: isValidType,
+                              extensionValid: isValidExtension
+                            });
+                            toast.error('Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed.');
                             e.target.value = ''; // Clear input value
                             return;
                           }
+                          
+                          console.log('Accident photo file validation passed, proceeding with upload...');
                           handleSinglePhotoUpload(file, photo.id);
                           e.target.value = ''; // Clear input value to allow re-uploading same file
                         }

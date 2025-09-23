@@ -1,8 +1,94 @@
 import api from '@/lib/api';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { logout } from './userSlice';
+import imageCompression from 'browser-image-compression';
 
 let vin = "";
+
+// Helper functions for image compression and chunked upload
+const generateUniqueId = () => {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+};
+
+const compressImage = async (file, maxSizeMB = 2) => {
+  const options = {
+    maxSizeMB: maxSizeMB,
+    maxWidthOrHeight: 1920,
+    useWebWorker: true,
+    fileType: 'image/jpeg',
+    initialQuality: 0.8
+  };
+  
+  try {
+    return await imageCompression(file, options);
+  } catch (error) {
+    console.error('Compression failed:', error);
+    return file; // Fallback to original
+  }
+};
+
+const uploadSingleImage = async (file, productId, imageName) => {
+  const formData = new FormData();
+  formData.append('image', file);
+  formData.append('product_id', productId);
+  formData.append('image_name', imageName);
+
+  const response = await api.post('/vehicle/upload-image', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  return response.data;
+};
+
+const uploadChunkedImage = async (file, productId, imageName, onProgress) => {
+  const CHUNK_SIZE = 1024 * 1024; // 1MB per chunk
+  const uploadId = generateUniqueId();
+  const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+  
+  console.log(`Uploading ${file.name} in ${totalChunks} chunks`);
+
+  for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+    const start = chunkIndex * CHUNK_SIZE;
+    const end = Math.min(start + CHUNK_SIZE, file.size);
+    const chunk = file.slice(start, end);
+
+    const formData = new FormData();
+    formData.append('chunk', chunk);
+    formData.append('product_id', productId);
+    formData.append('image_name', imageName);
+    formData.append('chunk_index', chunkIndex);
+    formData.append('total_chunks', totalChunks);
+    formData.append('upload_id', uploadId);
+
+    const response = await api.post('/vehicle/upload-image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    const result = response.data;
+    
+    if (!result.success) {
+      throw new Error(result.message || 'Upload failed');
+    }
+
+    // Update progress
+    const progress = ((chunkIndex + 1) / totalChunks) * 100;
+    console.log(`Chunk ${chunkIndex + 1}/${totalChunks} uploaded (${progress.toFixed(1)}%)`);
+    
+    if (onProgress) {
+      onProgress(progress);
+    }
+
+    // If this is the last chunk, the server will combine all chunks
+    if (chunkIndex === totalChunks - 1) {
+      console.log('All chunks uploaded, server is combining...');
+      return result; // Final response with attachment_id and image_url
+    }
+  }
+};
 
 // Async thunk to fetch vehicle details
 export const fetchVehicleDetails = createAsyncThunk(
@@ -90,45 +176,73 @@ export const getInstantCashOffer = createAsyncThunk(
   }
 );
 
-// Async thunk for uploading vehicle images
+// Async thunk for uploading vehicle images with compression and chunked upload
 export const uploadVehicleImage = createAsyncThunk(
   'carDetailsAndQuestions/uploadVehicleImage',
-  async ({ file, productId, imageName }, { rejectWithValue }) => {
+  async ({ file, productId, imageName, onProgress }, { rejectWithValue, dispatch }) => {
     try {
-      console.log('Uploading vehicle image:', { productId, imageName, fileName: file.name });
+      console.log('Uploading vehicle image:', { productId, imageName, fileName: file.name, fileSize: file.size });
 
       // Validate file type
-      //   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-      //   if (!allowedTypes.includes(file.type)) {
-      //     return rejectWithValue('Invalid file type. Only JPG, JPEG, PNG, GIF, and WEBP are allowed.');
-      //   }
-
-      // Create FormData
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('product_id', productId);
-      formData.append('image_name', imageName);
-
-      // Upload image
-      const response = await api.post('/vehicle/upload-image', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+      const fileType = file.type.toLowerCase();
+      const fileExtension = file.name.split('.').pop()?.toLowerCase();
+      const isValidType = allowedTypes.includes(fileType);
+      const isValidExtension = allowedExtensions.includes(fileExtension);
+      
+      console.log('File validation details:', {
+        fileName: file.name,
+        fileType: file.type,
+        fileTypeLower: fileType,
+        fileExtension,
+        fileSize: file.size,
+        allowedTypes,
+        allowedExtensions,
+        isValidType,
+        isValidExtension,
+        finalValidation: isValidType || isValidExtension
       });
+      
+      if (!isValidType && !isValidExtension) {
+        return rejectWithValue('Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed.');
+      }
 
-      console.log('Image upload API response:', response.data);
+      // Compress image first (optional but recommended)
+      const compressedFile = await compressImage(file);
+      console.log('Image compressed:', { 
+        originalSize: file.size, 
+        compressedSize: compressedFile.size,
+        compressionRatio: ((file.size - compressedFile.size) / file.size * 100).toFixed(1) + '%'
+      });
+      
+      // Decide upload method based on file size
+      const MAX_SINGLE_UPLOAD = 5 * 1024 * 1024; // 5MB
+      
+      let response;
+      if (compressedFile.size <= MAX_SINGLE_UPLOAD) {
+        console.log('Using single upload for file size:', compressedFile.size);
+        response = await uploadSingleImage(compressedFile, productId, imageName);
+      } else {
+        console.log('Using chunked upload for file size:', compressedFile.size);
+        response = await uploadChunkedImage(compressedFile, productId, imageName, onProgress);
+      }
 
-      if (response.data.success) {
+      console.log('Image upload API response:', response);
+
+      if (response.success) {
         return {
           attachmentId: response.data.attachment_id,
           imageUrl: response.data.image_url,
           metaKey: response.data.meta_key,
           productId: response.data.product_id,
           imageName: imageName,
-          localUrl: URL.createObjectURL(file) // Keep local URL for immediate display
+          localUrl: URL.createObjectURL(file), // Keep original file URL for immediate display
+          compressedSize: compressedFile.size,
+          originalSize: file.size
         };
       } else {
-        return rejectWithValue(response.data.message || 'Failed to upload image');
+        return rejectWithValue(response.message || 'Failed to upload image');
       }
     } catch (error) {
       console.log('Image upload API error:', error.response?.data || error.message);
@@ -488,7 +602,7 @@ const carDetailsAndQuestionsSlice = createSlice({
       state.uploadedImages.push(action.payload);
     },
     removeUploadedImage: (state, action) => {
-      state.uploadedImages = state.uploadedImages.filter(img => img.id !== action.payload);
+      state.uploadedImages = state.uploadedImages.filter(img => img.attachmentId !== action.payload);
     },
     clearImageUploadError: (state) => {
       state.imageUploadError = null;

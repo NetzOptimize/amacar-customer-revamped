@@ -33,6 +33,7 @@ const Dashboard = () => {
   const loading = useSelector(selectOffersLoading);
   const error = useSelector(selectOffersError);
   const userExists = useSelector((state) => state.carDetailsAndQuestions?.userExists);
+  const user = useSelector((state) => state.user?.user);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showPasswordResetModal, setShowPasswordResetModal] = useState(false);
   // Calculate stats from dashboard summary data
@@ -129,7 +130,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="mt-16 min-h-screen bg-gradient-hero p-8">
+      <div className="lg:mt-16 min-h-screen bg-gradient-hero p-8">
         <div className="max-w-8xl mx-auto">
           <motion.div
             variants={containerVariants}
@@ -138,7 +139,7 @@ const Dashboard = () => {
             className="mb-8"
           >
             <motion.h1 variants={itemVariants} className="text-3xl font-bold text-neutral-800 mb-2">
-              Welcome back, John!
+              Welcome back, {user?.firstName || user?.first_name || 'User'}!
             </motion.h1>
             <motion.p variants={itemVariants} className="text-neutral-600">
               Here's what's happening with your auctions today.
