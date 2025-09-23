@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import LogoutModal from "@/components/ui/LogoutModal";
 import { persistor } from "@/redux/store";
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight, Play, Menu, X } from "lucide-react";
 // import { AuthContext } from '@/contexts/AuthContext'
 
 export default function Header() {
@@ -53,40 +53,28 @@ export default function Header() {
       <header className="site-header">
         <div className="container">
           <div className="header-row">
-            {/* left: logo area */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                minWidth: 180,
-              }}
-            >
-              <a
-                href="/"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                  textDecoration: "none",
-                }}
+            {/* Logo Section - Responsive */}
+            <div className="logo-section">
+              <Link
+                to="/"
+                className="logo-link"
               >
                 <img
                   className="logo"
                   src="src/assets/original_logo.jpg"
-                  alt="Logo"
+                  alt="Amacar Logo"
                 />
-              </a>
+              </Link>
             </div>
 
-            {/* center: nav (absolutely centered on desktop) */}
+            {/* Desktop Navigation - Hidden on mobile/tablet */}
             <nav className="nav-desktop">
-              <a className="nav-link" href="/">
+              <Link className="nav-link" to="/">
                 Home
-              </a>
-              <a className="nav-link" href="/testimonials">
+              </Link>
+              <Link className="nav-link" to="/testimonials">
                 Testimonials
-              </a>
+              </Link>
               <a className="nav-link" href="/join-our-dealer-network">
                 Join Our Dealer Network
               </a>
@@ -95,93 +83,101 @@ export default function Header() {
               </Link>
             </nav>
 
-            {/* right: actions */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                minWidth: 180,
-              }}
-            >
-              <div className="actions-desktop hidden md:flex items-center gap-3">
+            {/* Actions Section - Responsive */}
+            <div className="actions-section">
+              {/* Desktop Actions */}
+              <div className="actions-desktop">
                 {user ? (
                   <button
-                    className="btn-login cursor-pointer"
+                    className="btn-login"
                     onClick={handleLogoutClick}
                   >
                     Logout
                   </button>
                 ) : (
-                  <a className="btn-login" href="#" onClick={handleLoginClick}>
+                  <button 
+                    className="btn-login" 
+                    onClick={handleLoginClick}
+                  >
                     Login / Register
-                  </a>
+                  </button>
                 )}
               </div>
 
-              <div
-                className="mobile-toggle"
-                style={{ display: "flex", alignItems: "center", marginLeft: 8 }}
+              {/* Mobile/Tablet Menu Toggle */}
+              <button
+                aria-label="Toggle menu"
+                aria-expanded={open}
+                onClick={() => setOpen(!open)}
+                className="mobile-menu-toggle"
               >
-                <button
-                  aria-label="Toggle menu"
-                  aria-expanded={open}
-                  onClick={() => setOpen(!open)}
-                  className="hamburger-btn"
-                >
-                  <span className={`hamburger ${open ? "open" : ""}`}>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </span>
-                </button>
-              </div>
+                {open ? (
+                  <X className="h-6 w-6 text-slate-700" />
+                ) : (
+                  <Menu className="h-6 w-6 text-slate-700" />
+                )}
+              </button>
             </div>
           </div>
         </div>
 
+        {/* Mobile/Tablet Navigation Panel */}
         <div className={`mobile-panel ${open ? "open" : ""}`}>
-          <div
-            className="container"
-            style={{ paddingTop: 12, paddingBottom: 18 }}
-          >
-            <nav style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <Link className="nav-link-mobile" to="/">
+          <div className="mobile-panel-content">
+            <nav className="mobile-nav">
+              <Link 
+                className="nav-link-mobile" 
+                to="/"
+                onClick={() => setOpen(false)}
+              >
                 Home
               </Link>
-              <a className="nav-link-mobile" href="#">
+              <Link 
+                className="nav-link-mobile" 
+                to="/testimonials"
+                onClick={() => setOpen(false)}
+              >
                 Testimonials
-              </a>
-              <a className="nav-link-mobile" href="#">
+              </Link>
+              <a 
+                className="nav-link-mobile" 
+                href="/join-our-dealer-network"
+                onClick={() => setOpen(false)}
+              >
                 Join Our Dealer Network
               </a>
-              <a className="nav-link-mobile" href="#">
+              <Link 
+                className="nav-link-mobile" 
+                to="/about-us"
+                onClick={() => setOpen(false)}
+              >
                 Our Vision
-              </a>
-              {/* {user && productId && (
-                <button
-                  className="bg-gradient-to-br from-orange-500 to-orange-400 hover:from-orange-600 hover:to-orange-500 text-white border-0 rounded-lg px-4 py-3 text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-200 ease-in-out shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 mt-2 w-full"
-                  onClick={handleContinueClick}
-                >
-                  <Play className="w-4 h-4" />
-                  Continue where you left off
-                </button>
-              )} */}
-              {user ? (
-                <button
-                  className="btn-login-mobile"
-                  onClick={handleLogoutClick}
-                >
-                  Logout
-                </button>
-              ) : (
-                <a
-                  className="btn-login-mobile"
-                  href="#"
-                  onClick={handleLoginClick}
-                >
-                  Login / Register
-                </a>
-              )}
+              </Link>
+              
+              {/* Mobile Auth Actions */}
+              <div className="mobile-auth-section">
+                {user ? (
+                  <button
+                    className="btn-login-mobile"
+                    onClick={() => {
+                      handleLogoutClick();
+                      setOpen(false);
+                    }}
+                  >
+                    Logout
+                  </button>
+                ) : (
+                  <button
+                    className="btn-login-mobile"
+                    onClick={() => {
+                      handleLoginClick();
+                      setOpen(false);
+                    }}
+                  >
+                    Login / Register
+                  </button>
+                )}
+              </div>
             </nav>
           </div>
         </div>
