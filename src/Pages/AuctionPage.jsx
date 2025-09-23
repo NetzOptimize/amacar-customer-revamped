@@ -541,7 +541,7 @@ useEffect(() => {
                                   onChange={(e) => handleChange(key, e.target.value)}
                                   onBlur={() => handleBlur(key)}
                                   placeholder={placeholder}
-                                  className={`h-11 w-full rounded-xl border bg-white px-3 pr-20 text-sm outline-none transition-shadow ${
+                                  className={`h-11 w-full rounded-xl border bg-white px-3 pr-20 text-base outline-none transition-shadow ${
                                     hasError
                                       ? "border-red-300 focus:shadow-[0_0_0_4px_rgba(225,29,72,0.15)]"
                                       : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"

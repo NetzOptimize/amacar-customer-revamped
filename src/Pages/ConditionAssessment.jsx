@@ -295,7 +295,7 @@ export default function ConditionAssessment() {
               value={question.details || ""}
               onChange={(e) => setQuestionDetails(question.key, e.target.value)}
               placeholder="Describe specific details..."
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#f6851f]/20 focus:border-[#f6851f] resize-none"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-[#f6851f]/20 focus:border-[#f6851f] resize-none"
               rows={3}
             />
           </motion.div>
@@ -419,7 +419,7 @@ export default function ConditionAssessment() {
                         onChange={(e) => setUser({ ...user, fullName: e.target.value })}
                         placeholder="Enter full name"
                         disabled={!!userState?.display_name}
-                        className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-sm outline-none transition-shadow ${
+                        className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-base outline-none transition-shadow ${
                           userState?.display_name 
                             ? "bg-green-50 border-orange-200 text-orange-800 cursor-not-allowed" 
                             : userErrors.fullName 
@@ -448,7 +448,7 @@ export default function ConditionAssessment() {
                         onChange={(e) => setUser({ ...user, email: e.target.value })}
                         placeholder="name@example.com"
                         disabled={!!userState?.email}
-                        className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-sm outline-none transition-shadow ${
+                        className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-base outline-none transition-shadow ${
                           userState?.email 
                             ? "bg-orange-50 border-orange-200 text-orange-800 cursor-not-allowed" 
                             : userErrors.email 
@@ -477,7 +477,7 @@ export default function ConditionAssessment() {
                         onChange={(e) => setUser({ ...user, phone: e.target.value.replace(/[^0-9+\-\s]/g, "") })}
                         placeholder="+1 555 123 4567"
                         disabled={!!userState?.meta?.phone}
-                        className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-sm outline-none transition-shadow ${
+                        className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-base outline-none transition-shadow ${
                           userState?.meta?.phone 
                             ? "bg-orange-50 border-orange-200 text-orange-800 cursor-not-allowed" 
                             : userErrors.phone 
@@ -506,7 +506,7 @@ export default function ConditionAssessment() {
                         onChange={(e) => setUser({ ...user, zipcode: e.target.value.replace(/[^0-9]/g, "").slice(0, 10) })}
                         placeholder="94016"
                         disabled={!!stateZip}
-                        className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-sm outline-none transition-shadow ${
+                        className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-base outline-none transition-shadow ${
                           stateZip
                             ? "bg-orange-50 border-orange-200 text-orange-800 cursor-not-allowed" 
                             : userErrors.zipcode 
@@ -535,7 +535,7 @@ export default function ConditionAssessment() {
                         onChange={(e) => setUser({ ...user, state: e.target.value })}
                         placeholder="State"
                         disabled={!!reduxLocation.state || !!localState}
-                        className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-sm outline-none transition-shadow ${
+                        className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-base outline-none transition-shadow ${
                           reduxLocation.state || localState 
                             ? "bg-orange-50 border-orange-200 text-orange-800 cursor-not-allowed" 
                             : userErrors.state 
@@ -564,7 +564,7 @@ export default function ConditionAssessment() {
                         onChange={(e) => setUser({ ...user, city: e.target.value })}
                         placeholder="City"
                         disabled={!!reduxLocation.city || !!localCity}
-                        className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-sm outline-none transition-shadow ${
+                        className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-base outline-none transition-shadow ${
                           reduxLocation.city || localCity 
                             ? "bg-orange-50 border-orange-200 text-orange-800 cursor-not-allowed" 
                             : userErrors.city 
@@ -681,8 +681,8 @@ export default function ConditionAssessment() {
           <div className="lg:col-span-4">
             <div className="sticky top-6">
               {/* Merged Vehicle Information and Your Answers Card */}
-              <div className="rounded-2xl w-[400px] border border-white/60 bg-white/70 shadow-xl backdrop-blur-xl overflow-hidden">
-                <div className="h-[560px]  overflow-y-auto">
+              <div className="rounded-2xl border border-white/60 bg-white/70 shadow-xl backdrop-blur-xl overflow-hidden">
+                <div className="h-auto lg:h-[560px] lg:overflow-y-auto">
                   <div className="p-6">
                     {/* Vehicle Information Section */}
                     <div className="mb-6">
