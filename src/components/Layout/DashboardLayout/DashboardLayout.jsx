@@ -137,15 +137,68 @@ const DashboardLayout = ({ children }) => {
 
           <h1 className="text-lg font-semibold text-neutral-800">Dashboard</h1>
 
-          <button
-            onClick={toggleNotificationsDropdown}
-            className="relative p-2 hover:bg-neutral-100 rounded-lg transition-colors duration-200"
-          >
-            <Bell className="w-5 h-5 text-neutral-600" />
-            {notifications.length > 0 && (
-              <span className="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
-            )}
-          </button>
+          <div className="relative" ref={notificationsRef}>
+            <button
+              onClick={toggleNotificationsDropdown}
+              className="relative p-2 hover:bg-neutral-100 rounded-lg transition-colors duration-200"
+            >
+              <Bell className="w-5 h-5 text-neutral-600" />
+              {notifications.length > 0 && (
+                <span className="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+              )}
+            </button>
+            <AnimatePresence>
+              {isNotificationsOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-neutral-200 z-50 overflow-hidden"
+                >
+                  <div className="bg-gradient-to-r from-neutral-50 to-white px-4 py-3 border-b border-neutral-200">
+                    <h3 className="text-sm font-semibold text-neutral-800">Notifications</h3>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto">
+                    {notifications.length > 0 ? (
+                      notifications.map((notification) => {
+                        const IconComponent = notification.icon;
+                        return (
+                          <div
+                            key={notification.id}
+                            className="px-4 py-3 hover:bg-primary-50 transition-colors duration-200 border-b border-neutral-100 last:border-b-0"
+                          >
+                            <div className="flex items-start space-x-3">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${notification.type === 'bid' ? 'bg-emerald-100' :
+                                notification.type === 'auction' ? 'bg-orange-100' :
+                                  notification.type === 'appointment' ? 'bg-purple-100' :
+                                    'bg-blue-100'
+                                }`}>
+                                <IconComponent className={`w-4 h-4 ${notification.type === 'bid' ? 'text-emerald-600' :
+                                  notification.type === 'auction' ? 'text-orange-600' :
+                                    notification.type === 'appointment' ? 'text-purple-600' :
+                                      'text-blue-600'
+                                  }`} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm text-neutral-800">{notification.message}</p>
+                                <p className="text-xs text-neutral-500 mt-1">{notification.time}</p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="px-4 py-8 text-center">
+                        <Bell className="w-8 h-8 text-neutral-300 mx-auto mb-2" />
+                        <p className="text-sm text-neutral-500">No recent activity</p>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
 
