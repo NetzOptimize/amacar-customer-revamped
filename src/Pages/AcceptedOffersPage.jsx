@@ -316,7 +316,7 @@ const AcceptedOffersPage = () => {
   }
 
   return (
-    <div className="lg:mt-16 min-h-screen bg-gradient-hero p-8">
+    <div className="lg:mt-16 min-h-screen bg-gradient-hero p-4 sm:p-6 lg:p-8">
       <div className="max-w-8xl mx-auto">
         <motion.div
           variants={containerVariants}
@@ -324,21 +324,21 @@ const AcceptedOffersPage = () => {
           animate="visible"
           className="mb-8"
         >
-          <div className="flex flex-col items-center sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <motion.h1 variants={itemVariants} className="text-3xl font-bold text-neutral-800 mb-2">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+            <div className="text-center sm:text-left">
+              <motion.h1 variants={itemVariants} className="text-2xl sm:text-3xl font-bold text-neutral-800 mb-2">
                 Accepted Offers
               </motion.h1>
-              <motion.p variants={itemVariants} className="text-neutral-600">
+              <motion.p variants={itemVariants} className="text-sm sm:text-base text-neutral-600">
                 Track the progress of your accepted offers through to completion.
               </motion.p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
               <motion.button
                 variants={itemVariants}
                 onClick={() => dispatch(fetchAcceptedOffers())}
                 disabled={loading}
-                className="btn-ghost flex items-center space-x-2"
+                className="btn-ghost flex items-center space-x-2 w-full sm:w-auto justify-center sm:justify-start"
               >
                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                 <span>Refresh</span>
@@ -348,7 +348,7 @@ const AcceptedOffersPage = () => {
               {!loading && !error && searchResults.length > 0 && (
                 <motion.div
                   variants={itemVariants}
-                  className="relative w-[200px]"
+                  className="relative w-full sm:w-[200px]"
                   ref={dropdownRef}
                 >
                   {/* Dropdown Trigger */}
@@ -492,18 +492,18 @@ const AcceptedOffersPage = () => {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-                className="flex flex-col sm:flex-row gap-4 mt-4"
+                className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-4 w-full max-w-sm sm:max-w-none"
               >
                 <motion.button
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   onClick={() => navigate('/pending-offers')}
-                  className="cursor-pointer w-64 px-4 h-16 group relative bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:shadow-xl hover:shadow-primary-500/25 focus:outline-none focus:ring-4 focus:ring-primary-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="cursor-pointer w-full sm:w-64 px-4 h-14 sm:h-16 group relative bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:shadow-xl hover:shadow-primary-500/25 focus:outline-none focus:ring-4 focus:ring-primary-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
-                  <div className="flex items-center gap-2 justify-between">
-                    <CheckCircle className="transition-transform duration-300 group-hover:scale-110" />
-                    <span className="text-md">View Pending offers</span>
+                  <div className="flex items-center gap-2 justify-center sm:justify-between">
+                    <CheckCircle className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+                    <span className="text-sm sm:text-base">View Pending offers</span>
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
                 </motion.button>
@@ -513,11 +513,11 @@ const AcceptedOffersPage = () => {
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   onClick={() => navigate('/dashboard')}
-                  className="cursor-pointer w-64 px-4 h-16 group relative overflow-hidden bg-white hover:bg-neutral-50 text-neutral-700 font-semibold py-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-300 transition-all duration-300 transform hover:shadow-lg hover:shadow-neutral-500/10 focus:outline-none focus:ring-4 focus:ring-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="cursor-pointer w-full sm:w-64 px-4 h-14 sm:h-16 group relative overflow-hidden bg-white hover:bg-neutral-50 text-neutral-700 font-semibold py-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-300 transition-all duration-300 transform hover:shadow-lg hover:shadow-neutral-500/10 focus:outline-none focus:ring-4 focus:ring-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
-                  <div className="flex items-center justify-center space-x-3">
+                  <div className="flex items-center justify-center space-x-2 sm:space-x-3">
                     <Eye className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-                    <span className="text-lg">View Dashboard</span>
+                    <span className="text-sm sm:text-base">View Dashboard</span>
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-r from-neutral-100/0 via-neutral-100/50 to-neutral-100/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
                 </motion.button>
@@ -553,11 +553,13 @@ const AcceptedOffersPage = () => {
                   <motion.div
                     key={offer.id}
                     variants={itemVariants}
-                    className="card p-6"
+                    className="card p-4 sm:p-6"
                   >
-                    <div className="flex items-start justify-between mb-6">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-16 h-16 bg-neutral-200 rounded-lg flex items-center justify-center overflow-hidden">
+                    {/* Mobile-first layout */}
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+                      {/* Vehicle Image and Info */}
+                      <div className="flex items-start space-x-3 sm:space-x-4">
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-neutral-200 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                           {offer.imageUrl ? (
                             <img
                               src={offer.imageUrl}
@@ -565,25 +567,33 @@ const AcceptedOffersPage = () => {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <Car className="w-8 h-8 text-neutral-400" />
+                            <Car className="w-8 h-8 sm:w-10 sm:h-10 text-neutral-400" />
                           )}
                         </div>
-                        <div>
-                          <h3 className="text-xl font-semibold text-neutral-800">{offer.vehicle}</h3>
-                          <p className="text-neutral-600">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-lg sm:text-xl font-semibold text-neutral-800 mb-1 break-words">
+                            {offer.vehicle}
+                          </h3>
+                          <p className="text-sm sm:text-base text-neutral-600 mb-1">
                             Accepted on {formatDate(offer.acceptedDate)}
                           </p>
-                          <p className="text-sm text-neutral-500">
-                            VIN: {offer.vin} • {offer.title}
+                          <p className="text-xs sm:text-sm text-neutral-500 break-words">
+                            VIN: {offer.vin}
                           </p>
+                          {offer.title && (
+                            <p className="text-xs sm:text-sm text-neutral-500 break-words">
+                              {offer.title}
+                            </p>
+                          )}
                         </div>
                       </div>
 
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-success mb-1">
+                      {/* Offer Amount - Mobile positioned below, Desktop on right */}
+                      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2 sm:gap-1">
+                        <div className="text-xl sm:text-2xl font-bold text-success">
                           {formatCurrency(offer.offerAmount)}
                         </div>
-                        <div className="text-sm text-neutral-600">
+                        <div className="text-sm text-neutral-600 text-center sm:text-right">
                           by {offer.dealer}
                         </div>
                       </div>
@@ -592,54 +602,61 @@ const AcceptedOffersPage = () => {
 
 
                     {/* Dealer Information */}
-                    <div className="bg-neutral-50 rounded-lg p-4 mb-4">
-                      <h4 className="font-semibold text-neutral-800 mb-3">Dealer Information</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-neutral-50 rounded-lg p-3 sm:p-4 mb-4">
+                      <h4 className="font-semibold text-neutral-800 mb-3 text-sm sm:text-base">Dealer Information</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div className="flex items-center space-x-2">
-                          <Car className="w-4 h-4 text-neutral-500" />
-                          <span className="text-sm text-neutral-700">{offer.dealer}</span>
+                          <Car className="w-4 h-4 text-neutral-500 flex-shrink-0" />
+                          <span className="text-sm text-neutral-700 break-words">{offer.dealer}</span>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Phone className="w-4 h-4 text-neutral-500" />
-                          <span className="text-sm text-neutral-700">{offer.dealerPhone}</span>
+                          <Phone className="w-4 h-4 text-neutral-500 flex-shrink-0" />
+                          <span className="text-sm text-neutral-700 break-words">{offer.dealerPhone}</span>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm text-neutral-500">Email:</span>
-                          <span className="text-sm text-neutral-700">{offer.dealerEmail}</span>
+                        <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                          <span className="text-sm text-neutral-500 flex-shrink-0">Email:</span>
+                          <span className="text-sm text-neutral-700 break-words">{offer.dealerEmail}</span>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm text-neutral-500">Dealer ID:</span>
-                          <span className="text-sm text-neutral-700">#{offer.dealerId}</span>
+                        <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                          <span className="text-sm text-neutral-500 flex-shrink-0">Dealer ID:</span>
+                          <span className="text-sm text-neutral-700 break-words">#{offer.dealerId}</span>
                         </div>
-                        <div className="flex items-center space-x-2 md:col-span-2">
-                          <MapPin className="w-4 h-4 text-neutral-500" />
-                          <span className="text-sm text-neutral-700">{offer.dealerAddress}</span>
+                        <div className="flex items-start space-x-2 sm:col-span-2">
+                          <MapPin className="w-4 h-4 text-neutral-500 flex-shrink-0 mt-0.5" />
+                          <span className="text-sm text-neutral-700 break-words">{offer.dealerAddress}</span>
                         </div>
                         {offer.cashOffer > 0 && (
-                          <div className="flex items-center space-x-2 md:col-span-2">
-                            <span className="text-sm text-neutral-500">Cash Offer:</span>
-                            <span className="text-sm font-medium text-success">{formatCurrency(offer.cashOffer)}</span>
+                          <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 sm:col-span-2">
+                            <span className="text-sm text-neutral-500 flex-shrink-0">Cash Offer:</span>
+                            <span className="text-sm font-medium text-success break-words">{formatCurrency(offer.cashOffer)}</span>
                           </div>
                         )}
                       </div>
                     </div>
 
                     {/* Next Steps */}
-                    <div className="flex items-center justify-end">
-                      <div className="flex space-x-2">
-                        <button className="cursor-pointer btn-ghost flex items-center space-x-2">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-2">
+                      {/* Mobile: Stack buttons vertically, Desktop: Horizontal */}
+                      <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                        <button className="cursor-pointer btn-ghost flex items-center justify-center space-x-2 py-2 px-3 sm:py-2 sm:px-4 text-sm">
                           <Phone className="w-4 h-4" />
-                          <span>Contact Dealer</span>
+                          <span className="hidden sm:inline">Contact Dealer</span>
+                          <span className="sm:hidden">Contact</span>
                         </button>
                         <button
                           onClick={() => handleOpenAppointmentModal(offer)}
-                          className="cursor-pointer btn-secondary flex items-center space-x-2"
+                          className="cursor-pointer btn-secondary flex items-center justify-center space-x-2 py-2 px-3 sm:py-2 sm:px-4 text-sm"
                         >
                           <Clock className="w-4 h-4" />
-                          <span>Schedule Appointment</span>
+                          <span className="hidden sm:inline">Schedule Appointment</span>
+                          <span className="sm:hidden">Schedule</span>
                         </button>
-                        <button onClick={() => navigate('/car-details', { state: { productId: offer.id } })} className="cursor-pointer btn-primary">
-                          View Details
+                        <button 
+                          onClick={() => navigate('/car-details', { state: { productId: offer.id } })} 
+                          className="cursor-pointer btn-primary flex items-center justify-center space-x-2 py-2 px-3 sm:py-2 sm:px-4 text-sm"
+                        >
+                          <Eye className="w-4 h-4" />
+                          <span>View Details</span>
                         </button>
                       </div>
                     </div>
@@ -651,12 +668,12 @@ const AcceptedOffersPage = () => {
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mt-8 flex justify-center"
+                    className="mt-6 sm:mt-8 flex justify-center"
                   >
                     <motion.button
                       onClick={handleLoadMore}
                       disabled={isLoadingMore}
-                      className={`px-8 py-3 rounded-xl font-medium transition-all duration-200 ${isLoadingMore
+                      className={`px-4 sm:px-8 py-3 rounded-xl font-medium transition-all duration-200 w-full sm:w-auto ${isLoadingMore
                         ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
                         : 'bg-primary-500 text-white hover:bg-primary-600 hover:shadow-lg cursor-pointer'
                         }`}
@@ -664,14 +681,14 @@ const AcceptedOffersPage = () => {
                       whileTap={!isLoadingMore ? { scale: 0.98 } : {}}
                     >
                       {isLoadingMore ? (
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center justify-center space-x-2">
                           <RefreshCw className="w-4 h-4 animate-spin" />
-                          <span>Loading offers...</span>
+                          <span className="text-sm sm:text-base">Loading offers...</span>
                         </div>
                       ) : (
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm font-extrabold">Load More Offers</span>
-                          <span className="text-sm opacity-75">
+                        <div className="flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-2">
+                          <span className="text-sm sm:text-base font-extrabold">Load More Offers</span>
+                          <span className="text-xs sm:text-sm opacity-75">
                             ({remainingItems} remaining)
                           </span>
                         </div>
