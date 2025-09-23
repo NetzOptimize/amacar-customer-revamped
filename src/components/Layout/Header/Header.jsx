@@ -76,7 +76,7 @@ export default function Header() {
               >
                 <img
                   className="logo"
-                  src="src/assets/original_logo.jpg"
+                  src="https://dealer.amacar.ai/wp-content/uploads/2024/10/logo-4-2048x680.png"
                   alt="Amacar Logo"
                 />
               </Link>

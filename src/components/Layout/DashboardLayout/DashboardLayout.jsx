@@ -137,7 +137,7 @@ const DashboardLayout = ({ children }) => {
 
           <Link to="/" className="flex items-center">
             <img 
-              src="/src/assets/original_logo.jpg" 
+              src="https://dealer.amacar.ai/wp-content/uploads/2024/10/logo-4-2048x680.png" 
               alt="Amacar Logo" 
               className="h-8 w-auto object-contain hover:opacity-80 transition-opacity duration-200"
             />
