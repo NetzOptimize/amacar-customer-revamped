@@ -199,6 +199,9 @@ export default function Footer() {
                 </div>
               </div>
             </div>
+            <div className="text-neutral-500 text-sm">
+              © {new Date().getFullYear()} Amacar. All rights reserved.
+            </div>
           </div>
         </div>
       </div>

@@ -314,7 +314,7 @@ export default function LoginModal({
     <>
       <Dialog open={isOpen} onOpenChange={isCloseDisabled ? undefined : handleModalClose}>
         <DialogContent
-          className="sm:max-w-lg rounded-2xl shadow-xl p-0 overflow-y-auto max-h-[70vh] bg-white"
+          className="sm:max-w-lg rounded-2xl shadow-xl p-0 overflow-y-auto max-h-[70vh] lg:max-h-[82vh] bg-white"
           showCloseButton={!isCloseDisabled}
         >
           <div className="bg-gradient-to-br from-white via-slate-50 to-slate-100 p-6">
@@ -484,11 +484,12 @@ export default function LoginModal({
                               <Phone className="h-4 w-4" />
                             </div>
                             <input
+                              maxLength={10}
                               id="phone"
                               type="tel"
                               value={values.phone || ""}
                               onChange={(e) => setValue("phone", e.target.value)}
-                              placeholder="+1 (555) 123-4567"
+                              placeholder="5551234567"
                               className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]"
                             />
                           </div>
