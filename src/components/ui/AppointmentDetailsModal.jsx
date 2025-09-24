@@ -47,7 +47,14 @@ export default function AppointmentDetailsModal({
 
   // Handle modal close
   const handleClose = (open) => {
-    if (open && !isProcessing && !isCancelProcessing) {
+    if (!open && !isProcessing && !isCancelProcessing) {
+      onClose(false);
+    }
+  };
+
+  // Handle close button click
+  const handleCloseClick = () => {
+    if (!isProcessing && !isCancelProcessing) {
       onClose(false);
     }
   };
@@ -172,18 +179,20 @@ export default function AppointmentDetailsModal({
         <div className="relative bg-[#f6851f] p-4 sm:p-6 text-white flex-shrink-0 rounded-t-xl sm:rounded-t-2xl">
           <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent"></div>
           <div className="relative z-10">
-            <DialogTitle className="text-base sm:text-lg font-bold mb-1">
-              Appointment Details
-            </DialogTitle>
-            {/* Custom Close Button for Mobile */}
-            <button
-                  onClick={handleClose}
-                  disabled={isCloseDisabled}
-                  className="absolute top-0 right-0  sm:hidden p-1 rounded-full hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  aria-label="Close modal"
-                >
-                  <X className="w-2 h-2 text-black " />
-                </button>
+            <div className="flex items-start justify-between">
+              <DialogTitle className="text-base sm:text-lg font-bold mb-1 break-words">
+                Appointment Details
+              </DialogTitle>
+              {/* Custom Close Button for Mobile */}
+              <button
+                onClick={handleCloseClick}
+                disabled={isCloseDisabled}
+                className="absolute top-2 right-2 sm:hidden p-1 rounded-full hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Close modal"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
+            </div>
           </div>
           {/* Decorative elements */}
           <div className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 w-16 h-16 sm:w-20 sm:h-20 bg-orange-500/10 rounded-full blur-xl"></div>
@@ -382,8 +391,9 @@ export default function AppointmentDetailsModal({
                 {/* Footer Actions */}
                 <div className="flex gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-slate-200">
                   <button
-                    onClick={() => onClose(false)}
-                    className="flex-1 h-10 sm:h-12 rounded-lg border-2 border-slate-200 text-slate-700 font-medium hover:bg-slate-50 transition-colors text-sm sm:text-base"
+                    onClick={handleCloseClick}
+                    disabled={isCloseDisabled}
+                    className="flex-1 h-10 sm:h-12 rounded-lg border-2 border-slate-200 text-slate-700 font-medium hover:bg-slate-50 transition-colors text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Close
                   </button>
@@ -400,8 +410,9 @@ export default function AppointmentDetailsModal({
                   <p className="text-xs sm:text-sm text-slate-600">Unable to load appointment details.</p>
                 </div>
                 <button
-                  onClick={() => onClose(false)}
-                  className="px-3 sm:px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors text-sm sm:text-base"
+                  onClick={handleCloseClick}
+                  disabled={isCloseDisabled}
+                  className="px-3 sm:px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Close
                 </button>
