@@ -484,8 +484,8 @@ export default function ConditionAssessment() {
                               ? "border-green-300 bg-green-50 focus:shadow-[0_0_0_4px_rgba(34,197,94,0.18)]"
                               : !isEmailPrefilled && emailValidation.isDisposable === true
                                 ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.18)]"
-                                : userErrors.email 
-                                  ? "border-red-300" 
+                                : userErrors.email && !emailValidation.isValidating
+                                  ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.18)]"
                                   : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"
                         }`}
                       />
@@ -510,17 +510,6 @@ export default function ConditionAssessment() {
                       )}
                     </div>
                     
-                    {/* Email validation messages - only show for non-prefilled emails */}
-                    {!isEmailPrefilled && emailValidation.isValid === true && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-xs text-green-600"
-                      >
-                        ✓ Email is valid and not disposable
-                      </motion.p>
-                    )}
-                    
                     {!isEmailPrefilled && emailValidation.isDisposable === true && (
                       <motion.p
                         initial={{ opacity: 0, y: -4 }}
@@ -538,6 +527,17 @@ export default function ConditionAssessment() {
                         className="text-xs text-red-600"
                       >
                         Unable to verify email. Please try again.
+                      </motion.p>
+                    )}
+                    
+                    {/* Show regex validation error only when not validating */}
+                    {userErrors.email && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-xs text-red-600"
+                      >
+                        Please enter a valid email address.
                       </motion.p>
                     )}
                   </div>
@@ -693,8 +693,12 @@ export default function ConditionAssessment() {
 
                         const errs = {};
                         if (!finalUserData.fullName) errs.fullName = true;
-                        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(finalUserData.email)) {
-                          errs.email = true;
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if (!emailRegex.test(finalUserData.email)) {
+                          // Only show regex validation error if email validation hasn't started yet
+                          if (!emailValidation.isValidating) {
+                            errs.email = true;
+                          }
                         } else if (!isEmailPrefilled && emailValidation.isDisposable === true) {
                           errs.email = true;
                         } else if (!isEmailPrefilled && emailValidation.error) {

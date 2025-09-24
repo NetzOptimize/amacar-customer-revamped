@@ -56,7 +56,10 @@ export default function LoginModal({
     if (!values.email) {
       newErrors.email = "Email is required";
     } else if (!emailRegex.test(values.email)) {
-      newErrors.email = "Please enter a valid email address";
+      // Only show regex validation error if not in register mode or if email validation hasn't started yet
+      if (!isRegisterMode || !emailValidation.isValidating) {
+        newErrors.email = "Please enter a valid email address";
+      }
     } else if (isRegisterMode && emailValidation.isDisposable === true) {
       newErrors.email = "Disposable email addresses are not allowed";
     } else if (isRegisterMode && emailValidation.error) {
@@ -462,7 +465,9 @@ export default function LoginModal({
                                 ? 'border-green-300 bg-green-50 focus:shadow-[0_0_0_4px_rgba(34,197,94,0.08)]'
                                 : isRegisterMode && emailValidation.isDisposable === true
                                   ? 'border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]'
-                                  : 'border-slate-200 bg-white focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]'
+                                  : errors.email && !emailValidation.isValidating
+                                    ? 'border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]'
+                                    : 'border-slate-200 bg-white focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]'
                           }`}
                         />
                         {/* Validation status indicator - only show in register mode */}
@@ -493,7 +498,7 @@ export default function LoginModal({
                         </motion.p>
                       )}
                       
-                      
+                      {/* Show regex validation error only when not validating in register mode */}
                       {errors.email && (
                         <motion.p
                           initial={{ opacity: 0, y: -4 }}

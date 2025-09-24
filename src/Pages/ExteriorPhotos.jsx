@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronRight, ChevronLeft, X, AlertCircle, Rocket, Car, CarFront, Gauge, Hash, Armchair, Camera, ArrowRight, ArrowLeft, LifeBuoy, CircleGauge } from 'lucide-react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { uploadVehicleImage, deleteVehicleImage, addUploadedImage, removeUploadedImage, clearImageUploadError, clearImageDeleteError, startAuction, clearAuctionStartError } from '@/redux/slices/carDetailsAndQuestionsSlice';
 import toast from 'react-hot-toast';
@@ -36,10 +36,9 @@ export default function VehiclePhotos() {
     try {
       // Clear any previous errors
       dispatch(clearAuctionStartError());
-      const auction_page_privacy_check = termsAccepted ? "accepted" : "not_accepted";
-      const auction_page_terms = accountTermsAccepted ? "accepted" : "not_accepted";
+      const auction_terms_accepted = termsAccepted ? "accepted" : "not_accepted";
       // Start the auction
-      const result = await dispatch(startAuction({ productId, auction_page_privacy_check, auction_page_terms })).unwrap();
+      const result = await dispatch(startAuction({ productId, auction_terms_accepted })).unwrap();
 
       // Show success toast
       toast.success(result.message || 'Auction started successfully!');
@@ -62,12 +61,11 @@ export default function VehiclePhotos() {
   const handleModalClose = () => {
     setShowTermsModal(false);
     setTermsAccepted(false);
-    setAccountTermsAccepted(false);
   };
 
   const handleAcceptTerms = async () => {
-    if (!termsAccepted || !accountTermsAccepted) {
-      toast.error('Please accept both terms and conditions to continue');
+    if (!termsAccepted) {
+      toast.error('Please accept the terms and conditions to continue');
       return;
     }
 
@@ -88,7 +86,6 @@ export default function VehiclePhotos() {
   const [dragActive, setDragActive] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [accountTermsAccepted, setAccountTermsAccepted] = useState(false);
 
   useEffect(() => {
     // console.log("questions", questions);
@@ -116,7 +113,7 @@ export default function VehiclePhotos() {
     }));
 
     const convertedAccidentPhotos = accidentPhotosFromRedux.map(img => ({
-      id: `${img.metaKey}_${img.attachmentId}`, // Use full ID with attachmentId for uniqueness
+      id: img.metaKey?.replace('image_image_', '').replace('_view', ''),
       file: null, // File object not available after reload
       url: img.imageUrl, // Use server URL for display
       serverUrl: img.imageUrl,
@@ -126,35 +123,15 @@ export default function VehiclePhotos() {
       metaKey: img.metaKey,
       uploaded: true,
       label: 'Accident Photo',
-      icon: Camera,
+      icon: '📸',
       description: 'Photo of accident damage',
       required: img.metaKey?.includes('accident_mandatory_'),
       isAccident: true
     }));
 
     setPhotos(convertedRegularPhotos);
-    
-    // Merge Redux accident photos with existing accident photos, ensuring mandatory one exists
-    setAccidentPhotos(prevAccidentPhotos => {
-      // Check if we already have a mandatory accident photo card
-      const hasMandatoryCard = prevAccidentPhotos.some(p => p.required && !p.uploaded);
-      
-      // If hasAccident is true and no mandatory card exists, add one
-      const mandatoryCard = hasAccident && !hasMandatoryCard ? [{
-        id: `accident_mandatory_${Date.now()}`,
-        label: 'Accident Photo (Required)',
-        icon: Camera,
-        description: 'Photo of accident damage',
-        required: true,
-        isAccident: true,
-        uploaded: false
-      }] : [];
-      
-      // Combine mandatory card, existing non-uploaded cards, and uploaded photos from Redux
-      const existingNonUploaded = prevAccidentPhotos.filter(p => !p.uploaded);
-      return [...mandatoryCard, ...existingNonUploaded, ...convertedAccidentPhotos];
-    });
-  }, [uploadedImages, hasAccident]);
+    setAccidentPhotos(convertedAccidentPhotos);
+  }, [uploadedImages]);
 
   const photoRequirements = [
     {
@@ -224,6 +201,19 @@ export default function VehiclePhotos() {
 
   ];
 
+  // Initialize one mandatory accident photo card if hasAccident is true
+  useEffect(() => {
+    if (hasAccident && accidentPhotos.length === 0) {
+      setAccidentPhotos([{
+        id: `accident_mandatory_${Date.now()}`,
+        label: 'Accident Photo (Required)',
+        icon: Camera,
+        description: 'Photo of accident damage',
+        required: true,
+        isAccident: true
+      }]);
+    }
+  }, [hasAccident]);
 
   const requiredPhotos = photoRequirements.filter((req) => req.required);
   const totalRequired = requiredPhotos.length + (hasAccident ? 1 : 0); // Include mandatory accident photo
@@ -270,24 +260,8 @@ export default function VehiclePhotos() {
 
       console.log('Image upload successful:', result);
 
-      // For accident photos, update local state immediately to show the uploaded photo
-      if (id.startsWith('accident')) {
-        setAccidentPhotos(prev => prev.map(photo => 
-          photo.id === id 
-            ? { 
-                ...photo, 
-                file: file, 
-                url: URL.createObjectURL(file), 
-                uploaded: true,
-                attachmentId: result.attachmentId,
-                metaKey: result.metaKey
-              }
-            : photo
-        ));
-      }
-
       // Note: Image is automatically added to Redux state via uploadVehicleImage.fulfilled
-      // Regular photos will be loaded from Redux in useEffect
+      // No need to manually add to local state as it will be loaded from Redux in useEffect
 
       // Show compression info if significant compression occurred
       if (result.compressedSize && result.originalSize && result.compressedSize < result.originalSize) {
@@ -375,17 +349,10 @@ export default function VehiclePhotos() {
         console.log('Image delete successful:', result);
       }
 
-      // Remove from Redux store if it has an attachmentId
-      if (photoToDelete.attachmentId) {
-        dispatch(removeUploadedImage(photoToDelete.attachmentId));
-      }
+      // Remove from Redux store
+      dispatch(removeUploadedImage(photoToDelete.attachmentId));
 
-      // For accident photos, also remove from local state immediately if it's not uploaded
-      if (isAccidentPhoto && !photoToDelete.uploaded) {
-        setAccidentPhotos(prev => prev.filter(p => p.id !== photoId));
-      }
-
-      // Note: For uploaded photos, local state will be updated automatically via useEffect when Redux state changes
+      // Note: Local state will be updated automatically via useEffect when Redux state changes
 
     } catch (error) {
       console.error('Image delete failed:', error);
@@ -393,12 +360,7 @@ export default function VehiclePhotos() {
       if (photoToDelete && photoToDelete.attachmentId) {
         dispatch(removeUploadedImage(photoToDelete.attachmentId));
       }
-      
-      // For accident photos, also remove from local state immediately if it's not uploaded
-      if (isAccidentPhoto && !photoToDelete.uploaded) {
-        setAccidentPhotos(prev => prev.filter(p => p.id !== photoId));
-      }
-      
+      // Note: Local state will be updated automatically via useEffect when Redux state changes
       // Show error to user
       toast.error(`Failed to delete image from server: ${error}. Image removed locally.`);
     } finally {
@@ -594,7 +556,7 @@ export default function VehiclePhotos() {
                           removePhoto(uploadedPhoto.id);
                         }}
                         disabled={!!uploadingMap[uploadedPhoto.id]}
-                        className="absolute top-2 right-2 lg:hidden bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation z-10"
+                        className="absolute top-2 right-2 sm:hidden bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation z-10"
                       >
                         {uploadingMap[uploadedPhoto.id] ? (
                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -735,7 +697,7 @@ export default function VehiclePhotos() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {accidentPhotos.map((photo, index) => {
-                const uploadedPhoto = accidentPhotos.find((p) => p.id === photo.id && (p.file || p.uploaded));
+                const uploadedPhoto = accidentPhotos.find((p) => p.id === photo.id && p.file);
                 const hasPhoto = !!uploadedPhoto;
                 const isUploadingThisPhoto = !!uploadingMap[photo.id];
 
@@ -959,29 +921,27 @@ export default function VehiclePhotos() {
 
       {/* Terms and Conditions Modal */}
       <Dialog open={showTermsModal} onOpenChange={handleModalClose}>
-        <DialogContent className="w-[95vw] max-w-4xl h-[80vh] max-h-[650px] md:max-h-[800px] rounded-2xl shadow-xl p-0 overflow-hidden bg-white flex flex-col">
-          {/* Fixed Header */}
-          <div className="bg-gradient-to-br from-white via-slate-50 to-slate-100 p-4 sm:p-6 flex-shrink-0">
+        <DialogContent className="sm:max-w-2xl rounded-2xl shadow-xl p-0 overflow-hidden bg-white">
+          <div className="bg-gradient-to-br from-white via-slate-50 to-slate-100 p-6">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl lg:text-2xl font-semibold tracking-tight text-slate-900 flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-purple-100 rounded-xl">
-                  <FileText className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-purple-600" />
+              <DialogTitle className="text-2xl font-semibold tracking-tight text-slate-900 flex items-center gap-3">
+                <div className="p-2 bg-purple-100 rounded-xl">
+                  <FileText className="h-6 w-6 text-purple-600" />
                 </div>
-                <span className="break-words">Your Car is Ready for Auction</span>
+                Your Car is Ready for Auction
               </DialogTitle>
-              <DialogDescription className="text-xs sm:text-sm text-slate-600 mt-1 sm:mt-2">
+              <DialogDescription className="text-sm text-slate-600 mt-2">
                 Please review and accept the terms before starting your auction
               </DialogDescription>
             </DialogHeader>
           </div>
 
-          {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto  px-4 sm:px-6 sm:py-2 min-h-0">
-            <div className="space-y-4 sm:space-y-4">
+          <div className="p-6 max-h-96 overflow-y-auto">
+            <div className="space-y-4">
               {[
                 {
                   title: "Auction Agreement",
-                  content: "Once you confirm, your vehicle details will be shared with verified dealerships across the Amacar platform. Dealers will begin bidding in real time based on your car's information and photos"
+                  content: "Once you confirm, your vehicle details will be shared with verified dealerships across the Amacar platform. Dealers will begin bidding in real time based on your car’s information and photos"
                 },
                 {
                   title: "Vehicle Condition",
@@ -998,74 +958,59 @@ export default function VehiclePhotos() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="border border-slate-200 rounded-xl p-3 sm:p-4 bg-slate-50/50"
+                  className="border border-slate-200 rounded-xl p-4 bg-slate-50/50"
                 >
-                  <h3 className="text-xs sm:text-sm font-semibold text-slate-800 mb-2 flex items-center gap-2">
-                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 flex-shrink-0" />
-                    <span className="break-words">{term.title}</span>
+                  <h3 className="text-sm font-semibold text-slate-800 mb-2 flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    {term.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed break-words">{term.content}</p>
+                  <p className="text-xs text-slate-600 leading-relaxed">{term.content}</p>
                 </motion.div>
               ))}
             </div>
+
+
           </div>
 
-          {/* Fixed Footer */}
-          <div className="p-4 sm:p-6 bg-slate-50 border-t border-slate-200 flex-shrink-0">
-            <div className="flex flex-col items-start sm:items-center justify-between gap-4 flex-column">
-              <div className="flex flex-col gap-3 w-full">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <input
-                    type="checkbox"
-                    id="terms-checkbox"
-                    checked={termsAccepted}
-                    onChange={(e) => setTermsAccepted(e.target.checked)}
-                    className="h-4 w-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500 flex-shrink-0"
-                  />
-                  <label htmlFor="terms-checkbox" className="text-xs sm:text-sm text-slate-700 cursor-pointer break-words">
-                    I have read and agree to the <Link to="/terms-of-service" className="text-[#f6851f] hover:text-[#e63946] font-medium">Terms of services</Link>
-                  </label>
-                </div>
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <input
-                    type="checkbox"
-                    id="account-terms-checkbox"
-                    checked={accountTermsAccepted}
-                    onChange={(e) => setAccountTermsAccepted(e.target.checked)}
-                    className="h-4 w-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500 flex-shrink-0"
-                  />
-                  <label htmlFor="account-terms-checkbox" className="text-xs sm:text-sm text-slate-700 cursor-pointer break-words">
-                    I agree to the <Link to="/privacy-policy" className="text-[#f6851f] hover:text-[#e63946] font-medium">Account and Auction Terms for Customers</Link>
-                  </label>
-                </div>
+          {/* Modal Footer */}
+          <div className="p-6 bg-slate-50 border-t border-slate-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="terms-checkbox"
+                  checked={termsAccepted}
+                  onChange={(e) => setTermsAccepted(e.target.checked)}
+                  className="h-4 w-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"
+                />
+                <label htmlFor="terms-checkbox" className="text-sm text-slate-700 cursor-pointer">
+                  I have read and agree to the Terms & Conditions
+                </label>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
+              <div className="flex gap-3">
                 <button
                   onClick={handleModalClose}
-                  className="w-full sm:w-auto cursor-pointer px-4 py-2 text-xs sm:text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+                  className="cursor-pointer px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAcceptTerms}
-                  disabled={!termsAccepted || !accountTermsAccepted || auctionStartStatus === 'starting'}
-                  className={`w-full sm:w-auto cursor-pointer px-4 sm:px-6 py-2 text-xs sm:text-sm font-semibold text-white rounded-lg transition-all ${termsAccepted && accountTermsAccepted && auctionStartStatus !== 'starting'
+                  disabled={!termsAccepted || auctionStartStatus === 'starting'}
+                  className={`cursor-pointer px-6 py-2 text-sm font-semibold text-white rounded-lg transition-all ${termsAccepted && auctionStartStatus !== 'starting'
                     ? 'bg-gradient-to-r from-[#f6851f] to-[#e63946] hover:from-orange-600 hover:to-red-600 shadow-lg'
                     : 'bg-slate-400 cursor-not-allowed'
                     }`}
                 >
                   {auctionStartStatus === 'starting' ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
-                      <span className="hidden sm:inline">Starting...</span>
-                      <span className="sm:hidden">Starting...</span>
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Starting...
                     </div>
                   ) : (
-                    <div className="flex items-center justify-center gap-2">
-                      <Rocket className="w-3 h-3 sm:w-4 sm:h-4" />
-                      <span>Start</span>
-                    </div>
+                    <div className="flex items-center gap-2"><Rocket className="w-4 h-4" />
+                      <p>Start</p></div>
                   )}
                 </button>
               </div>

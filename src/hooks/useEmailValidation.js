@@ -8,6 +8,10 @@ const useEmailValidation = (email, isRegisterMode, shouldReset = false) => {
     isValid: null
   });
 
+  // Email regex validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const isEmailFormatValid = email && emailRegex.test(email);
+
   // Reset validation state when shouldReset is true
   useEffect(() => {
     if (shouldReset) {
@@ -21,7 +25,7 @@ const useEmailValidation = (email, isRegisterMode, shouldReset = false) => {
   }, [shouldReset]);
 
   const checkDisposableEmail = useCallback(async (emailToCheck) => {
-    if (!emailToCheck || !isRegisterMode) {
+    if (!emailToCheck || !isRegisterMode || !isEmailFormatValid) {
       setValidationState({
         isValidating: false,
         isDisposable: null,
@@ -65,17 +69,25 @@ const useEmailValidation = (email, isRegisterMode, shouldReset = false) => {
         isValid: null
       });
     }
-  }, [isRegisterMode]);
+  }, [isRegisterMode, isEmailFormatValid]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (email && isRegisterMode) {
+      if (email && isRegisterMode && isEmailFormatValid) {
         checkDisposableEmail(email);
+      } else if (email && isRegisterMode && !isEmailFormatValid) {
+        // Reset validation state if email format is invalid
+        setValidationState({
+          isValidating: false,
+          isDisposable: null,
+          error: null,
+          isValid: null
+        });
       }
     }, 500); // 500ms debounce
 
     return () => clearTimeout(timeoutId);
-  }, [email, isRegisterMode, checkDisposableEmail]);
+  }, [email, isRegisterMode, isEmailFormatValid, checkDisposableEmail]);
 
   return validationState;
 };

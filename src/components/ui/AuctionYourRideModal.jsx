@@ -149,7 +149,10 @@ export default function AuctionModal({
     if (!email) {
       newErrors.email = "This field is required."
     } else if (!emailRegex.test(email)) {
-      newErrors.email = "Please enter a valid email address."
+      // Only show regex validation error if email validation hasn't started yet
+      if (!emailValidation.isValidating) {
+        newErrors.email = "Please enter a valid email address."
+      }
     } else if (email && isOpen && emailValidation.isDisposable === true) {
       newErrors.email = "Disposable email addresses are not allowed."
     } else if (email && isOpen && emailValidation.error) {
@@ -412,7 +415,9 @@ export default function AuctionModal({
                               ? 'border-green-300 bg-green-50 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.5)]'
                               : email && isOpen && emailValidation.isDisposable === true
                                 ? 'border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]'
-                                : 'border-slate-200 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]'
+                                : errors.email && !emailValidation.isValidating
+                                  ? 'border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]'
+                                  : 'border-slate-200 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]'
                           }`}
                         />
                         {/* Validation status indicator */}
@@ -428,18 +433,7 @@ export default function AuctionModal({
                           )}
                         </div>
                       </div>
-                      
-                      {/* Email validation messages */}
-                      {email && isOpen && emailValidation.isValid === true && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-xs text-green-600 mt-1"
-                        >
-                          ✓ Email is valid and not disposable
-                        </motion.p>
-                      )}
-                      
+                   
                       {email && isOpen && emailValidation.isDisposable === true && (
                         <motion.p 
                           initial={{ opacity: 0, y: -4 }}
@@ -460,6 +454,7 @@ export default function AuctionModal({
                         </motion.p>
                       )}
                       
+                      {/* Show regex validation error only when not validating */}
                       {errors.email && (
                         <motion.p 
                           initial={{ opacity: 0, y: -4 }}
