@@ -333,7 +333,7 @@ export default function AppointmentDetailsModal({
                           </div>
                         )}
                         {/* Communication Actions */}
-                        <div className={`grid gap-2 ${appointment.status === 'cancelled' ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
+                        <div className={`grid gap-2 ${appointment.status === 'cancelled' ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-1'}`}>
                           {/* <button
                             onClick={() => onCall && onCall(appointment)}
                             className="cursor-pointer flex items-center justify-center gap-2 h-10 bg-green-50 text-green-700 rounded-lg border border-green-200 hover:bg-green-100 transition-colors"
