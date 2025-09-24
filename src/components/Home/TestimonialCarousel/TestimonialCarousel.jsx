@@ -195,8 +195,8 @@ export default function TestimonialCarousel() {
                         </CarouselContent>
 
                         {/* Navigation Arrows */}
-                        <CarouselPrevious className="absolute left-6 top-1/2 transform -translate-y-1/2 -translate-x-6 bg-white rounded-full p-4 transition-all duration-300 border border-neutral-200 hover:bg-primary-50 hover:border-primary-300 hover:text-primary-600 shadow-lg" />
-                        <CarouselNext className="absolute right-6 top-1/2 transform -translate-y-1/2 translate-x-6 bg-white rounded-full p-4 transition-all duration-300 border border-neutral-200 hover:bg-primary-50 hover:border-primary-300 hover:text-primary-600 shadow-lg" />
+                        <CarouselPrevious className="cursor-pointer absolute left-6 top-1/2 transform -translate-y-1/2 -translate-x-6 bg-white rounded-full p-4 transition-all duration-300 border border-neutral-200 hover:bg-primary-50 hover:border-primary-300 hover:text-primary-600 shadow-lg" />
+                        <CarouselNext className="cursor-pointer absolute right-6 top-1/2 transform -translate-y-1/2 translate-x-6 bg-white rounded-full p-4 transition-all duration-300 border border-neutral-200 hover:bg-primary-50 hover:border-primary-300 hover:text-primary-600 shadow-lg" />
                     </Carousel>
 
                     {/* Dots Navigation */}
@@ -205,7 +205,7 @@ export default function TestimonialCarousel() {
                             <button
                                 key={index}
                                 onClick={() => scrollTo(index)}
-                                className={`w-3 h-3 rounded-full transition-all duration-300 ${index === current - 1
+                                className={`cursor-pointer w-3 h-3 rounded-full transition-all duration-300 ${index === current - 1
                                         ? 'bg-primary-500 scale-125'
                                         : 'bg-neutral-300 hover:bg-neutral-400'
                                     }`}

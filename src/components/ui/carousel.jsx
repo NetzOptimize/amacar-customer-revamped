@@ -227,12 +227,12 @@ function CarouselDots({
   if (scrollSnaps.length <= 1) return null
 
   return (
-    <div className={cn("flex justify-center space-x-2 mt-6", className)} {...props}>
+    <div className={cn("flex justify-center space-x-2 mt-4", className)} {...props}>
       {scrollSnaps.map((_, index) => (
         <button
           key={index}
           className={cn(
-            "w-2 h-2 rounded-full transition-all duration-200",
+            "w-2 cursor-pointer h-2 rounded-full transition-all duration-200",
             selectedIndex === index
               ? "bg-primary-500 scale-125"
               : "bg-neutral-300 hover:bg-neutral-400"
