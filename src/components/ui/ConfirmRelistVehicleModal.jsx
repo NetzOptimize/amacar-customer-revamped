@@ -78,7 +78,7 @@ const ConfirmRelistVehicleModal = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4"
           onClick={isLoading ? undefined : onClose}
         >
           <motion.div
@@ -86,59 +86,59 @@ const ConfirmRelistVehicleModal = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="bg-white rounded-2xl shadow-2xl max-w-lg w-full"
+            className="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-neutral-200">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                  <RefreshCw className="w-6 h-6 text-white" />
+            <div className="flex items-start sm:items-center justify-between p-4 sm:p-6 border-b border-neutral-200">
+              <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <RefreshCw className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-neutral-800">Any Change in Your Vehicle?</h2>
-                  <p className="text-sm text-neutral-600">Please let us know if anything has changed</p>
+                <div className="min-w-0 flex-1">
+                  <h2 className="text-lg sm:text-2xl font-bold text-neutral-800 leading-tight">Any Change in Your Vehicle?</h2>
+                  <p className="text-xs sm:text-sm text-neutral-600 mt-1">Please let us know if anything has changed</p>
                 </div>
               </div>
               <button
                 onClick={onClose}
                 disabled={isLoading}
-                className="p-2 hover:bg-neutral-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-2 hover:bg-neutral-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 ml-2"
               >
                 <X className="w-5 h-5 text-neutral-500" />
               </button>
             </div>
 
             {/* Modal Content */}
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {/* Vehicle Info */}
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 mb-6">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-5 h-5 text-blue-600" />
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-neutral-800">{vehicleName}</h3>
-                    <p className="text-sm text-neutral-600">Ready for relisting</p>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-neutral-800 text-sm sm:text-base truncate">{vehicleName}</h3>
+                    <p className="text-xs sm:text-sm text-neutral-600">Ready for relisting</p>
                   </div>
                 </div>
               </div>
 
               {/* Question */}
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-neutral-800 mb-4 text-center">
+              <div className="mb-4 sm:mb-6">
+                <h3 className="text-base sm:text-lg font-semibold text-neutral-800 mb-4 text-center leading-tight">
                   Has anything changed with your vehicle since the last assessment?
                 </h3>
                 
                 {/* Yes/No Buttons */}
-                <div className="flex space-x-4 justify-center">
+                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 justify-center">
                   <button
                     onClick={() => {
                       console.log('YES button clicked');
                       setHasChanges(true);
                     }}
                     disabled={isLoading}
-                    className={`px-8 py-3 rounded-xl font-semibold transition-all duration-200 border-2 cursor-pointer ${
+                    className={`px-6 sm:px-8 py-3 rounded-xl font-semibold transition-all duration-200 border-2 cursor-pointer w-full sm:w-auto ${
                       hasChanges === true
                         ? 'bg-green-500 text-white shadow-lg transform scale-105 border-green-600'
                         : 'bg-green-100 text-green-700 hover:bg-green-200 border-green-300'
@@ -152,7 +152,7 @@ const ConfirmRelistVehicleModal = ({
                       setHasChanges(false);
                     }}
                     disabled={isLoading}
-                    className={`px-8 py-3 rounded-xl font-semibold transition-all duration-200 border-2 cursor-pointer ${
+                    className={`px-6 sm:px-8 py-3 rounded-xl font-semibold transition-all duration-200 border-2 cursor-pointer w-full sm:w-auto ${
                       hasChanges === false
                         ? 'bg-red-500 text-white shadow-lg transform scale-105 border-red-600'
                         : 'bg-red-100 text-red-700 hover:bg-red-200 border-red-300'
@@ -164,18 +164,11 @@ const ConfirmRelistVehicleModal = ({
               </div>
 
               {/* Light line above footer */}
-              <div className="border-t border-neutral-200 mb-6"></div>
+              <div className="border-t border-neutral-200 mb-4 sm:mb-6"></div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-between">
-                <button
-                  onClick={onClose}
-                  disabled={isLoading}
-                  className="px-6 py-3 text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium border-2 border-neutral-300 hover:border-neutral-400 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
+              <div className="flex gap-2 sm:flex-row items-stretch sm:items-center justify-between space-y-3 sm:space-y-0 sm:space-x-4">
+              <button
                   onClick={() => {
                     console.log('RELIST button clicked');
                     console.log('Current hasChanges state:', hasChanges);
@@ -183,7 +176,7 @@ const ConfirmRelistVehicleModal = ({
                     handleRelist();
                   }}
                   disabled={isLoading || hasChanges === null}
-                  className="px-8 py-3 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none border-2 border-primary-600 hover:border-primary-700 cursor-pointer"
+                  className="px-6 py-3 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none border-2 border-primary-600 hover:border-primary-700 cursor-pointer w-full sm:w-auto order-1 sm:order-2 mb-0"
                 >
                   {isLoading ? (
                     <>
@@ -195,6 +188,14 @@ const ConfirmRelistVehicleModal = ({
                     </>
                   )}
                 </button>
+                <button
+                  onClick={onClose}
+                  disabled={isLoading}
+                  className="px-6 py-3 text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium border-2 border-neutral-300 hover:border-neutral-400 cursor-pointer w-full sm:w-auto order-2 sm:order-1"
+                >
+                  Cancel
+                </button>
+               
               </div>
             </div>
           </motion.div>
