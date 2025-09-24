@@ -190,15 +190,15 @@ export default function ReviewPage() {
           >
             <div className="flex items-center gap-2">
               <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="text-xs sm:text-sm">Secure Transaction</span>
+              <span className="text-xs sm:text-sm">Secure</span>
             </div>
             <div className="flex items-center gap-2">
               <Star className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="text-xs sm:text-sm">Verified Dealers</span>
+              <span className="text-xs sm:text-sm">Transparent</span>
             </div>
             <div className="flex items-center gap-2">
               <Trophy className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="text-xs sm:text-sm">Best Price Guarantee</span>
+              <span className="text-xs sm:text-sm">Fast</span>
             </div>
           </motion.div>
         </div>
