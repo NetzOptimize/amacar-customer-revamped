@@ -259,7 +259,7 @@ export const uploadVehicleImage = createAsyncThunk(
       let response;
       if (compressedFile.size <= MAX_SINGLE_UPLOAD) {
         console.log('Using single upload for file size:', compressedFile.size);
-        response = await uploadSingleImage(compressedFile, productId, imageName);
+        response = await uploadSingleImage(compressedFile, productId, imageName, onProgress);
       } else {
         console.log('Using chunked upload for file size:', compressedFile.size);
         response = await uploadChunkedImage(compressedFile, productId, imageName, onProgress);

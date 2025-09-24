@@ -676,12 +676,7 @@ export default function ConditionAssessment() {
                       <p className="text-sm text-yellow-800 mb-2">
                         <strong>Vehicle details required:</strong> Please complete the VIN lookup first to get an instant cash offer.
                       </p>
-                      <button
-                        onClick={() => setShowAuctionModal(true)}
-                        className="text-sm text-yellow-700 underline hover:text-yellow-900"
-                      >
-                        Start VIN Lookup →
-                      </button>
+                 
                     </div>
                   )}
 
