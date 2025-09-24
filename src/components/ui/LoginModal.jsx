@@ -307,6 +307,13 @@ export default function LoginModal({
     }
   }, [shouldResetEmailValidation]);
 
+  // Reset email validation when email field becomes empty (only in register mode)
+  useEffect(() => {
+    if (isRegisterMode && (!values.email || values.email.trim() === "")) {
+      setShouldResetEmailValidation(true);
+    }
+  }, [values.email, isRegisterMode]);
+
   // Prefill email when modal opens and user info is available
   useEffect(() => {
     if (isOpen && userInfo && !values.email) {
