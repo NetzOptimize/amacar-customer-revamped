@@ -50,8 +50,12 @@ export default function AuctionModal({
   })
   const [shouldResetEmailValidation, setShouldResetEmailValidation] = useState(false)
   
-  // Email validation hook
-  const emailValidation = useEmailValidation(email, true, shouldResetEmailValidation) // Always validate in auction modal
+  // Email validation hook - only validate when email is not empty and modal is open
+  const emailValidation = useEmailValidation(
+    email && isOpen ? email : "", 
+    true, 
+    shouldResetEmailValidation
+  )
   const navigate = useNavigate();
   const dispatch = useDispatch();
   
@@ -110,6 +114,13 @@ export default function AuctionModal({
     }
   }, [shouldResetEmailValidation]);
 
+  // Reset email validation when email field becomes empty
+  useEffect(() => {
+    if (!email || email.trim() === "") {
+      setShouldResetEmailValidation(true);
+    }
+  }, [email]);
+
   function validate() {
     const newErrors = {
       vin: "", firstName: "", lastName: "", email: "", phone: "",
@@ -139,9 +150,9 @@ export default function AuctionModal({
       newErrors.email = "This field is required."
     } else if (!emailRegex.test(email)) {
       newErrors.email = "Please enter a valid email address."
-    } else if (emailValidation.isDisposable === true) {
+    } else if (email && isOpen && emailValidation.isDisposable === true) {
       newErrors.email = "Disposable email addresses are not allowed."
-    } else if (emailValidation.error) {
+    } else if (email && isOpen && emailValidation.error) {
       newErrors.email = "Unable to verify email. Please try again."
     }
 
@@ -376,15 +387,15 @@ export default function AuctionModal({
                     <div className="grid gap-1">
                       <label htmlFor="email" className="text-sm font-medium text-slate-800">
                         Email Address *
-                        {emailValidation.isValidating && (
+                        {emailValidation.isValidating && email && isOpen && (
                           <span className="ml-2 text-xs text-slate-500">(Validating...)</span>
                         )}
                       </label>
                       <div className="relative">
                         <div className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 ${
-                          emailValidation.isValid === true 
+                          email && isOpen && emailValidation.isValid === true 
                             ? 'text-green-500' 
-                            : emailValidation.isDisposable === true 
+                            : email && isOpen && emailValidation.isDisposable === true 
                               ? 'text-red-500' 
                               : 'text-slate-400'
                         }`}>
@@ -397,29 +408,29 @@ export default function AuctionModal({
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="Enter your email address"
                           className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-all duration-200 ${
-                            emailValidation.isValid === true
+                            email && isOpen && emailValidation.isValid === true
                               ? 'border-green-300 bg-green-50 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.5)]'
-                              : emailValidation.isDisposable === true
+                              : email && isOpen && emailValidation.isDisposable === true
                                 ? 'border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]'
                                 : 'border-slate-200 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]'
                           }`}
                         />
                         {/* Validation status indicator */}
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                          {emailValidation.isValidating && (
+                          {emailValidation.isValidating && email && isOpen && (
                             <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
                           )}
-                          {!emailValidation.isValidating && emailValidation.isValid === true && (
+                          {!emailValidation.isValidating && email && isOpen && emailValidation.isValid === true && (
                             <CheckCircle2 className="h-4 w-4 text-green-500" />
                           )}
-                          {!emailValidation.isValidating && emailValidation.isDisposable === true && (
+                          {!emailValidation.isValidating && email && isOpen && emailValidation.isDisposable === true && (
                             <XCircle className="h-4 w-4 text-red-500" />
                           )}
                         </div>
                       </div>
                       
                       {/* Email validation messages */}
-                      {emailValidation.isValid === true && (
+                      {email && isOpen && emailValidation.isValid === true && (
                         <motion.p
                           initial={{ opacity: 0, y: -4 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -429,7 +440,7 @@ export default function AuctionModal({
                         </motion.p>
                       )}
                       
-                      {emailValidation.isDisposable === true && (
+                      {email && isOpen && emailValidation.isDisposable === true && (
                         <motion.p 
                           initial={{ opacity: 0, y: -4 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -439,7 +450,7 @@ export default function AuctionModal({
                         </motion.p>
                       )}
                       
-                      {emailValidation.error && (
+                      {email && isOpen && emailValidation.error && (
                         <motion.p 
                           initial={{ opacity: 0, y: -4 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -771,7 +782,7 @@ export default function AuctionModal({
                 <div className="pt-2 mt-auto">
                   <button
                     type="submit"
-                    disabled={modalState.isLoading || !auctionConsent || !registerConsent || emailValidation.isValidating || emailValidation.isDisposable === true}
+                    disabled={modalState.isLoading || !auctionConsent || !registerConsent || (email && isOpen && (emailValidation.isValidating || emailValidation.isDisposable === true))}
                     className="cursor-pointer w-full h-12 sm:h-11 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-base font-semibold shadow-lg shadow-orange-500/20  disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {modalState.isLoading ? (
@@ -779,7 +790,7 @@ export default function AuctionModal({
                         <Loader2 className="h-4 w-4 animate-spin" />
                         Submitting...
                       </div>
-                    ) : emailValidation.isValidating ? (
+                    ) : email && isOpen && emailValidation.isValidating ? (
                       <div className="flex items-center justify-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
                         Validating Email...
