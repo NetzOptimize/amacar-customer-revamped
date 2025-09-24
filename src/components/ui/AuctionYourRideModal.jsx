@@ -48,9 +48,10 @@ export default function AuctionModal({
     vin: "", firstName: "", lastName: "", email: "", phone: "",
     password: "", confirmPassword: "", zipCode: "", auctionConsent: "", registerConsent: "",
   })
+  const [shouldResetEmailValidation, setShouldResetEmailValidation] = useState(false)
   
   // Email validation hook
-  const emailValidation = useEmailValidation(email, true) // Always validate in auction modal
+  const emailValidation = useEmailValidation(email, true, shouldResetEmailValidation) // Always validate in auction modal
   const navigate = useNavigate();
   const dispatch = useDispatch();
   
@@ -101,6 +102,13 @@ export default function AuctionModal({
       setState(location.state);
     }
   }, [location, locationStatus]);
+
+  // Reset the email validation reset flag after it's been used
+  useEffect(() => {
+    if (shouldResetEmailValidation) {
+      setShouldResetEmailValidation(false);
+    }
+  }, [shouldResetEmailValidation]);
 
   function validate() {
     const newErrors = {
@@ -266,6 +274,7 @@ export default function AuctionModal({
       setAuctionConsent(false);
       setRegisterConsent(false);
       setErrors({});
+      setShouldResetEmailValidation(true); // Reset email validation state
       
       // Reset Redux state
       dispatch(clearLocation());
@@ -407,28 +416,38 @@ export default function AuctionModal({
                             <XCircle className="h-4 w-4 text-red-500" />
                           )}
                         </div>
-
-                        {/* Email validation messages */}
-                       
-                        {emailValidation.isDisposable === true && (
-                          <motion.p 
-                            initial={{ opacity: 0, y: -4 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="text-xs text-red-500 mt-1"
-                          >
-                            {emailValidation.isDisposable === true && "Disposable email addresses are not allowed"}
-                          </motion.p>
-                        )}
-                        {emailValidation.error && (
-                          <motion.p 
-                            initial={{ opacity: 0, y: -4 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="text-xs text-red-500 mt-1"
-                          >
-                            {emailValidation.error && "Unable to verify email. Please try again."}
-                          </motion.p>
-                        )}
                       </div>
+                      
+                      {/* Email validation messages */}
+                      {emailValidation.isValid === true && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="text-xs text-green-600 mt-1"
+                        >
+                          ✓ Email is valid and not disposable
+                        </motion.p>
+                      )}
+                      
+                      {emailValidation.isDisposable === true && (
+                        <motion.p 
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="text-xs text-red-500 mt-1"
+                        >
+                          Disposable email addresses are not allowed
+                        </motion.p>
+                      )}
+                      
+                      {emailValidation.error && (
+                        <motion.p 
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="text-xs text-red-500 mt-1"
+                        >
+                          Unable to verify email. Please try again.
+                        </motion.p>
+                      )}
                       
                       {errors.email && (
                         <motion.p 

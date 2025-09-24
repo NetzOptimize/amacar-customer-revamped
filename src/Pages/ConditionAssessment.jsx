@@ -1,7 +1,7 @@
 import { toast } from "react-hot-toast";
 import React, { useMemo, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Circle, ChevronLeft, ChevronRight, User, Mail, Phone, MapPin, Landmark, Building, Loader2 } from "lucide-react";
+import { CheckCircle2, Circle, ChevronLeft, ChevronRight, User, Mail, Phone, MapPin, Landmark, Building, Loader2, XCircle } from "lucide-react";
 import AuctionSelectionModal from "@/components/ui/auction-selection-modal";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
@@ -536,6 +536,8 @@ export default function ConditionAssessment() {
                         userState?.meta?.phone ? "text-orange-500" : "text-slate-400"
                       }`} />
                       <input
+                        maxLength={10}
+                        
                         value={user.phone || userState?.meta?.phone || ""}
                         onChange={(e) => setUser({ ...user, phone: e.target.value.replace(/[^0-9+\-\s]/g, "") })}
                         placeholder="+1 555 123 4567"
