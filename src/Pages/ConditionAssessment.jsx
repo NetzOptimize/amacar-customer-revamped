@@ -8,6 +8,7 @@ import { useLocation } from "react-router-dom";
 import LoginModal from "@/components/ui/LoginModal";
 import { setLoginRedirect } from "@/redux/slices/userSlice"; // Adjust import path
 import { updateQuestion, resetQuestions, fetchCityStateByZip } from "@/redux/slices/carDetailsAndQuestionsSlice"; // Adjust import path
+import useEmailValidation from "@/hooks/useEmailValidation";
 
 export default function ConditionAssessment() {
   const dispatch = useDispatch();
@@ -93,6 +94,10 @@ export default function ConditionAssessment() {
   const [userErrors, setUserErrors] = useState({});
   const [imageLoading, setImageLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
+  
+  // Email validation for non-prefilled emails only
+  const isEmailPrefilled = !!userState?.email;
+  const emailValidation = useEmailValidation(user.email, !isEmailPrefilled);
 
   const userExists = useSelector((state) => state?.user?.user);
 
@@ -438,30 +443,88 @@ export default function ConditionAssessment() {
                   <div className="grid gap-2">
                     <label className="text-sm font-medium text-slate-800 flex items-center gap-2">
                       Email Address
+                      {!isEmailPrefilled && emailValidation.isValidating && (
+                        <span className="ml-2 text-xs text-slate-500">(Validating...)</span>
+                      )}
                     </label>
                     <div className="relative">
                       <Mail className={`h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 ${
-                        userState?.email ? "text-orange-500" : "text-slate-400"
+                        userState?.email 
+                          ? "text-orange-500" 
+                          : !isEmailPrefilled && emailValidation.isValid === true 
+                            ? "text-green-500" 
+                            : !isEmailPrefilled && emailValidation.isDisposable === true 
+                              ? "text-red-500" 
+                              : "text-slate-400"
                       }`} />
                       <input
                         value={user.email || userState?.email || ""}
                         onChange={(e) => setUser({ ...user, email: e.target.value })}
                         placeholder="name@example.com"
                         disabled={!!userState?.email}
-                        className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-base outline-none transition-shadow ${
+                        className={`h-11 w-full rounded-xl border bg-white pl-9 pr-10 text-base outline-none transition-all duration-200 ${
                           userState?.email 
                             ? "bg-orange-50 border-orange-200 text-orange-800 cursor-not-allowed" 
-                            : userErrors.email 
-                              ? "border-red-300" 
-                              : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"
+                            : !isEmailPrefilled && emailValidation.isValid === true
+                              ? "border-green-300 bg-green-50 focus:shadow-[0_0_0_4px_rgba(34,197,94,0.18)]"
+                              : !isEmailPrefilled && emailValidation.isDisposable === true
+                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.18)]"
+                                : userErrors.email 
+                                  ? "border-red-300" 
+                                  : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"
                         }`}
                       />
+                      {/* Validation status indicator - only show for non-prefilled emails */}
+                      {!isEmailPrefilled && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          {emailValidation.isValidating && (
+                            <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                          )}
+                          {!emailValidation.isValidating && emailValidation.isValid === true && (
+                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          )}
+                          {!emailValidation.isValidating && emailValidation.isDisposable === true && (
+                            <XCircle className="h-4 w-4 text-red-500" />
+                          )}
+                        </div>
+                      )}
                       {userState?.email && (
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
                           <div className="h-2 w-2 bg-orange-500 rounded-full"></div>
                         </div>
                       )}
                     </div>
+                    
+                    {/* Email validation messages - only show for non-prefilled emails */}
+                    {!isEmailPrefilled && emailValidation.isValid === true && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-xs text-green-600"
+                      >
+                        ✓ Email is valid and not disposable
+                      </motion.p>
+                    )}
+                    
+                    {!isEmailPrefilled && emailValidation.isDisposable === true && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-xs text-red-600"
+                      >
+                        Disposable email addresses are not allowed
+                      </motion.p>
+                    )}
+                    
+                    {!isEmailPrefilled && emailValidation.error && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-xs text-red-600"
+                      >
+                        Unable to verify email. Please try again.
+                      </motion.p>
+                    )}
                   </div>
 
                   <div className="grid gap-2">
@@ -618,7 +681,13 @@ export default function ConditionAssessment() {
 
                         const errs = {};
                         if (!finalUserData.fullName) errs.fullName = true;
-                        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(finalUserData.email)) errs.email = true;
+                        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(finalUserData.email)) {
+                          errs.email = true;
+                        } else if (!isEmailPrefilled && emailValidation.isDisposable === true) {
+                          errs.email = true;
+                        } else if (!isEmailPrefilled && emailValidation.error) {
+                          errs.email = true;
+                        }
                         if (!finalUserData.phone || finalUserData.phone.replace(/\D/g, "").length < 7) errs.phone = true;
                         if (!finalUserData.zipcode) errs.zipcode = true;
                         if (!finalUserData.state) errs.state = true;
@@ -631,15 +700,20 @@ export default function ConditionAssessment() {
                           handleSubmitToAuction(finalUserData);
                         }
                       }}
-                      disabled={!vehicleDetails || Object.keys(vehicleDetails).length === 0}
+                      disabled={!vehicleDetails || Object.keys(vehicleDetails).length === 0 || (!isEmailPrefilled && (emailValidation.isValidating || emailValidation.isDisposable === true))}
                       className={`cursor-pointer inline-flex h-11 items-center justify-center rounded-xl bg-gradient-to-r bg-[#f6851f]  px-6 text-sm font-semibold text-white shadow-lg shadow-orange-500/25 transition hover:scale-[1.01] ${
-                        !vehicleDetails || Object.keys(vehicleDetails).length === 0
+                        !vehicleDetails || Object.keys(vehicleDetails).length === 0 || (!isEmailPrefilled && (emailValidation.isValidating || emailValidation.isDisposable === true))
                           ? 'opacity-50 cursor-not-allowed' 
                           : ''
                       }`}
                     >
                       {(!vehicleDetails || Object.keys(vehicleDetails).length === 0) ? (
                         'VIN Required'
+                      ) : !isEmailPrefilled && emailValidation.isValidating ? (
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Validating Email...
+                        </div>
                       ) : (
                         'see your offer'
                       )}

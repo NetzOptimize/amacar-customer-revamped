@@ -474,6 +474,17 @@ export default function LoginModal({
                         )}
                       </div>
 
+                      {/* Email validation messages - only show in register mode */}
+                      {isRegisterMode && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="text-xs text-red-600"
+                        >
+                          {emailValidation.isDisposable === true && "Disposable email addresses are not allowed"}
+                          {emailValidation.error && "Unable to verify email. Please try again."}
+                        </motion.p>
+                      )}
                       
                       
                       {errors.email && (

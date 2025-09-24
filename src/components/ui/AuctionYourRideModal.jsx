@@ -407,6 +407,27 @@ export default function AuctionModal({
                             <XCircle className="h-4 w-4 text-red-500" />
                           )}
                         </div>
+
+                        {/* Email validation messages */}
+                       
+                        {emailValidation.isDisposable === true && (
+                          <motion.p 
+                            initial={{ opacity: 0, y: -4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-xs text-red-500 mt-1"
+                          >
+                            {emailValidation.isDisposable === true && "Disposable email addresses are not allowed"}
+                          </motion.p>
+                        )}
+                        {emailValidation.error && (
+                          <motion.p 
+                            initial={{ opacity: 0, y: -4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-xs text-red-500 mt-1"
+                          >
+                            {emailValidation.error && "Unable to verify email. Please try again."}
+                          </motion.p>
+                        )}
                       </div>
                       
                       {errors.email && (
