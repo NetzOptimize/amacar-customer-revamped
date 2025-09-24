@@ -938,16 +938,7 @@ const CarDetailsView = () => {
                           </span>
                         </div>
 
-                        {bid.notes && (
-                          <div className="pt-2 border-t border-neutral-200">
-                            <span className="text-sm text-neutral-600">
-                              Notes:
-                            </span>
-                            <p className="text-sm text-neutral-800 mt-1">
-                              {bid.notes}
-                            </p>
-                          </div>
-                        )}
+                      
                       </div>
                     </div>
                   ))}
