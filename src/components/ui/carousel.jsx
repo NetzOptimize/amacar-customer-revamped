@@ -227,7 +227,7 @@ function CarouselDots({
   if (scrollSnaps.length <= 1) return null
 
   return (
-    <div className={cn("flex justify-center space-x-2 mt-4", className)} {...props}>
+    <div className={cn("flex justify-center space-x-2 mt-6", className)} {...props}>
       {scrollSnaps.map((_, index) => (
         <button
           key={index}
