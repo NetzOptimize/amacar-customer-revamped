@@ -155,8 +155,9 @@ export default function Modal({
                     <input
                       id="vin"
                       value={vin}
-                      onChange={(e) => setVin(e.target.value.toUpperCase())}
+                      onChange={(e) => setVin(e.target.value.toUpperCase().slice(0, 17))}
                       placeholder="Enter 17‑character VIN"
+                      maxLength={17}
                       className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]"
                     />
                   </div>
@@ -175,6 +176,7 @@ export default function Modal({
                       inputMode="numeric"
                       onChange={(e) => setZip(e.target.value.replace(/[^0-9]/g, "").slice(0, 5))}
                       placeholder="Enter 5‑digit ZIP"
+                      maxLength={5}
                       className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]"
                     />
                   </div>

@@ -160,13 +160,6 @@ export default function Header() {
               >
                 Testimonials
               </Link>
-              <a 
-                className={`nav-link-mobile ${isActive("/join-our-dealer-network") ? "active" : ""}`} 
-                href="/join-our-dealer-network"
-                onClick={() => setOpen(false)}
-              >
-                Join Our Dealer Network
-              </a>
               <Link 
                 className={`nav-link-mobile ${isActive("/about-us") ? "active" : ""}`} 
                 to="/about-us"
