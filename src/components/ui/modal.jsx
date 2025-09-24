@@ -158,7 +158,8 @@ export default function Modal({
                       onChange={(e) => setVin(e.target.value.toUpperCase().slice(0, 17))}
                       placeholder="Enter 17‑character VIN"
                       maxLength={17}
-                      className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]"
+                      className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-[16px] sm:text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]"
+                      style={{ fontSize: '16px' }}
                     />
                   </div>
                   {errors.vin && <p className="text-xs text-red-600">{errors.vin}</p>}
@@ -177,7 +178,8 @@ export default function Modal({
                       onChange={(e) => setZip(e.target.value.replace(/[^0-9]/g, "").slice(0, 5))}
                       placeholder="Enter 5‑digit ZIP"
                       maxLength={5}
-                      className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]"
+                      className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-[16px] sm:text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]"
+                      style={{ fontSize: '16px' }}
                     />
                   </div>
                   {errors.zip && <p className="text-xs text-red-600">{errors.zip}</p>}
