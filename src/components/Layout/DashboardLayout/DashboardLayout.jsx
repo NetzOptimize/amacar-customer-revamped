@@ -126,7 +126,7 @@ const DashboardLayout = ({ children }) => {
   return (
     <div className="min-h-screen bg-gradient-hero">
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-neutral-200 shadow-sm">
+      <div className="lg:hidden h-20 fixed top-0 left-0 right-0 z-50 bg-white border-b border-neutral-200 shadow-sm">
         <div className="flex items-center justify-between p-4">
           <button
             onClick={toggleMobileMenu}

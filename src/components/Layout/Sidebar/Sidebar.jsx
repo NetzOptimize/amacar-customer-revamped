@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -27,6 +27,9 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
   const location = useLocation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isManualToggle, setIsManualToggle] = useState(false);
+  const prevPathRef = useRef(location.pathname);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.user);
@@ -65,6 +68,56 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
     }
   ];
 
+  // Check if screen is mobile/tablet (less than 1024px)
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    // Check on mount
+    checkScreenSize();
+
+    // Add event listener for window resize
+    window.addEventListener('resize', checkScreenSize);
+
+    // Cleanup event listener
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  // Auto-close sidebar on mobile/tablet when navigating to dashboard pages
+  useEffect(() => {
+    // Only auto-close if:
+    // 1. On mobile/tablet
+    // 2. Sidebar is currently open
+    // 3. Path actually changed (not just initial load)
+    // 4. Not a manual toggle
+    if (isMobile && !isCollapsed && prevPathRef.current !== location.pathname && !isManualToggle) {
+      // Check if current path is a dashboard page
+      const dashboardPages = ['/dashboard', '/auctions', '/pending-offers', '/offers', '/accepted', '/appointments', '/profile'];
+      const isDashboardPage = dashboardPages.some(page => location.pathname.startsWith(page));
+      
+      if (isDashboardPage) {
+        // Add a small delay to make the navigation feel more natural
+        const timer = setTimeout(() => {
+          onToggle();
+        }, 150);
+        
+        return () => clearTimeout(timer);
+      }
+    }
+    
+    // Update previous path
+    prevPathRef.current = location.pathname;
+    
+    // Reset manual toggle flag after a short delay
+    if (isManualToggle) {
+      const timer = setTimeout(() => {
+        setIsManualToggle(false);
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [location.pathname, isMobile, isCollapsed, onToggle, isManualToggle]);
+
   const containerVariants = {
     open: { width: '16rem', transition: { type: 'spring', stiffness: 200, damping: 25 } },
     closed: { width: '4rem', transition: { type: 'spring', stiffness: 200, damping: 25 } }
@@ -85,8 +138,11 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
         <div className="flex flex-col h-full relative">
           {/* Toggle Button - Fixed position */}
           <button
-            onClick={onToggle}
-            className={`hidden sm:block cursor-pointer absolute top-16 z-[51] p-1.5 bg-white border border-neutral-200 rounded-sm  shadow-sm hover:bg-neutral-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-200 ${isCollapsed ? 'right-[-12px]' : 'right-3'
+            onClick={() => {
+              setIsManualToggle(true);
+              onToggle();
+            }}
+            className={`cursor-pointer hidden lg:block absolute top-16 z-[51] p-1.5 bg-white border border-neutral-200 rounded-sm shadow-sm hover:bg-neutral-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-200 ${isCollapsed ? 'right-[-12px]' : 'right-3'
               }`}
           >
             {isCollapsed ? (
