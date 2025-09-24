@@ -28,6 +28,7 @@ const BidConfirmationModal = ({
 
   // Handle API call when user confirms action
   const handleConfirmAction = async () => {
+    console.log('Confirming action:', action);
     if (!auctionData) return;
 
     // Clear any previous errors

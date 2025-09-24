@@ -357,22 +357,22 @@ const LiveAuctionsPage = () => {
     handleLoadMore,
   } = useLoadMore(sortedAuctions, itemsPerPage);
 
-  // Debug logging
-  console.log('LiveAuctions Debug:', {
-    auctionsLength: auctions.length,
-    sortedAuctionsLength: sortedAuctions.length,
-    paginatedAuctionsLength: paginatedAuctions.length,
-    hasMoreItems,
-    remainingItems,
-    itemsPerPage,
-    firstAuction: auctions[0] ? {
-      id: auctions[0].id,
-      currentBid: auctions[0].currentBid,
-      timeRemaining: auctions[0].timeRemaining,
-      images: auctions[0].images,
-      bidCount: auctions[0].bidCount
-    } : null
-  });
+  // // Debug logging
+  // console.log('LiveAuctions Debug:', {
+  //   auctionsLength: auctions.length,
+  //   sortedAuctionsLength: sortedAuctions.length,
+  //   paginatedAuctionsLength: paginatedAuctions.length,
+  //   hasMoreItems,
+  //   remainingItems,
+  //   itemsPerPage,
+  //   firstAuction: auctions[0] ? {
+  //     id: auctions[0].id,
+  //     currentBid: auctions[0].currentBid,
+  //     timeRemaining: auctions[0].timeRemaining,
+  //     images: auctions[0].images,
+  //     bidCount: auctions[0].bidCount
+  //   } : null
+  // });
 
   const handleEndAuction = (auctionId) => {
     setAuctions((prev) =>
@@ -1070,6 +1070,7 @@ const LiveAuctionsPage = () => {
 
       {/* Bid Confirmation Modal */}
       <BidConfirmationModal
+        auctionData={selectedAuctionBids}
         isOpen={isConfirmationModalOpen}
         onClose={handleCloseConfirmationModal}
         onConfirm={handleConfirmBidAction}
