@@ -13,7 +13,8 @@ import {
   selectOffersError
 } from '../redux/slices/offersSlice';
 import useDebounce from '../hooks/useDebounce';
-
+import { useHistory } from 'react-router-dom';
+  
 const SearchContext = createContext();
 
 export const useSearch = () => {
@@ -26,7 +27,7 @@ export const useSearch = () => {
 
 export const SearchProvider = ({ children }) => {
   const dispatch = useDispatch();
-  
+  const history = useHistory();
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -46,7 +47,8 @@ export const SearchProvider = ({ children }) => {
   const error = useSelector(selectOffersError);
 
   // Debounce search query
-  const debouncedSearchQuery = useDebounce(searchQuery, 1000);
+  const time = Math.random() * 1000;
+  const debouncedSearchQuery = useDebounce(searchQuery, time);
 
   // Helper function to extract car name from different data structures
   const getCarName = (item, type) => {
@@ -151,6 +153,10 @@ export const SearchProvider = ({ children }) => {
     });
   }, [pendingOffers, previousOffers, liveAuctions, acceptedOffers]);
 
+  useEffect(() => {
+    // when the page changes it should clear the search query
+    setSearchQuery('');
+  }, [history.location.pathname]);
   // Get search results for specific page type
   const getSearchResults = useCallback((pageType) => {
     if (!debouncedSearchQuery.trim()) {
