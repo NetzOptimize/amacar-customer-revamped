@@ -11,7 +11,8 @@ import {
   Sparkles, 
   XCircle,
   ChevronDown,
-  FileText
+  FileText,
+  X
 } from "lucide-react";
 import {
   Dialog,
@@ -87,9 +88,16 @@ export default function AppointmentModal({
     };
   }, [showCalendar]);
 
-  // Disable past dates
+  // Disable past dates - ensure we're working with today's date properly
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  
+  // Function to check if a date is before today
+  const isDateDisabled = (date) => {
+    const dateToCheck = new Date(date);
+    dateToCheck.setHours(0, 0, 0, 0);
+    return dateToCheck < today;
+  };
 
   // Reset form state
   const resetFormState = () => {
@@ -253,7 +261,14 @@ export default function AppointmentModal({
 
   // Handle modal close
   const handleClose = (open) => {
-    if (!open && phase !== "loading") {
+    if (!open && phase !== "loading" && !appointmentOperationLoading) {
+      onClose(false);
+    }
+  };
+
+  // Handle close button click
+  const handleCloseClick = () => {
+    if (phase !== "loading" && !appointmentOperationLoading) {
       onClose(false);
     }
   };
@@ -275,25 +290,44 @@ export default function AppointmentModal({
     });
   };
 
+  // Helper function to truncate notes for display
+  const truncateNotes = (notes, maxLength = 50) => {
+    if (!notes || notes.length <= maxLength) return notes;
+    return notes.substring(0, maxLength) + '...';
+  };
+
   const isCloseDisabled = phase === "loading" || appointmentOperationLoading;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
-        className="sm:max-w-[800px] w-full max-h-[85vh] rounded-2xl shadow-2xl p-0 overflow-y-auto overflow-x-hidden bg-white border-0"
+        className="sm:max-w-[800px] w-full max-h-[90vh] sm:max-h-[85vh] rounded-2xl shadow-2xl p-0 overflow-y-auto overflow-x-hidden bg-white border-0 "
         showCloseButton={!isCloseDisabled}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="relative bg-[#f6851f] p-6 text-white">
+          <div className="relative bg-[#f6851f] p-3 sm:p-6 text-white">
             <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent"></div>
             <div className="relative z-10">
-              <DialogTitle className="text-lg font-bold mb-1">
-                {isReschedule ? "Reschedule Appointment" : title}
-              </DialogTitle>
-              <DialogDescription className="text-white text-sm">
-                {isReschedule ? "Choose a new date and time for your appointment" : description}
-              </DialogDescription>
+              <div className="flex items-start justify-between">
+                <div className="flex-1 pr-8">
+                  <DialogTitle className="text-base sm:text-lg font-bold mb-1 break-words">
+                    {isReschedule ? "Reschedule Appointment" : title}
+                  </DialogTitle>
+                  <DialogDescription className="text-white text-xs sm:text-sm break-words">
+                    {isReschedule ? "Choose a new date and time for your appointment" : description}
+                  </DialogDescription>
+                </div>
+                {/* Custom Close Button for Mobile */}
+                <button
+                  onClick={handleCloseClick}
+                  disabled={isCloseDisabled}
+                  className="absolute top-0 right-0  sm:hidden p-1 rounded-full hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Close modal"
+                >
+                  <X className="w-4 h-4 text-black " />
+                </button>
+              </div>
             </div>
             {/* Decorative elements */}
             <div className="absolute -top-4 -right-4 w-20 h-20 bg-orange-500/10 rounded-full blur-xl"></div>
@@ -301,7 +335,7 @@ export default function AppointmentModal({
           </div>
 
           {/* Content Area */}
-          <div className="flex-1 p-6 overflow-y-auto">
+          <div className="flex-1 p-3 sm:p-6 md:p-8 overflow-y-auto">
             <AnimatePresence mode="wait">
               {phase === "form" && (
                 <motion.form
@@ -311,58 +345,56 @@ export default function AppointmentModal({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3, ease: "easeOut" }}
-                  className="flex flex-col gap-6"
+                  className="flex flex-col gap-3 sm:gap-6"
                 >
                   {/* Dealer Info Card */}
-                  <div className="flex gap-4">
-                    <div className="w-full bg-slate-50 rounded-xl p-4 border border-slate-100">
+                  <div className="w-full bg-slate-50 rounded-xl p-3 sm:p-4 border border-slate-100">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-7 h-7 bg-orange-500 rounded-lg flex items-center justify-center">
-                        <Car className="w-4 h-4 text-white" />
+                      <div className="w-6 h-6 sm:w-7 sm:h-7 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Car className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                       </div>
-                      <h3 className="font-semibold text-slate-800 text-sm">Appointment Details</h3>
+                      <h3 className="font-semibold text-slate-800 text-xs sm:text-sm break-words">Appointment Details</h3>
                     </div>
                     <div className="space-y-1.5 text-xs text-slate-600">
-                      <div className="flex items-center gap-1.5">
-                        <User className="w-3 h-3" />
-                        <span>{dealerName}</span>
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <User className="w-3 h-3 flex-shrink-0" />
+                        <span className="truncate">{dealerName}</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <Mail className="w-3 h-3" />
-                        <span>{dealerEmail}</span>
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <Mail className="w-3 h-3 flex-shrink-0" />
+                        <span className="truncate">{dealerEmail}</span>
                       </div>
                       {vehicleInfo && (
-                        <div className="text-xs font-medium text-orange-600 bg-orange-50 px-2 py-1 rounded-md inline-block">
+                        <div className="text-xs font-medium text-orange-600 bg-orange-50 px-2 py-1 rounded-md inline-block break-words max-w-full">
                           {vehicleInfo}
                         </div>
                       )}
                     </div>
                   </div>
 
-                   {/* Selected Appointment Summary */}
+                   {/* Selected Appointment Summary - Mobile: Below details, Desktop: Side by side */}
                    {selectedDate && selectedTime && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="w-full bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-4"
+                      className="w-full bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-3 sm:p-4"
                     >
-                      <h4 className="text-sm font-semibold text-orange-800 mb-2 flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4" />
-                        Appointment Summary
+                      <h4 className="text-xs sm:text-sm font-semibold text-orange-800 mb-2 flex items-center gap-2">
+                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                        <span className="break-words">Appointment Summary</span>
                       </h4>
-                      <div className="text-sm text-orange-700 space-y-1">
-                        <p><strong>Date:</strong> {formatFullDate(selectedDate)}</p>
-                        <p><strong>Time:</strong> {selectedTime}</p>
+                      <div className="text-xs sm:text-sm text-orange-700 space-y-1">
+                        <p className="break-words"><strong>Date:</strong> {formatFullDate(selectedDate)}</p>
+                        <p className="break-words"><strong>Time:</strong> {selectedTime}</p>
                         {notes && (
-                          <p><strong>Notes:</strong> {notes}</p>
+                          <p className="break-words"><strong>Notes:</strong> {truncateNotes(notes)}</p>
                         )}
                       </div>
                     </motion.div>
                   )}
-                  </div>
 
                   {/* Date & Time Selection */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
                     {/* Date Selection */}
                     <div ref={calendarRef} className="relative">
                       <label className="text-xs font-semibold text-slate-700 mb-2 flex items-center gap-1.5">
@@ -372,12 +404,12 @@ export default function AppointmentModal({
                       <button
                         type="button"
                         onClick={() => setShowCalendar(!showCalendar)}
-                        className="cursor-pointer w-full h-12 rounded-lg border-2 border-slate-200 bg-white hover:border-orange-500 transition-all duration-200 flex items-center justify-between px-3 group"
+                        className="cursor-pointer w-full h-10 sm:h-12 rounded-lg border-2 border-slate-200 bg-white hover:border-orange-500 transition-all duration-200 flex items-center justify-between px-3 group"
                       >
-                        <span className={`text-sm ${selectedDate ? 'text-slate-900 font-medium' : 'text-slate-500'}`}>
+                        <span className={`text-xs sm:text-sm ${selectedDate ? 'text-slate-900 font-medium' : 'text-slate-500'} truncate`}>
                           {selectedDate ? formatDate(selectedDate) : 'Select date'}
                         </span>
-                        <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-orange-500 transition-colors" />
+                        <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-slate-400 group-hover:text-orange-500 transition-colors flex-shrink-0" />
                       </button>
                       <AnimatePresence>
                         {showCalendar && (
@@ -386,7 +418,7 @@ export default function AppointmentModal({
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: -10 }}
                             transition={{ duration: 0.15 }}
-                            className="absolute z-50 mt-2 bg-white rounded-lg border border-slate-200 shadow-lg p-4 w-full"
+                            className="absolute z-50 mt-2 bg-white rounded-lg border border-slate-200 shadow-lg p-2 sm:p-4 w-full max-w-[calc(100vw-0.5rem)] sm:max-w-none left-0 right-0"
                           >
                             <div className="w-full text-center">
                                 <CalendarComponent
@@ -396,7 +428,7 @@ export default function AppointmentModal({
                                     setSelectedDate(date);
                                     setShowCalendar(false);
                                 }}
-                                disabled={(date) => date < today}
+                                disabled={isDateDisabled}
                                 className="rounded-lg w-full"
                                 classNames={{
                                     months: "flex flex-col space-y-4",
@@ -442,13 +474,13 @@ export default function AppointmentModal({
                         <Clock className="w-3.5 h-3.5" />
                         Time
                       </label>
-                      <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 max-h-[200px] overflow-y-auto pr-1">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-1.5 sm:gap-2 max-h-[180px] sm:max-h-[200px] overflow-y-auto pr-1">
                         {timeSlots.map(time => (
                           <button
                             key={time}
                             type="button"
                             onClick={() => setSelectedTime(time)}
-                            className={`h-10 text-sm font-medium rounded-lg transition-all duration-200 ${
+                            className={`h-8 sm:h-10 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 ${
                               selectedTime === time
                                 ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25'
                                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -473,8 +505,8 @@ export default function AppointmentModal({
                   {/* Additional Notes */}
                   <div className="space-y-2">
                     <label htmlFor="notes" className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
-                      <FileText className="w-3.5 h-3.5" />
-                      Additional Notes (Optional)
+                      <FileText className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span className="break-words">Additional Notes (Optional)</span>
                     </label>
                     <textarea
                       id="notes"
@@ -482,26 +514,27 @@ export default function AppointmentModal({
                       onChange={(e) => setNotes(e.target.value)}
                       placeholder="Any special requirements, questions, or notes for the appointment..."
                       rows={3}
-                      className="w-full rounded-lg border-2 border-slate-200 bg-white p-3 text-sm outline-none transition-all duration-200 focus:border-orange-500 focus:ring-0 resize-none"
+                      className="w-full rounded-lg border-2 border-slate-200 bg-white p-3 text-xs sm:text-sm outline-none transition-all duration-200 focus:border-orange-500 focus:ring-0 resize-none break-words overflow-wrap-anywhere overflow-x-hidden"
+                      style={{ wordBreak: 'break-word', overflowWrap: 'anywhere', overflowX: 'hidden' }}
                     />
                   </div>
 
                  
 
                   {/* Submit Button */}
-                  <div className="pt-2">
+                  <div className="pt-1 sm:pt-2">
                     <button
                       type="submit"
                       disabled={appointmentOperationLoading || !selectedDate || !selectedTime}
-                      className="cursor-pointer w-full h-12 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold shadow-md shadow-orange-500/25 transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                      className="cursor-pointer w-full h-10 sm:h-12 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold shadow-md shadow-orange-500/25 transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none text-xs sm:text-sm"
                     >
                       {appointmentOperationLoading ? (
                         <div className="flex items-center justify-center gap-2">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          {isReschedule ? "Rescheduling..." : "Scheduling..."}
+                          <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                          <span className="truncate">{isReschedule ? "Rescheduling..." : "Scheduling..."}</span>
                         </div>
                       ) : (
-                        isReschedule ? "Reschedule Appointment" : "Schedule Appointment"
+                        <span className="truncate">{isReschedule ? "Reschedule Appointment" : "Schedule Appointment"}</span>
                       )}
                     </button>
                   </div>
@@ -514,19 +547,19 @@ export default function AppointmentModal({
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="flex flex-col items-center justify-center text-center gap-6 py-8"
+                  className="flex flex-col items-center justify-center text-center gap-4 sm:gap-6 py-6 sm:py-8"
                 >
                   <div className="relative">
-                    <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
-                      <Loader2 className="h-7 w-7 text-white animate-spin" />
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
+                      <Loader2 className="h-6 w-6 sm:h-7 sm:w-7 text-white animate-spin" />
                     </div>
                     <div className="absolute inset-0 bg-orange-500 rounded-lg blur-xl opacity-30 animate-pulse"></div>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                    <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-2 break-words">
                       {isReschedule ? "Rescheduling Appointment" : "Scheduling Appointment"}
                     </h3>
-                    <p className="text-sm text-slate-600">
+                    <p className="text-xs sm:text-sm text-slate-600 break-words">
                       {isReschedule ? "Please wait while we update your appointment..." : "Please wait while we confirm your booking..."}
                     </p>
                   </div>
@@ -548,7 +581,7 @@ export default function AppointmentModal({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                  className="flex flex-col items-center justify-center text-center gap-6 py-8"
+                  className="flex flex-col items-center justify-center text-center gap-4 sm:gap-6 py-6 sm:py-8"
                 >
                   <motion.div
                     className="relative"
@@ -556,48 +589,53 @@ export default function AppointmentModal({
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
                   >
-                    <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
-                      <CheckCircle2 className="h-8 w-8 text-white" />
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                      <CheckCircle2 className="h-7 w-7 sm:h-8 sm:w-8 text-white" />
                     </div>
                     <motion.div
                       className="absolute -top-2 -right-2"
                       animate={{ rotate: 360 }}
                       transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                     >
-                      <Sparkles className="h-4 w-4 text-orange-500" />
+                      <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-orange-500" />
                     </motion.div>
                     <div className="absolute inset-0 bg-green-500 rounded-lg blur-xl opacity-20 animate-pulse"></div>
                   </motion.div>
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-2">
+                    <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2 break-words">
                       {isReschedule ? "Rescheduled!" : "All Set!"}
                     </h3>
-                    <p className="text-sm text-slate-600 mb-3">
+                    <p className="text-xs sm:text-sm text-slate-600 mb-3 break-words">
                       {isReschedule ? "Your appointment has been rescheduled successfully." : "Your appointment has been scheduled successfully."}
                     </p>
                     {appointmentData ? (
-                      <div className="bg-slate-50 rounded-lg p-2.5 text-sm space-y-1">
-                        <p className="font-semibold text-slate-900">
+                      <div className="bg-slate-50 rounded-lg p-2.5 text-xs sm:text-sm space-y-1">
+                        <p className="font-semibold text-slate-900 break-words">
                           {appointmentData.formatted_start_time}
                         </p>
-                        <p className="text-slate-600">
+                        <p className="text-slate-600 break-words">
                           Appointment ID: #{appointmentData.id}
                         </p>
-                        <p className="text-slate-600">
+                        <p className="text-slate-600 break-words">
                           Status: <span className="capitalize text-orange-600">{appointmentData.status}</span>
                         </p>
                       </div>
                     ) : selectedDate && selectedTime && (
-                      <div className="bg-slate-50 rounded-lg p-2.5 text-sm">
-                        <p className="font-semibold text-slate-900">
+                      <div className="bg-slate-50 rounded-lg p-2.5 text-xs sm:text-sm">
+                        <p className="font-semibold text-slate-900 break-words">
                           {formatFullDate(selectedDate)} at {selectedTime}
                         </p>
+                        {notes && (
+                          <p className="text-slate-600 break-words mt-1">
+                            <strong>Notes:</strong> {truncateNotes(notes)}
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>
                   <button
-                    onClick={() => onClose(false)}
-                    className="cursor-pointer w-full h-12 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold shadow-md shadow-orange-500/25 transition-all duration-200 hover:shadow-lg"
+                    onClick={handleCloseClick}
+                    className="cursor-pointer w-full h-10 sm:h-12 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold shadow-md shadow-orange-500/25 transition-all duration-200 hover:shadow-lg text-xs sm:text-sm"
                   >
                     Close
                   </button>
@@ -611,24 +649,24 @@ export default function AppointmentModal({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                  className="flex flex-col items-center justify-center text-center gap-6 py-8"
+                  className="flex flex-col items-center justify-center text-center gap-4 sm:gap-6 py-6 sm:py-8"
                 >
                   <div className="relative">
-                    <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center">
-                      <XCircle className="h-8 w-8 text-white" />
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center">
+                      <XCircle className="h-7 w-7 sm:h-8 sm:w-8 text-white" />
                     </div>
                     <div className="absolute inset-0 bg-red-500 rounded-lg blur-xl opacity-20"></div>
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-2">
+                    <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2 break-words">
                       {isReschedule ? "Rescheduling Failed" : "Scheduling Failed"}
                     </h3>
-                    <p className="text-sm text-slate-600 mb-3">
+                    <p className="text-xs sm:text-sm text-slate-600 mb-3 break-words">
                       {errorMessage || "Something went wrong. Please try again."}
                     </p>
                     {errorMessage && (
-                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-sm">
-                        <p className="text-orange-800 font-medium">
+                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-xs sm:text-sm">
+                        <p className="text-orange-800 font-medium break-words">
                           {errorMessage.includes("Cannot reschedule appointment") && errorMessage.includes("hours") ? 
                             "⏰ Tip: You can only reschedule appointments at least 2 hours before the scheduled time." :
                             errorMessage.includes("already have an appointment scheduled") ?
@@ -641,16 +679,16 @@ export default function AppointmentModal({
                       </div>
                     )}
                   </div>
-                  <div className="flex gap-3 w-full">
+                  <div className="flex flex-col sm:flex-row gap-3 w-full">
                     <button
                       onClick={resetFormState}
-                      className="flex-1 h-12 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold"
+                      className="flex-1 h-10 sm:h-12 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold text-xs sm:text-sm"
                     >
                       Try Again
                     </button>
                     <button
-                      onClick={() => onClose(false)}
-                      className="flex-1 h-12 rounded-lg border-2 border-slate-200 text-slate-700 font-medium hover:bg-slate-50"
+                      onClick={handleCloseClick}
+                      className="flex-1 h-10 sm:h-12 rounded-lg border-2 border-slate-200 text-slate-700 font-medium hover:bg-slate-50 text-xs sm:text-sm"
                     >
                       Cancel
                     </button>

@@ -371,7 +371,7 @@ const CarDetailsView = () => {
   } = vehicleData;
 
   return (
-    <div className="mt-16 min-h-screen bg-gradient-hero">
+    <div className="mt-8 lg:mt-16 min-h-screen bg-gradient-hero">
       <div className="max-w-7xl mx-auto">
         <motion.div
           variants={containerVariants}
