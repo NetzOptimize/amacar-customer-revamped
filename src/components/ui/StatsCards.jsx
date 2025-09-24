@@ -19,7 +19,7 @@ const StatsCards = ({
     activeAuctions: data?.active_auctions || 0,
     totalVehicles: data?.total_vehicles || 0,
     upcomingAppointments: data?.upcoming_appointments || 0,
-    totalOffers: data?.total_offers || 0,
+    totalOffers: data?.total_offers + data?.total_bid_value || 0,
   };
 
   const containerVariants = {
