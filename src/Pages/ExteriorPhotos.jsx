@@ -924,7 +924,7 @@ export default function VehiclePhotos() {
 
       {/* Terms and Conditions Modal */}
       <Dialog open={showTermsModal} onOpenChange={handleModalClose}>
-        <DialogContent className="w-[95vw] max-w-4xl h-[80vh] max-h-[800px] rounded-2xl shadow-xl p-0 overflow-hidden bg-white flex flex-col">
+        <DialogContent className="w-[95vw] max-w-4xl h-[80vh] max-h-[650px] md:max-h-[800px] rounded-2xl shadow-xl p-0 overflow-hidden bg-white flex flex-col">
           {/* Fixed Header */}
           <div className="bg-gradient-to-br from-white via-slate-50 to-slate-100 p-4 sm:p-6 flex-shrink-0">
             <DialogHeader>
@@ -941,8 +941,8 @@ export default function VehiclePhotos() {
           </div>
 
           {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 min-h-0">
-            <div className="space-y-3 sm:space-y-4">
+          <div className="flex-1 overflow-y-auto  px-4 sm:px-6 sm:py-2 min-h-0">
+            <div className="space-y-4 sm:space-y-4">
               {[
                 {
                   title: "Auction Agreement",
