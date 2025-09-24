@@ -961,9 +961,7 @@ const CarDetailsView = () => {
                         <th className="text-left py-3 sm:py-4 px-2 sm:px-4 font-semibold text-neutral-700 text-xs sm:text-sm">
                           Date & Time
                         </th>
-                        <th className="text-left py-3 sm:py-4 px-2 sm:px-4 font-semibold text-neutral-700 text-xs sm:text-sm">
-                          Notes
-                        </th>
+                    
                       </tr>
                     </thead>
                     <tbody>
@@ -1005,11 +1003,7 @@ const CarDetailsView = () => {
                               </p>
                             </div>
                           </td>
-                          <td className="py-3 sm:py-4 px-2 sm:px-4">
-                            <p className="text-xs sm:text-sm text-neutral-600 max-w-[100px] sm:max-w-none truncate">
-                              {bid.notes || "N/A"}
-                            </p>
-                          </td>
+                        
                         </tr>
                       ))}
                     </tbody>
