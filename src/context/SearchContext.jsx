@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { 
   fetchPendingOffers, 
   fetchPreviousOffers, 
@@ -26,6 +27,7 @@ export const useSearch = () => {
 
 export const SearchProvider = ({ children }) => {
   const dispatch = useDispatch();
+  const location = useLocation();
   
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -132,6 +134,27 @@ export const SearchProvider = ({ children }) => {
     searchLiveAuctions,
     searchAcceptedOffers
   ]);
+
+  // Clear search when navigating between dashboard pages
+  useEffect(() => {
+    // List of dashboard pages
+    const dashboardPages = ['/dashboard', '/auctions', '/pending-offers', '/offers', '/accepted', '/appointments', '/profile'];
+    
+    // Check if current path is a dashboard page
+    const isDashboardPage = dashboardPages.some(page => location.pathname.startsWith(page));
+    
+    if (isDashboardPage) {
+      // Clear search when navigating to any dashboard page
+      setSearchQuery('');
+      setSearchResults({
+        pendingOffers: pendingOffers || [],
+        previousOffers: previousOffers || [],
+        liveAuctions: liveAuctions || [],
+        acceptedOffers: acceptedOffers || []
+      });
+      setIsSearching(false);
+    }
+  }, [location.pathname, pendingOffers, previousOffers, liveAuctions, acceptedOffers]);
 
   // Fetch all data on mount
   useEffect(() => {
