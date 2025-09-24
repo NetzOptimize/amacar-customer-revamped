@@ -291,7 +291,7 @@ export default function AppointmentModal({
   };
 
   // Helper function to truncate notes for display
-  const truncateNotes = (notes, maxLength = 100) => {
+  const truncateNotes = (notes, maxLength = 50) => {
     if (!notes || notes.length <= maxLength) return notes;
     return notes.substring(0, maxLength) + '...';
   };
@@ -301,7 +301,7 @@ export default function AppointmentModal({
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
-        className="sm:max-w-[800px] w-full max-h-[90vh] sm:max-h-[85vh] rounded-2xl shadow-2xl p-0 overflow-y-auto overflow-x-hidden bg-white border-0 "
+        className="sm:max-w-[800px] w-full md:max-h-[90vh] sm:max-h-[75vh] rounded-2xl shadow-2xl p-0 overflow-y-auto overflow-x-hidden bg-white border-0 "
         showCloseButton={!isCloseDisabled}
       >
         <div className="flex flex-col h-full">

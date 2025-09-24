@@ -6,6 +6,7 @@ export default {
     ],
     theme: {
       extend: {
+        scrollbar: false,
         colors: {
           primary: {
             50: '#fef7ed',
