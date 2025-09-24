@@ -1,16 +1,36 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { Car, CheckCircle, Clock, FileText, Phone, MapPin, RefreshCw, AlertCircle, ArrowUpDown, ArrowUp, ArrowDown, ChevronDown, Search, Eye } from 'lucide-react';
-import { formatCurrency, formatDate } from '../lib/utils';
-import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useState, useMemo, useRef } from 'react';
-import { fetchAcceptedOffers, selectAcceptedOffers, selectOffersLoading, selectOffersError } from '../redux/slices/offersSlice';
-import { useSearch } from '../context/SearchContext';
-import AcceptedOffersSkeleton from '../components/skeletons/AcceptedOffersSkeleton';
-import OffersListSkeleton from '../components/skeletons/OffersListSkeleton';
-import LoadMore from '../components/ui/load-more';
-import useLoadMore from '../hooks/useLoadMore';
-import AppointmentModal from '../components/ui/AppointmentModal';
-import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Car,
+  CheckCircle,
+  Clock,
+  FileText,
+  Phone,
+  MapPin,
+  RefreshCw,
+  AlertCircle,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  ChevronDown,
+  Search,
+  Eye,
+} from "lucide-react";
+import { formatCurrency, formatDate } from "../lib/utils";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState, useMemo, useRef } from "react";
+import {
+  fetchAcceptedOffers,
+  selectAcceptedOffers,
+  selectOffersLoading,
+  selectOffersError,
+} from "../redux/slices/offersSlice";
+import { useSearch } from "../context/SearchContext";
+import AcceptedOffersSkeleton from "../components/skeletons/AcceptedOffersSkeleton";
+import OffersListSkeleton from "../components/skeletons/OffersListSkeleton";
+import LoadMore from "../components/ui/load-more";
+import useLoadMore from "../hooks/useLoadMore";
+import AppointmentModal from "../components/ui/AppointmentModal";
+import { useNavigate } from "react-router-dom";
 
 const AcceptedOffersPage = () => {
   const dispatch = useDispatch();
@@ -22,7 +42,7 @@ const AcceptedOffersPage = () => {
   const { getSearchResults, searchQuery, clearSearch } = useSearch();
 
   // Sorting state
-  const [sortBy, setSortBy] = useState('date-desc');
+  const [sortBy, setSortBy] = useState("date-desc");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSorting, setIsSorting] = useState(false);
   const [sortProgress, setSortProgress] = useState(0);
@@ -38,14 +58,21 @@ const AcceptedOffersPage = () => {
   const transformAcceptedOffersData = (offers) => {
     if (!offers || !Array.isArray(offers)) return [];
 
-    return offers.map(offer => {
+    return offers.map((offer) => {
       // Find the accepted bid
-      const acceptedBid = offer.bid?.find(bid => bid.is_accepted && bid.status === 'accepted') || offer.bid?.[0];
+      const acceptedBid =
+        offer.bid?.find(
+          (bid) => bid.is_accepted && bid.status === "accepted"
+        ) || offer.bid?.[0];
 
       // Parse accepted date safely
       let acceptedDate;
       try {
-        acceptedDate = new Date(acceptedBid?.accepted_at_raw || offer.bid?.[0]?.created_at_raw || new Date());
+        acceptedDate = new Date(
+          acceptedBid?.accepted_at_raw ||
+            offer.bid?.[0]?.created_at_raw ||
+            new Date()
+        );
         if (isNaN(acceptedDate.getTime())) {
           acceptedDate = new Date();
         }
@@ -55,74 +82,91 @@ const AcceptedOffersPage = () => {
 
       // Determine status based on accepted date and other factors
       const now = new Date();
-      const daysSinceAccepted = Math.floor((now - acceptedDate) / (1000 * 60 * 60 * 24));
+      const daysSinceAccepted = Math.floor(
+        (now - acceptedDate) / (1000 * 60 * 60 * 24)
+      );
 
-      let status = 'accepted';
-      let nextStep = 'Complete paperwork';
-      let estimatedCompletion = new Date(acceptedDate.getTime() + 5 * 24 * 60 * 60 * 1000); // 5 days from accepted
+      let status = "accepted";
+      let nextStep = "Complete paperwork";
+      let estimatedCompletion = new Date(
+        acceptedDate.getTime() + 5 * 24 * 60 * 60 * 1000
+      ); // 5 days from accepted
 
       if (daysSinceAccepted >= 1) {
-        status = 'paperwork';
-        nextStep = 'Complete paperwork';
-        estimatedCompletion = new Date(acceptedDate.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days from accepted
+        status = "paperwork";
+        nextStep = "Complete paperwork";
+        estimatedCompletion = new Date(
+          acceptedDate.getTime() + 7 * 24 * 60 * 60 * 1000
+        ); // 7 days from accepted
       }
 
       if (daysSinceAccepted >= 3) {
-        status = 'pickup_scheduled';
-        nextStep = 'Schedule pickup';
-        estimatedCompletion = new Date(acceptedDate.getTime() + 10 * 24 * 60 * 60 * 1000); // 10 days from accepted
+        status = "pickup_scheduled";
+        nextStep = "Schedule pickup";
+        estimatedCompletion = new Date(
+          acceptedDate.getTime() + 10 * 24 * 60 * 60 * 1000
+        ); // 10 days from accepted
       }
 
       if (daysSinceAccepted >= 7) {
-        status = 'completed';
-        nextStep = 'Transaction completed';
-        estimatedCompletion = new Date(acceptedDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+        status = "completed";
+        nextStep = "Transaction completed";
+        estimatedCompletion = new Date(
+          acceptedDate.getTime() + 7 * 24 * 60 * 60 * 1000
+        );
       }
 
       // Extract front view image from images array, fallback to image_url, then to empty string
       const getFrontViewImage = () => {
         if (offer.images && offer.images.length > 0) {
-          const frontViewImage = offer.images.find(img => img.name === 'front_view');
+          const frontViewImage = offer.images.find(
+            (img) => img.name === "front_view"
+          );
           return frontViewImage ? frontViewImage.url : offer.images[0].url;
         }
-        return offer.image_url || '';
+        return offer.image_url || "";
       };
 
       return {
-        id: offer.product_id?.toString() || 'unknown',
-        vehicle: `${offer.year || 'N/A'} ${offer.make || 'Unknown'} ${offer.model || 'Vehicle'}`,
+        id: offer.product_id?.toString() || "unknown",
+        vehicle: `${offer.year || "N/A"} ${offer.make || "Unknown"} ${
+          offer.model || "Vehicle"
+        }`,
         year: parseInt(offer.year) || 0,
-        make: offer.make || 'Unknown',
-        model: offer.model || 'Unknown',
-        trim: offer.trim || 'N/A',
-        vin: offer.vin || 'N/A',
-        offerAmount: parseFloat(acceptedBid?.amount || offer.cash_offer || '0'),
+        make: offer.make || "Unknown",
+        model: offer.model || "Unknown",
+        trim: offer.trim || "N/A",
+        vin: offer.vin || "N/A",
+        offerAmount: parseFloat(acceptedBid?.amount || offer.cash_offer || "0"),
         status: status,
-        dealer: acceptedBid?.bidder_display_name || 'Unknown Dealer',
-        dealerEmail: acceptedBid?.bidder_email || '',
-        dealerId: acceptedBid?.bidder_id || '',
-        dealerPhone: 'Contact via email', // Not provided in API
-        dealerAddress: 'Address not provided', // Not provided in API
+        dealer: acceptedBid?.bidder_display_name || "Unknown Dealer",
+        dealerPhone: acceptedBid?.bidder_phone || "",
+        dealerEmail: acceptedBid?.bidder_email || "",
+        dealerId: acceptedBid?.bidder_id || "",
+        dealerPhone: "Contact via email", // Not provided in API
+        dealerAddress: "Address not provided", // Not provided in API
         acceptedDate: acceptedDate,
         nextStep: nextStep,
         estimatedCompletion: estimatedCompletion,
         imageUrl: getFrontViewImage(),
-        title: offer.title || '',
-        appointmentUrl: offer.appointment_url || '',
+        title: offer.title || "",
+        appointmentUrl: offer.appointment_url || "",
         acceptedBidData: acceptedBid,
-        cashOffer: parseFloat(offer.cash_offer || '0')
+        cashOffer: parseFloat(offer.cash_offer || "0"),
       };
     });
   };
 
   // Get search results for accepted offers
-  const searchResults = getSearchResults('acceptedOffers');
-  const acceptedOffers = useMemo(() => transformAcceptedOffersData(searchResults), [searchResults]);
+  const searchResults = getSearchResults("acceptedOffers");
+  const acceptedOffers = useMemo(
+    () => transformAcceptedOffersData(searchResults),
+    [searchResults]
+  );
 
   useEffect(() => {
     dispatch(fetchAcceptedOffers());
   }, [dispatch]);
-
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -132,22 +176,43 @@ const AcceptedOffersPage = () => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   // Sort options
   const sortOptions = [
-    { value: 'date-desc', label: 'Newest First', icon: ArrowDown, description: 'Most recent offers' },
-    { value: 'date-asc', label: 'Oldest First', icon: ArrowUp, description: 'Earliest offers' },
-    { value: 'amount-desc', label: 'Highest Amount', icon: ArrowDown, description: 'Highest to lowest' },
-    { value: 'amount-asc', label: 'Lowest Amount', icon: ArrowUp, description: 'Lowest to highest' },
+    {
+      value: "date-desc",
+      label: "Newest First",
+      icon: ArrowDown,
+      description: "Most recent offers",
+    },
+    {
+      value: "date-asc",
+      label: "Oldest First",
+      icon: ArrowUp,
+      description: "Earliest offers",
+    },
+    {
+      value: "amount-desc",
+      label: "Highest Amount",
+      icon: ArrowDown,
+      description: "Highest to lowest",
+    },
+    {
+      value: "amount-asc",
+      label: "Lowest Amount",
+      icon: ArrowUp,
+      description: "Lowest to highest",
+    },
   ];
 
   // Get current selected option
-  const selectedOption = sortOptions.find(option => option.value === sortBy) || sortOptions[0];
+  const selectedOption =
+    sortOptions.find((option) => option.value === sortBy) || sortOptions[0];
 
   // Handle sort selection with loading animation
   const handleSortSelect = (value) => {
@@ -165,7 +230,7 @@ const AcceptedOffersPage = () => {
     const progressInterval = 50; // Update progress every 50ms
 
     const progressTimer = setInterval(() => {
-      setSortProgress(prev => {
+      setSortProgress((prev) => {
         if (prev >= 90) {
           clearInterval(progressTimer);
           return 90;
@@ -201,10 +266,10 @@ const AcceptedOffersPage = () => {
 
   const handleAppointmentSubmit = async (appointmentData) => {
     // Here you would typically make an API call to schedule the appointment
-    console.log('Scheduling appointment:', appointmentData);
+    console.log("Scheduling appointment:", appointmentData);
 
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // You could dispatch an action to update the offer status or show a success message
     // dispatch(updateOfferStatus({ offerId: selectedOffer.id, status: 'appointment_scheduled' }));
@@ -214,7 +279,6 @@ const AcceptedOffersPage = () => {
     console.log("acceptedOffers", acceptedOffers);
   }, [acceptedOffers]);
 
-
   // Sort offers based on selected options
   const sortedOffers = useMemo(() => {
     if (!acceptedOffers || acceptedOffers.length === 0) return [];
@@ -222,13 +286,13 @@ const AcceptedOffersPage = () => {
     // Sort the offers
     return [...acceptedOffers].sort((a, b) => {
       switch (sortBy) {
-        case 'date-desc':
+        case "date-desc":
           return b.acceptedDate - a.acceptedDate;
-        case 'date-asc':
+        case "date-asc":
           return a.acceptedDate - b.acceptedDate;
-        case 'amount-desc':
+        case "amount-desc":
           return b.offerAmount - a.offerAmount;
-        case 'amount-asc':
+        case "amount-asc":
           return a.offerAmount - b.offerAmount;
         default:
           return 0;
@@ -242,25 +306,25 @@ const AcceptedOffersPage = () => {
     hasMoreItems,
     remainingItems,
     isLoadingMore,
-    handleLoadMore
+    handleLoadMore,
   } = useLoadMore(sortedOffers, itemsPerPage);
 
   // Debug logging
-  console.log('AcceptedOffers Debug:', {
+  console.log("AcceptedOffers Debug:", {
     acceptedOffersLength: acceptedOffers.length,
     sortedOffersLength: sortedOffers.length,
     paginatedOffersLength: paginatedOffers.length,
     hasMoreItems,
     remainingItems,
     itemsPerPage,
-    searchResultsLength: searchResults.length
+    searchResultsLength: searchResults.length,
   });
 
   const statusSteps = [
-    { key: 'accepted', label: 'Offer Accepted', icon: CheckCircle },
-    { key: 'paperwork', label: 'Paperwork', icon: FileText },
-    { key: 'pickup_scheduled', label: 'Pickup Scheduled', icon: Clock },
-    { key: 'completed', label: 'Completed', icon: CheckCircle },
+    { key: "accepted", label: "Offer Accepted", icon: CheckCircle },
+    { key: "paperwork", label: "Paperwork", icon: FileText },
+    { key: "pickup_scheduled", label: "Pickup Scheduled", icon: Clock },
+    { key: "completed", label: "Completed", icon: CheckCircle },
   ];
 
   const containerVariants = {
@@ -288,8 +352,6 @@ const AcceptedOffersPage = () => {
     return <AcceptedOffersSkeleton />;
   }
 
-
-
   // Error state
   if (error) {
     return (
@@ -300,7 +362,9 @@ const AcceptedOffersPage = () => {
               <div className="w-16 h-16 bg-error/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <AlertCircle className="w-8 h-8 text-error" />
               </div>
-              <h3 className="text-xl font-semibold text-neutral-800 mb-2">Error Loading Offers</h3>
+              <h3 className="text-xl font-semibold text-neutral-800 mb-2">
+                Error Loading Offers
+              </h3>
               <p className="text-neutral-600 mb-4">{error}</p>
               <button
                 onClick={() => dispatch(fetchAcceptedOffers())}
@@ -326,11 +390,18 @@ const AcceptedOffersPage = () => {
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
             <div className="text-left">
-              <motion.h1 variants={itemVariants} className="text-2xl sm:text-3xl font-bold text-neutral-800 mb-2">
+              <motion.h1
+                variants={itemVariants}
+                className="text-2xl sm:text-3xl font-bold text-neutral-800 mb-2"
+              >
                 Accepted Offers
               </motion.h1>
-              <motion.p variants={itemVariants} className="text-sm sm:text-base text-neutral-600">
-                Track the progress of your accepted offers through to completion.
+              <motion.p
+                variants={itemVariants}
+                className="text-sm sm:text-base text-neutral-600"
+              >
+                Track the progress of your accepted offers through to
+                completion.
               </motion.p>
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
@@ -340,7 +411,9 @@ const AcceptedOffersPage = () => {
                 disabled={loading}
                 className="btn-ghost flex items-center space-x-2 w-full sm:w-auto justify-center sm:justify-start"
               >
-                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                <RefreshCw
+                  className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
+                />
                 <span>Refresh</span>
               </motion.button>
 
@@ -353,10 +426,13 @@ const AcceptedOffersPage = () => {
                 >
                   {/* Dropdown Trigger */}
                   <button
-                    onClick={() => !isSorting && setIsDropdownOpen(!isDropdownOpen)}
+                    onClick={() =>
+                      !isSorting && setIsDropdownOpen(!isDropdownOpen)
+                    }
                     disabled={isSorting}
-                    className={`cursor-pointer flex items-center gap-3 bg-white border border-neutral-200 rounded-xl px-4 py-3 hover:border-neutral-300 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent group ${isSorting ? 'opacity-75 cursor-not-allowed' : ''
-                      }`}
+                    className={`cursor-pointer flex items-center gap-3 bg-white border border-neutral-200 rounded-xl px-4 py-3 hover:border-neutral-300 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent group ${
+                      isSorting ? "opacity-75 cursor-not-allowed" : ""
+                    }`}
                   >
                     <div className="flex items-center gap-2">
                       {isSorting ? (
@@ -366,14 +442,15 @@ const AcceptedOffersPage = () => {
                       )}
                       <div className="text-left">
                         <div className="text-sm font-medium text-neutral-700">
-                          {isSorting ? 'Sorting...' : selectedOption.label}
+                          {isSorting ? "Sorting..." : selectedOption.label}
                         </div>
                       </div>
                     </div>
                     {!isSorting && (
                       <ChevronDown
-                        className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''
-                          }`}
+                        className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${
+                          isDropdownOpen ? "rotate-180" : ""
+                        }`}
                       />
                     )}
                   </button>
@@ -396,17 +473,39 @@ const AcceptedOffersPage = () => {
                             <button
                               key={option.value}
                               onClick={() => handleSortSelect(option.value)}
-                              className={`cursor-pointer w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-neutral-50 transition-colors duration-150 ${isSelected ? 'bg-orange-50 text-orange-700' : 'text-neutral-700'
-                                } ${index !== sortOptions.length - 1 ? 'border-b border-neutral-100' : ''}`}
+                              className={`cursor-pointer w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-neutral-50 transition-colors duration-150 ${
+                                isSelected
+                                  ? "bg-orange-50 text-orange-700"
+                                  : "text-neutral-700"
+                              } ${
+                                index !== sortOptions.length - 1
+                                  ? "border-b border-neutral-100"
+                                  : ""
+                              }`}
                             >
-                              <div className={`p-1.5 rounded-lg ${isSelected ? 'bg-orange-100' : 'bg-neutral-100'
-                                }`}>
-                                <IconComponent className={`w-3.5 h-3.5 ${isSelected ? 'text-orange-600' : 'text-neutral-500'
-                                  }`} />
+                              <div
+                                className={`p-1.5 rounded-lg ${
+                                  isSelected
+                                    ? "bg-orange-100"
+                                    : "bg-neutral-100"
+                                }`}
+                              >
+                                <IconComponent
+                                  className={`w-3.5 h-3.5 ${
+                                    isSelected
+                                      ? "text-orange-600"
+                                      : "text-neutral-500"
+                                  }`}
+                                />
                               </div>
                               <div className="flex-1">
-                                <div className={`text-sm font-medium ${isSelected ? 'text-orange-700' : 'text-neutral-700'
-                                  }`}>
+                                <div
+                                  className={`text-sm font-medium ${
+                                    isSelected
+                                      ? "text-orange-700"
+                                      : "text-neutral-700"
+                                  }`}
+                                >
                                   {option.label}
                                 </div>
                               </div>
@@ -472,7 +571,10 @@ const AcceptedOffersPage = () => {
                 </div>
                 {/* Decorative elements */}
                 <div className="absolute -top-2 -right-2 w-6 h-6 bg-warning/20 rounded-full animate-pulse-slow"></div>
-                <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-accent/20 rounded-full animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+                <div
+                  className="absolute -bottom-1 -left-1 w-4 h-4 bg-accent/20 rounded-full animate-pulse-slow"
+                  style={{ animationDelay: "1s" }}
+                ></div>
               </motion.div>
 
               {/* Content */}
@@ -498,12 +600,14 @@ const AcceptedOffersPage = () => {
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                  onClick={() => navigate('/pending-offers')}
+                  onClick={() => navigate("/pending-offers")}
                   className="cursor-pointer w-full sm:w-64 px-4 h-14 sm:h-16 group relative bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:shadow-xl hover:shadow-primary-500/25 focus:outline-none focus:ring-4 focus:ring-primary-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   <div className="flex items-center gap-2 justify-center sm:justify-between">
                     <CheckCircle className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-                    <span className="text-sm sm:text-base">View Pending offers</span>
+                    <span className="text-sm sm:text-base">
+                      View Pending offers
+                    </span>
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
                 </motion.button>
@@ -512,7 +616,7 @@ const AcceptedOffersPage = () => {
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => navigate("/dashboard")}
                   className="cursor-pointer w-full sm:w-64 px-4 h-14 sm:h-16 group relative overflow-hidden bg-white hover:bg-neutral-50 text-neutral-700 font-semibold py-4 rounded-2xl border-2 border-neutral-200 hover:border-neutral-300 transition-all duration-300 transform hover:shadow-lg hover:shadow-neutral-500/10 focus:outline-none focus:ring-4 focus:ring-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   <div className="flex items-center justify-center space-x-2 sm:space-x-3">
@@ -599,36 +703,45 @@ const AcceptedOffersPage = () => {
                       </div>
                     </div>
 
-
-
                     {/* Dealer Information */}
                     <div className="bg-neutral-50 rounded-lg p-3 sm:p-4 mb-4">
-                      <h4 className="font-semibold text-neutral-800 mb-3 text-sm sm:text-base">Dealer Information</h4>
+                      <h4 className="font-semibold text-neutral-800 mb-3 text-sm sm:text-base">
+                        Dealer Information
+                      </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div className="flex items-center space-x-2">
                           <Car className="w-4 h-4 text-neutral-500 flex-shrink-0" />
-                          <span className="text-sm text-neutral-700 break-words">{offer.dealer}</span>
+                          <span className="text-sm text-neutral-700 break-words">
+                            {offer.dealer}
+                          </span>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <Phone className="w-4 h-4 text-neutral-500 flex-shrink-0" />
-                          <span className="text-sm text-neutral-700 break-words">{offer.dealerPhone}</span>
-                        </div>
+
                         <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
-                          <span className="text-sm text-neutral-500 flex-shrink-0">Email:</span>
-                          <span className="text-sm text-neutral-700 break-words">{offer.dealerEmail}</span>
+                          <span className="text-sm text-neutral-500 flex-shrink-0">
+                            Email:
+                          </span>
+                          <a
+                            href={`mailto:${offer.dealerEmail}`}
+                            className="text-sm text-neutral-700 break-words hover:underline hover:text-orange-600 transition-all duration-200 hover:outline-none"
+                          >
+                            {offer.dealerEmail}
+                          </a>
                         </div>
-                        <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
-                          <span className="text-sm text-neutral-500 flex-shrink-0">Dealer ID:</span>
-                          <span className="text-sm text-neutral-700 break-words">#{offer.dealerId}</span>
-                        </div>
+
                         <div className="flex items-start space-x-2 sm:col-span-2">
                           <MapPin className="w-4 h-4 text-neutral-500 flex-shrink-0 mt-0.5" />
-                          <span className="text-sm text-neutral-700 break-words">{offer.dealerAddress}</span>
+                          <span className="text-sm text-neutral-700 break-words">
+                            {offer.dealerAddress}
+                          </span>
                         </div>
                         {offer.cashOffer > 0 && (
                           <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 sm:col-span-2">
-                            <span className="text-sm text-neutral-500 flex-shrink-0">Cash Offer:</span>
-                            <span className="text-sm font-medium text-success break-words">{formatCurrency(offer.cashOffer)}</span>
+                            <span className="text-sm text-neutral-500 flex-shrink-0">
+                              Cash Offer:
+                            </span>
+                            <span className="text-sm font-medium text-success break-words">
+                              {formatCurrency(offer.cashOffer)}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -638,21 +751,33 @@ const AcceptedOffersPage = () => {
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-2">
                       {/* Mobile: Stack buttons vertically, Desktop: Horizontal */}
                       <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                        <button className="cursor-pointer btn-ghost flex items-center justify-center space-x-2 py-2 px-3 sm:py-2 sm:px-4 text-sm">
+                        <a
+                          href={`tel:${offer.dealerPhone}`} // replace with the dealer's phone number
+                          className="cursor-pointer btn-ghost flex items-center justify-center space-x-2 py-2 px-3 sm:py-2 sm:px-4 text-sm"
+                        >
                           <Phone className="w-4 h-4" />
-                          <span className="hidden sm:inline">Contact Dealer</span>
+                          <span className="hidden sm:inline">
+                            Contact Dealer
+                          </span>
                           <span className="sm:hidden">Contact</span>
-                        </button>
+                        </a>
+
                         <button
                           onClick={() => handleOpenAppointmentModal(offer)}
                           className="cursor-pointer btn-secondary flex items-center justify-center space-x-2 py-2 px-3 sm:py-2 sm:px-4 text-sm"
                         >
                           <Clock className="w-4 h-4" />
-                          <span className="hidden sm:inline">Schedule Appointment</span>
+                          <span className="hidden sm:inline">
+                            Schedule Appointment
+                          </span>
                           <span className="sm:hidden">Schedule</span>
                         </button>
-                        <button 
-                          onClick={() => navigate('/car-details', { state: { productId: offer.id } })} 
+                        <button
+                          onClick={() =>
+                            navigate("/car-details", {
+                              state: { productId: offer.id },
+                            })
+                          }
                           className="cursor-pointer btn-primary flex items-center justify-center space-x-2 py-2 px-3 sm:py-2 sm:px-4 text-sm"
                         >
                           <Eye className="w-4 h-4" />
@@ -673,21 +798,26 @@ const AcceptedOffersPage = () => {
                     <motion.button
                       onClick={handleLoadMore}
                       disabled={isLoadingMore}
-                      className={`px-4 sm:px-8 py-3 rounded-xl font-medium transition-all duration-200 w-full sm:w-auto ${isLoadingMore
-                        ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
-                        : 'bg-primary-500 text-white hover:bg-primary-600 hover:shadow-lg cursor-pointer'
-                        }`}
+                      className={`px-4 sm:px-8 py-3 rounded-xl font-medium transition-all duration-200 w-full sm:w-auto ${
+                        isLoadingMore
+                          ? "bg-neutral-100 text-neutral-400 cursor-not-allowed"
+                          : "bg-primary-500 text-white hover:bg-primary-600 hover:shadow-lg cursor-pointer"
+                      }`}
                       whileHover={!isLoadingMore ? { scale: 1.02 } : {}}
                       whileTap={!isLoadingMore ? { scale: 0.98 } : {}}
                     >
                       {isLoadingMore ? (
                         <div className="flex items-center justify-center space-x-2">
                           <RefreshCw className="w-4 h-4 animate-spin" />
-                          <span className="text-sm sm:text-base">Loading offers...</span>
+                          <span className="text-sm sm:text-base">
+                            Loading offers...
+                          </span>
                         </div>
                       ) : (
                         <div className="flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-2">
-                          <span className="text-sm sm:text-base font-extrabold">Load More Offers</span>
+                          <span className="text-sm sm:text-base font-extrabold">
+                            Load More Offers
+                          </span>
                           <span className="text-xs sm:text-sm opacity-75">
                             ({remainingItems} remaining)
                           </span>
@@ -715,17 +845,16 @@ const AcceptedOffersPage = () => {
             )}
           </motion.div>
         )}
-
       </div>
 
       {/* Appointment Modal */}
       <AppointmentModal
         isOpen={isAppointmentModalOpen}
         onClose={handleCloseAppointmentModal}
-        dealerName={selectedOffer?.dealer || ''}
-        dealerId={selectedOffer?.acceptedBidData?.bidder_id || ''}
-        dealerEmail={selectedOffer?.dealerEmail || ''}
-        vehicleInfo={selectedOffer?.vehicle || ''}
+        dealerName={selectedOffer?.dealer || ""}
+        dealerId={selectedOffer?.acceptedBidData?.bidder_id || ""}
+        dealerEmail={selectedOffer?.dealerEmail || ""}
+        vehicleInfo={selectedOffer?.vehicle || ""}
         onAppointmentSubmit={handleAppointmentSubmit}
         title="Schedule Appointment"
         description="Choose a convenient date and time for your appointment with the dealer"

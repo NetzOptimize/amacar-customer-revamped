@@ -77,40 +77,7 @@ const AcceptedOffersSkeleton = () => {
               </div>
 
               {/* Progress Steps Skeleton */}
-              <div className="mb-6">
-                <div className="relative flex items-center justify-between">
-                  {Array.from({ length: 4 }).map((_, stepIndex) => {
-                    // Simulate different progress states
-                    const isCompleted = stepIndex < (index === 0 ? 2 : 1);
-                    const isActive = stepIndex === (index === 0 ? 2 : 1);
-                    
-                    return (
-                      <div key={stepIndex} className="flex flex-col items-center flex-1 relative">
-                        {/* Step Icon Skeleton */}
-                        <div className={`w-10 h-10 rounded-full mb-2 animate-pulse ${
-                          isCompleted ? 'bg-success/20' : isActive ? 'bg-primary/20' : 'bg-neutral-200'
-                        }`}></div>
-                        {/* Step Label Skeleton */}
-                        <div className={`h-3 rounded-md w-20 animate-pulse ${
-                          isActive ? 'bg-primary/20' : 'bg-neutral-200'
-                        }`}></div>
-                        {/* Progress Line Skeleton */}
-                        {stepIndex < 3 && (
-                          <div
-                            className={`absolute top-5 h-0.5 animate-pulse ${
-                              isCompleted ? 'bg-success/20' : 'bg-neutral-200'
-                            }`}
-                            style={{
-                              width: 'calc(100% - 40px)',
-                              left: 'calc(50% + 20px)',
-                            }}
-                          />
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+             
 
               {/* Dealer Information Skeleton */}
               <div className="bg-neutral-50 rounded-lg p-4 mb-4">
