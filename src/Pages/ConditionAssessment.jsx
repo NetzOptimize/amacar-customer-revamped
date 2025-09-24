@@ -97,7 +97,8 @@ export default function ConditionAssessment() {
   
   // Email validation for non-prefilled emails only
   const isEmailPrefilled = !!userState?.email;
-  const emailValidation = useEmailValidation(user.email, !isEmailPrefilled);
+  const [shouldResetEmailValidation, setShouldResetEmailValidation] = useState(false);
+  const emailValidation = useEmailValidation(user.email, !isEmailPrefilled, shouldResetEmailValidation);
 
   const userExists = useSelector((state) => state?.user?.user);
 
@@ -120,6 +121,20 @@ export default function ConditionAssessment() {
       return () => clearTimeout(timer);
     }
   }, [showValidation]);
+
+  // Reset email validation when email field becomes empty
+  useEffect(() => {
+    if (!isEmailPrefilled && (!user.email || user.email.trim() === "")) {
+      setShouldResetEmailValidation(true);
+    }
+  }, [user.email, isEmailPrefilled]);
+
+  // Reset the email validation reset flag after it's been used
+  useEffect(() => {
+    if (shouldResetEmailValidation) {
+      setShouldResetEmailValidation(false);
+    }
+  }, [shouldResetEmailValidation]);
 
 
 
