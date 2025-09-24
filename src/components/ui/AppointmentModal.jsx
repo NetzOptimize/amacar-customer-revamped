@@ -291,7 +291,7 @@ export default function AppointmentModal({
   };
 
   // Helper function to truncate notes for display
-  const truncateNotes = (notes, maxLength = 50) => {
+  const truncateNotes = (notes, maxLength = 100) => {
     if (!notes || notes.length <= maxLength) return notes;
     return notes.substring(0, maxLength) + '...';
   };
@@ -383,11 +383,11 @@ export default function AppointmentModal({
                         <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                         <span className="break-words">Appointment Summary</span>
                       </h4>
-                      <div className="text-xs sm:text-sm text-orange-700 space-y-1">
-                        <p className="break-words"><strong>Date:</strong> {formatFullDate(selectedDate)}</p>
-                        <p className="break-words"><strong>Time:</strong> {selectedTime}</p>
+                      <div className="text-xs overflow-x-hidden sm:text-sm text-orange-700 space-y-1">
+                        <p className="break-words overflow-x-hidden"><strong>Date:</strong> {formatFullDate(selectedDate)}</p>
+                        <p className="break-words overflow-x-hidden"><strong>Time:</strong> {selectedTime}</p>
                         {notes && (
-                          <p className="break-words"><strong>Notes:</strong> {truncateNotes(notes)}</p>
+                          <p className="break-words overflow-x-hidden"><strong>Notes:</strong> {truncateNotes(notes)}</p>
                         )}
                       </div>
                     </motion.div>
