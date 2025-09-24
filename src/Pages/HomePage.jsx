@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux'
 import { useEffect } from 'react'
 import Seo from '@/components/SEO/Seo'
 import { seoData } from '@/config/seoConfig'
-
+import BrandLogosCarousel from '@/components/Home/BrandLogosCarousel/BrandLogosCarousel.jsx'
 export default function HomePage() {
     const { userState, loading } = useSelector((state) => state.user);
     useEffect(() => {
@@ -30,6 +30,7 @@ export default function HomePage() {
             <WhyChooseAmacar />
             {/* <WinWinAmacar /> */}
             <HowAmacarWorks />
+            <BrandLogosCarousel />
             <TwoColumnSection />
             <CarFooterSection />
             <TestimonialCarousel />
