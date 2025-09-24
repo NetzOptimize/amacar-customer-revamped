@@ -18,6 +18,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, registerUser, forgotPassword, verifyOTP, resetPassword, verifyLoginOTP, clearError } from "@/redux/slices/userSlice";
 import useAuth from "@/hooks/useAuth";
+import useEmailValidation from "@/hooks/useEmailValidation";
 import { Link } from "react-router-dom";
 
 export default function LoginModal({
@@ -41,6 +42,9 @@ export default function LoginModal({
   const [twoFactorData, setTwoFactorData] = useState(null); // Store 2FA data from login response
   const [registerConsent, setRegisterConsent] = useState(false); // State for terms and privacy policy consent
   const [privacyConsent, setPrivacyConsent] = useState(false); // State for privacy policy consent
+  
+  // Email validation hook
+  const emailValidation = useEmailValidation(values.email, isRegisterMode);
 
   const navigate = useNavigate();
   const isCloseDisabled = phase === "loading" || phase === "verify-otp" || phase === "verify-2fa";
@@ -52,6 +56,10 @@ export default function LoginModal({
       newErrors.email = "Email is required";
     } else if (!emailRegex.test(values.email)) {
       newErrors.email = "Please enter a valid email address";
+    } else if (isRegisterMode && emailValidation.isDisposable === true) {
+      newErrors.email = "Disposable email addresses are not allowed";
+    } else if (isRegisterMode && emailValidation.error) {
+      newErrors.email = "Unable to verify email. Please try again.";
     }
 
     if (isRegisterMode && !values.firstName) {
@@ -408,10 +416,20 @@ export default function LoginModal({
                     <div className="grid gap-2">
                       <label htmlFor="email" className="text-sm font-medium text-slate-800">
                         Email Address
+                        {isRegisterMode && emailValidation.isValidating && (
+                          <span className="ml-2 text-xs text-slate-500">(Validating...)</span>
+                        )}
                       </label>
                       <div className="relative">
-                        <div className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 ${isEmailPrefilled ? 'text-orange-500' : 'text-slate-400'
-                          }`}>
+                        <div className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 ${
+                          isEmailPrefilled 
+                            ? 'text-orange-500' 
+                            : emailValidation.isValid === true 
+                              ? 'text-green-500' 
+                              : emailValidation.isDisposable === true 
+                                ? 'text-red-500' 
+                                : 'text-slate-400'
+                        }`}>
                           <Mail className="h-4 w-4" />
                         </div>
                         <input
@@ -421,13 +439,32 @@ export default function LoginModal({
                           onChange={(e) => setValue("email", e.target.value)}
                           placeholder="user@example.com"
                           disabled={isEmailPrefilled}
-                          className={`h-11 w-full rounded-xl border pl-9 pr-3 text-sm outline-none ring-0 transition-shadow ${isEmailPrefilled
-                            ? 'border-orange-200 bg-orange-50 text-orange-800 cursor-not-allowed'
-                            : 'border-slate-200 bg-white focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]'
-                            }`}
+                          className={`h-11 w-full rounded-xl border pl-9 pr-10 text-sm outline-none ring-0 transition-all duration-200 ${
+                            isEmailPrefilled
+                              ? 'border-orange-200 bg-orange-50 text-orange-800 cursor-not-allowed'
+                              : emailValidation.isValid === true
+                                ? 'border-green-300 bg-green-50 focus:shadow-[0_0_0_4px_rgba(34,197,94,0.08)]'
+                                : emailValidation.isDisposable === true
+                                  ? 'border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]'
+                                  : 'border-slate-200 bg-white focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]'
+                          }`}
                         />
+                        {/* Validation status indicator */}
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          {emailValidation.isValidating && (
+                            <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                          )}
+                          {!emailValidation.isValidating && emailValidation.isValid === true && (
+                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          )}
+                          {!emailValidation.isValidating && emailValidation.isDisposable === true && (
+                            <XCircle className="h-4 w-4 text-red-500" />
+                          )}
+                        </div>
                       </div>
 
+                      
+                      
                       {errors.email && (
                         <motion.p
                           initial={{ opacity: 0, y: -4 }}
@@ -754,7 +791,7 @@ export default function LoginModal({
                   <div className="pt-1">
                     <button
                       type="submit"
-                      disabled={status === "loading" || (isRegisterMode && (!registerConsent || !privacyConsent))}
+                      disabled={status === "loading" || (isRegisterMode && (!registerConsent || !privacyConsent || emailValidation.isValidating || emailValidation.isDisposable === true))}
                       className="cursor-pointer w-full h-11 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-sm font-semibold shadow-lg shadow-orange-500/20 transition hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {status === "loading" ? (
@@ -769,6 +806,11 @@ export default function LoginModal({
                                 : phase === "verify-2fa"
                                   ? "Verifying OTP..."
                                   : "Signing In..."}
+                        </div>
+                      ) : emailValidation.isValidating && isRegisterMode ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Validating Email...
                         </div>
                       ) : (
                         isRegisterMode
