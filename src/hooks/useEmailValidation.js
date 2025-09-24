@@ -1,12 +1,24 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const useEmailValidation = (email, isRegisterMode) => {
+const useEmailValidation = (email, isRegisterMode, shouldReset = false) => {
   const [validationState, setValidationState] = useState({
     isValidating: false,
     isDisposable: null,
     error: null,
     isValid: null
   });
+
+  // Reset validation state when shouldReset is true
+  useEffect(() => {
+    if (shouldReset) {
+      setValidationState({
+        isValidating: false,
+        isDisposable: null,
+        error: null,
+        isValid: null
+      });
+    }
+  }, [shouldReset]);
 
   const checkDisposableEmail = useCallback(async (emailToCheck) => {
     if (!emailToCheck || !isRegisterMode) {

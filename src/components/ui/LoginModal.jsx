@@ -42,9 +42,10 @@ export default function LoginModal({
   const [twoFactorData, setTwoFactorData] = useState(null); // Store 2FA data from login response
   const [registerConsent, setRegisterConsent] = useState(false); // State for terms and privacy policy consent
   const [privacyConsent, setPrivacyConsent] = useState(false); // State for privacy policy consent
+  const [shouldResetEmailValidation, setShouldResetEmailValidation] = useState(false);
   
   // Email validation hook
-  const emailValidation = useEmailValidation(values.email, isRegisterMode);
+  const emailValidation = useEmailValidation(values.email, isRegisterMode, shouldResetEmailValidation);
 
   const navigate = useNavigate();
   const isCloseDisabled = phase === "loading" || phase === "verify-otp" || phase === "verify-2fa";
@@ -247,6 +248,7 @@ export default function LoginModal({
     setTwoFactorData(null);
     setRegisterConsent(false);
     setPrivacyConsent(false);
+    setShouldResetEmailValidation(true); // Reset email validation state
     resetForm();
     dispatch(clearError()); // Clear Redux error state
   }
@@ -297,6 +299,13 @@ export default function LoginModal({
       handleSuccessAction();
     }
   }, [phase]);
+
+  // Reset the email validation reset flag after it's been used
+  useEffect(() => {
+    if (shouldResetEmailValidation) {
+      setShouldResetEmailValidation(false);
+    }
+  }, [shouldResetEmailValidation]);
 
   // Prefill email when modal opens and user info is available
   useEffect(() => {
@@ -424,9 +433,9 @@ export default function LoginModal({
                         <div className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 ${
                           isEmailPrefilled 
                             ? 'text-orange-500' 
-                            : emailValidation.isValid === true 
+                            : isRegisterMode && emailValidation.isValid === true 
                               ? 'text-green-500' 
-                              : emailValidation.isDisposable === true 
+                              : isRegisterMode && emailValidation.isDisposable === true 
                                 ? 'text-red-500' 
                                 : 'text-slate-400'
                         }`}>
@@ -442,25 +451,27 @@ export default function LoginModal({
                           className={`h-11 w-full rounded-xl border pl-9 pr-10 text-sm outline-none ring-0 transition-all duration-200 ${
                             isEmailPrefilled
                               ? 'border-orange-200 bg-orange-50 text-orange-800 cursor-not-allowed'
-                              : emailValidation.isValid === true
+                              : isRegisterMode && emailValidation.isValid === true
                                 ? 'border-green-300 bg-green-50 focus:shadow-[0_0_0_4px_rgba(34,197,94,0.08)]'
-                                : emailValidation.isDisposable === true
+                                : isRegisterMode && emailValidation.isDisposable === true
                                   ? 'border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]'
                                   : 'border-slate-200 bg-white focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]'
                           }`}
                         />
-                        {/* Validation status indicator */}
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                          {emailValidation.isValidating && (
-                            <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
-                          )}
-                          {!emailValidation.isValidating && emailValidation.isValid === true && (
-                            <CheckCircle2 className="h-4 w-4 text-green-500" />
-                          )}
-                          {!emailValidation.isValidating && emailValidation.isDisposable === true && (
-                            <XCircle className="h-4 w-4 text-red-500" />
-                          )}
-                        </div>
+                        {/* Validation status indicator - only show in register mode */}
+                        {isRegisterMode && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            {emailValidation.isValidating && (
+                              <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                            )}
+                            {!emailValidation.isValidating && emailValidation.isValid === true && (
+                              <CheckCircle2 className="h-4 w-4 text-green-500" />
+                            )}
+                            {!emailValidation.isValidating && emailValidation.isDisposable === true && (
+                              <XCircle className="h-4 w-4 text-red-500" />
+                            )}
+                          </div>
+                        )}
                       </div>
 
                       

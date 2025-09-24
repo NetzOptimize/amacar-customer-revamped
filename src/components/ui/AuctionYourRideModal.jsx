@@ -21,6 +21,7 @@ import {
   setStateVin
 } from "@/redux/slices/carDetailsAndQuestionsSlice"
 import { useNavigate, Link } from "react-router-dom"
+import useEmailValidation from "@/hooks/useEmailValidation"
 
 export default function AuctionModal({
   isOpen,
@@ -47,6 +48,9 @@ export default function AuctionModal({
     vin: "", firstName: "", lastName: "", email: "", phone: "",
     password: "", confirmPassword: "", zipCode: "", auctionConsent: "", registerConsent: "",
   })
+  
+  // Email validation hook
+  const emailValidation = useEmailValidation(email, true) // Always validate in auction modal
   const navigate = useNavigate();
   const dispatch = useDispatch();
   
@@ -127,6 +131,10 @@ export default function AuctionModal({
       newErrors.email = "This field is required."
     } else if (!emailRegex.test(email)) {
       newErrors.email = "Please enter a valid email address."
+    } else if (emailValidation.isDisposable === true) {
+      newErrors.email = "Disposable email addresses are not allowed."
+    } else if (emailValidation.error) {
+      newErrors.email = "Unable to verify email. Please try again."
     }
 
     // Phone validation
@@ -306,6 +314,7 @@ export default function AuctionModal({
                           <Car className="h-4 w-4" />
                         </div>
                         <input
+                          maxLength={17}
                           id="vin"
                           type="text"
                           value={vin}
@@ -358,9 +367,18 @@ export default function AuctionModal({
                     <div className="grid gap-1">
                       <label htmlFor="email" className="text-sm font-medium text-slate-800">
                         Email Address *
+                        {emailValidation.isValidating && (
+                          <span className="ml-2 text-xs text-slate-500">(Validating...)</span>
+                        )}
                       </label>
                       <div className="relative">
-                        <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                        <div className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 ${
+                          emailValidation.isValid === true 
+                            ? 'text-green-500' 
+                            : emailValidation.isDisposable === true 
+                              ? 'text-red-500' 
+                              : 'text-slate-400'
+                        }`}>
                           <Mail className="h-4 w-4" />
                         </div>
                         <input
@@ -369,9 +387,28 @@ export default function AuctionModal({
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="Enter your email address"
-                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
+                          className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-all duration-200 ${
+                            emailValidation.isValid === true
+                              ? 'border-green-300 bg-green-50 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.5)]'
+                              : emailValidation.isDisposable === true
+                                ? 'border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]'
+                                : 'border-slate-200 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]'
+                          }`}
                         />
+                        {/* Validation status indicator */}
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          {emailValidation.isValidating && (
+                            <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                          )}
+                          {!emailValidation.isValidating && emailValidation.isValid === true && (
+                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          )}
+                          {!emailValidation.isValidating && emailValidation.isDisposable === true && (
+                            <XCircle className="h-4 w-4 text-red-500" />
+                          )}
+                        </div>
                       </div>
+                      
                       {errors.email && (
                         <motion.p 
                           initial={{ opacity: 0, y: -4 }}
@@ -464,12 +501,14 @@ export default function AuctionModal({
                         </div>
                         <input
                           id="zipCode"
-                          type="number"
+                          type="text"
+                          inputMode="numeric"
                           maxLength={5}
                           value={zipCode}
                           onChange={(e) => handleZipCodeChange(e.target.value)}
                           placeholder="Enter your zip code"
                           className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
+                          style={{ fontSize: '16px' }}
                         />
                         {locationStatus === 'loading' && (
                           <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
@@ -536,10 +575,17 @@ export default function AuctionModal({
                           <MapPin className="h-4 w-4" />
                         </div>
                         <input
+                          maxLength={10}
+                          inputMode="numeric"
                           id="phone"
                           type="tel"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
+                          value={phone} 
+                          onChange={(e) => {
+                            // keep only digits
+                            const value = e.target.value.replace(/\D/g, "");
+                            setPhone(value);
+                          }}
+                          pattern="[0-9]*"
                           placeholder="Enter your phone number"
                           className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
                         />
@@ -685,13 +731,18 @@ export default function AuctionModal({
                 <div className="pt-2 mt-auto">
                   <button
                     type="submit"
-                    disabled={modalState.isLoading || !auctionConsent || !registerConsent}
+                    disabled={modalState.isLoading || !auctionConsent || !registerConsent || emailValidation.isValidating || emailValidation.isDisposable === true}
                     className="cursor-pointer w-full h-12 sm:h-11 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-base font-semibold shadow-lg shadow-orange-500/20  disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {modalState.isLoading ? (
                       <div className="flex items-center justify-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
                         Submitting...
+                      </div>
+                    ) : emailValidation.isValidating ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Validating Email...
                       </div>
                     ) : (
                       "Auction Now"
