@@ -440,23 +440,24 @@ export default function AuctionSelectionModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="md:max-w-2xl lg:max-w-3xl rounded-2xl shadow-xl p-0 overflow-hidden bg-white max-h-[75vh] sm:max-h-[80vh] flex flex-col">
-          <div className="bg-gradient-to-br from-white via-slate-50 to-slate-100 p-4 sm:p-6 flex-shrink-0">
-            <DialogHeader className="text-center ">
-              <DialogTitle className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900">
+        <DialogContent className="w-[95vw] max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-3xl xl:max-w-4xl rounded-2xl shadow-xl p-0 overflow-hidden bg-white max-h-[95vh] sm:max-h-[80vh] md:max-h-[75vh] flex flex-col">
+          <div className="bg-gradient-to-br from-white via-slate-50 to-slate-100 p-3 sm:p-4 md:p-6 flex-shrink-0">
+            <DialogHeader className="text-center">
+              <DialogTitle className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold tracking-tight text-slate-900 leading-tight">
                 Hi,{" "}
-                {userFormData?.fullName || userState?.display_name || "User"}
+                <span className="break-words">
+                  {userFormData?.fullName || userState?.display_name || "User"}
+                </span>
               </DialogTitle>
-              <DialogDescription className="text-sm text-slate-600 mt-2">
-                Choose your auction preferences to get the best offers for your
-                vehicle
+              <DialogDescription className="text-xs sm:text-sm md:text-base text-slate-600 mt-1 sm:mt-2 leading-relaxed px-2 sm:px-0">
+                Choose your auction preference
               </DialogDescription>
             </DialogHeader>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 pt-0">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 pt-0">
             <motion.div
-              className="space-y-4 sm:space-y-6"
+              className="space-y-3 sm:space-y-4 md:space-y-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
@@ -474,7 +475,7 @@ export default function AuctionSelectionModal({
                     onClick={() =>
                       !isSubmitting && handleOptionSelect(option.id)
                     }
-                    className={`relative rounded-2xl p-4 sm:p-6 shadow-lg border-2 transition-all ${
+                    className={`relative rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 shadow-lg border-2 transition-all ${
                       isSubmitting
                         ? "cursor-not-allowed opacity-60"
                         : "cursor-pointer"
@@ -485,24 +486,24 @@ export default function AuctionSelectionModal({
                     } ${option.bgColor}`}
                   >
                     {/* Header */}
-                    <div className="flex items-start justify-between mb-3 sm:mb-4">
+                    <div className="flex items-start justify-between mb-2 sm:mb-3 md:mb-4">
                       <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                         <div
-                          className={`p-2 sm:p-3 rounded-xl bg-gradient-to-r ${option.color} text-white shadow-lg flex-shrink-0`}
+                          className={`p-2 sm:p-3 rounded-lg sm:rounded-xl bg-gradient-to-r ${option.color} text-white shadow-lg flex-shrink-0`}
                         >
-                          <IconComponent className="h-5 w-5 sm:h-6 sm:w-6" />
+                          <IconComponent className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-lg sm:text-xl font-bold text-slate-900">
+                          <h3 className="text-base sm:text-lg md:text-xl font-bold text-slate-900 leading-tight">
                             {option.title}
                           </h3>
-                          <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                          <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
                             {option.subtitle}
                           </p>
                         </div>
                       </div>
                       {isSelected ? (
-                        <div className="flex items-center gap-2 text-green-600 flex-shrink-0 ml-2">
+                        <div className="flex items-center gap-1 sm:gap-2 text-green-600 flex-shrink-0 ml-2">
                           <Check className="h-4 w-4 sm:h-5 sm:w-5" />
                         </div>
                       ) : (
@@ -511,7 +512,7 @@ export default function AuctionSelectionModal({
                     </div>
 
                     {/* Consent Text */}
-                    <div className="mb-3 sm:mb-4">
+                    <div className="mb-2 sm:mb-3 md:mb-4">
                       <div className="text-xs sm:text-sm text-slate-700 leading-relaxed">
                         {option.consentText}
                       </div>
@@ -521,65 +522,68 @@ export default function AuctionSelectionModal({
               })}
 
               {/* Common Terms Checkbox and Continue Button - Now inside scrollable area */}
-              <div className="border-t border-slate-200 pt-4 sm:pt-6 mt-4 sm:mt-6 flex items-center justify-between">
-                <div className="flex items-center gap-2 sm:gap-3 ">
-                  <input
-                    type="checkbox"
-                    checked={termsConsent}
-                    onChange={(e) => setTermsConsent(e.target.checked)}
-                    disabled={isSubmitting}
-                    className="h-4 w-4 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 flex-shrink-0 items-center"
-                  />
-                  <label className="text-xs sm:text-sm text-slate-700 cursor-pointer leading-relaxed">
-                    I have read and agree to the{" "}
-                    <Link
-                      to="/terms-of-service"
-                      className="no-underline font-bold text-[#f6851f] hover:underline"
+              <div className="border-t border-slate-200 pt-3 sm:pt-4 md:pt-6 mt-3 sm:mt-4 md:mt-6">
+                {/* Mobile: Stack vertically, Desktop: Side by side */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                  <div className="flex items-center justify-center gap-2 sm:gap-3 flex-1 min-w-0">
+                    <input
+                      type="checkbox"
+                      checked={termsConsent}
+                      onChange={(e) => setTermsConsent(e.target.checked)}
+                      disabled={isSubmitting}
+                      className="h-4 w-4 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 flex-shrink-0 items-center"
+                    />
+                    <label className="text-xs sm:text-sm text-slate-700 cursor-pointer leading-relaxed flex-1 min-w-0">
+                      I have read and agree to the{" "}
+                      <Link
+                        to="/terms-of-service"
+                        className="no-underline font-bold text-[#f6851f] hover:underline break-words"
+                      >
+                        Terms of Use
+                      </Link>{" "}
+                      and{" "}
+                      <Link
+                        to="/privacy-policy"
+                        className="no-underline font-bold text-[#f6851f] hover:underline break-words"
+                      >
+                        Privacy Policy
+                      </Link>
+                      .
+                    </label>
+                  </div>
+                  
+                  <div className="flex justify-end sm:justify-end w-full sm:w-auto">
+                    <button
+                      onClick={handleGo}
+                      disabled={isSubmitting || !selectedOption || !termsConsent}
+                      className={`inline-flex items-center justify-center rounded-xl 
+                        w-full sm:w-auto
+                        px-4 py-2.5 text-xs
+                        sm:px-6 sm:py-3 sm:text-sm
+                        md:px-8 md:py-4 md:text-base
+                        font-semibold text-white shadow-lg transition hover:scale-[1.02]
+                        ${
+                          !isSubmitting && selectedOption && termsConsent
+                            ? "bg-gradient-to-r from-[#f6851f] to-[#e63946] hover:from-orange-600 hover:to-red-600"
+                            : "bg-slate-400 cursor-not-allowed"
+                        }`}
                     >
-                      Terms of Use
-                    </Link>{" "}
-                    and{" "}
-                    <Link
-                      to="/privacy-policy"
-                      className="no-underline font-bold text-[#f6851f] hover:underline"
-                    >
-                      Privacy Policy
-                    </Link>
-                    .
-                  </label>
-                </div>
-                
-
-                <div className="flex justify-end">
-                  <button
-                    onClick={handleGo}
-                    disabled={isSubmitting || !selectedOption || !termsConsent}
-                    className={`inline-flex items-center justify-center rounded-xl 
-      px-4 py-2 text-xs
-      sm:px-6 sm:py-3 sm:text-sm
-      md:px-8 md:py-4 md:text-base
-      font-semibold text-white shadow-lg transition hover:scale-[1.02]
-      ${
-        !isSubmitting && selectedOption && termsConsent
-          ? "bg-gradient-to-r from-[#f6851f] to-[#e63946] hover:from-orange-600 hover:to-red-600"
-          : "bg-slate-400 cursor-not-allowed"
-      }`}
-                  >
-                    {isSubmitting ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span className="hidden sm:inline">Setting up...</span>
-                        <span className="sm:hidden">Setting...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2 w-full justify-center">
-                        <span className="hidden sm:inline">
-                          See your offer →
-                        </span>
-                        <span className="sm:hidden">See offer</span>
-                      </div>
-                    )}
-                  </button>
+                      {isSubmitting ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span className="hidden sm:inline">Setting up...</span>
+                          <span className="sm:hidden">Setting...</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 w-full justify-center">
+                          <span className="hidden sm:inline">
+                            See your offer →
+                          </span>
+                          <span className="sm:hidden">See offer</span>
+                        </div>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
