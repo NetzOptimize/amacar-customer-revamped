@@ -314,7 +314,7 @@ export default function LoginModal({
     <>
       <Dialog open={isOpen} onOpenChange={isCloseDisabled ? undefined : handleModalClose}>
         <DialogContent
-          className="sm:max-w-lg rounded-2xl shadow-xl p-0 overflow-hidden bg-white"
+          className="sm:max-w-lg rounded-2xl shadow-xl p-0 overflow-y-auto max-h-[70vh] bg-white"
           showCloseButton={!isCloseDisabled}
         >
           <div className="bg-gradient-to-br from-white via-slate-50 to-slate-100 p-6">
