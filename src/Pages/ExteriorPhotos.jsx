@@ -559,7 +559,7 @@ export default function VehiclePhotos() {
                           removePhoto(uploadedPhoto.id);
                         }}
                         disabled={!!uploadingMap[uploadedPhoto.id]}
-                        className="absolute top-2 right-2 sm:hidden bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation z-10"
+                        className="absolute top-2 right-2 lg:hidden bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation z-10"
                       >
                         {uploadingMap[uploadedPhoto.id] ? (
                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

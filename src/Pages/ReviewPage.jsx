@@ -161,7 +161,7 @@ export default function ReviewPage() {
                     whileTap={{ scale: 0.98 }}
                   >
                     <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
-                    Upload Photos
+                    Auction your ride
                   </motion.button>
                 )
               }
@@ -174,7 +174,7 @@ export default function ReviewPage() {
                     whileTap={{ scale: 0.98 }}
                   >
                     <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
-                    Upload Photos
+                    Auction your ride
                   </motion.button>
                 )
               }
