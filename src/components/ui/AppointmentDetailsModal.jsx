@@ -17,7 +17,8 @@ import {
   Video,
   Edit3,
   Trash2,
-  AlertCircle
+  AlertCircle,
+  X
 } from "lucide-react";
 import {
   Dialog,
@@ -46,7 +47,7 @@ export default function AppointmentDetailsModal({
 
   // Handle modal close
   const handleClose = (open) => {
-    if (!open && !isProcessing && !isCancelProcessing) {
+    if (open && !isProcessing && !isCancelProcessing) {
       onClose(false);
     }
   };
@@ -164,7 +165,7 @@ export default function AppointmentDetailsModal({
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
-        className="sm:max-w-[600px] w-full max-h-[95vh] sm:max-h-[90vh] rounded-xl sm:rounded-2xl shadow-2xl p-0 bg-white border-0 flex flex-col mx-4 sm:mx-0"
+        className="sm:max-w-[600px] w-full max-h-[95vh] sm:max-h-[90vh] rounded-xl sm:rounded-2xl shadow-2xl p-0 bg-white border-0 flex flex-col sm:mx-0"
         showCloseButton={!isCloseDisabled}
       >
         {/* Header - Fixed */}
@@ -174,7 +175,15 @@ export default function AppointmentDetailsModal({
             <DialogTitle className="text-base sm:text-lg font-bold mb-1">
               Appointment Details
             </DialogTitle>
-          
+            {/* Custom Close Button for Mobile */}
+            <button
+                  onClick={handleClose}
+                  disabled={isCloseDisabled}
+                  className="absolute top-0 right-0  sm:hidden p-1 rounded-full hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Close modal"
+                >
+                  <X className="w-2 h-2 text-black " />
+                </button>
           </div>
           {/* Decorative elements */}
           <div className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 w-16 h-16 sm:w-20 sm:h-20 bg-orange-500/10 rounded-full blur-xl"></div>

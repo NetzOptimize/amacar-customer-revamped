@@ -325,7 +325,7 @@ const AcceptedOffersPage = () => {
           className="mb-8"
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
-            <div className="text-center sm:text-left">
+            <div className="text-left">
               <motion.h1 variants={itemVariants} className="text-2xl sm:text-3xl font-bold text-neutral-800 mb-2">
                 Accepted Offers
               </motion.h1>

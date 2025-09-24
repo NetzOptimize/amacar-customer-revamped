@@ -230,12 +230,15 @@ export default function AppointmentModal({
         // Error cases (400, 403)
         const errorMessage = response.payload.message || "Something went wrong. Please try again.";
         
+        // Log the full error response for debugging
+        console.log("Appointment error response:", response.payload);
+        
         // Handle specific error cases
         if (errorMessage.includes("Cannot reschedule appointment") && errorMessage.includes("hours")) {
           // Too late to reschedule error
           setErrorMessage(errorMessage);
-        } else if (errorMessage.includes("already have an appointment scheduled")) {
-          // Duplicate appointment error
+        } else if (errorMessage.includes("already have an appointment scheduled") || errorMessage.includes("You already have an appointment scheduled")) {
+          // Duplicate appointment error - show the full message
           setErrorMessage(errorMessage);
         } else if (errorMessage.includes("not authorized")) {
           // Authorization error
@@ -301,7 +304,7 @@ export default function AppointmentModal({
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
-        className="sm:max-w-[800px] w-full md:max-h-[90vh] sm:max-h-[75vh] rounded-2xl shadow-2xl p-0 overflow-y-auto overflow-x-hidden bg-white border-0 "
+        className="sm:max-w-[800px] w-full max-h-[90vh] sm:max-h-[85vh] rounded-2xl shadow-2xl p-0 overflow-y-auto overflow-x-hidden bg-white border-0 "
         showCloseButton={!isCloseDisabled}
       >
         <div className="flex flex-col h-full">
@@ -649,7 +652,7 @@ export default function AppointmentModal({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                  className="flex flex-col items-center justify-center text-center gap-4 sm:gap-6 py-6 sm:py-8"
+                  className="flex flex-col items-center justify-center text-center gap-4 sm:gap-6 py-4 sm:py-8 px-2 sm:px-0"
                 >
                   <div className="relative">
                     <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center">
@@ -665,12 +668,12 @@ export default function AppointmentModal({
                       {errorMessage || "Something went wrong. Please try again."}
                     </p>
                     {errorMessage && (
-                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-xs sm:text-sm">
-                        <p className="text-orange-800 font-medium break-words">
+                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-xs sm:text-sm w-full max-w-sm sm:max-w-md">
+                        <p className="text-orange-800 font-medium break-words text-center sm:text-left">
                           {errorMessage.includes("Cannot reschedule appointment") && errorMessage.includes("hours") ? 
                             "⏰ Tip: You can only reschedule appointments at least 2 hours before the scheduled time." :
-                            errorMessage.includes("already have an appointment scheduled") ?
-                            "💡 Tip: Try selecting a different date or contact the dealer directly." :
+                            errorMessage.includes("already have an appointment scheduled") || errorMessage.includes("You already have an appointment scheduled") ?
+                            "💡 Tip: You already have an appointment with this dealer. Please choose a different date or contact the dealer to modify your existing appointment." :
                             errorMessage.includes("not authorized") ?
                             "🔒 Tip: You don't have permission to reschedule this appointment. Contact support if this is an error." :
                             "💡 Tip: Please check your input and try again, or contact support if the issue persists."
@@ -679,16 +682,16 @@ export default function AppointmentModal({
                       </div>
                     )}
                   </div>
-                  <div className="flex flex-col sm:flex-row gap-3 w-full">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
                     <button
                       onClick={resetFormState}
-                      className="flex-1 h-10 sm:h-12 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold text-xs sm:text-sm"
+                      className="flex-1 h-10 sm:h-12 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold text-xs sm:text-sm px-4 py-2 transition-all duration-200 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Try Again
                     </button>
                     <button
                       onClick={handleCloseClick}
-                      className="flex-1 h-10 sm:h-12 rounded-lg border-2 border-slate-200 text-slate-700 font-medium hover:bg-slate-50 text-xs sm:text-sm"
+                      className="flex-1 h-10 sm:h-12 rounded-lg border-2 border-slate-200 text-slate-700 font-medium hover:bg-slate-50 text-xs sm:text-sm px-4 py-2 transition-all duration-200"
                     >
                       Cancel
                     </button>
