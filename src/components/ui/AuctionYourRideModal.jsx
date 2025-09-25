@@ -21,6 +21,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import ReusableTooltip from "@/components/ui/ReusableTooltip";
 import { registerWithVin } from "@/redux/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -143,6 +144,87 @@ export default function AuctionModal({
     }
   }, [email]);
 
+  // Clear errors in real-time as user types
+  useEffect(() => {
+    if (errors.vin && vin && vin.length > 0) {
+      // Clear error as soon as user starts typing
+      setErrors(prev => ({ ...prev, vin: "" }));
+    }
+  }, [vin, errors.vin]);
+
+  useEffect(() => {
+    if (errors.firstName && firstName.length > 0) {
+      setErrors(prev => ({ ...prev, firstName: "" }));
+    }
+  }, [firstName, errors.firstName]);
+
+  useEffect(() => {
+    if (errors.lastName && lastName.length > 0) {
+      setErrors(prev => ({ ...prev, lastName: "" }));
+    }
+  }, [lastName, errors.lastName]);
+
+  useEffect(() => {
+    if (errors.phone && phone && phone.length === 10) {
+      setErrors(prev => ({ ...prev, phone: "" }));
+    }
+  }, [phone, errors.phone]);
+
+  useEffect(() => {
+    if (errors.password && password.length > 0) {
+      setErrors(prev => ({ ...prev, password: "" }));
+    }
+  }, [password, errors.password]);
+
+  useEffect(() => {
+    if (errors.confirmPassword && confirmPassword.length > 0) {
+      setErrors(prev => ({ ...prev, confirmPassword: "" }));
+    }
+  }, [confirmPassword, errors.confirmPassword]);
+
+  useEffect(() => {
+    if (errors.zipCode && zipCode.length > 0) {
+      setErrors(prev => ({ ...prev, zipCode: "" }));
+    }
+  }, [zipCode, errors.zipCode]);
+
+  // Clear location error when zip code changes
+  useEffect(() => {
+    if (locationError && zipCode) {
+      // Clear location error when user starts typing a new zip code
+      if (zipCode.length > 0) {
+        // The location error will be cleared by the Redux action when a new lookup starts
+      }
+    }
+  }, [zipCode, locationError]);
+
+  useEffect(() => {
+    if (errors.auctionConsent && auctionConsent) {
+      setErrors(prev => ({ ...prev, auctionConsent: "" }));
+    }
+  }, [auctionConsent, errors.auctionConsent]);
+
+  useEffect(() => {
+    if (errors.registerConsent && registerConsent) {
+      setErrors(prev => ({ ...prev, registerConsent: "" }));
+    }
+  }, [registerConsent, errors.registerConsent]);
+
+  // Clear email errors in real-time (more complex due to validation states)
+  useEffect(() => {
+    if (errors.email && email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (emailRegex.test(email)) {
+        // Only clear if not currently validating and no disposable/error states
+        if (!emailValidation.isValidating && 
+            emailValidation.isDisposable !== true && 
+            !emailValidation.error) {
+          setErrors(prev => ({ ...prev, email: "" }));
+        }
+      }
+    }
+  }, [email, errors.email, emailValidation.isValidating, emailValidation.isDisposable, emailValidation.error]);
+
   function validate() {
     const newErrors = {
       vin: "",
@@ -192,6 +274,8 @@ export default function AuctionModal({
     // Phone validation
     if (!phone) {
       newErrors.phone = "This field is required.";
+    } else if (phone.length < 10) {
+      newErrors.phone = "Phone number must be 10 digits.";
     }
 
     // Password validation
@@ -376,29 +460,36 @@ export default function AuctionModal({
                       >
                         VIN Number *
                       </label>
-                      <div className="relative">
-                        <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                          <Car className="h-4 w-4" />
+                      <ReusableTooltip
+                        content={errors.vin}
+                        side="top"
+                        align="start"
+                        disabled={!errors.vin}
+                      >
+                        <div className="relative">
+                          <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                            <Car className="h-4 w-4" />
+                          </div>
+                          <input
+                            maxLength={17}
+                            id="vin"
+                            type="text"
+                            value={vin}
+                            onChange={(e) => setVin(e.target.value)}
+                            placeholder="Enter vehicle's VIN number"
+                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${
+                              errors.vin 
+                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]" 
+                                : "border-slate-200"
+                            }`}
+                          />
+                          {vin && vin.length > 0 && (
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+                              {vin.length}/17
+                            </div>
+                          )}
                         </div>
-                        <input
-                          maxLength={17}
-                          id="vin"
-                          type="text"
-                          value={vin}
-                          onChange={(e) => setVin(e.target.value)}
-                          placeholder="Enter your vehicle's VIN number"
-                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
-                        />
-                      </div>
-                      {errors.vin && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-xs text-red-500 mt-1"
-                        >
-                          {errors.vin}
-                        </motion.p>
-                      )}
+                      </ReusableTooltip>
                     </div>
 
                     {/* First Name Field */}
@@ -409,28 +500,30 @@ export default function AuctionModal({
                       >
                         First Name *
                       </label>
-                      <div className="relative">
-                        <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                          <User className="h-4 w-4" />
+                      <ReusableTooltip
+                        content={errors.firstName}
+                        side="top"
+                        align="start"
+                        disabled={!errors.firstName}
+                      >
+                        <div className="relative">
+                          <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                            <User className="h-4 w-4" />
+                          </div>
+                          <input
+                            id="firstName"
+                            type="text"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            placeholder="Enter first name"
+                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${
+                              errors.firstName 
+                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]" 
+                                : "border-slate-200"
+                            }`}
+                          />
                         </div>
-                        <input
-                          id="firstName"
-                          type="text"
-                          value={firstName}
-                          onChange={(e) => setFirstName(e.target.value)}
-                          placeholder="Enter your first name"
-                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
-                        />
-                      </div>
-                      {errors.firstName && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-xs text-red-500 mt-1"
-                        >
-                          {errors.firstName}
-                        </motion.p>
-                      )}
+                      </ReusableTooltip>
                     </div>
 
                     {/* Email Field */}
@@ -446,90 +539,74 @@ export default function AuctionModal({
                           </span>
                         )}
                       </label>
-                      <div className="relative">
-                        <div
-                          className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 ${
-                            email && isOpen && emailValidation.isValid === true
-                              ? "text-green-500"
-                              : email &&
-                                isOpen &&
-                                emailValidation.isDisposable === true
-                              ? "text-red-500"
-                              : "text-slate-400"
-                          }`}
-                        >
-                          <Mail className="h-4 w-4" />
-                        </div>
-                        <input
-                          id="email"
-                          type="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="Enter your email address"
-                          className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-all duration-200 ${
-                            email && isOpen && emailValidation.isValid === true
-                              ? "border-green-300 bg-green-50 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.5)]"
-                              : email &&
-                                isOpen &&
-                                emailValidation.isDisposable === true
-                              ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
-                              : errors.email && !emailValidation.isValidating
-                              ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
-                              : "border-slate-200 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
-                          }`}
-                        />
-                        {/* Validation status indicator */}
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                          {emailValidation.isValidating && email && isOpen && (
-                            <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
-                          )}
-                          {!emailValidation.isValidating &&
-                            email &&
-                            isOpen &&
-                            emailValidation.isValid === true && (
-                              <CheckCircle2 className="h-4 w-4 text-green-500" />
-                            )}
-                          {!emailValidation.isValidating &&
-                            email &&
-                            isOpen &&
-                            emailValidation.isDisposable === true && (
-                              <XCircle className="h-4 w-4 text-red-500" />
-                            )}
-                        </div>
-                      </div>
-
-                      {email &&
-                        isOpen &&
-                        emailValidation.isDisposable === true && (
-                          <motion.p
-                            initial={{ opacity: 0, y: -4 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="text-xs text-red-500 mt-1"
+                      <ReusableTooltip
+                        content={
+                          email && isOpen && emailValidation.isDisposable === true
+                            ? "Disposable email addresses are not allowed"
+                            : email && isOpen && emailValidation.error
+                            ? "Unable to verify email. Please try again."
+                            : errors.email
+                        }
+                        side="top"
+                        align="start"
+                        disabled={
+                          !errors.email && 
+                          !(email && isOpen && emailValidation.isDisposable === true) &&
+                          !(email && isOpen && emailValidation.error)
+                        }
+                      >
+                        <div className="relative">
+                          <div
+                            className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 ${
+                              email && isOpen && emailValidation.isValid === true
+                                ? "text-green-500"
+                                : email &&
+                                  isOpen &&
+                                  emailValidation.isDisposable === true
+                                ? "text-red-500"
+                                : "text-slate-400"
+                            }`}
                           >
-                            Disposable email addresses are not allowed
-                          </motion.p>
-                        )}
-
-                      {email && isOpen && emailValidation.error && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-xs text-red-500 mt-1"
-                        >
-                          Unable to verify email. Please try again.
-                        </motion.p>
-                      )}
-
-                      {/* Show regex validation error only when not validating */}
-                      {errors.email && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-xs text-red-500 mt-1"
-                        >
-                          {errors.email}
-                        </motion.p>
-                      )}
+                            <Mail className="h-4 w-4" />
+                          </div>
+                          <input
+                            id="email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Enter email address"
+                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-all duration-200 ${
+                              email && isOpen && emailValidation.isValid === true
+                                ? "border-green-300 bg-green-50 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.5)]"
+                                : email &&
+                                  isOpen &&
+                                  emailValidation.isDisposable === true
+                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
+                                : errors.email && !emailValidation.isValidating
+                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
+                                : "border-slate-200 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
+                            }`}
+                          />
+                          {/* Validation status indicator */}
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            {emailValidation.isValidating && email && isOpen && (
+                              <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                            )}
+                            {!emailValidation.isValidating &&
+                              email &&
+                              isOpen &&
+                              emailValidation.isValid === true && (
+                                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                              )}
+                            {!emailValidation.isValidating &&
+                              email &&
+                              isOpen &&
+                              emailValidation.isDisposable === true && (
+                                <XCircle className="h-4 w-4 text-red-500" />
+                              )}
+                          </div>
+                        </div>
+                      </ReusableTooltip>
                     </div>
 
                     {/* Password Field */}
@@ -540,39 +617,41 @@ export default function AuctionModal({
                       >
                         Password *
                       </label>
-                      <div className="relative">
-                        <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                          <Lock className="h-4 w-4" />
+                      <ReusableTooltip
+                        content={errors.password}
+                        side="top"
+                        align="start"
+                        disabled={!errors.password}
+                      >
+                        <div className="relative">
+                          <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                            <Lock className="h-4 w-4" />
+                          </div>
+                          <input
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Enter password"
+                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${
+                              errors.password 
+                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]" 
+                                : "border-slate-200"
+                            }`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </button>
                         </div>
-                        <input
-                          id="password"
-                          type={showPassword ? "text" : "password"}
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="Enter your password"
-                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                        >
-                          {showPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </button>
-                      </div>
-                      {errors.password && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-xs text-red-500 mt-1"
-                        >
-                          {errors.password}
-                        </motion.p>
-                      )}
+                      </ReusableTooltip>
                     </div>
 
                     {/* City Field */}
@@ -595,7 +674,7 @@ export default function AuctionModal({
                           placeholder={
                             locationStatus === "loading"
                               ? "Looking up city..."
-                              : "Enter your city"
+                              : "Enter city"
                           }
                           disabled={
                             locationStatus === "loading" ||
@@ -623,45 +702,38 @@ export default function AuctionModal({
                       >
                         Zip Code *
                       </label>
-                      <div className="relative">
-                        <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                          <MapPin className="h-4 w-4" />
-                        </div>
-                        <input
-                          id="zipCode"
-                          type="text"
-                          inputMode="numeric"
-                          maxLength={5}
-                          value={zipCode}
-                          onChange={(e) => handleZipCodeChange(e.target.value)}
-                          placeholder="Enter your zip code"
-                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
-                          style={{ fontSize: "16px" }}
-                        />
-                        {locationStatus === "loading" && (
-                          <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
-                            <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                      <ReusableTooltip
+                        content={errors.zipCode || locationError}
+                        side="top"
+                        align="start"
+                        disabled={!errors.zipCode && !locationError}
+                      >
+                        <div className="relative">
+                          <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                            <MapPin className="h-4 w-4" />
                           </div>
-                        )}
-                      </div>
-                      {errors.zipCode && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-xs text-red-500 mt-1"
-                        >
-                          {errors.zipCode}
-                        </motion.p>
-                      )}
-                      {locationError && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-xs text-red-500 mt-1"
-                        >
-                          {locationError}
-                        </motion.p>
-                      )}
+                          <input
+                            id="zipCode"
+                            type="text"
+                            inputMode="numeric"
+                            maxLength={5}
+                            value={zipCode}
+                            onChange={(e) => handleZipCodeChange(e.target.value)}
+                            placeholder="Enter zip code"
+                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${
+                              errors.zipCode || locationError
+                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]" 
+                                : "border-slate-200"
+                            }`}
+                            style={{ fontSize: "16px" }}
+                          />
+                          {locationStatus === "loading" && (
+                            <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
+                              <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                            </div>
+                          )}
+                        </div>
+                      </ReusableTooltip>
                     </div>
 
                     {/* Last Name Field */}
@@ -672,28 +744,30 @@ export default function AuctionModal({
                       >
                         Last Name *
                       </label>
-                      <div className="relative">
-                        <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                          <User className="h-4 w-4" />
+                      <ReusableTooltip
+                        content={errors.lastName}
+                        side="top"
+                        align="start"
+                        disabled={!errors.lastName}
+                      >
+                        <div className="relative">
+                          <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                            <User className="h-4 w-4" />
+                          </div>
+                          <input
+                            id="lastName"
+                            type="text"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            placeholder="Enter last name"
+                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${
+                              errors.lastName 
+                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]" 
+                                : "border-slate-200"
+                            }`}
+                          />
                         </div>
-                        <input
-                          id="lastName"
-                          type="text"
-                          value={lastName}
-                          onChange={(e) => setLastName(e.target.value)}
-                          placeholder="Enter your last name"
-                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
-                        />
-                      </div>
-                      {errors.lastName && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-xs text-red-500 mt-1"
-                        >
-                          {errors.lastName}
-                        </motion.p>
-                      )}
+                      </ReusableTooltip>
                     </div>
 
                     {/* Phone Number Field */}
@@ -704,35 +778,38 @@ export default function AuctionModal({
                       >
                         Phone Number *
                       </label>
-                      <div className="relative">
-                        <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                          <MapPin className="h-4 w-4" />
+                      <ReusableTooltip
+                        content={errors.phone}
+                        side="top"
+                        align="start"
+                        disabled={!errors.phone}
+                      >
+                        <div className="relative">
+                          <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                            <MapPin className="h-4 w-4" />
+                          </div>
+                          <input
+                            maxLength={10}
+                            inputMode="numeric"
+                            id="phone"
+                            type="tel"
+                            value={phone}
+                            onChange={(e) => {
+                              // keep only digits
+                              const value = e.target.value.replace(/\D/g, "");
+                              setPhone(value);
+                            }}
+                            pattern="[0-9]*"
+                            placeholder="Enter phone number"
+                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${
+                              errors.phone 
+                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]" 
+                                : "border-slate-200"
+                            }`}
+                          />
+                        
                         </div>
-                        <input
-                          maxLength={10}
-                          inputMode="numeric"
-                          id="phone"
-                          type="tel"
-                          value={phone}
-                          onChange={(e) => {
-                            // keep only digits
-                            const value = e.target.value.replace(/\D/g, "");
-                            setPhone(value);
-                          }}
-                          pattern="[0-9]*"
-                          placeholder="Enter your phone number"
-                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
-                        />
-                      </div>
-                      {errors.phone && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-xs text-red-500 mt-1"
-                        >
-                          {errors.phone}
-                        </motion.p>
-                      )}
+                      </ReusableTooltip>
                     </div>
 
                     {/* Confirm Password Field */}
@@ -743,41 +820,43 @@ export default function AuctionModal({
                       >
                         Confirm Password *
                       </label>
-                      <div className="relative">
-                        <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                          <Lock className="h-4 w-4" />
+                      <ReusableTooltip
+                        content={errors.confirmPassword}
+                        side="top"
+                        align="start"
+                        disabled={!errors.confirmPassword}
+                      >
+                        <div className="relative">
+                          <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                            <Lock className="h-4 w-4" />
+                          </div>
+                          <input
+                            id="confirmPassword"
+                            type={showConfirmPassword ? "text" : "password"}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Confirm password"
+                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${
+                              errors.confirmPassword 
+                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]" 
+                                : "border-slate-200"
+                            }`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setShowConfirmPassword(!showConfirmPassword)
+                            }
+                            className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                          >
+                            {showConfirmPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </button>
                         </div>
-                        <input
-                          id="confirmPassword"
-                          type={showConfirmPassword ? "text" : "password"}
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          placeholder="Confirm your password"
-                          className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
-                        />
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setShowConfirmPassword(!showConfirmPassword)
-                          }
-                          className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                        >
-                          {showConfirmPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </button>
-                      </div>
-                      {errors.confirmPassword && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-xs text-red-500 mt-1"
-                        >
-                          {errors.confirmPassword}
-                        </motion.p>
-                      )}
+                      </ReusableTooltip>
                     </div>
 
                     {/* State Field */}
@@ -800,7 +879,7 @@ export default function AuctionModal({
                           placeholder={
                             locationStatus === "loading"
                               ? "Looking up state..."
-                              : "Enter your state"
+                              : "Enter state"
                           }
                           disabled={
                             locationStatus === "loading" ||
@@ -822,85 +901,99 @@ export default function AuctionModal({
                 {/* Terms and Conditions Checkboxes */}
                 <div className="space-y-3 items-center pt-4 border-t border-slate-200">
                   {/* Account and Auction Terms Checkbox */}
-                  <div className="flex items-center  gap-3">
-                    <div className="flex items-center h-5">
-                      <input
-                        id="auctionConsent"
-                        type="checkbox"
-                        checked={auctionConsent}
-                        onChange={(e) => setAuctionConsent(e.target.checked)}
-                        className="h-4 w-4 cursor-pointer text-orange-600 border-slate-300 rounded focus:ring-orange-500 focus:ring-2"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <label
-                        htmlFor="auctionConsent"
-                        className="text-sm text-slate-700 cursor-pointer"
-                      >
-                        I agree to Amacar's{" "}
-                        <Link
-                          to="/terms-of-service"
-                          className="no-underline font-bold text-[#f6851f]"
+                  <ReusableTooltip
+                    content={errors.auctionConsent}
+                    side="top"
+                    align="start"
+                    disabled={!errors.auctionConsent}
+                  >
+                    <div className={`flex items-center gap-3 ${errors.auctionConsent ? 'p-2 rounded-md border border-red-300 bg-red-50' : ''}`}>
+                      <div className="flex items-center h-5">
+                        <input
+                          id="auctionConsent"
+                          type="checkbox"
+                          checked={auctionConsent}
+                          onChange={(e) => setAuctionConsent(e.target.checked)}
+                          className={`h-4 w-4 cursor-pointer text-orange-600 border-slate-300 rounded focus:ring-orange-500 focus:ring-2 ${
+                            errors.auctionConsent ? 'border-red-300' : ''
+                          }`}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label
+                          htmlFor="auctionConsent"
+                          className="text-sm text-slate-700 cursor-pointer"
                         >
-                          Account and Auction Terms for Customers
-                        </Link>
-                        , including arbitration and disclaimer clauses. *
-                      </label>
-                      {errors.auctionConsent && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-xs text-red-500 mt-1"
-                        >
-                          {errors.auctionConsent}
-                        </motion.p>
-                      )}
+                          I agree to Amacar's{" "}
+                          <Link
+                            to="/terms-of-service"
+                            className="no-underline font-bold text-[#f6851f]"
+                          >
+                            Account and Auction Terms for Customers
+                          </Link>
+                          , including arbitration and disclaimer clauses. *
+                        </label>
+                        {errors.auctionConsent && (
+                          <div className="mt-1">
+                            <span className="text-xs text-red-500">
+                              {errors.auctionConsent}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  </ReusableTooltip>
 
                   {/* Terms of Use and Privacy Policy Checkbox */}
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center  h-5">
-                      <input
-                        id="registerConsent"
-                        type="checkbox"
-                        checked={registerConsent}
-                        onChange={(e) => setRegisterConsent(e.target.checked)}
-                        className="h-4 w-4 cursor-pointer text-orange-600 border-slate-300 rounded focus:ring-orange-500 focus:ring-2"
-                      />
+                  <ReusableTooltip
+                    content={errors.registerConsent}
+                    side="top"
+                    align="start"
+                    disabled={!errors.registerConsent}
+                  >
+                    <div className={`flex items-center gap-3 ${errors.registerConsent ? 'p-2 rounded-md border border-red-300 bg-red-50' : ''}`}>
+                      <div className="flex items-center h-5">
+                        <input
+                          id="registerConsent"
+                          type="checkbox"
+                          checked={registerConsent}
+                          onChange={(e) => setRegisterConsent(e.target.checked)}
+                          className={`h-4 w-4 cursor-pointer text-orange-600 border-slate-300 rounded focus:ring-orange-500 focus:ring-2 ${
+                            errors.registerConsent ? 'border-red-300' : ''
+                          }`}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label
+                          htmlFor="registerConsent"
+                          className="text-sm text-slate-700 cursor-pointer"
+                        >
+                          I agree to the{" "}
+                          <Link
+                            to="/terms-of-service"
+                            className="no-underline font-bold text-[#f6851f]"
+                          >
+                            Terms of Use
+                          </Link>{" "}
+                          and{" "}
+                          <Link
+                            to="/privacy-policy"
+                            className="no-underline font-bold text-[#f6851f]"
+                          >
+                            Privacy Policy
+                          </Link>
+                          . *
+                        </label>
+                        {errors.registerConsent && (
+                          <div className="mt-1">
+                            <span className="text-xs text-red-500">
+                              {errors.registerConsent}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <label
-                        htmlFor="registerConsent"
-                        className="text-sm text-slate-700 cursor-pointer"
-                      >
-                        I agree to the{" "}
-                        <Link
-                          to="/terms-of-service"
-                          className="no-underline font-bold text-[#f6851f]"
-                        >
-                          Terms of Use
-                        </Link>{" "}
-                        and{" "}
-                        <Link
-                          to="/privacy-policy"
-                          className="no-underline font-bold text-[#f6851f]"
-                        >
-                          Privacy Policy
-                        </Link>
-                        . *
-                      </label>
-                      {errors.registerConsent && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-xs text-red-500 mt-1"
-                        >
-                          {errors.registerConsent}
-                        </motion.p>
-                      )}
-                    </div>
-                  </div>
+                  </ReusableTooltip>
                 </div>
 
                 {/* Auction Button */}
@@ -1037,19 +1130,19 @@ export default function AuctionModal({
                   <button
                     onClick={() => dispatch(resetModalState())}
                     className="
-    cursor-pointer 
-    w-full sm:w-auto          
-    px-2 sm:px-6 lg:px-8     
-    h-11 sm:h-12 lg:h-12      
-    rounded-xl 
-    bg-slate-900 
-    text-white 
-    text-sm sm:text-base lg:text-lg 
-    font-semibold 
-    shadow-lg shadow-slate-900/20 
-    hover:bg-slate-800 
-    transition-all duration-200
-  "
+                      cursor-pointer 
+                      w-full sm:w-auto          
+                      px-2 sm:px-6 lg:px-8     
+                      h-11 sm:h-12 lg:h-12      
+                      rounded-xl 
+                      bg-slate-900 
+                      text-white 
+                      text-sm sm:text-base lg:text-lg 
+                      font-semibold 
+                      shadow-lg shadow-slate-900/20 
+                      hover:bg-slate-800 
+                      transition-all duration-200
+                    "
                   >
                     Try Again
                   </button>
@@ -1057,17 +1150,17 @@ export default function AuctionModal({
                   <button
                     onClick={() => handleOpenChange(false)}
                     className="
-    cursor-pointer 
-    w-full sm:w-auto              /* Full width on mobile, auto on bigger screens */
-    px-4 sm:px-6 lg:px-8          /* Padding scales with screen size */
-    h-11 sm:h-12 lg:h-12          /* Adjust height */
-    rounded-xl 
-    border border-slate-300 
-    text-slate-700 
-    text-sm sm:text-base lg:text-lg /* Responsive font size */
-    font-semibold 
-    hover:bg-slate-50 
-    transition-all duration-200
+                      cursor-pointer 
+                      w-full sm:w-auto              /* Full width on mobile, auto on bigger screens */
+                      px-4 sm:px-6 lg:px-8          /* Padding scales with screen size */
+                      h-11 sm:h-12 lg:h-12          /* Adjust height */
+                      rounded-xl 
+                      border border-slate-300 
+                      text-slate-700 
+                      text-sm sm:text-base lg:text-lg /* Responsive font size */
+                      font-semibold 
+                      hover:bg-slate-50 
+                      transition-all duration-200
   "
                   >
                     Cancel
