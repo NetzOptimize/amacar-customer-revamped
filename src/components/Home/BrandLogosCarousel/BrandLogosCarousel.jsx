@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselDots,
-} from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
 
-const BrandLogosCarousel = ({ className = "" }) => {
-  const [api, setApi] = useState();
-  const [current, setCurrent] = useState(0);
+const BrandLogosCarousel = ({ className = "", pauseOnHover = true }) => {
+  const [isPaused, setIsPaused] = useState(false);
 
   // Brand logos data - removing duplicates
   const brandLogos = [
@@ -131,55 +124,41 @@ const BrandLogosCarousel = ({ className = "" }) => {
     }
   ];
 
-  // Auto-play functionality
-  useEffect(() => {
-    if (!api) return;
+  // Duplicate logos for seamless infinite scroll
+  const duplicatedLogos = [...brandLogos, ...brandLogos];
 
-    const interval = setInterval(() => {
-      api.scrollNext();
-    }, 3000); // Auto-advance every 3 seconds
-
-    return () => clearInterval(interval);
-  }, [api]);
-
-  // Responsive logos per slide based on screen size
-  const getLogosPerSlide = () => {
-    if (typeof window === 'undefined') return 2; // SSR fallback - start with mobile
+  // Responsive logo sizing
+  const getLogoSize = () => {
+    if (typeof window === 'undefined') return 'h-20 w-24'; // SSR fallback
     
     const width = window.innerWidth;
-    if (width < 480) return 2;      // Very small mobile: 2 logos
-    if (width < 640) return 3;      // Mobile: 3 logos
-    if (width < 768) return 4;      // Small tablet: 4 logos
-    if (width < 1024) return 5;     // Tablet: 5 logos
-    if (width < 1280) return 6;     // Small desktop: 6 logos
-    return 6;                       // Large desktop: 6 logos
+    if (width < 480) return 'h-16 w-20';      // Very small mobile
+    if (width < 640) return 'h-18 w-22';      // Mobile
+    if (width < 768) return 'h-20 w-24';      // Small tablet
+    if (width < 1024) return 'h-22 w-28';     // Tablet
+    if (width < 1280) return 'h-24 w-32';     // Small desktop
+    return 'h-24 w-32';                       // Large desktop
   };
 
-  const [logosPerSlide, setLogosPerSlide] = useState(2); // Start with mobile-friendly default
+  const [logoSize, setLogoSize] = useState('h-20 w-24'); // Start with mobile-friendly default
 
-  // Update logos per slide on window resize
+  // Update logo size on window resize
   useEffect(() => {
-    const updateLogosPerSlide = () => {
-      setLogosPerSlide(getLogosPerSlide());
+    const updateLogoSize = () => {
+      setLogoSize(getLogoSize());
     };
 
     // Set initial value
-    updateLogosPerSlide();
+    updateLogoSize();
 
     // Add resize listener
-    window.addEventListener('resize', updateLogosPerSlide);
+    window.addEventListener('resize', updateLogoSize);
     
-    return () => window.removeEventListener('resize', updateLogosPerSlide);
+    return () => window.removeEventListener('resize', updateLogoSize);
   }, []);
 
-  // Group logos into slides based on responsive logos per slide
-  const slides = [];
-  for (let i = 0; i < brandLogos.length; i += logosPerSlide) {
-    slides.push(brandLogos.slice(i, i + logosPerSlide));
-  }
-
   return (
-    <div className={cn("w-full p-[1rem] lg:p-[2.5rem]", className)}>
+    <div className={cn("w-full py-[2rem] px-[1rem] lg:p-[3.5rem]", className)}>
       <div className="text-center mb-8">
         <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-800 mb-2">
           Trusted by Leading Brands
@@ -189,54 +168,54 @@ const BrandLogosCarousel = ({ className = "" }) => {
         </p>
       </div>
 
-      <Carousel
-        setApi={setApi}
-        opts={{
-          align: "start",
-          loop: true,
-        }}
-        className="w-full"
+      {/* Continuous scrolling container */}
+      <div 
+        className="relative overflow-hidden"
+        onMouseEnter={() => pauseOnHover && setIsPaused(true)}
+        onMouseLeave={() => pauseOnHover && setIsPaused(false)}
       >
-         <CarouselContent className="-ml-2 md:-ml-4">
-           {slides.map((slide, slideIndex) => (
-             <CarouselItem key={slideIndex} className="pl-2 md:pl-4">
-               <div 
-                 className="grid gap-3 sm:gap-4 md:gap-6"
-                 style={{
-                   gridTemplateColumns: `repeat(${logosPerSlide}, 1fr)`
-                 }}
-               >
-                 {slide.map((brand, brandIndex) => (
-                   <motion.div
-                     key={`${slideIndex}-${brandIndex}`}
-                     initial={{ opacity: 0, y: 20 }}
-                     animate={{ opacity: 1, y: 0 }}
-                     transition={{ 
-                       duration: 0.5, 
-                       delay: brandIndex * 0.1 
-                     }}
-                     className="group"
-                   >
-                     <div className="bg-white rounded-xl p-3 sm:p-4 md:p-6 shadow-sm border border-neutral-200 hover:shadow-md transition-all duration-300 group-hover:scale-105 h-20 sm:h-24 md:h-28 flex items-center justify-center">
-                       <img
-                         src={brand.logo}
-                         alt={brand.alt}
-                         className="max-h-10 sm:max-h-12 md:max-h-16 w-auto object-contain filter-none"
-                         loading="lazy"
-                         onError={(e) => {
-                           e.target.style.display = 'none';
-                         }}
-                       />
-                     </div>
-                   </motion.div>
-                 ))}
-               </div>
-             </CarouselItem>
-           ))}
-         </CarouselContent>
-        
-        <CarouselDots className="mt-6" />
-      </Carousel>
+        <div 
+          className={cn(
+            "flex gap-6 md:gap-8 lg:gap-12",
+            isPaused ? "animate-pause" : "animate-scroll"
+          )}
+          style={{
+            animationDuration: '45s', // Adjust speed here (lower = faster)
+            animationTimingFunction: 'linear',
+            animationIterationCount: 'infinite',
+            animationDirection: 'normal',
+            width: 'max-content'
+          }}
+        >
+          {duplicatedLogos.map((brand, index) => (
+            <motion.div
+              key={`${brand.name}-${index}`}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ 
+                duration: 0.5, 
+                delay: index * 0.05 
+              }}
+              className="group flex-shrink-0"
+            >
+              <div className={cn(
+                "bg-white rounded-xl p-3 sm:p-4 md:p-6 shadow-sm border border-neutral-200 hover:shadow-md transition-all duration-300 group-hover:scale-105 flex items-center justify-center",
+                logoSize
+              )}>
+                <img
+                  src={brand.logo}
+                  alt={brand.alt}
+                  className="max-h-10 sm:max-h-12 md:max-h-16 w-auto object-contain filter-none"
+                  loading="lazy"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                  }}
+                />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

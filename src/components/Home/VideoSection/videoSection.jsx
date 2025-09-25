@@ -30,7 +30,7 @@ export default function VideoSection() {
     <section className="video-section">
       {/* Left Text Section */}
       <motion.div
-        className="left-text-section"
+        className="left-text-section "
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
@@ -46,7 +46,7 @@ export default function VideoSection() {
         </p>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="cursor-pointer btn-purple mt-4"
+          className="cursor-pointer btn-purple mt-4 block mx-auto md:mx-0"
         >
           See your car value
         </button>
