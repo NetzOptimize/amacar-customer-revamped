@@ -143,7 +143,9 @@ export default function VehiclePhotos() {
     return [];
   });
   const [uploadingMap, setUploadingMap] = useState({});
+  const [deletingMap, setDeletingMap] = useState({});
   const [progressMap, setProgressMap] = useState({});
+  const [progressIntervals, setProgressIntervals] = useState({});
   const [dragActive, setDragActive] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -337,6 +339,50 @@ export default function VehiclePhotos() {
 
   const isComplete = uploadedRequiredCount >= totalRequired;
 
+  // Function to start random progress simulation
+  const startRandomProgress = (id) => {
+    // Clear any existing interval for this photo
+    if (progressIntervals[id]) {
+      clearInterval(progressIntervals[id]);
+    }
+
+    // Generate random stop point between 80-85%
+    const stopPoint = Math.floor(Math.random() * 6) + 90; // 90-95%
+    
+    let currentProgress = 0;
+    const interval = setInterval(() => {
+      currentProgress += Math.floor(Math.random() * 12) + 2; // Random increment between 2-9
+      
+      // Stop at the random stop point
+      if (currentProgress >= stopPoint) {
+        currentProgress = stopPoint;
+        clearInterval(interval);
+        setProgressIntervals(prev => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+      }
+      
+      setProgressMap(prev => ({ ...prev, [id]: currentProgress }));
+    }, 200 + Math.random() * 300); // Random interval between 200-500ms
+
+    setProgressIntervals(prev => ({ ...prev, [id]: interval }));
+  };
+
+  // Function to complete progress (set to 100%)
+  const completeProgress = (id) => {
+    if (progressIntervals[id]) {
+      clearInterval(progressIntervals[id]);
+      setProgressIntervals(prev => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    }
+    setProgressMap(prev => ({ ...prev, [id]: 100 }));
+  };
+
   const handleSinglePhotoUpload = async (file, id) => {
     console.log("=== handleSinglePhotoUpload START ===");
     console.log("Upload parameters:", { file, id, productId });
@@ -350,14 +396,17 @@ export default function VehiclePhotos() {
     setUploadingMap((prev) => ({ ...prev, [id]: true }));
     setProgressMap((prev) => ({ ...prev, [id]: 0 }));
 
+    // Start random progress simulation
+    startRandomProgress(id);
+
     try {
       // Create image name based on requirement ID
       const imageName = `image_${id}_view`;
       console.log("Created image name:", imageName);
 
-      // Progress callback for chunked uploads
+      // Progress callback for chunked uploads (this will override random progress if called)
       const onProgress = (progress) => {
-        console.log(`Progress update for ${id}:`, progress);
+        console.log(`Real progress update for ${id}:`, progress);
         setProgressMap((prev) => ({ ...prev, [id]: progress }));
       };
 
@@ -373,6 +422,9 @@ export default function VehiclePhotos() {
       ).unwrap();
 
       console.log("Image upload successful:", result);
+
+      // Complete the progress to 100% when upload is successful
+      completeProgress(id);
 
       // Note: Image is automatically added to Redux state via uploadVehicleImage.fulfilled
       // No need to manually add to local state as it will be loaded from Redux in useEffect
@@ -398,6 +450,10 @@ export default function VehiclePhotos() {
         fileType: file.type,
         fileSize: file.size,
       });
+      
+      // Complete progress even on error to show it finished
+      completeProgress(id);
+      
       // Show error to user
       toast.error(`Failed to upload image: ${error.message || error}`);
     } finally {
@@ -407,11 +463,16 @@ export default function VehiclePhotos() {
         delete next[id];
         return next;
       });
-      setProgressMap((prev) => {
-        const next = { ...prev };
-        delete next[id];
-        return next;
-      });
+      
+      // Clear progress after a short delay to show 100% completion
+      setTimeout(() => {
+        setProgressMap((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+      }, 1000);
+      
       console.log("=== handleSinglePhotoUpload END ===");
     }
   };
@@ -455,7 +516,7 @@ export default function VehiclePhotos() {
       }
 
       // Set deleting state for this specific photo
-      setUploadingMap((prev) => ({ ...prev, [photoId]: true }));
+      setDeletingMap((prev) => ({ ...prev, [photoId]: true }));
 
       // If photo was uploaded to server, delete it via API
       if (photoToDelete.attachmentId) {
@@ -551,7 +612,7 @@ export default function VehiclePhotos() {
       );
     } finally {
       // Clear the deleting state for this specific photo
-      setUploadingMap((prev) => {
+      setDeletingMap((prev) => {
         const next = { ...prev };
         delete next[photoId];
         return next;
@@ -585,6 +646,15 @@ export default function VehiclePhotos() {
   useEffect(() => {
     onChange({ photos: [...photos, ...accidentPhotos.filter((p) => p.url)] });
   }, [photos, accidentPhotos]);
+
+  // Cleanup intervals on component unmount
+  useEffect(() => {
+    return () => {
+      Object.values(progressIntervals).forEach(interval => {
+        if (interval) clearInterval(interval);
+      });
+    };
+  }, [progressIntervals]);
 
   const progress = Math.round((uploadedRequiredCount / totalRequired) * 100);
 
@@ -753,12 +823,7 @@ export default function VehiclePhotos() {
                       <p className="text-xs text-slate-600 mt-2">
                         {progressMap[photo.id] || 0}% complete
                       </p>
-                      {progressMap[photo.id] > 0 &&
-                        progressMap[photo.id] < 100 && (
-                          <p className="text-xs text-slate-500 mt-1">
-                            Chunked upload in progress...
-                          </p>
-                        )}
+                     
                     </div>
                   ) : hasPhoto ? (
                     <div className="relative group aspect-square">
@@ -774,10 +839,10 @@ export default function VehiclePhotos() {
                           e.stopPropagation();
                           removePhoto(uploadedPhoto.id);
                         }}
-                        disabled={!!uploadingMap[uploadedPhoto.id]}
+                        disabled={!!deletingMap[uploadedPhoto.id]}
                         className="absolute top-2 right-2 sm:hidden bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation z-10"
                       >
-                        {uploadingMap[uploadedPhoto.id] ? (
+                        {deletingMap[uploadedPhoto.id] ? (
                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                         ) : (
                           <X className="w-4 h-4" />
@@ -791,10 +856,10 @@ export default function VehiclePhotos() {
                             e.stopPropagation();
                             removePhoto(uploadedPhoto.id);
                           }}
-                          disabled={!!uploadingMap[uploadedPhoto.id]}
+                          disabled={!!deletingMap[uploadedPhoto.id]}
                           className="bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {uploadingMap[uploadedPhoto.id] ? (
+                          {deletingMap[uploadedPhoto.id] ? (
                             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                           ) : (
                             <X className="w-5 h-5" />
@@ -1013,12 +1078,7 @@ export default function VehiclePhotos() {
                         <p className="text-xs text-slate-600 mt-2">
                           {progressMap[photo.id] || 0}% complete
                         </p>
-                        {progressMap[photo.id] > 0 &&
-                          progressMap[photo.id] < 100 && (
-                            <p className="text-xs text-slate-500 mt-1">
-                              Chunked upload in progress...
-                            </p>
-                          )}
+                 
                       </div>
                     ) : hasPhoto ? (
                       <div className="relative group aspect-square">
@@ -1034,10 +1094,10 @@ export default function VehiclePhotos() {
                             e.stopPropagation();
                             removePhoto(uploadedPhoto.id, true);
                           }}
-                          disabled={!!uploadingMap[uploadedPhoto.id]}
+                          disabled={!!deletingMap[uploadedPhoto.id]}
                           className="absolute top-2 right-2 sm:hidden bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation z-10"
                         >
-                          {uploadingMap[uploadedPhoto.id] ? (
+                          {deletingMap[uploadedPhoto.id] ? (
                             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                           ) : (
                             <X className="w-4 h-4" />
@@ -1051,10 +1111,10 @@ export default function VehiclePhotos() {
                               e.stopPropagation();
                               removePhoto(uploadedPhoto.id, true);
                             }}
-                            disabled={!!uploadingMap[uploadedPhoto.id]}
+                            disabled={!!deletingMap[uploadedPhoto.id]}
                             className="bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            {uploadingMap[uploadedPhoto.id] ? (
+                            {deletingMap[uploadedPhoto.id] ? (
                               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                             ) : (
                               <X className="w-5 h-5" />
