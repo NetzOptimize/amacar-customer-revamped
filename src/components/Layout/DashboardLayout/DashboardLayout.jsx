@@ -8,11 +8,12 @@ import Sidebar from '../Sidebar/Sidebar';
 import { useSearch } from '../../../context/SearchContext';
 import BackToTop from '../../ui/back-to-top';
 import LogoutModal from '../../ui/LogoutModal';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const DashboardLayout = ({ children }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -34,6 +35,11 @@ const DashboardLayout = ({ children }) => {
   // Get user data from Redux store
   const { user } = useSelector((state) => state.user);
   const dashboardSummary = useSelector(selectDashboardSummary);
+
+  // Check if search bar should be hidden
+  const shouldHideSearchBar = () => {
+    return location.pathname === '/dashboard' || location.pathname === '/appointments' || location.pathname === '/profile';
+  };
 
   const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
@@ -243,36 +249,38 @@ const DashboardLayout = ({ children }) => {
         {/* Desktop Header */}
         <div className={`fixed top-0 right-0 z-40 hidden h-20 lg:block bg-white border-b border-neutral-200 shadow-md transition-all duration-300 ${isSidebarCollapsed ? 'left-16' : 'left-64'}`}>
           <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-white to-neutral-50">
-            {/* Left Side: Search Bar */}
-            <div className="flex items-center flex-1 max-w-lg">
-              <div className="relative w-full">
-                <input
-                  type="text"
-                  placeholder="Search car names..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-10 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-400 transition-all duration-300 shadow-sm hover:shadow-md"
-                  style={{ background: 'linear-gradient(145deg, #ffffff, #f8fafc)' }}
-                />
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-primary-500" />
-                {searchQuery && (
-                  <button
-                    onClick={clearSearch}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-neutral-100 rounded-full transition-colors duration-200"
-                  >
-                    <XIcon className="w-4 h-4 text-neutral-400 hover:text-neutral-600" />
-                  </button>
-                )}
-                {isSearching && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <div className="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
-                  </div>
-                )}
+            {/* Left Side: Search Bar - Hidden on dashboard and appointments pages */}
+            {!shouldHideSearchBar() && (
+              <div className="flex items-center flex-1 max-w-lg">
+                <div className="relative w-full">
+                  <input
+                    type="text"
+                    placeholder="Search car names..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-12 pr-10 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm text-neutral-800 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-400 transition-all duration-300 shadow-sm hover:shadow-md"
+                    style={{ background: 'linear-gradient(145deg, #ffffff, #f8fafc)' }}
+                  />
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-primary-500" />
+                  {searchQuery && (
+                    <button
+                      onClick={clearSearch}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-neutral-100 rounded-full transition-colors duration-200"
+                    >
+                      <XIcon className="w-4 h-4 text-neutral-400 hover:text-neutral-600" />
+                    </button>
+                  )}
+                  {isSearching && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <div className="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Right Side: Icons */}
-            <div className="flex items-center space-x-3">
+            <div className={`flex items-center space-x-3 ${shouldHideSearchBar() ? 'ml-auto' : ''}`}>
               <div className="relative" ref={notificationsRef}>
                 <button
                   onClick={toggleNotificationsDropdown}
