@@ -18,7 +18,8 @@ import {
   setModalError,
   setModalSuccess,
   resetModalState,
-  setStateVin
+  setStateVin,
+  setZipState
 } from "@/redux/slices/carDetailsAndQuestionsSlice"
 import { useNavigate, Link } from "react-router-dom"
 import useEmailValidation from "@/hooks/useEmailValidation"
@@ -231,6 +232,7 @@ export default function AuctionModal({
         dispatch(setVehicleDetails(resultAction.payload));
         dispatch(setModalSuccess("Registration successful! Redirecting to auction page..."));
         dispatch(setStateVin(vin))
+        dispatch(setZipState(zipCode))
         // Navigate after a short delay to show success message
         setTimeout(() => {
           navigate('/auction-page');

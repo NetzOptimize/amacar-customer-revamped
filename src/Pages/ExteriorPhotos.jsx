@@ -516,10 +516,10 @@ export default function VehiclePhotos() {
           className="border-2 border-[#f6851f]/20 rounded-2xl p-6 mb-10 bg-white/90 shadow-lg backdrop-blur-md"
         >
           <div className="flex items-center justify-between mb-4">
-            <span className="text-md lg:text-lg font-semibold text-slate-800">
+            <span className="text-sm sm:text-md lg:text-lg font-semibold text-slate-800">
               Required Photos: {uploadedRequiredCount} of {totalRequired}
             </span>
-            <span className="text-md lg:text-lg font-semibold text-[#f6851f]">
+            <span className="text-sm sm:text-md lg:text-lg font-semibold text-[#f6851f]">
               {progress}% Complete
             </span>
           </div>
@@ -793,15 +793,17 @@ export default function VehiclePhotos() {
             transition={{ duration: 0.5 }}
             className="mb-12"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-slate-800 font-sans">Accident Photos</h2>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 sm:gap-0">
+              <h2 className="text-xl  sm:text-2xl font-semibold text-slate-800 font-sans">Accident Photos</h2>
               <motion.button
                 onClick={addAccidentPhotoCard}
-                className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-gradient-to-r from-[#f6851f] to-[#e63946] px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-lg transition-all"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-gradient-to-r from-[#f6851f] to-[#e63946] px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-white shadow-md hover:shadow-lg transition-all w-full sm:w-auto justify-center"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
               >
-                <span className="text-lg ">+</span> Add Accident Photo
+                <span className="text-base sm:text-lg">+</span> 
+                <span className="hidden sm:inline">Add Accident Photo</span>
+                <span className="sm:hidden">Add Photo</span>
               </motion.button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -1030,7 +1032,7 @@ export default function VehiclePhotos() {
 
       {/* Terms and Conditions Modal */}
       <Dialog open={showTermsModal} onOpenChange={handleModalClose}>
-        <DialogContent className="sm:max-w-2xl rounded-2xl shadow-xl p-0 overflow-hidden bg-white">
+        <DialogContent className="sm:max-w-2xl h-[82vh] overflow-y-auto rounded-2xl shadow-xl p-0 overflow-hidden bg-white">
           <div className="bg-gradient-to-br from-white via-slate-50 to-slate-100 p-6">
             <DialogHeader>
               <DialogTitle className="text-2xl font-semibold tracking-tight text-slate-900 flex items-center gap-3">
@@ -1045,7 +1047,7 @@ export default function VehiclePhotos() {
             </DialogHeader>
           </div>
 
-          <div className="p-6 max-h-96 overflow-y-auto">
+          <div className="p-6 max-h-[80vh] overflow-y-auto">
             <div className="space-y-4">
               {[
                 {
