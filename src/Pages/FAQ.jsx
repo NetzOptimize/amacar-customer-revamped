@@ -1,54 +1,71 @@
-import React, { useState, useMemo } from 'react';
-import { Search, ChevronDown, ChevronUp, HelpCircle, Car, Gavel, ArrowDown, MessageCircle } from 'lucide-react';
+import React, { useState, useMemo } from "react";
+import {
+  Search,
+  ChevronDown,
+  ChevronUp,
+  HelpCircle,
+  Car,
+  Gavel,
+  ArrowDown,
+  MessageCircle,
+  ArrowLeft,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const FAQ = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [openItems, setOpenItems] = useState(new Set());
-
+  const navigate = useNavigate();
   const faqData = [
     {
-      category: 'Appraisal FAQs',
+      category: "Appraisal FAQs",
       icon: <Car className="h-5 w-5" />,
-      color: 'from-blue-500 to-indigo-500',
+      color: "from-blue-500 to-indigo-500",
       items: [
         {
-          id: 'appraisal-1',
-          question: 'What is Amacar?',
-          answer: 'Amacar is a digital vehicle appraisal and live auction platform that connects individual sellers with verified dealerships. Users can get an online vehicle valuation, enter their car into a dealer auction, and accept the best live bid—all from the comfort of home.'
+          id: "appraisal-1",
+          question: "What is Amacar?",
+          answer:
+            "Amacar is a digital vehicle appraisal and live auction platform that connects individual sellers with verified dealerships. Users can get an online vehicle valuation, enter their car into a dealer auction, and accept the best live bid—all from the comfort of home.",
         },
         {
-          id: 'appraisal-2',
-          question: 'How do I Appraise my vehicle?',
-          answer: 'Enter your vehicle\'s VIN, mileage, condition, and photos. Amacar\'s appraisal engine generates an estimated valuation based on current market trends and numerous sources. This estimate offer serves as a pricing guide before entering the auction.'
+          id: "appraisal-2",
+          question: "How do I Appraise my vehicle?",
+          answer:
+            "Enter your vehicle's VIN, mileage, condition, and photos. Amacar's appraisal engine generates an estimated valuation based on current market trends and numerous sources. This estimate offer serves as a pricing guide before entering the auction.",
         },
         {
-          id: 'appraisal-3',
-          question: 'How often is your appraisal data updated?',
-          answer: 'Our system refreshes daily to reflect changes in dealer inventory, consumer demand, and market pricing patterns—ensuring your appraisal stays current.'
+          id: "appraisal-3",
+          question: "How often is your appraisal data updated?",
+          answer:
+            "Our system refreshes daily to reflect changes in dealer inventory, consumer demand, and market pricing patterns—ensuring your appraisal stays current.",
         },
         {
-          id: 'appraisal-4',
-          question: 'Why is my vehicle not eligible for a Price?',
-          answer: 'If a vehicle has an unrecognized VIN, insufficient market data, or is extremely rare or new, an online appraisal may not be possible. We recommend scheduling an in-person appraisal with the participating dealership in these cases.'
-        }
-      ]
+          id: "appraisal-4",
+          question: "Why is my vehicle not eligible for a Price?",
+          answer:
+            "If a vehicle has an unrecognized VIN, insufficient market data, or is extremely rare or new, an online appraisal may not be possible. We recommend scheduling an in-person appraisal with the participating dealership in these cases.",
+        },
+      ],
     },
     {
-      category: 'Auction FAQs',
+      category: "Auction FAQs",
       icon: <Gavel className="h-5 w-5" />,
-      color: 'from-orange-500 to-red-500',
+      color: "from-orange-500 to-red-500",
       items: [
         {
-          id: 'auction-1',
-          question: 'What if no dealer places a bid on my vehicle?',
-          answer: 'If the auction ends with no bids, your listing simply expires. You can relist the vehicle, revise details for a fresh appraisal, or schedule an in-person visit with a local dealer.'
+          id: "auction-1",
+          question: "What if no dealer places a bid on my vehicle?",
+          answer:
+            "If the auction ends with no bids, your listing simply expires. You can relist the vehicle, revise details for a fresh appraisal, or schedule an in-person visit with a local dealer.",
         },
         {
-          id: 'auction-2',
-          question: 'Do I have to pay to use Amacar?',
-          answer: 'No. There\'s no fee for appraisals, listings, or auction participation. If you accept a bid, the transaction is handled directly with the dealer—Amacar charges no commission to you.'
-        }
-      ]
+          id: "auction-2",
+          question: "Do I have to pay to use Amacar?",
+          answer:
+            "No. There's no fee for appraisals, listings, or auction participation. If you accept a bid, the transaction is handled directly with the dealer—Amacar charges no commission to you.",
+        },
+      ],
     },
     // {
     //   category: 'Reverse Bidding FAQs',
@@ -121,14 +138,17 @@ const FAQ = () => {
 
   const filteredData = useMemo(() => {
     if (!searchTerm) return faqData;
-    
-    return faqData.map(category => ({
-      ...category,
-      items: category.items.filter(item => 
-        item.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.answer.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    })).filter(category => category.items.length > 0);
+
+    return faqData
+      .map((category) => ({
+        ...category,
+        items: category.items.filter(
+          (item) =>
+            item.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.answer.toLowerCase().includes(searchTerm.toLowerCase())
+        ),
+      }))
+      .filter((category) => category.items.length > 0);
   }, [searchTerm, faqData]);
 
   return (
@@ -141,18 +161,27 @@ const FAQ = () => {
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 py-16 mt-20">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(-1)} // or your navigate logic
+          className="cursor-pointer shadow-md rounded-lg px-4 py-2 flex items-center text-slate-700 hover:text-slate-900 font-medium mb-8"
+        >
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          Back
+        </button>
         {/* Header Section */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl mb-6 shadow-lg">
             <HelpCircle className="h-10 w-10 text-white" />
           </div>
-          
+
           <h1 className="text-5xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-4">
             Frequently Asked Questions
           </h1>
-          
+
           <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            Find answers to common questions about Amacar's vehicle appraisal, auction, and reverse bidding services.
+            Find answers to common questions about Amacar's vehicle appraisal,
+            auction, and reverse bidding services.
           </p>
         </div>
 
@@ -173,14 +202,19 @@ const FAQ = () => {
         {/* FAQ Content */}
         <div className="space-y-8">
           {filteredData.map((category, categoryIndex) => (
-            <div key={categoryIndex} className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+            <div
+              key={categoryIndex}
+              className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden"
+            >
               {/* Category Header */}
               <div className={`bg-gradient-to-r ${category.color} p-6`}>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
                     {category.icon}
                   </div>
-                  <h2 className="text-2xl font-bold text-white">{category.category}</h2>
+                  <h2 className="text-2xl font-bold text-white">
+                    {category.category}
+                  </h2>
                 </div>
               </div>
 
@@ -207,7 +241,7 @@ const FAQ = () => {
                           )}
                         </div>
                       </button>
-                      
+
                       {openItems.has(item.id) && (
                         <div className="px-6 pb-4 border-t border-slate-100">
                           <p className="text-slate-600 leading-relaxed pt-4">
@@ -229,11 +263,14 @@ const FAQ = () => {
             <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Search className="h-8 w-8 text-slate-400" />
             </div>
-            <h3 className="text-xl font-semibold text-slate-600 mb-2">No results found</h3>
-            <p className="text-slate-500">Try searching with different keywords</p>
+            <h3 className="text-xl font-semibold text-slate-600 mb-2">
+              No results found
+            </h3>
+            <p className="text-slate-500">
+              Try searching with different keywords
+            </p>
           </div>
         )}
-
       </div>
     </div>
   );

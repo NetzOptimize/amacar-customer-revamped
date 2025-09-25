@@ -1,11 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, FileText, Shield, Scale, Users, AlertTriangle } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Seo from '@/components/SEO/Seo';
 import { seoData } from '@/config/seoConfig';
 
 const TermsOfService = () => {
+    const navigate = useNavigate();
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -126,12 +127,12 @@ You and the dealers agree that any Disputes will be resolved on an individual ba
                         className="mb-12"
                     >
                         <div className="flex items-center mb-6">
-                            <Link
-                                to="/"
+                            <button
+                                onClick={() => navigate(-1)}
                                 className="mr-4 p-2 hover:bg-slate-100 rounded-lg transition-colors duration-200"
                             >
                                 <ArrowLeft className="w-5 h-5 text-slate-600" />
-                            </Link>
+                            </button>
                             <div className="flex items-center">
                                 <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mr-4">
                                     <FileText className="w-6 h-6 text-white" />

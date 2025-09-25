@@ -1,9 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Cookie, Settings, BarChart3, Target, Shield, AlertTriangle, FileText } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const CookiesPolicy = () => {
+    const navigate = useNavigate();
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -123,12 +124,12 @@ If you use multiple devices to access the platform (e.g., smartphone, tablet, la
                     className="mb-12"
                 >
                     <div className="flex items-center mb-6">
-                        <Link
-                            to="/"
+                        <button
+                            onClick={() => navigate(-1)}
                             className="mr-4 p-2 hover:bg-slate-100 rounded-lg transition-colors duration-200"
                         >
                             <ArrowLeft className="w-5 h-5 text-slate-600" />
-                        </Link>
+                        </button>
                         <div className="flex items-center">
                             <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mr-4">
                                 <Cookie className="w-6 h-6 text-white" />

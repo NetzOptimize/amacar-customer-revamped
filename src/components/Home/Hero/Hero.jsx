@@ -69,7 +69,7 @@ export default function Hero() {
 
         <motion.div className="hero-ctas " variants={fadeUp} custom={0.4}>
          
-            <button className="cursor-pointer btn-white" onClick={(e) => {
+            <button className="cursor-pointer text-left btn-white" onClick={(e) => {
               e.preventDefault()
               setOpen(true)
             }}>
