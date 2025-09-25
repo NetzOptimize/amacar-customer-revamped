@@ -430,7 +430,7 @@ const ProfilePage = () => {
                 </div>
                 <button
                   onClick={() => setShowChangePasswordModal(true)}
-                  className="btn-secondary flex items-center justify-center sm:justify-start space-x-2 w-full sm:w-auto"
+                  className="cursor-pointer btn-secondary flex items-center justify-center sm:justify-start space-x-2 w-full sm:w-auto"
                 >
                   <Key className="w-4 h-4" />
                   <span>Change</span>
@@ -451,7 +451,7 @@ const ProfilePage = () => {
                 </div>
                 <button 
                   onClick={handleTwoFactorToggle}
-                  className={`btn-secondary w-full sm:w-auto flex items-center justify-center sm:justify-start space-x-2 ${
+                  className={`cursor-pointer btn-secondary w-full sm:w-auto flex items-center justify-center sm:justify-start space-x-2 ${
                     isTwoFactorEnabled 
                       ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100' 
                       : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
