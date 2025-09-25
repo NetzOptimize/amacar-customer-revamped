@@ -22,11 +22,12 @@ export default function AuctionPage() {
 
   // Get data from location state first, fallback to Redux state
   const vin = location.state?.vin || stateVin;
-  const zipCode = location.state?.zipCode || stateZip;
+  const zipCode = location.state?.zipCode || location.state?.zip || stateZip;
   const vehicleName = location.state?.vehicleName || vehicleDetails?.vehicleName;
   const vehicleType = location.state?.vehicleType || vehicleDetails?.vehicleType;
 
   const productId = location.state?.productId || vehicleDetails?.productId;
+
 
   // Store auction page data in Redux when component mounts (only for relisting vehicles)
   useEffect(() => {
@@ -38,14 +39,14 @@ export default function AuctionPage() {
 
   // Fetch vehicle details if not already loaded
   useEffect(() => {
-    // if (!vehicleDetails || Object.keys(vehicleDetails).length === 0) {
+    if (!vehicleDetails || Object.keys(vehicleDetails).length === 0 || location.state) {
       console.log("zipcode from relist", zipCode);
       console.log("vin from relist", vin);
       dispatch(fetchVehicleDetails({ vin: vin, zip: zipCode }));
       console.log("fetching vehicle details");
       // dispatch(fetchVehicleDetails({ vin: vin, zip: zipCode }));
-    // }
-  }, [dispatch, vin, zipCode]);
+    }
+  }, [dispatch, vin, zipCode, location.state]);
 useEffect(() => {
     // console.log("avg", vehicleDetails.averagemileage);
     console.log("vin", vin);
