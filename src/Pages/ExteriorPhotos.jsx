@@ -116,6 +116,11 @@ export default function VehiclePhotos() {
       return;
     }
 
+    if (!privacyAccepted) {
+      toast.error("Please accept the privacy policy to continue");
+      return;
+    }
+
     await handleStartAuction();
     setShowTermsModal(false);
   };
@@ -1337,9 +1342,9 @@ export default function VehiclePhotos() {
                 </button>
                 <button
                   onClick={handleAcceptTerms}
-                  disabled={!termsAccepted || auctionStartStatus === "starting"}
+                  disabled={!termsAccepted || !privacyAccepted || auctionStartStatus === "starting"}
                   className={`w-full sm:w-auto px-6 py-2 text-sm font-semibold text-white rounded-lg transition-all ${
-                    termsAccepted && auctionStartStatus !== "starting"
+                    termsAccepted && privacyAccepted && auctionStartStatus !== "starting"
                       ? "bg-gradient-to-r from-[#f6851f] to-[#e63946] hover:from-orange-600 hover:to-red-600 shadow-lg"
                       : "bg-slate-400 cursor-not-allowed"
                   }`}
