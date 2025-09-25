@@ -81,6 +81,12 @@ export default function VehiclePhotos() {
 
   const [photos, setPhotos] = useState(data.photos || []);
   const [accidentPhotos, setAccidentPhotos] = useState([]);
+  const [extraAccidentCardIds, setExtraAccidentCardIds] = useState(() => {
+    if (productId) {
+      return JSON.parse(localStorage.getItem(`extra_accident_cards_${productId}`)) || [];
+    }
+    return [];
+  });
   const [uploadingMap, setUploadingMap] = useState({});
   const [progressMap, setProgressMap] = useState({});
   const [dragActive, setDragActive] = useState(false);
@@ -91,19 +97,36 @@ export default function VehiclePhotos() {
     // console.log("questions", questions);
   });
 
+  // Load extra (optional) accident card IDs from localStorage and initialize blanks
+  useEffect(() => {
+    if (productId) {
+      const savedIds = JSON.parse(localStorage.getItem(`extra_accident_cards_${productId}`)) || [];
+      setExtraAccidentCardIds(savedIds);
+      const blankOptionals = savedIds.map(id => ({
+        id,
+        label: 'Accident Photo',
+        icon: Camera,
+        description: 'Photo of accident damage',
+        required: false,
+        isAccident: true
+      }));
+      setAccidentPhotos(blankOptionals);
+    }
+  }, [productId]);
+
   // Load persisted images from Redux state whenever uploadedImages changes
   useEffect(() => {
     console.log('Redux uploadedImages changed:', uploadedImages);
-
+  
     // Separate regular photos from accident photos
     const regularPhotos = (uploadedImages || []).filter(img => !img.metaKey?.includes('accident'));
     const accidentPhotosFromRedux = (uploadedImages || []).filter(img => img.metaKey?.includes('accident'));
-
+  
     // Convert Redux images to component format
     const convertedRegularPhotos = regularPhotos.map(img => ({
       id: `${img.metaKey}_${img.attachmentId}`,
-      file: null, // File object not available after reload
-      url: img.imageUrl, // Use server URL for display
+      file: null,
+      url: img.imageUrl,
       serverUrl: img.imageUrl,
       requirement: img.metaKey?.replace('image_image_', '').replace('_view', ''),
       timestamp: new Date(),
@@ -111,11 +134,11 @@ export default function VehiclePhotos() {
       metaKey: img.metaKey,
       uploaded: true
     }));
-
+  
     const convertedAccidentPhotos = accidentPhotosFromRedux.map(img => ({
       id: img.metaKey?.replace('image_image_', '').replace('_view', ''),
-      file: null, // File object not available after reload
-      url: img.imageUrl, // Use server URL for display
+      file: null,
+      url: img.imageUrl,
       serverUrl: img.imageUrl,
       requirement: img.metaKey?.replace('image_image_', '').replace('_view', ''),
       timestamp: new Date(),
@@ -123,15 +146,45 @@ export default function VehiclePhotos() {
       metaKey: img.metaKey,
       uploaded: true,
       label: 'Accident Photo',
-      icon: '📸',
+      icon: Camera,
       description: 'Photo of accident damage',
       required: img.metaKey?.includes('accident_mandatory_'),
       isAccident: true
     }));
-
+  
     setPhotos(convertedRegularPhotos);
-    setAccidentPhotos(convertedAccidentPhotos);
-  }, [uploadedImages]);
+  
+    // Merge converted accident photos with existing (blanks preserved)
+    setAccidentPhotos(prev => {
+      let newList = prev.map(p => {
+        const match = convertedAccidentPhotos.find(u => u.id === p.id);
+        if (match) {
+          return { ...p, ...match, url: match.url, uploaded: true };
+        }
+        return p;
+      });
+  
+      // Add any new uploaded that weren't in prev
+      const added = convertedAccidentPhotos.filter(u => !prev.some(p => p.id === u.id));
+      newList = [...newList, ...added];
+  
+      // Ensure required accident card exists if hasAccident
+      const hasRequired = newList.some(p => p.required);
+      if (hasAccident && !hasRequired) {
+        const newReqId = `accident_mandatory_${Date.now()}`;
+        newList.push({
+          id: newReqId,
+          label: 'Accident Photo (Required)',
+          icon: Camera,
+          description: 'Photo of accident damage',
+          required: true,
+          isAccident: true
+        });
+      }
+  
+      return newList;
+    });
+  }, [uploadedImages, hasAccident]);
 
   const photoRequirements = [
     {
@@ -201,27 +254,13 @@ export default function VehiclePhotos() {
 
   ];
 
-  // Initialize one mandatory accident photo card if hasAccident is true
-  useEffect(() => {
-    if (hasAccident && accidentPhotos.length === 0) {
-      setAccidentPhotos([{
-        id: `accident_mandatory_${Date.now()}`,
-        label: 'Accident Photo (Required)',
-        icon: Camera,
-        description: 'Photo of accident damage',
-        required: true,
-        isAccident: true
-      }]);
-    }
-  }, [hasAccident]);
-
   const requiredPhotos = photoRequirements.filter((req) => req.required);
   const totalRequired = requiredPhotos.length + (hasAccident ? 1 : 0); // Include mandatory accident photo
   
   // Count uploaded required photos more accurately
   const uploadedRequiredCount = photos.filter((photo) =>
     requiredPhotos.some((req) => req.id === photo.requirement) && photo.uploaded
-  ).length + (hasAccident && accidentPhotos.some(p => p.uploaded && p.requirement?.startsWith('accident_mandatory_')) ? 1 : 0);
+  ).length + (hasAccident && accidentPhotos.some(p => p.uploaded && p.required) ? 1 : 0);
   
   const isComplete = uploadedRequiredCount >= totalRequired;
 
@@ -329,38 +368,96 @@ export default function VehiclePhotos() {
       const photoToDelete = isAccidentPhoto
         ? accidentPhotos.find(photo => photo.id === photoId)
         : photos.find(photo => photo.id === photoId);
-
+  
       if (!photoToDelete) {
         console.error('Photo not found for deletion');
         return;
       }
-
+  
       // Set deleting state for this specific photo
       setUploadingMap((prev) => ({ ...prev, [photoId]: true }));
-
+  
       // If photo was uploaded to server, delete it via API
       if (photoToDelete.attachmentId) {
         console.log('Deleting image from server:', photoToDelete.attachmentId);
-
+  
         const result = await dispatch(deleteVehicleImage({
           attachmentId: photoToDelete.attachmentId
         })).unwrap();
-
+  
         console.log('Image delete successful:', result);
       }
-
+  
       // Remove from Redux store
       dispatch(removeUploadedImage(photoToDelete.attachmentId));
-
-      // Note: Local state will be updated automatically via useEffect when Redux state changes
-
+  
+      // For accident photos: handle required vs optional differently
+      if (isAccidentPhoto) {
+        if (photoToDelete.required) {
+          // For required accident photo, clear image data but keep the card
+          setAccidentPhotos(prev =>
+            prev.map(p =>
+              p.id === photoId
+                ? {
+                    ...p,
+                    url: null,
+                    serverUrl: null,
+                    file: null,
+                    attachmentId: null,
+                    uploaded: false
+                  }
+                : p
+            )
+          );
+        } else {
+          // For optional accident photo, remove both image and card
+          setAccidentPhotos(prev => prev.filter(p => p.id !== photoId));
+          setExtraAccidentCardIds(prev => {
+            const newIds = prev.filter(id => id !== photoId);
+            if (productId) {
+              localStorage.setItem(`extra_accident_cards_${productId}`, JSON.stringify(newIds));
+            }
+            return newIds;
+          });
+        }
+      }
+  
     } catch (error) {
       console.error('Image delete failed:', error);
       // Still remove from Redux store even if API call failed
       if (photoToDelete && photoToDelete.attachmentId) {
         dispatch(removeUploadedImage(photoToDelete.attachmentId));
       }
-      // Note: Local state will be updated automatically via useEffect when Redux state changes
+      // For accident photos: handle required vs optional differently
+      if (isAccidentPhoto) {
+        if (photoToDelete.required) {
+          // For required accident photo, clear image data but keep the card
+          setAccidentPhotos(prev =>
+            prev.map(p =>
+              p.id === photoId
+                ? {
+                    ...p,
+                    url: null,
+                    serverUrl: null,
+                    file: null,
+                    attachmentId: null,
+                    uploaded: false
+                  }
+                : p
+            )
+          );
+        } else {
+          // For optional accident photo, remove both image and card
+          setAccidentPhotos(prev => prev.filter(p => p.id !== photoId));
+          setExtraAccidentCardIds(prev => {
+            const newIds = prev.filter(id => id !== photoId);
+            if (productId) {
+              localStorage.setItem(`extra_accident_cards_${productId}`, JSON.stringify(newIds));
+            }
+            return newIds;
+          });
+        }
+      }
       // Show error to user
       toast.error(`Failed to delete image from server: ${error}. Image removed locally.`);
     } finally {
@@ -375,14 +472,26 @@ export default function VehiclePhotos() {
 
   const addAccidentPhotoCard = () => {
     const newId = `accident_${Date.now()}`;
-    setAccidentPhotos((prev) => [
-      ...prev,
-      { id: newId, label: 'Accident Photo', icon: Camera, description: 'Photo of accident damage', required: false, isAccident: true },
-    ]);
+    const newCard = {
+      id: newId,
+      label: 'Accident Photo',
+      icon: Camera,
+      description: 'Photo of accident damage',
+      required: false,
+      isAccident: true
+    };
+    setAccidentPhotos((prev) => [...prev, newCard]);
+    setExtraAccidentCardIds(prev => {
+      const newIds = [...prev, newId];
+      if (productId) {
+        localStorage.setItem(`extra_accident_cards_${productId}`, JSON.stringify(newIds));
+      }
+      return newIds;
+    });
   };
 
   useEffect(() => {
-    onChange({ photos: [...photos, ...accidentPhotos.filter(p => p.file)] });
+    onChange({ photos: [...photos, ...accidentPhotos.filter(p => p.url)] });
   }, [photos, accidentPhotos]);
 
   const progress = Math.round((uploadedRequiredCount / totalRequired) * 100);
@@ -697,8 +806,8 @@ export default function VehiclePhotos() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {accidentPhotos.map((photo, index) => {
-                const uploadedPhoto = accidentPhotos.find((p) => p.id === photo.id && p.file);
-                const hasPhoto = !!uploadedPhoto;
+                const uploadedPhoto = accidentPhotos.find((p) => p.id === photo.id);
+                const hasPhoto = !!uploadedPhoto?.url;
                 const isUploadingThisPhoto = !!uploadingMap[photo.id];
 
                 return (
@@ -895,7 +1004,7 @@ export default function VehiclePhotos() {
           </motion.button>
           <motion.button
             onClick={() => {
-              onChange({ photos: [...photos, ...accidentPhotos.filter(p => p.file)] });
+              onChange({ photos: [...photos, ...accidentPhotos.filter(p => p.url)] });
               onNext();
             }}
             disabled={!isComplete || auctionStartStatus === 'starting'}

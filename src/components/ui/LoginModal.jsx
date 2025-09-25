@@ -78,6 +78,15 @@ export default function LoginModal({
       newErrors.lastName = "Last name must be at least 2 characters";
     }
 
+    if (isRegisterMode && !values.username) {
+      newErrors.username = "Username is required";
+    } else if (isRegisterMode && values.username?.length < 2) {
+      newErrors.username = "username must be at least 2 characters";
+    }
+    else if (isRegisterMode && values.username && !/^[a-zA-Z0-9]+$/.test(values.username)) {
+      newErrors.username = "Username must contain only letters and numbers";
+    }
+
     if (isRegisterMode && !values.phone) {
       newErrors.phone = "Phone number is required";
     } else if (isRegisterMode && values.phone && !/^[\+]?[1-9][\d]{0,15}$/.test(values.phone.replace(/\s/g, ""))) {

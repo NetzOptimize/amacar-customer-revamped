@@ -134,6 +134,13 @@
   }
 }
 
+@layer base {
+  ::placeholder {
+    @apply text-black opacity-100;
+  }
+}
+
+
 .rdp-month_grid {
   width: 100%;
 }
