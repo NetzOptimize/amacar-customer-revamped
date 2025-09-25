@@ -70,6 +70,7 @@ export default function AuctionModal({
     zipCode: "",
     auctionConsent: "",
     registerConsent: "",
+    passwordMismatch: "",
   });
   const [shouldResetEmailValidation, setShouldResetEmailValidation] =
     useState(false);
@@ -187,6 +188,12 @@ export default function AuctionModal({
   }, [confirmPassword, errors.confirmPassword]);
 
   useEffect(() => {
+    if (errors.passwordMismatch && confirmPassword === password && password.length > 0) {
+      setErrors(prev => prev.passwordMismatch ? { ...prev, passwordMismatch: "" } : prev);
+    }
+  }, [confirmPassword, password, errors.passwordMismatch]);
+
+  useEffect(() => {
     if (errors.zipCode && zipCode.length > 0) {
       setErrors(prev => prev.zipCode ? { ...prev, zipCode: "" } : prev);
     }
@@ -241,6 +248,7 @@ export default function AuctionModal({
       zipCode: "",
       auctionConsent: "",
       registerConsent: "",
+      passwordMismatch: "",
     };
 
     // VIN validation
@@ -294,6 +302,7 @@ export default function AuctionModal({
       newErrors.confirmPassword = "This field is required.";
     } else if (confirmPassword !== password) {
       newErrors.confirmPassword = "Passwords do not match.";
+      newErrors.passwordMismatch = "Passwords do not match.";
     }
 
     // Zip Code validation
@@ -625,10 +634,10 @@ export default function AuctionModal({
                         Password *
                       </label>
                       <ReusableTooltip
-                        content={errors.password}
+                        content={errors.password || errors.passwordMismatch}
                         side="top"
                         align="start"
-                        disabled={!errors.password}
+                        disabled={!errors.password && !errors.passwordMismatch}
                       >
                         <div className="relative">
                           <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
@@ -642,7 +651,7 @@ export default function AuctionModal({
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Enter password"
                             className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${
-                              errors.password 
+                              errors.password || errors.passwordMismatch
                                 ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]" 
                                 : "border-slate-200"
                             }`}
@@ -833,10 +842,10 @@ export default function AuctionModal({
                         Confirm Password *
                       </label>
                       <ReusableTooltip
-                        content={errors.confirmPassword}
+                        content={errors.confirmPassword || errors.passwordMismatch}
                         side="top"
                         align="start"
-                        disabled={!errors.confirmPassword}
+                        disabled={!errors.confirmPassword && !errors.passwordMismatch}
                       >
                         <div className="relative">
                           <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
@@ -850,7 +859,7 @@ export default function AuctionModal({
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             placeholder="Confirm password"
                             className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${
-                              errors.confirmPassword 
+                              errors.confirmPassword || errors.passwordMismatch
                                 ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]" 
                                 : "border-slate-200"
                             }`}

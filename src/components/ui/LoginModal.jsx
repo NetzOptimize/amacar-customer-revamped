@@ -96,6 +96,8 @@ export default function LoginModal({
       newErrors.phone = "Phone number is required";
     } else if (isRegisterMode && values.phone && !/^[\+]?[1-9][\d]{0,15}$/.test(values.phone.replace(/\s/g, ""))) {
       newErrors.phone = "Please enter a valid phone number";
+    } else if (isRegisterMode && values.phone && values.phone.length !== 10) {
+      newErrors.phone = "Phone number must be 10 digits";
     }
 
     if ((isRegisterMode || !isForgotPasswordMode) && !values.password) {
@@ -562,6 +564,9 @@ export default function LoginModal({
                                 maxLength={10}
                                 id="phone"
                                 type="tel"
+
+                                inputMode="numeric"
+
                                 value={values.phone || ""}
                                 onChange={(e) => setValue("phone", e.target.value)}
                                 placeholder="5551234567"
