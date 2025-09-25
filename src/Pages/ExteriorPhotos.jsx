@@ -1229,16 +1229,16 @@ export default function VehiclePhotos() {
 
       {/* Terms and Conditions Modal */}
       <Dialog open={showTermsModal} onOpenChange={handleModalClose}>
-        <DialogContent className="sm:max-w-2xl h-[82vh] lg:h-[75vh]  overflow-y-auto rounded-2xl shadow-xl p-0 overflow-hidden bg-white">
-          <div className="bg-gradient-to-br from-white via-slate-50 to-slate-100 p-6">
+        <DialogContent className="sm:max-w-2xl h-[75vh] lg:h-[75vh]  overflow-y-auto rounded-2xl shadow-xl p-0 overflow-hidden bg-white">
+          <div className="bg-gradient-to-br from-white via-slate-50 to-slate-100 p-6 ">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-semibold tracking-tight text-slate-900 flex items-center gap-3">
+              <DialogTitle className="text-xl lg:text-2xl font-semibold tracking-tight text-slate-900 text-left flex items-center  gap-3">
                 <div className="p-2 bg-purple-100 rounded-xl">
                   <FileText className="h-6 w-6 text-purple-600" />
                 </div>
                 Your Car is Ready for Auction
               </DialogTitle>
-              <DialogDescription className="text-sm text-slate-600 mt-2">
+              <DialogDescription className="text-sm text-slate-600 mt-2 text-left">
                 Please review and accept the terms before starting your auction
               </DialogDescription>
             </DialogHeader>
