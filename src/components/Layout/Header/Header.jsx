@@ -15,9 +15,11 @@ export default function Header() {
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const { user } = useSelector((state) => state.user);
   const { productId } = useSelector((state) => state.carDetailsAndQuestions);
-
+  const userExists = useSelector(
+    (state) => state.carDetailsAndQuestions.userExists
+  );
   // Debug modal state changes
-  console.log('Header state:', { open, loginModalOpen, logoutModalOpen, user });
+  console.log("Header state:", { open, loginModalOpen, logoutModalOpen, user });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,7 +33,7 @@ export default function Header() {
   };
 
   const handleLoginClick = (e) => {
-    console.log('Login button clicked', { e, user });
+    console.log("Login button clicked", { e, user });
     if (e) {
       e.preventDefault();
     }
@@ -70,10 +72,7 @@ export default function Header() {
           <div className="header-row">
             {/* Logo Section - Responsive */}
             <div className="logo-section">
-              <Link
-                to="/"
-                className="logo-link"
-              >
+              <Link to="/" className="logo-link">
                 <img
                   className="logo"
                   src="https://dealer.amacar.ai/wp-content/uploads/2024/10/logo-4-2048x680.png"
@@ -84,20 +83,22 @@ export default function Header() {
 
             {/* Desktop Navigation - Hidden on mobile/tablet */}
             <nav className="nav-desktop">
-              <Link 
-                className={`nav-link ${isActive("/") ? "active" : ""}`} 
+              <Link
+                className={`nav-link ${isActive("/") ? "active" : ""}`}
                 to="/"
               >
                 Home
               </Link>
-              <Link 
-                className={`nav-link ${isActive("/testimonials") ? "active" : ""}`} 
+              <Link
+                className={`nav-link ${
+                  isActive("/testimonials") ? "active" : ""
+                }`}
                 to="/testimonials"
               >
                 Testimonials
               </Link>
-              <Link 
-                className={`nav-link ${isActive("/about-us") ? "active" : ""}`} 
+              <Link
+                className={`nav-link ${isActive("/about-us") ? "active" : ""}`}
                 to="/about-us"
               >
                 Our Vision
@@ -109,18 +110,20 @@ export default function Header() {
               {/* Desktop Actions */}
               <div className="actions-desktop">
                 {user ? (
-                  <button
-                    className="btn-login"
-                    onClick={handleLogoutClick}
-                  >
+                  <button className="btn-login" onClick={handleLogoutClick}>
                     Logout
                   </button>
                 ) : (
-                  <button 
-                    className="btn-login" 
-                    onClick={handleLoginClick}
-                  >
+                  <button className="btn-login" onClick={handleLoginClick}>
                     Login / Register
+                  </button>
+                )}
+                {user && (
+                  <button
+                    className="btn-login !bg-white !text-[var(--brand-orange)]"
+                    onClick={() => navigate("/dashboard")}
+                  >
+                    Dashboard
                   </button>
                 )}
               </div>
@@ -146,33 +149,37 @@ export default function Header() {
         <div className={`mobile-panel ${open ? "open" : ""}`}>
           <div className="mobile-panel-content">
             <nav className="mobile-nav">
-              <Link 
-                className={`nav-link-mobile ${isActive("/") ? "active" : ""}`} 
+              <Link
+                className={`nav-link-mobile ${isActive("/") ? "active" : ""}`}
                 to="/"
                 onClick={() => setOpen(false)}
               >
                 Home
               </Link>
-              <Link 
-                className={`nav-link-mobile ${isActive("/testimonials") ? "active" : ""}`} 
+              <Link
+                className={`nav-link-mobile ${
+                  isActive("/testimonials") ? "active" : ""
+                }`}
                 to="/testimonials"
                 onClick={() => setOpen(false)}
               >
                 Testimonials
               </Link>
-              <Link 
-                className={`nav-link-mobile ${isActive("/about-us") ? "active" : ""}`} 
+              <Link
+                className={`nav-link-mobile ${
+                  isActive("/about-us") ? "active" : ""
+                }`}
                 to="/about-us"
                 onClick={() => setOpen(false)}
               >
                 Our Vision
               </Link>
-              
+
               {/* Mobile Auth Actions */}
-              <div className="mobile-auth-section">
+              <div className="mobile-auth-section flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center">
                 {user ? (
                   <button
-                    className="btn-login-mobile"
+                    className="btn-login-mobile w-full sm:w-auto"
                     onClick={() => {
                       handleLogoutClick();
                       setOpen(false);
@@ -182,13 +189,22 @@ export default function Header() {
                   </button>
                 ) : (
                   <button
-                    className="btn-login-mobile"
+                    className="btn-login-mobile w-full sm:w-auto"
                     onClick={() => {
                       handleLoginClick();
                       setOpen(false);
                     }}
                   >
                     Login / Register
+                  </button>
+                )}
+
+                {user && (
+                  <button
+                    className="btn-login-mobile btn-login-mobile !bg-white !text-[var(--brand-orange)] w-full sm:w-auto"
+                    onClick={() => navigate("/dashboard")}
+                  >
+                    Dashboard
                   </button>
                 )}
               </div>
