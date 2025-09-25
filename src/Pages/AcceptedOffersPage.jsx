@@ -153,6 +153,7 @@ const AcceptedOffersPage = () => {
         appointmentUrl: offer.appointment_url || "",
         acceptedBidData: acceptedBid,
         cashOffer: parseFloat(offer.cash_offer || "0"),
+        appointmentScheduled: offer.appointment_scheduled || false,
       };
     });
   };
@@ -675,9 +676,17 @@ const AcceptedOffersPage = () => {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-lg sm:text-xl font-semibold text-neutral-800 mb-1 break-words">
-                            {offer.vehicle}
-                          </h3>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-lg sm:text-xl font-semibold text-neutral-800 break-words">
+                              {offer.vehicle}
+                            </h3>
+                            {offer.appointmentScheduled && (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                                <Clock className="w-3 h-3 mr-1" />
+                                Appointment Scheduled
+                              </span>
+                            )}
+                          </div>
                           <p className="text-sm sm:text-base text-neutral-600 mb-1">
                             Accepted on {formatDate(offer.acceptedDate)}
                           </p>
@@ -762,16 +771,29 @@ const AcceptedOffersPage = () => {
                           <span className="sm:hidden">Contact</span>
                         </a>
 
-                        <button
-                          onClick={() => handleOpenAppointmentModal(offer)}
-                          className="cursor-pointer btn-secondary flex items-center justify-center space-x-2 py-2 px-3 sm:py-2 sm:px-4 text-sm"
-                        >
-                          <Clock className="w-4 h-4" />
-                          <span className="hidden sm:inline">
-                            Schedule Appointment
-                          </span>
-                          <span className="sm:hidden">Schedule</span>
-                        </button>
+                        {offer.appointmentScheduled ? (
+                          <button
+                            onClick={() => navigate('/appointments')}
+                            className="cursor-pointer btn-secondary flex items-center justify-center space-x-2 py-2 px-3 sm:py-2 sm:px-4 text-sm"
+                          >
+                            <Clock className="w-4 h-4" />
+                            <span className="hidden sm:inline">
+                              Go to Appointments
+                            </span>
+                            <span className="sm:hidden">Appointments</span>
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleOpenAppointmentModal(offer)}
+                            className="cursor-pointer btn-secondary flex items-center justify-center space-x-2 py-2 px-3 sm:py-2 sm:px-4 text-sm"
+                          >
+                            <Clock className="w-4 h-4" />
+                            <span className="hidden sm:inline">
+                              Schedule Appointment
+                            </span>
+                            <span className="sm:hidden">Schedule</span>
+                          </button>
+                        )}
                         <button
                           onClick={() =>
                             navigate("/car-details", {
