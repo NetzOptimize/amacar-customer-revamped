@@ -393,7 +393,7 @@ export default function AppointmentDetailsModal({
                   <button
                     onClick={handleCloseClick}
                     disabled={isCloseDisabled}
-                    className="flex-1 h-10 sm:h-12 rounded-lg border-2 border-slate-200 text-slate-700 font-medium hover:bg-slate-50 transition-colors text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="cursor-pointer flex-1 h-10 sm:h-12 rounded-lg border-2 border-slate-200 text-slate-700 font-medium hover:bg-slate-50 transition-colors text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Close
                   </button>
@@ -412,7 +412,7 @@ export default function AppointmentDetailsModal({
                 <button
                   onClick={handleCloseClick}
                   disabled={isCloseDisabled}
-                  className="px-3 sm:px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="cursor-pointer px-3 sm:px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Close
                 </button>

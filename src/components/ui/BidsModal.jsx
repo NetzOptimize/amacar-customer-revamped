@@ -223,7 +223,7 @@ const BidsModal = ({
                               <button
                                 onClick={() => handleRejectBid(bid)}
                                 disabled={isLoading}
-                                className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-2 text-xs sm:text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="cursor-pointer flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-2 text-xs sm:text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 <XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                 <span>Reject</span>
@@ -231,7 +231,7 @@ const BidsModal = ({
                               <button
                                 onClick={() => handleAcceptBid(bid)}
                                 disabled={isLoading}
-                                className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-2 text-xs sm:text-sm font-medium text-success bg-success/10 hover:bg-success/20 border border-success/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="cursor-pointer flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-2 text-xs sm:text-sm font-medium text-success bg-success/10 hover:bg-success/20 border border-success/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                 <span>Accept</span>
