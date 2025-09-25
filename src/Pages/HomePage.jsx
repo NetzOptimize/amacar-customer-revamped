@@ -14,6 +14,7 @@ import { useEffect } from 'react'
 import Seo from '@/components/SEO/Seo'
 import { seoData } from '@/config/seoConfig'
 import BrandLogosCarousel from '@/components/Home/BrandLogosCarousel/BrandLogosCarousel.jsx'
+import ModernCarousel from '@/components/Home/ModernCarousel/ModernCarousel'
 export default function HomePage() {
     const { userState, loading } = useSelector((state) => state.user);
     useEffect(() => {
@@ -26,7 +27,7 @@ export default function HomePage() {
             <SectionHeader title="How Amacar works" highlight="Sell smarter, faster" />
             <VideoSection />
             <HowItWorks />
-            <HeroCarousel />
+            <ModernCarousel />
             <WhyChooseAmacar />
             {/* <WinWinAmacar /> */}
             <HowAmacarWorks />
