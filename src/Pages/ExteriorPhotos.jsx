@@ -75,12 +75,16 @@ export default function VehiclePhotos() {
     try {
       // Clear any previous errors
       dispatch(clearAuctionStartError());
-      const auction_terms_accepted = termsAccepted
+      const auction_page_terms = termsAccepted
+        ? "accepted"
+        : "not_accepted";
+      const auction_page_privacy_check = privacyAccepted
         ? "accepted"
         : "not_accepted";
       // Start the auction
+      console.log("auction_terms_accepted: ", auction_page_terms);
       const result = await dispatch(
-        startAuction({ productId, auction_terms_accepted })
+        startAuction({ productId, auction_page_terms, auction_page_privacy_check })
       ).unwrap();
 
       // Show success toast
@@ -103,6 +107,7 @@ export default function VehiclePhotos() {
   const handleModalClose = () => {
     setShowTermsModal(false);
     setTermsAccepted(false);
+    setPrivacyAccepted(false);
   };
 
   const handleAcceptTerms = async () => {
@@ -137,6 +142,7 @@ export default function VehiclePhotos() {
   const [dragActive, setDragActive] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
   useEffect(() => {
     // console.log("questions", questions);
@@ -1300,6 +1306,24 @@ export default function VehiclePhotos() {
                   className="text-sm text-slate-700 cursor-pointer"
                 >
                   I have read and agree to the <Link to={'/terms-of-service'} className="no-underline font-bold text-[#f6851f]">Terms & Conditions</Link>
+                </label>
+              </div>
+
+              {/* Privacy Checkbox */}
+
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <input
+                  type="checkbox"
+                  id="privacy-checkbox"
+                  checked={privacyAccepted}
+                  onChange={(e) => setPrivacyAccepted(e.target.checked)}
+                  className="h-4 w-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"
+                />
+                <label
+                  htmlFor="privacy-checkbox"
+                  className="text-sm text-slate-700 cursor-pointer"
+                >
+                  I have read and agree to the <Link to={'/privacy-policy'} className="no-underline font-bold text-[#f6851f]">Privacy Policy</Link>
                 </label>
               </div>
 
