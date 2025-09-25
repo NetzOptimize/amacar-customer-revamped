@@ -17,7 +17,7 @@ import {
   LifeBuoy,
   CircleGauge,
 } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
   uploadVehicleImage,
@@ -1299,7 +1299,7 @@ export default function VehiclePhotos() {
                   htmlFor="terms-checkbox"
                   className="text-sm text-slate-700 cursor-pointer"
                 >
-                  I have read and agree to the Terms & Conditions
+                  I have read and agree to the <Link to={'/terms-of-service'} className="no-underline font-bold text-[#f6851f]">Terms & Conditions</Link>
                 </label>
               </div>
 
