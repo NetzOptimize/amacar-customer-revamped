@@ -1,28 +1,41 @@
-import React, { useState, useEffect, useCallback } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Loader2, CheckCircle2, Car, User, Mail, Lock, MapPin, Globe, EyeOff, Eye, XCircle, Sparkles } from "lucide-react"
+import React, { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Loader2,
+  CheckCircle2,
+  Car,
+  User,
+  Mail,
+  Lock,
+  MapPin,
+  Globe,
+  EyeOff,
+  Eye,
+  XCircle,
+  Sparkles,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog"
-import { registerWithVin } from "@/redux/slices/userSlice"
-import { useDispatch, useSelector } from "react-redux"
-import { 
-  setVehicleDetails, 
-  fetchCityStateByZip, 
+} from "@/components/ui/dialog";
+import { registerWithVin } from "@/redux/slices/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setVehicleDetails,
+  fetchCityStateByZip,
   clearLocation,
   setModalLoading,
   setModalError,
   setModalSuccess,
   resetModalState,
   setStateVin,
-  setZipState
-} from "@/redux/slices/carDetailsAndQuestionsSlice"
-import { useNavigate, Link } from "react-router-dom"
-import useEmailValidation from "@/hooks/useEmailValidation"
+  setZipState,
+} from "@/redux/slices/carDetailsAndQuestionsSlice";
+import { useNavigate, Link } from "react-router-dom";
+import useEmailValidation from "@/hooks/useEmailValidation";
 
 export default function AuctionModal({
   isOpen,
@@ -31,45 +44,53 @@ export default function AuctionModal({
   description = "Get the best value for your vehicle with competitive bidding",
 }) {
   // UI state
-  const [vin, setVin] = useState("")
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
-  const [email, setEmail] = useState("")
-  const [phone, setPhone] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [zipCode, setZipCode] = useState("")
-  const [city, setCity] = useState("")
-  const [state, setState] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [auctionConsent, setAuctionConsent] = useState(false)
-  const [registerConsent, setRegisterConsent] = useState(false)
+  const [vin, setVin] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [zipCode, setZipCode] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [auctionConsent, setAuctionConsent] = useState(false);
+  const [registerConsent, setRegisterConsent] = useState(false);
   const [errors, setErrors] = useState({
-    vin: "", firstName: "", lastName: "", email: "", phone: "",
-    password: "", confirmPassword: "", zipCode: "", auctionConsent: "", registerConsent: "",
-  })
-  const [shouldResetEmailValidation, setShouldResetEmailValidation] = useState(false)
-  
+    vin: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+    zipCode: "",
+    auctionConsent: "",
+    registerConsent: "",
+  });
+  const [shouldResetEmailValidation, setShouldResetEmailValidation] =
+    useState(false);
+
   // Email validation hook - only validate when email is not empty and modal is open
   const emailValidation = useEmailValidation(
-    email && isOpen ? email : "", 
-    true, 
+    email && isOpen ? email : "",
+    true,
     shouldResetEmailValidation
-  )
+  );
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   // Redux state
-  const { 
-    location, 
-    locationStatus, 
-    locationError,
-    modalState 
-  } = useSelector((state) => state.carDetailsAndQuestions);
-  
-  const { status: userStatus, error: userError } = useSelector((state) => state.user);
-  
+  const { location, locationStatus, locationError, modalState } = useSelector(
+    (state) => state.carDetailsAndQuestions
+  );
+
+  const { status: userStatus, error: userError } = useSelector(
+    (state) => state.user
+  );
+
   const isCloseDisabled = modalState.isLoading;
 
   // Debounced ZIP code lookup
@@ -80,7 +101,7 @@ export default function AuctionModal({
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
           if (zip && zip.length === 5 && /^\d{5}$/.test(zip)) {
-            console.log('Dispatching ZIP lookup for:', zip);
+            console.log("Dispatching ZIP lookup for:", zip);
             dispatch(fetchCityStateByZip(zip));
           } else if (zip.length === 0) {
             // Clear location when ZIP is empty
@@ -102,7 +123,7 @@ export default function AuctionModal({
 
   // Update city and state when Redux location changes
   useEffect(() => {
-    if (locationStatus === 'succeeded' && location.city && location.state) {
+    if (locationStatus === "succeeded" && location.city && location.state) {
       setCity(location.city);
       setState(location.state);
     }
@@ -124,89 +145,99 @@ export default function AuctionModal({
 
   function validate() {
     const newErrors = {
-      vin: "", firstName: "", lastName: "", email: "", phone: "",
-      password: "", confirmPassword: "", zipCode: "", auctionConsent: "", registerConsent: "",
-    }
+      vin: "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      password: "",
+      confirmPassword: "",
+      zipCode: "",
+      auctionConsent: "",
+      registerConsent: "",
+    };
 
     // VIN validation
     if (!vin) {
-      newErrors.vin = "Please enter a valid VIN number."
+      newErrors.vin = "Please enter a valid VIN number.";
     } else if (vin.length !== 17) {
-      newErrors.vin = "VIN must be 17 characters."
+      newErrors.vin = "VIN must be 17 characters.";
     }
 
     // First Name validation
     if (!firstName) {
-      newErrors.firstName = "This field is required."
+      newErrors.firstName = "This field is required.";
     }
 
     // Last Name validation
     if (!lastName) {
-      newErrors.lastName = "This field is required."
+      newErrors.lastName = "This field is required.";
     }
 
     // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
-      newErrors.email = "This field is required."
+      newErrors.email = "This field is required.";
     } else if (!emailRegex.test(email)) {
       // Only show regex validation error if email validation hasn't started yet
       if (!emailValidation.isValidating) {
-        newErrors.email = "Please enter a valid email address."
+        newErrors.email = "Please enter a valid email address.";
       }
     } else if (email && isOpen && emailValidation.isDisposable === true) {
-      newErrors.email = "Disposable email addresses are not allowed."
+      newErrors.email = "Disposable email addresses are not allowed.";
     } else if (email && isOpen && emailValidation.error) {
-      newErrors.email = "Unable to verify email. Please try again."
+      newErrors.email = "Unable to verify email. Please try again.";
     }
 
     // Phone validation
     if (!phone) {
-      newErrors.phone = "This field is required."
+      newErrors.phone = "This field is required.";
     }
 
     // Password validation
     if (!password) {
-      newErrors.password = "This field is required."
+      newErrors.password = "This field is required.";
     } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters."
+      newErrors.password = "Password must be at least 6 characters.";
     }
 
     // Confirm Password validation
     if (!confirmPassword) {
-      newErrors.confirmPassword = "This field is required."
+      newErrors.confirmPassword = "This field is required.";
     } else if (confirmPassword !== password) {
-      newErrors.confirmPassword = "Passwords do not match."
+      newErrors.confirmPassword = "Passwords do not match.";
     }
 
     // Zip Code validation
-    const zipRegex = /^\d{5}(-\d{4})?$/
+    const zipRegex = /^\d{5}(-\d{4})?$/;
     if (!zipCode) {
-      newErrors.zipCode = "This field is required."
+      newErrors.zipCode = "This field is required.";
     } else if (!zipRegex.test(zipCode)) {
-      newErrors.zipCode = "Please enter a valid zip code."
+      newErrors.zipCode = "Please enter a valid zip code.";
     }
 
     // Terms and Conditions validation
     if (!auctionConsent) {
-      newErrors.auctionConsent = "You must agree to the Account and Auction Terms."
+      newErrors.auctionConsent =
+        "You must agree to the Account and Auction Terms.";
     }
 
     if (!registerConsent) {
-      newErrors.registerConsent = "You must agree to the Terms of Use and Privacy Policy."
+      newErrors.registerConsent =
+        "You must agree to the Terms of Use and Privacy Policy.";
     }
 
-    setErrors(newErrors)
-    return Object.values(newErrors).every(error => !error)
+    setErrors(newErrors);
+    return Object.values(newErrors).every((error) => !error);
   }
 
   async function startAction() {
     // First, validate the form
     if (!validate()) return;
-  
+
     // Set loading state in Redux
     dispatch(setModalLoading(true));
-  
+
     try {
       // Prepare the form values for API
       const formValues = {
@@ -223,55 +254,60 @@ export default function AuctionModal({
         auctionConsent,
         registerConsent,
       };
-  
+
       // Dispatch registerWithVin thunk
       const resultAction = await dispatch(registerWithVin(formValues));
-  
+
       if (registerWithVin.fulfilled.match(resultAction)) {
         // Registration successful, store vehicle data in vehicle slice
         dispatch(setVehicleDetails(resultAction.payload));
-        dispatch(setModalSuccess("Registration successful! Redirecting to auction page..."));
-        dispatch(setStateVin(vin))
-        dispatch(setZipState(zipCode))
+        dispatch(
+          setModalSuccess(
+            "Registration successful! Redirecting to auction page..."
+          )
+        );
+        dispatch(setStateVin(vin));
+        dispatch(setZipState(zipCode));
         // Navigate after a short delay to show success message
         setTimeout(() => {
-          navigate('/auction-page');
+          navigate("/auction-page");
         }, 1500);
-
       } else {
         // Handle API error
-        const errorMessage = resultAction.payload || 'Registration failed. Please try again.';
+        const errorMessage =
+          resultAction.payload || "Registration failed. Please try again.";
         dispatch(setModalError(errorMessage));
       }
     } catch (err) {
-      console.error('Unexpected error:', err);
-      dispatch(setModalError('An unexpected error occurred. Please try again.'));
+      console.error("Unexpected error:", err);
+      dispatch(
+        setModalError("An unexpected error occurred. Please try again.")
+      );
     }
   }
-  
 
   function handleSubmit(e) {
-    e?.preventDefault()
-    console.log("firstName: ", firstName)
-    console.log("lastname: ", lastName)
-    console.log("email: ", email)
-    console.log("phone: ", phone)
-    console.log("password: ", password)
-    console.log("confirm password: ", confirmPassword)
-    console.log("vin: ", vin)
-    console.log("zip: ", zipCode)
-    console.log("state: ", state)
-    console.log("city: ", city)
-    console.log("auctionConsent: ", auctionConsent)
-    console.log("registerConsent: ", registerConsent)
+    e?.preventDefault();
+    console.log("firstName: ", firstName);
+    console.log("lastname: ", lastName);
+    console.log("email: ", email);
+    console.log("phone: ", phone);
+    console.log("password: ", password);
+    console.log("confirm password: ", confirmPassword);
+    console.log("vin: ", vin);
+    console.log("zip: ", zipCode);
+    console.log("state: ", state);
+    console.log("city: ", city);
+    console.log("auctionConsent: ", auctionConsent);
+    console.log("registerConsent: ", registerConsent);
     if (validate()) {
-      startAction()
+      startAction();
     }
   }
 
   function handleSuccessAction() {
-    onClose(false)
-    console.log("Auction submitted successfully")
+    onClose(false);
+    console.log("Auction submitted successfully");
   }
 
   const handleOpenChange = (open) => {
@@ -291,17 +327,20 @@ export default function AuctionModal({
       setRegisterConsent(false);
       setErrors({});
       setShouldResetEmailValidation(true); // Reset email validation state
-      
+
       // Reset Redux state
       dispatch(clearLocation());
       dispatch(resetModalState());
-      
+
       onClose(false);
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={isCloseDisabled ? undefined : handleOpenChange}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={isCloseDisabled ? undefined : handleOpenChange}
+    >
       <DialogContent
         className="lg:mt-[1rem] mt-[2rem] sm:max-w-2xl md:max-w-2xl lg:max-w-3xl rounded-xl shadow-xl p-0 overflow-hidden bg-white h-[70vh] md:h-[75vh] lg:h-auto lg:max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         showCloseButton={!isCloseDisabled}
@@ -331,7 +370,10 @@ export default function AuctionModal({
                   <div className="space-y-3 sm:space-y-4">
                     {/* VIN Field */}
                     <div className="grid gap-1">
-                      <label htmlFor="vin" className="text-sm font-medium text-slate-800">
+                      <label
+                        htmlFor="vin"
+                        className="text-sm font-medium text-slate-800"
+                      >
                         VIN Number *
                       </label>
                       <div className="relative">
@@ -349,7 +391,7 @@ export default function AuctionModal({
                         />
                       </div>
                       {errors.vin && (
-                        <motion.p 
+                        <motion.p
                           initial={{ opacity: 0, y: -4 }}
                           animate={{ opacity: 1, y: 0 }}
                           className="text-xs text-red-500 mt-1"
@@ -361,7 +403,10 @@ export default function AuctionModal({
 
                     {/* First Name Field */}
                     <div className="grid gap-1">
-                      <label htmlFor="firstName" className="text-sm font-medium text-slate-800">
+                      <label
+                        htmlFor="firstName"
+                        className="text-sm font-medium text-slate-800"
+                      >
                         First Name *
                       </label>
                       <div className="relative">
@@ -378,7 +423,7 @@ export default function AuctionModal({
                         />
                       </div>
                       {errors.firstName && (
-                        <motion.p 
+                        <motion.p
                           initial={{ opacity: 0, y: -4 }}
                           animate={{ opacity: 1, y: 0 }}
                           className="text-xs text-red-500 mt-1"
@@ -390,20 +435,29 @@ export default function AuctionModal({
 
                     {/* Email Field */}
                     <div className="grid gap-1">
-                      <label htmlFor="email" className="text-sm font-medium text-slate-800">
+                      <label
+                        htmlFor="email"
+                        className="text-sm font-medium text-slate-800"
+                      >
                         Email Address *
                         {emailValidation.isValidating && email && isOpen && (
-                          <span className="ml-2 text-xs text-slate-500">(Validating...)</span>
+                          <span className="ml-2 text-xs text-slate-500">
+                            (Validating...)
+                          </span>
                         )}
                       </label>
                       <div className="relative">
-                        <div className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 ${
-                          email && isOpen && emailValidation.isValid === true 
-                            ? 'text-green-500' 
-                            : email && isOpen && emailValidation.isDisposable === true 
-                              ? 'text-red-500' 
-                              : 'text-slate-400'
-                        }`}>
+                        <div
+                          className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 ${
+                            email && isOpen && emailValidation.isValid === true
+                              ? "text-green-500"
+                              : email &&
+                                isOpen &&
+                                emailValidation.isDisposable === true
+                              ? "text-red-500"
+                              : "text-slate-400"
+                          }`}
+                        >
                           <Mail className="h-4 w-4" />
                         </div>
                         <input
@@ -414,12 +468,14 @@ export default function AuctionModal({
                           placeholder="Enter your email address"
                           className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-all duration-200 ${
                             email && isOpen && emailValidation.isValid === true
-                              ? 'border-green-300 bg-green-50 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.5)]'
-                              : email && isOpen && emailValidation.isDisposable === true
-                                ? 'border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]'
-                                : errors.email && !emailValidation.isValidating
-                                  ? 'border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]'
-                                  : 'border-slate-200 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]'
+                              ? "border-green-300 bg-green-50 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.5)]"
+                              : email &&
+                                isOpen &&
+                                emailValidation.isDisposable === true
+                              ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
+                              : errors.email && !emailValidation.isValidating
+                              ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
+                              : "border-slate-200 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
                           }`}
                         />
                         {/* Validation status indicator */}
@@ -427,27 +483,35 @@ export default function AuctionModal({
                           {emailValidation.isValidating && email && isOpen && (
                             <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
                           )}
-                          {!emailValidation.isValidating && email && isOpen && emailValidation.isValid === true && (
-                            <CheckCircle2 className="h-4 w-4 text-green-500" />
-                          )}
-                          {!emailValidation.isValidating && email && isOpen && emailValidation.isDisposable === true && (
-                            <XCircle className="h-4 w-4 text-red-500" />
-                          )}
+                          {!emailValidation.isValidating &&
+                            email &&
+                            isOpen &&
+                            emailValidation.isValid === true && (
+                              <CheckCircle2 className="h-4 w-4 text-green-500" />
+                            )}
+                          {!emailValidation.isValidating &&
+                            email &&
+                            isOpen &&
+                            emailValidation.isDisposable === true && (
+                              <XCircle className="h-4 w-4 text-red-500" />
+                            )}
                         </div>
                       </div>
-                   
-                      {email && isOpen && emailValidation.isDisposable === true && (
-                        <motion.p 
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-xs text-red-500 mt-1"
-                        >
-                          Disposable email addresses are not allowed
-                        </motion.p>
-                      )}
-                      
+
+                      {email &&
+                        isOpen &&
+                        emailValidation.isDisposable === true && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-xs text-red-500 mt-1"
+                          >
+                            Disposable email addresses are not allowed
+                          </motion.p>
+                        )}
+
                       {email && isOpen && emailValidation.error && (
-                        <motion.p 
+                        <motion.p
                           initial={{ opacity: 0, y: -4 }}
                           animate={{ opacity: 1, y: 0 }}
                           className="text-xs text-red-500 mt-1"
@@ -455,10 +519,10 @@ export default function AuctionModal({
                           Unable to verify email. Please try again.
                         </motion.p>
                       )}
-                      
+
                       {/* Show regex validation error only when not validating */}
                       {errors.email && (
-                        <motion.p 
+                        <motion.p
                           initial={{ opacity: 0, y: -4 }}
                           animate={{ opacity: 1, y: 0 }}
                           className="text-xs text-red-500 mt-1"
@@ -470,7 +534,10 @@ export default function AuctionModal({
 
                     {/* Password Field */}
                     <div className="grid gap-1">
-                      <label htmlFor="password" className="text-sm font-medium text-slate-800">
+                      <label
+                        htmlFor="password"
+                        className="text-sm font-medium text-slate-800"
+                      >
                         Password *
                       </label>
                       <div className="relative">
@@ -498,7 +565,7 @@ export default function AuctionModal({
                         </button>
                       </div>
                       {errors.password && (
-                        <motion.p 
+                        <motion.p
                           initial={{ opacity: 0, y: -4 }}
                           animate={{ opacity: 1, y: 0 }}
                           className="text-xs text-red-500 mt-1"
@@ -510,7 +577,10 @@ export default function AuctionModal({
 
                     {/* City Field */}
                     <div className="grid gap-1">
-                      <label htmlFor="city" className="text-sm font-medium text-slate-800">
+                      <label
+                        htmlFor="city"
+                        className="text-sm font-medium text-slate-800"
+                      >
                         City *
                       </label>
                       <div className="relative">
@@ -522,14 +592,21 @@ export default function AuctionModal({
                           type="text"
                           value={city}
                           onChange={(e) => setCity(e.target.value)}
-                          placeholder={locationStatus === 'loading' ? "Looking up city..." : "Enter your city"}
-                          disabled={locationStatus === 'loading' || (locationStatus === 'succeeded' && city)}
+                          placeholder={
+                            locationStatus === "loading"
+                              ? "Looking up city..."
+                              : "Enter your city"
+                          }
+                          disabled={
+                            locationStatus === "loading" ||
+                            (locationStatus === "succeeded" && city)
+                          }
                           className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow ${
-                            locationStatus === 'loading' 
-                              ? 'border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed' 
-                              : locationStatus === 'succeeded' && city
-                              ? 'border-green-200 bg-green-50 text-green-800 cursor-not-allowed'
-                              : 'border-slate-200 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]'
+                            locationStatus === "loading"
+                              ? "border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed"
+                              : locationStatus === "succeeded" && city
+                              ? "border-green-200 bg-green-50 text-green-800 cursor-not-allowed"
+                              : "border-slate-200 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
                           }`}
                         />
                       </div>
@@ -540,7 +617,10 @@ export default function AuctionModal({
                   <div className="space-y-3 sm:space-y-4">
                     {/* Zip Code Field */}
                     <div className="grid gap-1">
-                      <label htmlFor="zipCode" className="text-sm font-medium text-slate-800">
+                      <label
+                        htmlFor="zipCode"
+                        className="text-sm font-medium text-slate-800"
+                      >
                         Zip Code *
                       </label>
                       <div className="relative">
@@ -556,16 +636,16 @@ export default function AuctionModal({
                           onChange={(e) => handleZipCodeChange(e.target.value)}
                           placeholder="Enter your zip code"
                           className="h-11 w-full rounded-md border border-slate-200 px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
-                          style={{ fontSize: '16px' }}
+                          style={{ fontSize: "16px" }}
                         />
-                        {locationStatus === 'loading' && (
+                        {locationStatus === "loading" && (
                           <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
                             <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
                           </div>
                         )}
                       </div>
                       {errors.zipCode && (
-                        <motion.p 
+                        <motion.p
                           initial={{ opacity: 0, y: -4 }}
                           animate={{ opacity: 1, y: 0 }}
                           className="text-xs text-red-500 mt-1"
@@ -574,7 +654,7 @@ export default function AuctionModal({
                         </motion.p>
                       )}
                       {locationError && (
-                        <motion.p 
+                        <motion.p
                           initial={{ opacity: 0, y: -4 }}
                           animate={{ opacity: 1, y: 0 }}
                           className="text-xs text-red-500 mt-1"
@@ -586,7 +666,10 @@ export default function AuctionModal({
 
                     {/* Last Name Field */}
                     <div className="grid gap-1">
-                      <label htmlFor="lastName" className="text-sm font-medium text-slate-800">
+                      <label
+                        htmlFor="lastName"
+                        className="text-sm font-medium text-slate-800"
+                      >
                         Last Name *
                       </label>
                       <div className="relative">
@@ -603,7 +686,7 @@ export default function AuctionModal({
                         />
                       </div>
                       {errors.lastName && (
-                        <motion.p 
+                        <motion.p
                           initial={{ opacity: 0, y: -4 }}
                           animate={{ opacity: 1, y: 0 }}
                           className="text-xs text-red-500 mt-1"
@@ -615,7 +698,10 @@ export default function AuctionModal({
 
                     {/* Phone Number Field */}
                     <div className="grid gap-1">
-                      <label htmlFor="phone" className="text-sm font-medium text-slate-800">
+                      <label
+                        htmlFor="phone"
+                        className="text-sm font-medium text-slate-800"
+                      >
                         Phone Number *
                       </label>
                       <div className="relative">
@@ -627,7 +713,7 @@ export default function AuctionModal({
                           inputMode="numeric"
                           id="phone"
                           type="tel"
-                          value={phone} 
+                          value={phone}
                           onChange={(e) => {
                             // keep only digits
                             const value = e.target.value.replace(/\D/g, "");
@@ -639,7 +725,7 @@ export default function AuctionModal({
                         />
                       </div>
                       {errors.phone && (
-                        <motion.p 
+                        <motion.p
                           initial={{ opacity: 0, y: -4 }}
                           animate={{ opacity: 1, y: 0 }}
                           className="text-xs text-red-500 mt-1"
@@ -651,7 +737,10 @@ export default function AuctionModal({
 
                     {/* Confirm Password Field */}
                     <div className="grid gap-1">
-                      <label htmlFor="confirmPassword" className="text-sm font-medium text-slate-800">
+                      <label
+                        htmlFor="confirmPassword"
+                        className="text-sm font-medium text-slate-800"
+                      >
                         Confirm Password *
                       </label>
                       <div className="relative">
@@ -668,7 +757,9 @@ export default function AuctionModal({
                         />
                         <button
                           type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
                           className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                         >
                           {showConfirmPassword ? (
@@ -679,7 +770,7 @@ export default function AuctionModal({
                         </button>
                       </div>
                       {errors.confirmPassword && (
-                        <motion.p 
+                        <motion.p
                           initial={{ opacity: 0, y: -4 }}
                           animate={{ opacity: 1, y: 0 }}
                           className="text-xs text-red-500 mt-1"
@@ -691,7 +782,10 @@ export default function AuctionModal({
 
                     {/* State Field */}
                     <div className="grid gap-1">
-                      <label htmlFor="state" className="text-sm font-medium text-slate-800">
+                      <label
+                        htmlFor="state"
+                        className="text-sm font-medium text-slate-800"
+                      >
                         State *
                       </label>
                       <div className="relative">
@@ -703,14 +797,21 @@ export default function AuctionModal({
                           type="text"
                           value={state}
                           onChange={(e) => setState(e.target.value)}
-                          placeholder={locationStatus === 'loading' ? "Looking up state..." : "Enter your state"}
-                          disabled={locationStatus === 'loading' || (locationStatus === 'succeeded' && state)}
+                          placeholder={
+                            locationStatus === "loading"
+                              ? "Looking up state..."
+                              : "Enter your state"
+                          }
+                          disabled={
+                            locationStatus === "loading" ||
+                            (locationStatus === "succeeded" && state)
+                          }
                           className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow ${
-                            locationStatus === 'loading' 
-                              ? 'border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed' 
-                              : locationStatus === 'succeeded' && state
-                              ? 'border-green-200 bg-green-50 text-green-800 cursor-not-allowed'
-                              : 'border-slate-200 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]'
+                            locationStatus === "loading"
+                              ? "border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed"
+                              : locationStatus === "succeeded" && state
+                              ? "border-green-200 bg-green-50 text-green-800 cursor-not-allowed"
+                              : "border-slate-200 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
                           }`}
                         />
                       </div>
@@ -732,11 +833,21 @@ export default function AuctionModal({
                       />
                     </div>
                     <div className="flex-1">
-                      <label htmlFor="auctionConsent" className="text-sm text-slate-700 cursor-pointer">
-                        I agree to Amacar's <Link to="/terms-of-service" className="no-underline font-bold text-[#f6851f]">Account and Auction Terms for Customers</Link>, including arbitration and disclaimer clauses. *
+                      <label
+                        htmlFor="auctionConsent"
+                        className="text-sm text-slate-700 cursor-pointer"
+                      >
+                        I agree to Amacar's{" "}
+                        <Link
+                          to="/terms-of-service"
+                          className="no-underline font-bold text-[#f6851f]"
+                        >
+                          Account and Auction Terms for Customers
+                        </Link>
+                        , including arbitration and disclaimer clauses. *
                       </label>
                       {errors.auctionConsent && (
-                        <motion.p 
+                        <motion.p
                           initial={{ opacity: 0, y: -4 }}
                           animate={{ opacity: 1, y: 0 }}
                           className="text-xs text-red-500 mt-1"
@@ -759,11 +870,28 @@ export default function AuctionModal({
                       />
                     </div>
                     <div className="flex-1">
-                      <label htmlFor="registerConsent" className="text-sm text-slate-700 cursor-pointer">
-                        I agree to the <Link to="/terms-of-service" className="no-underline font-bold text-[#f6851f]">Terms of Use</Link> and <Link to="/privacy-policy" className="no-underline font-bold text-[#f6851f]">Privacy Policy</Link>. *
+                      <label
+                        htmlFor="registerConsent"
+                        className="text-sm text-slate-700 cursor-pointer"
+                      >
+                        I agree to the{" "}
+                        <Link
+                          to="/terms-of-service"
+                          className="no-underline font-bold text-[#f6851f]"
+                        >
+                          Terms of Use
+                        </Link>{" "}
+                        and{" "}
+                        <Link
+                          to="/privacy-policy"
+                          className="no-underline font-bold text-[#f6851f]"
+                        >
+                          Privacy Policy
+                        </Link>
+                        . *
                       </label>
                       {errors.registerConsent && (
-                        <motion.p 
+                        <motion.p
                           initial={{ opacity: 0, y: -4 }}
                           animate={{ opacity: 1, y: 0 }}
                           className="text-xs text-red-500 mt-1"
@@ -779,7 +907,15 @@ export default function AuctionModal({
                 <div className="pt-2 mt-auto">
                   <button
                     type="submit"
-                    disabled={modalState.isLoading || !auctionConsent || !registerConsent || (email && isOpen && (emailValidation.isValidating || emailValidation.isDisposable === true))}
+                    disabled={
+                      modalState.isLoading ||
+                      !auctionConsent ||
+                      !registerConsent ||
+                      (email &&
+                        isOpen &&
+                        (emailValidation.isValidating ||
+                          emailValidation.isDisposable === true))
+                    }
                     className="cursor-pointer w-full h-12 sm:h-11 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-base font-semibold shadow-lg shadow-orange-500/20  disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {modalState.isLoading ? (
@@ -797,7 +933,6 @@ export default function AuctionModal({
                     )}
                   </button>
                 </div>
-
               </motion.form>
             )}
 
@@ -813,7 +948,9 @@ export default function AuctionModal({
                 <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50 w-full">
                   <div className="flex items-center gap-3 p-4">
                     <Loader2 className="h-5 w-5 animate-spin text-slate-700" />
-                    <span className="text-sm text-slate-700">Submitting your auction details...</span>
+                    <span className="text-sm text-slate-700">
+                      Submitting your auction details...
+                    </span>
                   </div>
                   <div className="h-1 w-full bg-slate-200">
                     <motion.div
@@ -839,10 +976,10 @@ export default function AuctionModal({
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
                 className="grid gap-4 sm:gap-5 place-items-center text-center h-full flex-1 justify-center"
               >
-                <motion.div 
-                  className="relative" 
-                  initial={{ scale: 0.9, opacity: 0 }} 
-                  animate={{ scale: 1, opacity: 1 }} 
+                <motion.div
+                  className="relative"
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: "spring", stiffness: 340, damping: 18 }}
                 >
                   <div className="grid place-items-center rounded-2xl border border-green-200 bg-gradient-to-b from-white to-emerald-50 p-4 shadow-sm">
@@ -851,9 +988,12 @@ export default function AuctionModal({
                   <Sparkles className="absolute -right-2 -top-2 h-4 w-4 text-amber-500" />
                 </motion.div>
                 <div className="space-y-1">
-                  <h3 className="text-lg font-semibold text-slate-900">Registration Successful!</h3>
+                  <h3 className="text-lg font-semibold text-slate-900">
+                    Registration Successful!
+                  </h3>
                   <p className="text-sm text-slate-600">
-                    {modalState.successMessage || "Your vehicle has been successfully submitted for auction."}
+                    {modalState.successMessage ||
+                      "Your vehicle has been successfully submitted for auction."}
                   </p>
                 </div>
                 <button
@@ -874,10 +1014,10 @@ export default function AuctionModal({
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
                 className="grid gap-4 sm:gap-5 place-items-center text-center h-full flex-1 justify-center"
               >
-                <motion.div 
-                  className="relative" 
-                  initial={{ scale: 0.9, opacity: 0 }} 
-                  animate={{ scale: 1, opacity: 1 }} 
+                <motion.div
+                  className="relative"
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: "spring", stiffness: 340, damping: 18 }}
                 >
                   <div className="grid place-items-center rounded-2xl border border-red-200 bg-gradient-to-b from-white to-red-50 p-4 shadow-sm">
@@ -885,21 +1025,50 @@ export default function AuctionModal({
                   </div>
                 </motion.div>
                 <div className="space-y-1">
-                  <h3 className="text-lg font-semibold text-slate-900">Registration Failed</h3>
+                  <h3 className="text-lg font-semibold text-slate-900">
+                    Registration Failed
+                  </h3>
                   <p className="text-sm text-slate-600">
-                    {modalState.error || "An error occurred during registration. Please try again."}
+                    {modalState.error ||
+                      "An error occurred during registration. Please try again."}
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 w-full">
                   <button
                     onClick={() => dispatch(resetModalState())}
-                    className="cursor-pointer px-4 sm:px-6 h-12 sm:h-11 rounded-xl bg-slate-900 text-white text-base font-semibold shadow-lg shadow-slate-900/20 hover:bg-slate-800 flex-1"
+                    className="
+    cursor-pointer 
+    w-full sm:w-auto          
+    px-2 sm:px-6 lg:px-8     
+    h-11 sm:h-12 lg:h-12      
+    rounded-xl 
+    bg-slate-900 
+    text-white 
+    text-sm sm:text-base lg:text-lg 
+    font-semibold 
+    shadow-lg shadow-slate-900/20 
+    hover:bg-slate-800 
+    transition-all duration-200
+  "
                   >
                     Try Again
                   </button>
+
                   <button
                     onClick={() => handleOpenChange(false)}
-                    className="cursor-pointer px-4 sm:px-6 h-12 sm:h-11 rounded-xl border border-slate-300 text-slate-700 text-base font-semibold hover:bg-slate-50 flex-1"
+                    className="
+    cursor-pointer 
+    w-full sm:w-auto              /* Full width on mobile, auto on bigger screens */
+    px-4 sm:px-6 lg:px-8          /* Padding scales with screen size */
+    h-11 sm:h-12 lg:h-12          /* Adjust height */
+    rounded-xl 
+    border border-slate-300 
+    text-slate-700 
+    text-sm sm:text-base lg:text-lg /* Responsive font size */
+    font-semibold 
+    hover:bg-slate-50 
+    transition-all duration-200
+  "
                   >
                     Cancel
                   </button>
@@ -910,5 +1079,5 @@ export default function AuctionModal({
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
