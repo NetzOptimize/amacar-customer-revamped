@@ -171,8 +171,8 @@ const BrandLogosCarousel = ({ className = "", pauseOnHover = true }) => {
       {/* Continuous scrolling container */}
       <div 
         className="relative overflow-hidden"
-        onMouseEnter={() => pauseOnHover && setIsPaused(true)}
-        onMouseLeave={() => pauseOnHover && setIsPaused(false)}
+        // onMouseEnter={() => pauseOnHover && setIsPaused(true)}
+        // onMouseLeave={() => pauseOnHover && setIsPaused(false)}
       >
         <div 
           className={cn(
