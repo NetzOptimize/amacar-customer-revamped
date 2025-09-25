@@ -96,7 +96,7 @@ const MyAppointments = () => {
 
   // Status filter options
   const statusFilterOptions = [
-    { value: 'all', label: 'All Appointments', count: appointments.length, color: 'bg-slate-100 text-slate-700' },
+    { value: 'all', label: 'All', count: appointments.length, color: 'bg-slate-100 text-slate-700' },
     { value: 'pending', label: 'Pending', count: appointments.filter(apt => apt.status === 'pending').length, color: 'bg-blue-100 text-blue-700' },
     { value: 'confirmed', label: 'Confirmed', count: appointments.filter(apt => apt.status === 'confirmed').length, color: 'bg-green-100 text-green-700' },
     { value: 'cancelled', label: 'Cancelled', count: appointments.filter(apt => apt.status === 'cancelled').length, color: 'bg-red-100 text-red-700' },
@@ -332,7 +332,7 @@ const MyAppointments = () => {
   }
 
   return (
-    <div className="lg:mt-16 min-h-screen bg-gradient-hero p-4 sm:p-6 lg:p-8">
+    <div className="lg:mt-16 min-h-screen bg-gradient-hero px-4 sm:px-6 lg:px-8 py-8 sm:py-6 lg:py-8">
       <div className="max-w-8xl mx-auto">
         <motion.div
           variants={containerVariants}

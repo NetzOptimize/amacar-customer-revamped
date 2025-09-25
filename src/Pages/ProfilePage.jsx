@@ -129,7 +129,7 @@ const ProfilePage = () => {
 
   if (loading || offersLoading) {
     return (
-      <div className="mt-16 min-h-screen bg-gradient-hero p-4 sm:p-6 lg:p-8">
+      <div className="mt-8 min-h-screen bg-gradient-hero p-4 sm:p-6 lg:p-8">
         <div className="max-w-6xl mx-auto">
           <div className="space-y-8">
             {/* Header Skeleton */}
@@ -217,7 +217,7 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="mt-16 min-h-screen bg-gradient-hero p-4 sm:p-6 lg:p-8">
+    <div className="mt-8 min-h-screen bg-gradient-hero p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto">
         <motion.div
           variants={containerVariants}
