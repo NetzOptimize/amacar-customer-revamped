@@ -14,7 +14,7 @@ import AuctionModal from '@/components/ui/AuctionYourRideModal';
 import './ModernCarousel.css';
 
 // Import images (you'll need to add these imports based on your actual image paths)
-import img1 from '../../../assets/home_page_first_hero(1).jpg';
+import img1 from '../../../assets/get_an_instant_offer_for_your_car.jpg';
 import img2 from '../../../assets/seize_the_opportunity.jpg';
 import img3 from '../../../assets/driving_the_future_of_your_car.jpg';
 
@@ -86,7 +86,7 @@ const ModernCarousel = ({ className = "" }) => {
   };
 
   return (
-    <div className={cn("w-full max-w-7xl mx-auto modern-carousel", className)}>
+    <div className={cn("w-full max-w-7xl mx-auto modern-carousel ", className)}>
       <Carousel
         setApi={setApi}
         opts={{
@@ -146,7 +146,7 @@ const ModernCarousel = ({ className = "" }) => {
                               ease: "easeOut" 
                             }}
                             onClick={() => handleCtaClick(slide.cta)}
-                            className="btn-primary text-sm md:text-base px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto"
+                            className="btn-primary text-sm md:text-base px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl w-[50%] sm:w-auto"
                           >
                             {slide.cta}
                           </motion.button>
