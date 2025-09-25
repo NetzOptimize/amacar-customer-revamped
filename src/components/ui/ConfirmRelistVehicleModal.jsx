@@ -42,7 +42,7 @@ const ConfirmRelistVehicleModal = ({
         console.log('Redirecting to /auction-page with data:', auctionData);
         navigate('/auction-page', { state: auctionData });
         onClose();
-      }, 1000);
+      }, 500);
     } else if (hasChanges === false) {
       // User selected "No" - call the existing re-auction API
       console.log('User selected NO - calling re-auction API');

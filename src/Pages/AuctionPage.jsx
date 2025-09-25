@@ -38,12 +38,14 @@ export default function AuctionPage() {
 
   // Fetch vehicle details if not already loaded
   useEffect(() => {
-    if (!vehicleDetails || Object.keys(vehicleDetails).length === 0) {
+    // if (!vehicleDetails || Object.keys(vehicleDetails).length === 0) {
+      console.log("zipcode from relist", zipCode);
+      console.log("vin from relist", vin);
       dispatch(fetchVehicleDetails({ vin: vin, zip: zipCode }));
       console.log("fetching vehicle details");
       // dispatch(fetchVehicleDetails({ vin: vin, zip: zipCode }));
-    }
-  }, [dispatch, vehicleDetails, vin, zipCode]);
+    // }
+  }, [dispatch, vin, zipCode]);
 useEffect(() => {
     // console.log("avg", vehicleDetails.averagemileage);
     console.log("vin", vin);

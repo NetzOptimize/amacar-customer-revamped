@@ -13,9 +13,8 @@ const ReusableTooltip = ({
   delayDuration = 0,
   ...props
 }) => {
-  if (!content || disabled) {
-    return <>{children}</>;
-  }
+  // Always render the tooltip structure to prevent re-mounting of children
+  const shouldShowTooltip = content && !disabled;
 
   // Variant styles
   const getVariantStyles = (variant) => {
@@ -38,14 +37,16 @@ const ReusableTooltip = ({
       <TooltipTrigger asChild>
         {children}
       </TooltipTrigger>
-      <TooltipContent
-        side={side}
-        align={align}
-        sideOffset={sideOffset}
-        className={`${getVariantStyles(variant)} ${className}`}
-      >
-        {content}
-      </TooltipContent>
+      {shouldShowTooltip && (
+        <TooltipContent
+          side={side}
+          align={align}
+          sideOffset={sideOffset}
+          className={`${getVariantStyles(variant)} ${className}`}
+        >
+          {content}
+        </TooltipContent>
+      )}
     </Tooltip>
   );
 };

@@ -94,6 +94,11 @@ export default function AuctionModal({
 
   const isCloseDisabled = modalState.isLoading;
 
+  // Memoized email change handler to prevent cursor jumping
+  const handleEmailChange = useCallback((e) => {
+    setEmail(e.target.value);
+  }, []);
+
   // Debounced ZIP code lookup
   const debouncedZipLookup = useCallback(
     (() => {
@@ -144,47 +149,46 @@ export default function AuctionModal({
     }
   }, [email]);
 
-  // Clear errors in real-time as user types
+  // Clear errors in real-time as user types - optimized to prevent unnecessary re-renders
   useEffect(() => {
     if (errors.vin && vin && vin.length > 0) {
-      // Clear error as soon as user starts typing
-      setErrors(prev => ({ ...prev, vin: "" }));
+      setErrors(prev => prev.vin ? { ...prev, vin: "" } : prev);
     }
   }, [vin, errors.vin]);
 
   useEffect(() => {
     if (errors.firstName && firstName.length > 0) {
-      setErrors(prev => ({ ...prev, firstName: "" }));
+      setErrors(prev => prev.firstName ? { ...prev, firstName: "" } : prev);
     }
   }, [firstName, errors.firstName]);
 
   useEffect(() => {
     if (errors.lastName && lastName.length > 0) {
-      setErrors(prev => ({ ...prev, lastName: "" }));
+      setErrors(prev => prev.lastName ? { ...prev, lastName: "" } : prev);
     }
   }, [lastName, errors.lastName]);
 
   useEffect(() => {
     if (errors.phone && phone && phone.length === 10) {
-      setErrors(prev => ({ ...prev, phone: "" }));
+      setErrors(prev => prev.phone ? { ...prev, phone: "" } : prev);
     }
   }, [phone, errors.phone]);
 
   useEffect(() => {
     if (errors.password && password.length > 0) {
-      setErrors(prev => ({ ...prev, password: "" }));
+      setErrors(prev => prev.password ? { ...prev, password: "" } : prev);
     }
   }, [password, errors.password]);
 
   useEffect(() => {
     if (errors.confirmPassword && confirmPassword.length > 0) {
-      setErrors(prev => ({ ...prev, confirmPassword: "" }));
+      setErrors(prev => prev.confirmPassword ? { ...prev, confirmPassword: "" } : prev);
     }
   }, [confirmPassword, errors.confirmPassword]);
 
   useEffect(() => {
     if (errors.zipCode && zipCode.length > 0) {
-      setErrors(prev => ({ ...prev, zipCode: "" }));
+      setErrors(prev => prev.zipCode ? { ...prev, zipCode: "" } : prev);
     }
   }, [zipCode, errors.zipCode]);
 
@@ -200,13 +204,13 @@ export default function AuctionModal({
 
   useEffect(() => {
     if (errors.auctionConsent && auctionConsent) {
-      setErrors(prev => ({ ...prev, auctionConsent: "" }));
+      setErrors(prev => prev.auctionConsent ? { ...prev, auctionConsent: "" } : prev);
     }
   }, [auctionConsent, errors.auctionConsent]);
 
   useEffect(() => {
     if (errors.registerConsent && registerConsent) {
-      setErrors(prev => ({ ...prev, registerConsent: "" }));
+      setErrors(prev => prev.registerConsent ? { ...prev, registerConsent: "" } : prev);
     }
   }, [registerConsent, errors.registerConsent]);
 
@@ -219,7 +223,7 @@ export default function AuctionModal({
         if (!emailValidation.isValidating && 
             emailValidation.isDisposable !== true && 
             !emailValidation.error) {
-          setErrors(prev => ({ ...prev, email: "" }));
+          setErrors(prev => prev.email ? { ...prev, email: "" } : prev);
         }
       }
     }
@@ -265,9 +269,9 @@ export default function AuctionModal({
       if (!emailValidation.isValidating) {
         newErrors.email = "Please enter a valid email address.";
       }
-    } else if (email && isOpen && emailValidation.isDisposable === true) {
+    } else if (email && isOpen && emailValidation.isDisposable === true && !emailValidation.isValidating) {
       newErrors.email = "Disposable email addresses are not allowed.";
-    } else if (email && isOpen && emailValidation.error) {
+    } else if (email && isOpen && emailValidation.error && !emailValidation.isValidating) {
       newErrors.email = "Unable to verify email. Please try again.";
     }
 
@@ -471,6 +475,7 @@ export default function AuctionModal({
                             <Car className="h-4 w-4" />
                           </div>
                           <input
+                            key="vin-input"
                             maxLength={17}
                             id="vin"
                             type="text"
@@ -511,6 +516,7 @@ export default function AuctionModal({
                             <User className="h-4 w-4" />
                           </div>
                           <input
+                            key="firstName-input"
                             id="firstName"
                             type="text"
                             value={firstName}
@@ -541,9 +547,9 @@ export default function AuctionModal({
                       </label>
                       <ReusableTooltip
                         content={
-                          email && isOpen && emailValidation.isDisposable === true
+                          email && isOpen && emailValidation.isDisposable === true && !emailValidation.isValidating
                             ? "Disposable email addresses are not allowed"
-                            : email && isOpen && emailValidation.error
+                            : email && isOpen && emailValidation.error && !emailValidation.isValidating
                             ? "Unable to verify email. Please try again."
                             : errors.email
                         }
@@ -551,8 +557,8 @@ export default function AuctionModal({
                         align="start"
                         disabled={
                           !errors.email && 
-                          !(email && isOpen && emailValidation.isDisposable === true) &&
-                          !(email && isOpen && emailValidation.error)
+                          !(email && isOpen && emailValidation.isDisposable === true && !emailValidation.isValidating) &&
+                          !(email && isOpen && emailValidation.error && !emailValidation.isValidating)
                         }
                       >
                         <div className="relative">
@@ -570,17 +576,18 @@ export default function AuctionModal({
                             <Mail className="h-4 w-4" />
                           </div>
                           <input
+                            key="email-input"
                             id="email"
                             type="email"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={handleEmailChange}
                             placeholder="Enter email address"
                             className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-all duration-200 ${
-                              email && isOpen && emailValidation.isValid === true
+                              email && isOpen && emailValidation.isValid === true && !emailValidation.isValidating
                                 ? "border-green-300 bg-green-50 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.5)]"
                                 : email &&
                                   isOpen &&
-                                  emailValidation.isDisposable === true
+                                  emailValidation.isDisposable === true && !emailValidation.isValidating
                                 ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
                                 : errors.email && !emailValidation.isValidating
                                 ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
@@ -628,6 +635,7 @@ export default function AuctionModal({
                             <Lock className="h-4 w-4" />
                           </div>
                           <input
+                            key="password-input"
                             id="password"
                             type={showPassword ? "text" : "password"}
                             value={password}
@@ -667,6 +675,7 @@ export default function AuctionModal({
                           <MapPin className="h-4 w-4" />
                         </div>
                         <input
+                          key="city-input"
                           id="city"
                           type="text"
                           value={city}
@@ -713,6 +722,7 @@ export default function AuctionModal({
                             <MapPin className="h-4 w-4" />
                           </div>
                           <input
+                            key="zipCode-input"
                             id="zipCode"
                             type="text"
                             inputMode="numeric"
@@ -755,6 +765,7 @@ export default function AuctionModal({
                             <User className="h-4 w-4" />
                           </div>
                           <input
+                            key="lastName-input"
                             id="lastName"
                             type="text"
                             value={lastName}
@@ -789,6 +800,7 @@ export default function AuctionModal({
                             <MapPin className="h-4 w-4" />
                           </div>
                           <input
+                            key="phone-input"
                             maxLength={10}
                             inputMode="numeric"
                             id="phone"
@@ -831,6 +843,7 @@ export default function AuctionModal({
                             <Lock className="h-4 w-4" />
                           </div>
                           <input
+                            key="confirmPassword-input"
                             id="confirmPassword"
                             type={showConfirmPassword ? "text" : "password"}
                             value={confirmPassword}
@@ -872,6 +885,7 @@ export default function AuctionModal({
                           <MapPin className="h-4 w-4" />
                         </div>
                         <input
+                          key="state-input"
                           id="state"
                           type="text"
                           value={state}
