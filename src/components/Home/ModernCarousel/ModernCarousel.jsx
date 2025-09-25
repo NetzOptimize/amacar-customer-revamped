@@ -98,7 +98,7 @@ const ModernCarousel = ({ className = "" }) => {
         <CarouselContent className="-ml-0">
           {slides.map((slide, index) => (
             <CarouselItem key={index} className="pl-0">
-              <div className="w-full h-[400px] md:h-[450px] lg:h-[500px]">
+              <div className="w-full h-[500px] md:h-[450px] lg:h-[500px]">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 h-full">
                   {/* Text Content Column */}
                   <div className="flex items-center justify-center p-4 md:p-6 lg:p-8 text-content">
@@ -164,12 +164,12 @@ const ModernCarousel = ({ className = "" }) => {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="relative w-full h-[200px] md:h-[250px] lg:h-full"
+                        className="relative w-full h-[300px] md:h-[250px] lg:h-full"
                       >
                         <img
                           src={slide.image}
                           alt={slide.heading}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover object-center"
                           loading="lazy"
                         />
                         {/* Gradient overlay for better text contrast if needed */}
