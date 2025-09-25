@@ -75,16 +75,18 @@ export default function VehiclePhotos() {
     try {
       // Clear any previous errors
       dispatch(clearAuctionStartError());
-      const auction_page_terms = termsAccepted
-        ? "accepted"
-        : "not_accepted";
+      const auction_page_terms = termsAccepted ? "accepted" : "not_accepted";
       const auction_page_privacy_check = privacyAccepted
         ? "accepted"
         : "not_accepted";
       // Start the auction
       console.log("auction_terms_accepted: ", auction_page_terms);
       const result = await dispatch(
-        startAuction({ productId, auction_page_terms, auction_page_privacy_check })
+        startAuction({
+          productId,
+          auction_page_terms,
+          auction_page_privacy_check,
+        })
       ).unwrap();
 
       // Show success toast
@@ -348,39 +350,39 @@ export default function VehiclePhotos() {
 
     // Generate random stop point between 80-85%
     const stopPoint = Math.floor(Math.random() * 6) + 90; // 90-95%
-    
+
     let currentProgress = 0;
     const interval = setInterval(() => {
       currentProgress += Math.floor(Math.random() * 12) + 2; // Random increment between 2-9
-      
+
       // Stop at the random stop point
       if (currentProgress >= stopPoint) {
         currentProgress = stopPoint;
         clearInterval(interval);
-        setProgressIntervals(prev => {
+        setProgressIntervals((prev) => {
           const next = { ...prev };
           delete next[id];
           return next;
         });
       }
-      
-      setProgressMap(prev => ({ ...prev, [id]: currentProgress }));
+
+      setProgressMap((prev) => ({ ...prev, [id]: currentProgress }));
     }, 200 + Math.random() * 300); // Random interval between 200-500ms
 
-    setProgressIntervals(prev => ({ ...prev, [id]: interval }));
+    setProgressIntervals((prev) => ({ ...prev, [id]: interval }));
   };
 
   // Function to complete progress (set to 100%)
   const completeProgress = (id) => {
     if (progressIntervals[id]) {
       clearInterval(progressIntervals[id]);
-      setProgressIntervals(prev => {
+      setProgressIntervals((prev) => {
         const next = { ...prev };
         delete next[id];
         return next;
       });
     }
-    setProgressMap(prev => ({ ...prev, [id]: 100 }));
+    setProgressMap((prev) => ({ ...prev, [id]: 100 }));
   };
 
   const handleSinglePhotoUpload = async (file, id) => {
@@ -450,10 +452,10 @@ export default function VehiclePhotos() {
         fileType: file.type,
         fileSize: file.size,
       });
-      
+
       // Complete progress even on error to show it finished
       completeProgress(id);
-      
+
       // Show error to user
       toast.error(`Failed to upload image: ${error.message || error}`);
     } finally {
@@ -463,7 +465,7 @@ export default function VehiclePhotos() {
         delete next[id];
         return next;
       });
-      
+
       // Clear progress after a short delay to show 100% completion
       setTimeout(() => {
         setProgressMap((prev) => {
@@ -472,7 +474,7 @@ export default function VehiclePhotos() {
           return next;
         });
       }, 1000);
-      
+
       console.log("=== handleSinglePhotoUpload END ===");
     }
   };
@@ -650,7 +652,7 @@ export default function VehiclePhotos() {
   // Cleanup intervals on component unmount
   useEffect(() => {
     return () => {
-      Object.values(progressIntervals).forEach(interval => {
+      Object.values(progressIntervals).forEach((interval) => {
         if (interval) clearInterval(interval);
       });
     };
@@ -823,7 +825,6 @@ export default function VehiclePhotos() {
                       <p className="text-xs text-slate-600 mt-2">
                         {progressMap[photo.id] || 0}% complete
                       </p>
-                     
                     </div>
                   ) : hasPhoto ? (
                     <div className="relative group aspect-square">
@@ -1078,7 +1079,6 @@ export default function VehiclePhotos() {
                         <p className="text-xs text-slate-600 mt-2">
                           {progressMap[photo.id] || 0}% complete
                         </p>
-                 
                       </div>
                     ) : hasPhoto ? (
                       <div className="relative group aspect-square">
@@ -1356,55 +1356,74 @@ export default function VehiclePhotos() {
           {/* Modal Footer */}
           {/* Modal Footer */}
           <div className="p-6 bg-slate-50 border-t border-slate-200">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
-              {/* Terms Checkbox */}
-              <div className="flex items-center gap-3 w-full sm:w-auto">
-                <input
-                  type="checkbox"
-                  id="terms-checkbox"
-                  checked={termsAccepted}
-                  onChange={(e) => setTermsAccepted(e.target.checked)}
-                  className="h-4 w-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"
-                />
-                <label
-                  htmlFor="terms-checkbox"
-                  className="text-sm text-slate-700 cursor-pointer"
-                >
-                  I have read and agree to the <Link to={'/terms-of-service'} className="no-underline font-bold text-[#f6851f]">Terms & Conditions</Link>
-                </label>
-              </div>
+            <div className="flex flex-col  sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
+              <div className="space-y-2">
+                {/* Terms Checkbox */}
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <input
+                    type="checkbox"
+                    id="terms-checkbox"
+                    checked={termsAccepted}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                    className="cursor-pointer h-4 w-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"
+                  />
+                  <label
+                    htmlFor="terms-checkbox"
+                    className="text-sm text-slate-700 cursor-pointer"
+                  >
+                    I have read and agree to the{" "}
+                    <Link
+                      to={"/terms-of-service"}
+                      className="no-underline font-bold text-[#f6851f]"
+                    >
+                      Terms & Conditions
+                    </Link>
+                  </label>
+                </div>
 
-              {/* Privacy Checkbox */}
-
-              <div className="flex items-center gap-3 w-full sm:w-auto">
-                <input
-                  type="checkbox"
-                  id="privacy-checkbox"
-                  checked={privacyAccepted}
-                  onChange={(e) => setPrivacyAccepted(e.target.checked)}
-                  className="h-4 w-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"
-                />
-                <label
-                  htmlFor="privacy-checkbox"
-                  className="text-sm text-slate-700 cursor-pointer"
-                >
-                  I have read and agree to the <Link to={'/privacy-policy'} className="no-underline font-bold text-[#f6851f]">Privacy Policy</Link>
-                </label>
+                {/* Privacy Checkbox */}
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <input
+                    type="checkbox"
+                    id="privacy-checkbox"
+                    checked={privacyAccepted}
+                    onChange={(e) => setPrivacyAccepted(e.target.checked)}
+                    className="cursor-pointer h-4 w-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"
+                  />
+                  <label
+                    htmlFor="privacy-checkbox"
+                    className=" text-sm text-slate-700 cursor-pointer"
+                  >
+                    I have read and agree to the{" "}
+                    <Link
+                      to={"/privacy-policy"}
+                      className="no-underline font-bold text-[#f6851f]"
+                    >
+                      Privacy Policy
+                    </Link>
+                  </label>
+                </div>
               </div>
 
               {/* Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                 <button
                   onClick={handleModalClose}
-                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+                  className="cursor-pointer w-full sm:w-auto px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAcceptTerms}
-                  disabled={!termsAccepted || !privacyAccepted || auctionStartStatus === "starting"}
-                  className={`w-full sm:w-auto px-6 py-2 text-sm font-semibold text-white rounded-lg transition-all ${
-                    termsAccepted && privacyAccepted && auctionStartStatus !== "starting"
+                  disabled={
+                    !termsAccepted ||
+                    !privacyAccepted ||
+                    auctionStartStatus === "starting"
+                  }
+                  className={`cursor-pointer w-full sm:w-auto px-6 py-2 text-sm font-semibold text-white rounded-lg transition-all ${
+                    termsAccepted &&
+                    privacyAccepted &&
+                    auctionStartStatus !== "starting"
                       ? "bg-gradient-to-r from-[#f6851f] to-[#e63946] hover:from-orange-600 hover:to-red-600 shadow-lg"
                       : "bg-slate-400 cursor-not-allowed"
                   }`}
