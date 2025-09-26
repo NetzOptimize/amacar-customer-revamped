@@ -1,3 +1,12 @@
+if (import.meta.env.VITE_NODE_ENV === "production") {
+  console.log = () => {};
+  console.error = () => {};
+  console.debug = () => {};
+  console.warn = () => {};
+  console.log("Production mode");
+}
+
+
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
