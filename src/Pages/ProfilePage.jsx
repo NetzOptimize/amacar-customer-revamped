@@ -45,10 +45,15 @@ const ProfilePage = () => {
 
   // Load user data from Redux state
   useEffect(() => {
+    console.log("profile page user data: ", user);
+    // i have display_name in the user data and has two words i want to split int in firstname and last name and if it has one wornd then wnnt only in the firstnam how to do that
+    const firstName = user.display_name.split(" ")[0] || user.first_name || "";
+    const lastName = user.display_name.split(" ")[1] || user.last_name || "";
+
     if (user) {
       const userProfile = {
-        firstName: user.firstName || user.first_name || "",
-        lastName: user.lastName || user.last_name || "",
+        firstName: user.display_name.split(" ")[0] || user.first_name || "",
+        lastName: user.display_name.split(" ")[1] || user.last_name || "",
         email: user.email || "",
         phone: user.phone || user.meta?.phone || "",
         zipcode:
