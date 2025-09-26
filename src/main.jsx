@@ -1,9 +1,8 @@
-if (import.meta.env.VITE_ENV === "a") {
+if (import.meta.env.VITE_ENV === "production") {
   console.log = () => {};
   console.error = () => {};
   console.debug = () => {};
   console.warn = () => {};
-  console.log("Production mode");
 }
 
 

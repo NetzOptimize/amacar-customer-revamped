@@ -1,19 +1,43 @@
 import { toast } from "react-hot-toast";
 import React, { useMemo, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Circle, ChevronLeft, ChevronRight, User, Mail, Phone, MapPin, Landmark, Building, Loader2, XCircle } from "lucide-react";
+import {
+  CheckCircle2,
+  Circle,
+  ChevronLeft,
+  ChevronRight,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Landmark,
+  Building,
+  Loader2,
+  XCircle,
+} from "lucide-react";
 import AuctionSelectionModal from "@/components/ui/auction-selection-modal";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import LoginModal from "@/components/ui/LoginModal";
 import { setLoginRedirect } from "@/redux/slices/userSlice"; // Adjust import path
-import { updateQuestion, resetQuestions, fetchCityStateByZip } from "@/redux/slices/carDetailsAndQuestionsSlice"; // Adjust import path
+import {
+  updateQuestion,
+  resetQuestions,
+  fetchCityStateByZip,
+} from "@/redux/slices/carDetailsAndQuestionsSlice"; // Adjust import path
 import useEmailValidation from "@/hooks/useEmailValidation";
 
 export default function ConditionAssessment() {
   const dispatch = useDispatch();
   const location = useLocation();
-  const { questions, vehicleDetails, stateZip, stateVin, location: reduxLocation, productId } = useSelector((state) => state.carDetailsAndQuestions);
+  const {
+    questions,
+    vehicleDetails,
+    stateZip,
+    stateVin,
+    location: reduxLocation,
+    productId,
+  } = useSelector((state) => state.carDetailsAndQuestions);
   const userState = useSelector((state) => state.user.user);
   const [localCity, setLocalCity] = useState("");
   const [localState, setLocalState] = useState("");
@@ -31,13 +55,13 @@ export default function ConditionAssessment() {
   }, [dispatch, questions]);
 
   useEffect(() => {
-    console.log("vehicleDetails", vehicleDetails)
-    console.log("userState", userState)
+    console.log("vehicleDetails", vehicleDetails);
+    console.log("userState", userState);
   }, [vehicleDetails, userState]);
   useEffect(() => {
-    const result = dispatch(fetchCityStateByZip(stateZip))
-    setLocalCity(result.city)
-    setLocalState(result.state)
+    const result = dispatch(fetchCityStateByZip(stateZip));
+    setLocalCity(result.city);
+    setLocalState(result.state);
   }, [stateZip]);
 
   // Debug log for productId
@@ -64,7 +88,7 @@ export default function ConditionAssessment() {
       setImageError(false);
     }
   };
-  
+
   // Group questions into sections for rendering
   const sections = useMemo(() => {
     if (!questions || questions.length < 8) {
@@ -95,12 +119,14 @@ export default function ConditionAssessment() {
   const [userErrors, setUserErrors] = useState({});
   const [imageLoading, setImageLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [fullNameError, setFullNameError] = useState(false);
 
   // Full name validation function
   const validateFullName = (name) => {
     if (!name || name.trim() === "") return false;
     const words = name.trim().split(/\s+/);
-    return words.length >= 2 && words.every(word => word.length > 0);
+    setFullNameError(words.length < 2 || words.every((word) => word.length > 0));
+    return words.length >= 2 && words.every((word) => word.length > 0);
   };
 
   // Phone validation function
@@ -115,13 +141,26 @@ export default function ConditionAssessment() {
     if (userState?.first_name && userState?.last_name) {
       return `${userState.first_name} ${userState.last_name}`;
     }
-    return userState?.first_name || userState?.last_name || userState?.display_name || "";
+    return (
+      userState?.first_name ||
+      userState?.last_name ||
+      userState?.display_name ||
+      ""
+    );
   };
-  
+  useEffect(() => {
+    console.log("validateFullName", fullNameError);
+  }, [validateFullName]);
+
   // Email validation for non-prefilled emails only
   const isEmailPrefilled = !!userState?.email;
-  const [shouldResetEmailValidation, setShouldResetEmailValidation] = useState(false);
-  const emailValidation = useEmailValidation(user.email, !isEmailPrefilled, shouldResetEmailValidation);
+  const [shouldResetEmailValidation, setShouldResetEmailValidation] =
+    useState(false);
+  const emailValidation = useEmailValidation(
+    user.email,
+    !isEmailPrefilled,
+    shouldResetEmailValidation
+  );
 
   const userExists = useSelector((state) => state?.user?.user);
 
@@ -132,7 +171,13 @@ export default function ConditionAssessment() {
   };
 
   const totalSections = sections.length;
-  const answeredQuestions = questions ? questions.filter((q) => q.answer || (q.isMultiSelect && Array.isArray(q.answer) && q.answer.length > 0)).length : 0;
+  const answeredQuestions = questions
+    ? questions.filter(
+        (q) =>
+          q.answer ||
+          (q.isMultiSelect && Array.isArray(q.answer) && q.answer.length > 0)
+      ).length
+    : 0;
   const totalQuestions = questions ? questions.length : 0;
   const currentQuestions = sections[currentSection]?.questions || [];
 
@@ -159,22 +204,24 @@ export default function ConditionAssessment() {
     }
   }, [shouldResetEmailValidation]);
 
-
-
   function getFinalSubmissionData() {
-    return questions ? questions.map((q) => ({
-      key: q.key,
-      label: q.label,
-      answer: q.answer || null,
-      details: q.details || null,
-    })) : [];
+    return questions
+      ? questions.map((q) => ({
+          key: q.key,
+          label: q.label,
+          answer: q.answer || null,
+          details: q.details || null,
+        }))
+      : [];
   }
 
   // Simple function to open auction modal
   function handleSubmitToAuction(userFormData = null) {
     // Check if vehicle details exist
     if (!vehicleDetails || Object.keys(vehicleDetails).length === 0) {
-      toast.error("Vehicle details are required. Please complete the VIN lookup first.");
+      toast.error(
+        "Vehicle details are required. Please complete the VIN lookup first."
+      );
       return;
     }
 
@@ -186,7 +233,6 @@ export default function ConditionAssessment() {
     // Open auction selection modal
     setShowAuctionModal(true);
   }
-
 
   const handleForgotPassword = () => {
     // console.log("Open forgot password modal");
@@ -200,16 +246,18 @@ export default function ConditionAssessment() {
     let newAnswer;
     if (isMultiSelect) {
       const currentAnswer = questions.find((q) => q.key === key)?.answer || [];
-      
+
       // Special handling for "Notable features" question
-      if (key === 'features') {
-        if (value === 'None of the above') {
+      if (key === "features") {
+        if (value === "None of the above") {
           // If "None of the above" is selected, clear all other selections
-          newAnswer = ['None of the above'];
+          newAnswer = ["None of the above"];
         } else {
           // If any other option is selected, remove "None of the above" if it exists
-          const filteredAnswer = currentAnswer.filter(v => v !== 'None of the above');
-          
+          const filteredAnswer = currentAnswer.filter(
+            (v) => v !== "None of the above"
+          );
+
           if (Array.isArray(filteredAnswer)) {
             newAnswer = filteredAnswer.includes(value)
               ? filteredAnswer.filter((v) => v !== value)
@@ -240,7 +288,9 @@ export default function ConditionAssessment() {
 
   function nextSection() {
     const unanswered = currentQuestions.some(
-      (q) => !q.answer || (q.isMultiSelect && (!Array.isArray(q.answer) || q.answer.length === 0))
+      (q) =>
+        !q.answer ||
+        (q.isMultiSelect && (!Array.isArray(q.answer) || q.answer.length === 0))
     );
     if (unanswered) {
       setShowValidation(true);
@@ -261,7 +311,9 @@ export default function ConditionAssessment() {
 
   function handleContinue() {
     const unanswered = currentQuestions.some(
-      (q) => !q.answer || (q.isMultiSelect && (!Array.isArray(q.answer) || q.answer.length === 0))
+      (q) =>
+        !q.answer ||
+        (q.isMultiSelect && (!Array.isArray(q.answer) || q.answer.length === 0))
     );
     if (unanswered) {
       setShowValidation(true);
@@ -272,14 +324,21 @@ export default function ConditionAssessment() {
   }
 
   function renderQuestion(question, questionIndex) {
-    console.log(question)
+    console.log(question);
     const selected = question.answer;
     // console.log(question.answer)
-    
+
     // Fixed: Added defensive checks for needsDetails
     const needsDetails = question.isMultiSelect
-      ? (question.needsDetails && Array.isArray(question.needsDetails) && question.needsDetails.length > 0 && Array.isArray(selected) && selected.length > 0)
-      : selected && question.needsDetails && Array.isArray(question.needsDetails) && question.needsDetails.includes(selected);
+      ? question.needsDetails &&
+        Array.isArray(question.needsDetails) &&
+        question.needsDetails.length > 0 &&
+        Array.isArray(selected) &&
+        selected.length > 0
+      : selected &&
+        question.needsDetails &&
+        Array.isArray(question.needsDetails) &&
+        question.needsDetails.includes(selected);
 
     return (
       <motion.div
@@ -291,12 +350,18 @@ export default function ConditionAssessment() {
       >
         <div className="mb-4">
           <h3 className="text-lg md:text-xl font-semibold text-slate-900 mb-2">
-            <span className="mr-2">{question.emoji || '❓'}</span>
+            <span className="mr-2">{question.emoji || "❓"}</span>
             {question.label}
           </h3>
         </div>
 
-        <div className={`grid ${question.isMultiSelect ? "grid-cols-1 gap-2" : "grid-cols-2 gap-3 md:grid-cols-3"} mb-4`}>
+        <div
+          className={`grid ${
+            question.isMultiSelect
+              ? "grid-cols-1 gap-2"
+              : "grid-cols-2 gap-3 md:grid-cols-3"
+          } mb-4`}
+        >
           {(question.options || []).map((opt) => {
             const isSelected = question.isMultiSelect
               ? Array.isArray(selected) && selected.includes(opt)
@@ -304,7 +369,9 @@ export default function ConditionAssessment() {
             return (
               <button
                 key={opt}
-                onClick={() => selectAnswer(question.key, opt, question.isMultiSelect)}
+                onClick={() =>
+                  selectAnswer(question.key, opt, question.isMultiSelect)
+                }
                 className={`cursor-pointer group rounded-xl border p-3 text-sm font-medium transition hover:scale-[1.01] ${
                   isSelected
                     ? "border-orange-400 bg-orange-50 text-orange-800"
@@ -380,7 +447,9 @@ export default function ConditionAssessment() {
         )}
 
         <div className="mb-6 w-1/3 flex items-center gap-3">
-          <div className="text-xs font-medium text-slate-600">Step {currentSection + 1} of {totalSections}</div>
+          <div className="text-xs font-medium text-slate-600">
+            Step {currentSection + 1} of {totalSections}
+          </div>
           <div className="flex items-center gap-1 flex-1 max-w-[150px]">
             {sections.map((_, index) => (
               <motion.div
@@ -388,8 +457,14 @@ export default function ConditionAssessment() {
                 className="h-2 rounded-full bg-slate-200"
                 initial={{ width: 0 }}
                 animate={{
-                  width: index === currentSection ? "40%" : index < currentSection ? "25%" : "15%",
-                  backgroundColor: index <= currentSection ? "#f6851f" : "#e2e8f0",
+                  width:
+                    index === currentSection
+                      ? "40%"
+                      : index < currentSection
+                      ? "25%"
+                      : "15%",
+                  backgroundColor:
+                    index <= currentSection ? "#f6851f" : "#e2e8f0",
                 }}
                 transition={{ duration: 0.4 }}
               />
@@ -400,8 +475,17 @@ export default function ConditionAssessment() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
           <div className="lg:col-span-8">
             {!showUserForm && (
-              <motion.div initial="hidden" animate="visible" exit="exit" variants={formVariants}>
-                <div className="space-y-6">{currentQuestions.map((question, index) => renderQuestion(question, index))}</div>
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                variants={formVariants}
+              >
+                <div className="space-y-6">
+                  {currentQuestions.map((question, index) =>
+                    renderQuestion(question, index)
+                  )}
+                </div>
 
                 <div className="mt-6 flex items-center justify-between gap-3">
                   <button
@@ -440,34 +524,59 @@ export default function ConditionAssessment() {
             )}
 
             {showUserForm && (
-              <motion.div initial="hidden" animate="visible" exit="exit" variants={formVariants} className="rounded-2xl border border-white/60 bg-white/70 p-6 shadow-xl backdrop-blur-xl">
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                variants={formVariants}
+                className="rounded-2xl border border-white/60 bg-white/70 p-6 shadow-xl backdrop-blur-xl"
+              >
                 <div className="mb-6">
-                  <h2 className="text-xl font-semibold text-slate-900">Your Details</h2>
+                  <h2 className="text-xl font-semibold text-slate-900">
+                    Your Details
+                  </h2>
                   <p className="text-sm text-slate-600">
-                    {getUserFullName() ? "Verify your information below." : "Provide contact and address information to proceed."}
+                    {getUserFullName()
+                      ? "Verify your information below."
+                      : "Provide contact and address information to proceed."}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-800 flex items-center gap-2">
-                      Full Name
-                    </label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-medium text-slate-800 flex items-center gap-2">
+                        Full Name
+                      </label>
+                      <div className="text-xs text-red-600">
+                        {fullNameError && (
+                          <p >
+                            Full name is required
+                          </p>
+                        )}
+                      </div>
+                    </div>
                     <div className="relative">
-                      <User className={`h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 ${
-                        getUserFullName() ? "text-orange-500" : "text-slate-400"
-                      }`} />
+                      <User
+                        className={`h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 ${
+                          getUserFullName()
+                            ? "text-orange-500"
+                            : "text-slate-400"
+                        }`}
+                      />
                       <input
                         value={user.fullName || getUserFullName() || ""}
-                        onChange={(e) => setUser({ ...user, fullName: e.target.value })}
+                        onChange={(e) =>
+                          setUser({ ...user, fullName: e.target.value })
+                        }
                         placeholder="Enter full name"
                         disabled={!!getUserFullName()}
                         className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-base outline-none transition-shadow ${
-                          getUserFullName() 
-                            ? "bg-green-50 border-orange-200 text-orange-800 cursor-not-allowed" 
-                            : userErrors.fullName 
-                              ? "border-red-300" 
-                              : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"
+                          getUserFullName()
+                            ? "bg-green-50 border-orange-200 text-orange-800 cursor-not-allowed"
+                            : userErrors.fullName
+                            ? "border-red-300"
+                            : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"
                         }`}
                       />
                       {getUserFullName() && (
@@ -476,39 +585,47 @@ export default function ConditionAssessment() {
                         </div>
                       )}
                     </div>
-                    
                   </div>
 
                   <div className="grid gap-2">
                     <label className="text-sm font-medium text-slate-800 flex items-center gap-2">
                       Email Address
                       {!isEmailPrefilled && emailValidation.isValidating && (
-                        <span className="ml-2 text-xs text-slate-500">(Validating...)</span>
+                        <span className="ml-2 text-xs text-slate-500">
+                          (Validating...)
+                        </span>
                       )}
                     </label>
                     <div className="relative">
-                      <Mail className={`h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 ${
-                        userState?.email 
-                          ? "text-orange-500" 
-                          : !isEmailPrefilled && emailValidation.isValid === true 
-                            ? "text-green-500" 
-                            : !isEmailPrefilled && emailValidation.isDisposable === true 
-                              ? "text-red-500" 
-                              : "text-slate-400"
-                      }`} />
+                      <Mail
+                        className={`h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 ${
+                          userState?.email
+                            ? "text-orange-500"
+                            : !isEmailPrefilled &&
+                              emailValidation.isValid === true
+                            ? "text-green-500"
+                            : !isEmailPrefilled &&
+                              emailValidation.isDisposable === true
+                            ? "text-red-500"
+                            : "text-slate-400"
+                        }`}
+                      />
                       <input
                         value={user.email || userState?.email || ""}
-                        onChange={(e) => setUser({ ...user, email: e.target.value })}
+                        onChange={(e) =>
+                          setUser({ ...user, email: e.target.value })
+                        }
                         placeholder="name@example.com"
                         disabled={!!userState?.email}
                         className={`h-11 w-full rounded-xl border bg-white pl-9 pr-10 text-base outline-none transition-all duration-200 ${
-                          userState?.email 
-                            ? "bg-orange-50 border-orange-200 text-orange-800 cursor-not-allowed" 
-                            : !isEmailPrefilled && emailValidation.isDisposable === true
-                              ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.18)]"
-                              : userErrors.email && !emailValidation.isValidating
-                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.18)]"
-                                : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"
+                          userState?.email
+                            ? "bg-orange-50 border-orange-200 text-orange-800 cursor-not-allowed"
+                            : !isEmailPrefilled &&
+                              emailValidation.isDisposable === true
+                            ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.18)]"
+                            : userErrors.email && !emailValidation.isValidating
+                            ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.18)]"
+                            : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"
                         }`}
                       />
                       {/* Validation status indicator - only show for non-prefilled emails */}
@@ -517,12 +634,14 @@ export default function ConditionAssessment() {
                           {emailValidation.isValidating && (
                             <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
                           )}
-                          {!emailValidation.isValidating && emailValidation.isValid === true && (
-                            <CheckCircle2 className="h-4 w-4 text-green-500" />
-                          )}
-                          {!emailValidation.isValidating && emailValidation.isDisposable === true && (
-                            <XCircle className="h-4 w-4 text-red-500" />
-                          )}
+                          {!emailValidation.isValidating &&
+                            emailValidation.isValid === true && (
+                              <CheckCircle2 className="h-4 w-4 text-green-500" />
+                            )}
+                          {!emailValidation.isValidating &&
+                            emailValidation.isDisposable === true && (
+                              <XCircle className="h-4 w-4 text-red-500" />
+                            )}
                         </div>
                       )}
                       {userState?.email && (
@@ -531,17 +650,18 @@ export default function ConditionAssessment() {
                         </div>
                       )}
                     </div>
-                    
-                    {!isEmailPrefilled && emailValidation.isDisposable === true && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-xs text-red-600"
-                      >
-                        Disposable email addresses are not allowed
-                      </motion.p>
-                    )}
-                    
+
+                    {!isEmailPrefilled &&
+                      emailValidation.isDisposable === true && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="text-xs text-red-600"
+                        >
+                          Disposable email addresses are not allowed
+                        </motion.p>
+                      )}
+
                     {!isEmailPrefilled && emailValidation.error && (
                       <motion.p
                         initial={{ opacity: 0, y: -4 }}
@@ -551,8 +671,6 @@ export default function ConditionAssessment() {
                         Unable to verify email. Please try again.
                       </motion.p>
                     )}
-                    
-                  
                   </div>
 
                   <div className="grid gap-2">
@@ -560,22 +678,30 @@ export default function ConditionAssessment() {
                       Phone Number
                     </label>
                     <div className="relative">
-                      <Phone className={`h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 ${
-                        userState?.meta?.phone ? "text-orange-500" : "text-slate-400"
-                      }`} />
+                      <Phone
+                        className={`h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 ${
+                          userState?.meta?.phone
+                            ? "text-orange-500"
+                            : "text-slate-400"
+                        }`}
+                      />
                       <input
                         maxLength={10}
-                        
                         value={user.phone || userState?.meta?.phone || ""}
-                        onChange={(e) => setUser({ ...user, phone: e.target.value.replace(/[^0-9+\-\s]/g, "") })}
+                        onChange={(e) =>
+                          setUser({
+                            ...user,
+                            phone: e.target.value.replace(/[^0-9+\-\s]/g, ""),
+                          })
+                        }
                         placeholder="+1 555 123 4567"
                         disabled={!!userState?.meta?.phone}
                         className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-base outline-none transition-shadow ${
-                          userState?.meta?.phone 
-                            ? "bg-orange-50 border-orange-200 text-orange-800 cursor-not-allowed" 
-                            : userErrors.phone 
-                              ? "border-red-300" 
-                              : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"
+                          userState?.meta?.phone
+                            ? "bg-orange-50 border-orange-200 text-orange-800 cursor-not-allowed"
+                            : userErrors.phone
+                            ? "border-red-300"
+                            : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"
                         }`}
                       />
                       {userState?.meta?.phone && (
@@ -584,7 +710,6 @@ export default function ConditionAssessment() {
                         </div>
                       )}
                     </div>
-                  
                   </div>
 
                   <div className="grid gap-2">
@@ -592,20 +717,31 @@ export default function ConditionAssessment() {
                       Zipcode
                     </label>
                     <div className="relative">
-                      <MapPin className={`h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 ${
-                        userState?.zipcode || stateZip ? "text-orange-500" : "text-slate-400"
-                      }`} />
+                      <MapPin
+                        className={`h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 ${
+                          userState?.zipcode || stateZip
+                            ? "text-orange-500"
+                            : "text-slate-400"
+                        }`}
+                      />
                       <input
                         value={user.zipcode || stateZip || ""}
-                        onChange={(e) => setUser({ ...user, zipcode: e.target.value.replace(/[^0-9]/g, "").slice(0, 10) })}
+                        onChange={(e) =>
+                          setUser({
+                            ...user,
+                            zipcode: e.target.value
+                              .replace(/[^0-9]/g, "")
+                              .slice(0, 10),
+                          })
+                        }
                         placeholder="94016"
                         disabled={!!stateZip}
                         className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-base outline-none transition-shadow ${
                           stateZip
-                            ? "bg-orange-50 border-orange-200 text-orange-800 cursor-not-allowed" 
-                            : userErrors.zipcode 
-                              ? "border-red-300" 
-                              : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"
+                            ? "bg-orange-50 border-orange-200 text-orange-800 cursor-not-allowed"
+                            : userErrors.zipcode
+                            ? "border-red-300"
+                            : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"
                         }`}
                       />
                       {stateZip && (
@@ -621,20 +757,28 @@ export default function ConditionAssessment() {
                       State
                     </label>
                     <div className="relative">
-                      <Landmark className={`h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 ${
-                        reduxLocation.state ? "text-orange-500" : "text-slate-400"
-                      }`} />
+                      <Landmark
+                        className={`h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 ${
+                          reduxLocation.state
+                            ? "text-orange-500"
+                            : "text-slate-400"
+                        }`}
+                      />
                       <input
-                        value={user.state || reduxLocation.state || localState || ""}
-                        onChange={(e) => setUser({ ...user, state: e.target.value })}
+                        value={
+                          user.state || reduxLocation.state || localState || ""
+                        }
+                        onChange={(e) =>
+                          setUser({ ...user, state: e.target.value })
+                        }
                         placeholder="State"
                         disabled={!!reduxLocation.state || !!localState}
                         className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-base outline-none transition-shadow ${
-                          reduxLocation.state || localState 
-                            ? "bg-orange-50 border-orange-200 text-orange-800 cursor-not-allowed" 
-                            : userErrors.state 
-                              ? "border-red-300" 
-                              : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"
+                          reduxLocation.state || localState
+                            ? "bg-orange-50 border-orange-200 text-orange-800 cursor-not-allowed"
+                            : userErrors.state
+                            ? "border-red-300"
+                            : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"
                         }`}
                       />
                       {reduxLocation.state && (
@@ -650,28 +794,35 @@ export default function ConditionAssessment() {
                       City
                     </label>
                     <div className="relative">
-                      <Building className={`h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 ${
-                        reduxLocation.city || localCity ? "text-orange-500" : "text-slate-400"
-                      }`} />
+                      <Building
+                        className={`h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 ${
+                          reduxLocation.city || localCity
+                            ? "text-orange-500"
+                            : "text-slate-400"
+                        }`}
+                      />
                       <input
-                        value={user.city || reduxLocation.city || localCity || ""}
-                        onChange={(e) => setUser({ ...user, city: e.target.value })}
+                        value={
+                          user.city || reduxLocation.city || localCity || ""
+                        }
+                        onChange={(e) =>
+                          setUser({ ...user, city: e.target.value })
+                        }
                         placeholder="City"
                         disabled={!!reduxLocation.city || !!localCity}
                         className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-base outline-none transition-shadow ${
-                          reduxLocation.city || localCity 
-                            ? "bg-orange-50 border-orange-200 text-orange-800 cursor-not-allowed" 
-                            : userErrors.city 
-                              ? "border-red-300" 
-                              : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"
+                          reduxLocation.city || localCity
+                            ? "bg-orange-50 border-orange-200 text-orange-800 cursor-not-allowed"
+                            : userErrors.city
+                            ? "border-red-300"
+                            : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"
                         }`}
                       />
-                     {(reduxLocation.city || localCity) && (
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <div className="h-2 w-2 bg-orange-500 rounded-full"></div>
-                      </div>
-                    )}
-
+                      {(reduxLocation.city || localCity) && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <div className="h-2 w-2 bg-orange-500 rounded-full"></div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -685,70 +836,96 @@ export default function ConditionAssessment() {
                   </button>
 
                   {/* Vehicle details missing warning */}
-                  {(!vehicleDetails || Object.keys(vehicleDetails).length === 0) && (
+                  {(!vehicleDetails ||
+                    Object.keys(vehicleDetails).length === 0) && (
                     <div className="flex-1 mx-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                       <p className="text-sm text-yellow-800 mb-2">
-                        <strong>Vehicle details required:</strong> Please complete the VIN lookup first to get an instant cash offer.
+                        <strong>Vehicle details required:</strong> Please
+                        complete the VIN lookup first to get an instant cash
+                        offer.
                       </p>
-                 
                     </div>
                   )}
 
-                    <button
-                      onClick={() => {
-                        const finalUserData = {
-                          fullName: user.fullName || getUserFullName() || "",
-                          email: user.email || userState?.email || "",
-                          phone: user.phone || userState?.meta?.phone || "",
-                          zipcode: user.zipcode || stateZip || "",
-                          state: user.state || reduxLocation.state || localState || "",
-                          city: user.city || reduxLocation.city || localCity || "",
-                        };
+                  <button
+                    onClick={() => {
+                      const finalUserData = {
+                        fullName: user.fullName || getUserFullName() || "",
+                        email: user.email || userState?.email || "",
+                        phone: user.phone || userState?.meta?.phone || "",
+                        zipcode: user.zipcode || stateZip || "",
+                        state:
+                          user.state || reduxLocation.state || localState || "",
+                        city:
+                          user.city || reduxLocation.city || localCity || "",
+                      };
 
-                        const errs = {};
-                        if (!finalUserData.fullName || !validateFullName(finalUserData.fullName)) errs.fullName = true;
-                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                        if (!emailRegex.test(finalUserData.email)) {
-                          // Only show regex validation error if email validation hasn't started yet
-                          if (!emailValidation.isValidating) {
-                            errs.email = true;
-                          }
-                        } else if (!isEmailPrefilled && emailValidation.isDisposable === true) {
-                          errs.email = true;
-                        } else if (!isEmailPrefilled && emailValidation.error) {
+                      const errs = {};
+                      if (
+                        !finalUserData.fullName ||
+                        !validateFullName(finalUserData.fullName)
+                      )
+                        errs.fullName = true;
+                      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                      if (!emailRegex.test(finalUserData.email)) {
+                        // Only show regex validation error if email validation hasn't started yet
+                        if (!emailValidation.isValidating) {
                           errs.email = true;
                         }
-                        if (!finalUserData.phone || !validatePhone(finalUserData.phone)) errs.phone = true;
-                        if (!finalUserData.zipcode) errs.zipcode = true;
-                        if (!finalUserData.state) errs.state = true;
-                        if (!finalUserData.city) errs.city = true;
+                      } else if (
+                        !isEmailPrefilled &&
+                        emailValidation.isDisposable === true
+                      ) {
+                        errs.email = true;
+                      } else if (!isEmailPrefilled && emailValidation.error) {
+                        errs.email = true;
+                      }
+                      if (
+                        !finalUserData.phone ||
+                        !validatePhone(finalUserData.phone)
+                      )
+                        errs.phone = true;
+                      if (!finalUserData.zipcode) errs.zipcode = true;
+                      if (!finalUserData.state) errs.state = true;
+                      if (!finalUserData.city) errs.city = true;
 
-                        setUserErrors(errs);
-                        const data = getFinalSubmissionData();
+                      setUserErrors(errs);
+                      const data = getFinalSubmissionData();
 
-                        if (Object.keys(errs).length === 0) {
-                          handleSubmitToAuction(finalUserData);
-                        }
-                      }}
-                      disabled={!vehicleDetails || Object.keys(vehicleDetails).length === 0 || (!isEmailPrefilled && (emailValidation.isValidating || emailValidation.isDisposable === true))}
-                      className={`cursor-pointer inline-flex h-11 items-center justify-center rounded-xl bg-gradient-to-r bg-[#f6851f]  px-6 text-sm font-semibold text-white shadow-lg shadow-orange-500/25 transition hover:scale-[1.01] ${
-                        !vehicleDetails || Object.keys(vehicleDetails).length === 0 || (!isEmailPrefilled && (emailValidation.isValidating || emailValidation.isDisposable === true))
-                          ? 'opacity-50 cursor-not-allowed' 
-                          : ''
-                      }`}
-                    >
-                      {(!vehicleDetails || Object.keys(vehicleDetails).length === 0) ? (
-                        'VIN Required'
-                      ) : !isEmailPrefilled && emailValidation.isValidating ? (
-                        <div className="flex items-center gap-2">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Validating Email...
-                        </div>
-                      ) : (
-                        'see your offer'
-                      )}
-                    </button>
-                  
+                      if (Object.keys(errs).length === 0) {
+                        handleSubmitToAuction(finalUserData);
+                      }
+                    }}
+                    disabled={
+                      !vehicleDetails ||
+                      Object.keys(vehicleDetails).length === 0 ||
+                      (!isEmailPrefilled &&
+                        (emailValidation.isValidating ||
+                          emailValidation.isDisposable === true))
+                    }
+                    className={`cursor-pointer inline-flex h-11 items-center justify-center rounded-xl bg-gradient-to-r bg-[#f6851f]  px-6 text-sm font-semibold text-white shadow-lg shadow-orange-500/25 transition hover:scale-[1.01] ${
+                      !vehicleDetails ||
+                      Object.keys(vehicleDetails).length === 0 ||
+                      (!isEmailPrefilled &&
+                        (emailValidation.isValidating ||
+                          emailValidation.isDisposable === true))
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                    }`}
+                  >
+                    {!vehicleDetails ||
+                    Object.keys(vehicleDetails).length === 0 ? (
+                      "VIN Required"
+                    ) : !isEmailPrefilled && emailValidation.isValidating ? (
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Validating Email...
+                      </div>
+                    ) : (
+                      "see your offer"
+                    )}
+                  </button>
+
                   {/* Success display for offer */}
                   {/* {offerStatus === 'succeeded' && offer.offerAmount && (
                     <div className="mt-3 p-4 bg-green-50 border border-green-200 rounded-lg">
@@ -776,7 +953,6 @@ export default function ConditionAssessment() {
                       </div>
                     </div>
                   )} */}
-
                 </div>
               </motion.div>
             )}
@@ -791,29 +967,44 @@ export default function ConditionAssessment() {
                     {/* Vehicle Information Section */}
                     <div className="mb-6">
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-lg font-semibold text-slate-900">Vehicle Information</h3>
+                        <h3 className="text-lg font-semibold text-slate-900">
+                          Vehicle Information
+                        </h3>
                         <div className="h-2 w-2 bg-orange-500 rounded-full"></div>
                       </div>
-                      
+
                       {/* VIN Badge */}
                       <div className="mb-4">
                         <div className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gradient-to-r bg-[#f6851f] text-white text-sm font-semibold">
-                          VIN- {stateVin || vehicleDetails?.vin || "JTHBL46FX75021954"}
+                          VIN-{" "}
+                          {stateVin ||
+                            vehicleDetails?.vin ||
+                            "JTHBL46FX75021954"}
                         </div>
                       </div>
 
                       {/* Vehicle Details */}
                       <div className="space-y-2 mb-4">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-slate-700">Vehicle</span>
+                          <span className="text-sm font-medium text-slate-700">
+                            Vehicle
+                          </span>
                           <span className="text-sm font-semibold text-slate-900">
-                            {vehicleDetails?.modelyear || "2007"} {vehicleDetails?.make || "LEXUS"} {vehicleDetails?.model || "LS"}
+                            {vehicleDetails?.modelyear || "2007"}{" "}
+                            {vehicleDetails?.make || "LEXUS"}{" "}
+                            {vehicleDetails?.model || "LS"}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-slate-700">Type</span>
+                          <span className="text-sm font-medium text-slate-700">
+                            Type
+                          </span>
                           <span className="text-sm font-semibold text-[#f6851f]">
-                            {vehicleDetails?.bodytype || "SEDAN"} {vehicleDetails?.doors || "4D"} {vehicleDetails?.model || "LS460"} {vehicleDetails?.engineconfiguration || "4.6L"} {vehicleDetails?.fueltype || "V8"}
+                            {vehicleDetails?.bodytype || "SEDAN"}{" "}
+                            {vehicleDetails?.doors || "4D"}{" "}
+                            {vehicleDetails?.model || "LS460"}{" "}
+                            {vehicleDetails?.engineconfiguration || "4.6L"}{" "}
+                            {vehicleDetails?.fueltype || "V8"}
                           </span>
                         </div>
                       </div>
@@ -828,30 +1019,36 @@ export default function ConditionAssessment() {
                                   <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
                                 </div>
                               )}
-                              <img 
-                                src={vehicleDetails.vehicleImg} 
-                                alt="Vehicle image" 
+                              <img
+                                src={vehicleDetails.vehicleImg}
+                                alt="Vehicle image"
                                 className={`w-full h-full object-cover transition-opacity duration-300 ${
-                                  imageLoading ? 'opacity-0' : 'opacity-100'
+                                  imageLoading ? "opacity-0" : "opacity-100"
                                 }`}
                                 onLoadStart={handleImageLoadStart}
                                 onLoad={handleImageLoad}
                                 onError={handleImageError}
-                                style={{ display: imageLoading ? 'none' : 'block' }}
+                                style={{
+                                  display: imageLoading ? "none" : "block",
+                                }}
                               />
                               {imageError && (
                                 <div className="absolute inset-0 flex items-center justify-center bg-slate-100">
                                   <div className="text-center">
-                                    <div className="text-slate-400 mb-2">⚠️</div>
-                                    <p className="text-xs text-slate-500">Image failed to load</p>
+                                    <div className="text-slate-400 mb-2">
+                                      ⚠️
+                                    </div>
+                                    <p className="text-xs text-slate-500">
+                                      Image failed to load
+                                    </p>
                                   </div>
                                 </div>
                               )}
                             </>
                           ) : (
-                            <img 
-                              src="https://dealer.amacar.ai/wp-content/uploads/2024/10/amacar-placeholder2.png" 
-                              alt="Vehicle placeholder" 
+                            <img
+                              src="https://dealer.amacar.ai/wp-content/uploads/2024/10/amacar-placeholder2.png"
+                              alt="Vehicle placeholder"
                               className="w-full h-full object-cover"
                             />
                           )}
@@ -862,11 +1059,20 @@ export default function ConditionAssessment() {
                       <div className="space-y-1.5 text-xs text-slate-500 mb-6">
                         <div className="flex justify-between">
                           <span>Mileage:</span>
-                          <span className="font-medium">{vehicleDetails?.mileage ? Number(vehicleDetails.mileage).toLocaleString() + ' km' : 'N/A'}</span>
+                          <span className="font-medium">
+                            {vehicleDetails?.mileage
+                              ? Number(
+                                  vehicleDetails.mileage
+                                ).toLocaleString() + " km"
+                              : "N/A"}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span>Location:</span>
-                          <span className="font-medium">{reduxLocation?.city || localCity || 'N/A'}, {reduxLocation?.state || localState || 'N/A'}</span>
+                          <span className="font-medium">
+                            {reduxLocation?.city || localCity || "N/A"},{" "}
+                            {reduxLocation?.state || localState || "N/A"}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -874,7 +1080,9 @@ export default function ConditionAssessment() {
                     {/* Your Answers Section */}
                     <div>
                       <div className="mb-3 flex items-center justify-between">
-                        <p className="text-sm font-medium text-slate-900">Your Answers</p>
+                        <p className="text-sm font-medium text-slate-900">
+                          Your Answers
+                        </p>
                         <span className="text-xs text-slate-600">
                           {answeredQuestions}/{totalQuestions}
                         </span>
@@ -887,16 +1095,21 @@ export default function ConditionAssessment() {
                           >
                             <div className=" flex items-center justify-between text-sm gap-2">
                               <div className="flex items-center gap-2 min-w-0">
-                                <span>{q.emoji || '❓'}</span>
-                                <span className="truncate min-w-0">{q.label}</span>
+                                <span>{q.emoji || "❓"}</span>
+                                <span className="truncate min-w-0">
+                                  {q.label}
+                                </span>
                               </div>
                               <span
                                 className={`text-xs overflow-hidden text-ellipsis font-medium whitespace-nowrap ${
-                                  q.answer ? "text-orange-700" : "text-slate-500"
+                                  q.answer
+                                    ? "text-orange-700"
+                                    : "text-slate-500"
                                 }`}
                               >
                                 {q.isMultiSelect
-                                  ? Array.isArray(q.answer) && q.answer.length > 0
+                                  ? Array.isArray(q.answer) &&
+                                    q.answer.length > 0
                                     ? q.answer.join(", ")
                                     : "—"
                                   : q.answer || "—"}
@@ -920,8 +1133,8 @@ export default function ConditionAssessment() {
         </div>
       </div>
 
-      <AuctionSelectionModal 
-        isOpen={showAuctionModal} 
+      <AuctionSelectionModal
+        isOpen={showAuctionModal}
         onClose={() => setShowAuctionModal(false)}
         userFormData={user}
       />
