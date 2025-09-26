@@ -101,6 +101,13 @@ export default function ConditionAssessment() {
     const words = name.trim().split(/\s+/);
     return words.length >= 2 && words.every(word => word.length > 0);
   };
+
+  // Phone validation function
+  const validatePhone = (phone) => {
+    if (!phone) return false;
+    const digitsOnly = phone.replace(/\D/g, "");
+    return digitsOnly.length === 10;
+  };
   
   // Email validation for non-prefilled emails only
   const isEmailPrefilled = !!userState?.email;
@@ -570,6 +577,7 @@ export default function ConditionAssessment() {
                         </div>
                       )}
                     </div>
+                  
                   </div>
 
                   <div className="grid gap-2">
@@ -703,7 +711,7 @@ export default function ConditionAssessment() {
                         } else if (!isEmailPrefilled && emailValidation.error) {
                           errs.email = true;
                         }
-                        if (!finalUserData.phone || finalUserData.phone.replace(/\D/g, "").length < 7) errs.phone = true;
+                        if (!finalUserData.phone || !validatePhone(finalUserData.phone)) errs.phone = true;
                         if (!finalUserData.zipcode) errs.zipcode = true;
                         if (!finalUserData.state) errs.state = true;
                         if (!finalUserData.city) errs.city = true;
