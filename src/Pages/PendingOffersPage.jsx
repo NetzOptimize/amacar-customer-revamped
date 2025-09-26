@@ -698,11 +698,11 @@ const PendingOffersPage = () => {
                                   </>
                                 )}
                               </div>
-                              {offer.totalBids > 0 && (
+                              {/* {offer.totalBids > 0 && (
                                 <p className="text-xs text-neutral-500 mt-1">
                                   Previous highest bid: {formatCurrency(offer.highestBid)}
                                 </p>
-                              )}
+                              )} */}
                             </>
                           )}
                         </div>

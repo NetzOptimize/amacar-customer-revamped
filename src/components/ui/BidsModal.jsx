@@ -283,6 +283,7 @@ const BidsModal = ({
         action={actionType}
         bidData={selectedBid}
         auctionData={auctionData}
+        onSuccess={handleConfirmationSuccess}
       />
     </AnimatePresence>
   );

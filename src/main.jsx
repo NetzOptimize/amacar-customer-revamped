@@ -1,4 +1,4 @@
-if (import.meta.env.VITE_NODE_ENV === "production") {
+if (import.meta.env.VITE_ENV === "production") {
   console.log = () => {};
   console.error = () => {};
   console.debug = () => {};
