@@ -94,6 +94,13 @@ export default function ConditionAssessment() {
   const [userErrors, setUserErrors] = useState({});
   const [imageLoading, setImageLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
+
+  // Full name validation function
+  const validateFullName = (name) => {
+    if (!name || name.trim() === "") return false;
+    const words = name.trim().split(/\s+/);
+    return words.length >= 2 && words.every(word => word.length > 0);
+  };
   
   // Email validation for non-prefilled emails only
   const isEmailPrefilled = !!userState?.email;
@@ -453,6 +460,7 @@ export default function ConditionAssessment() {
                         </div>
                       )}
                     </div>
+                    
                   </div>
 
                   <div className="grid gap-2">
@@ -530,16 +538,7 @@ export default function ConditionAssessment() {
                       </motion.p>
                     )}
                     
-                    {/* Show regex validation error only when not validating */}
-                    {userErrors.email && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-xs text-red-600"
-                      >
-                        Please enter a valid email address.
-                      </motion.p>
-                    )}
+                  
                   </div>
 
                   <div className="grid gap-2">
@@ -692,7 +691,7 @@ export default function ConditionAssessment() {
                         };
 
                         const errs = {};
-                        if (!finalUserData.fullName) errs.fullName = true;
+                        if (!finalUserData.fullName || !validateFullName(finalUserData.fullName)) errs.fullName = true;
                         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                         if (!emailRegex.test(finalUserData.email)) {
                           // Only show regex validation error if email validation hasn't started yet
