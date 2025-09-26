@@ -20,7 +20,7 @@ const FAQ = () => {
     {
       category: "Appraisal FAQs",
       icon: <Car className="h-5 w-5" />,
-      color: "from-blue-500 to-indigo-500",
+      color: "[var(--brand-orange)]",
       items: [
         {
           id: "appraisal-1",
@@ -51,7 +51,7 @@ const FAQ = () => {
     {
       category: "Auction FAQs",
       icon: <Gavel className="h-5 w-5" />,
-      color: "from-orange-500 to-red-500",
+      color: "[var(--brand-orange)]",
       items: [
         {
           id: "auction-1",
@@ -70,7 +70,7 @@ const FAQ = () => {
     // {
     //   category: 'Reverse Bidding FAQs',
     //   icon: <ArrowDown className="h-5 w-5" />,
-    //   color: 'from-green-500 to-emerald-500',
+    //   color: '[var(--brand-green)]',
     //   items: [
     //     {
     //       id: 'reverse-1',
@@ -171,7 +171,7 @@ const FAQ = () => {
         </button>
         {/* Header Section */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl mb-6 shadow-lg">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-[var(--brand-orange)] rounded-2xl mb-6 shadow-lg">
             <HelpCircle className="h-10 w-10 text-white" />
           </div>
 
@@ -207,7 +207,7 @@ const FAQ = () => {
               className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden"
             >
               {/* Category Header */}
-              <div className={`bg-gradient-to-r ${category.color} p-6`}>
+              <div className={`bg-${category.color} p-6`}>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
                     {category.icon}
@@ -228,7 +228,7 @@ const FAQ = () => {
                     >
                       <button
                         onClick={() => toggleItem(item.id)}
-                        className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-slate-50 transition-colors duration-200"
+                        className="cursor-pointer w-full px-6 py-4 text-left flex items-center justify-between hover:bg-slate-50 transition-colors duration-200"
                       >
                         <span className="font-semibold text-slate-800 text-lg pr-4">
                           {item.question}

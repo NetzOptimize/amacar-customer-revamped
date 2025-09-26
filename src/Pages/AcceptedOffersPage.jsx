@@ -143,7 +143,6 @@ const AcceptedOffersPage = () => {
         dealerPhone: acceptedBid?.bidder_phone || "",
         dealerEmail: acceptedBid?.bidder_email || "",
         dealerId: acceptedBid?.bidder_id || "",
-        dealerPhone: "Contact via email", // Not provided in API
         dealerAddress: "Address not provided", // Not provided in API
         acceptedDate: acceptedDate,
         nextStep: nextStep,
@@ -717,7 +716,9 @@ const AcceptedOffersPage = () => {
                       <h4 className="font-semibold text-neutral-800 mb-3 text-sm sm:text-base">
                         Dealer Information
                       </h4>
+
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        {/* Dealer Name */}
                         <div className="flex items-center space-x-2">
                           <Car className="w-4 h-4 text-neutral-500 flex-shrink-0" />
                           <span className="text-sm text-neutral-700 break-words">
@@ -725,27 +726,37 @@ const AcceptedOffersPage = () => {
                           </span>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
-                          <span className="text-sm text-neutral-500 flex-shrink-0">
-                            Email:
-                          </span>
+                        {/* Dealer Email */}
+                        <div className="flex items-center space-x-2">
                           <a
                             href={`mailto:${offer.dealerEmail}`}
-                            className="text-sm text-neutral-700 break-words hover:underline hover:text-orange-600 transition-all duration-200 hover:outline-none"
+                            className="text-sm text-neutral-700 break-words hover:underline hover:text-orange-600 transition-all duration-200"
                           >
                             {offer.dealerEmail}
                           </a>
                         </div>
 
-                        <div className="flex items-start space-x-2 sm:col-span-2">
-                          <MapPin className="w-4 h-4 text-neutral-500 flex-shrink-0 mt-0.5" />
-                          <span className="text-sm text-neutral-700 break-words">
-                            {offer.dealerAddress}
-                          </span>
-                        </div>
+                          {/* Dealer Address */}
+                          <div className="flex items-start space-x-2 ">
+                            <MapPin className="w-4 h-4 text-neutral-500 flex-shrink-0 mt-0.5" />
+                            <span className="text-sm text-neutral-700 break-words">
+                              {offer.dealerAddress}
+                            </span>
+                          </div>
+
+                          {/* Dealer Phone */}
+                          <div className="flex items-center space-x-2">
+                            <a
+                              className="text-sm text-neutral-700 break-words hover:underline hover:text-orange-600 transition-all duration-200"
+                            >
+                              {offer.dealerPhone}
+                            </a>
+                          </div>
+
+                        {/* Cash Offer */}
                         {offer.cashOffer > 0 && (
-                          <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 sm:col-span-2">
-                            <span className="text-sm text-neutral-500 flex-shrink-0">
+                          <div className="flex items-center space-x-2 sm:col-span-2">
+                            <span className="text-sm text-neutral-500">
                               Cash Offer:
                             </span>
                             <span className="text-sm font-medium text-success break-words">
@@ -773,7 +784,7 @@ const AcceptedOffersPage = () => {
 
                         {offer.appointmentScheduled ? (
                           <button
-                            onClick={() => navigate('/appointments')}
+                            onClick={() => navigate("/appointments")}
                             className="cursor-pointer btn-secondary flex items-center justify-center space-x-2 py-2 px-3 sm:py-2 sm:px-4 text-sm"
                           >
                             <Clock className="w-4 h-4" />

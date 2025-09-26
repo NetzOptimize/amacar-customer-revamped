@@ -395,7 +395,7 @@ const CarDetailsView = () => {
               </div>
               <button
                 onClick={() => navigate(-1)}
-                className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white hover:bg-neutral-50 border border-neutral-200 rounded-lg shadow-sm transition-colors duration-200 w-full sm:w-auto"
+                className="cursor-pointer flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white hover:bg-neutral-50 border border-neutral-200 rounded-lg shadow-sm transition-colors duration-200 w-full sm:w-auto"
               >
                 <ArrowLeft className="w-4 h-4 text-neutral-600" />
                 <span className="text-neutral-700 font-medium text-sm sm:text-base">

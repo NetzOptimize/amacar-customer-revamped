@@ -3,12 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle, AlertTriangle, DollarSign } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 import { formatCurrency } from '../../lib/utils';
 import { acceptBid, rejectBid, clearBidOperationStates } from '../../redux/slices/offersSlice';
 
 const BidConfirmationModal = ({ 
   isOpen, 
   onClose, 
+  onSuccess,
   action, 
   bidData, 
   auctionData
@@ -22,6 +24,7 @@ const BidConfirmationModal = ({
   // Local state to manage success display
   const [showSuccess, setShowSuccess] = useState(false);
   const [localError, setLocalError] = useState(null);
+  const [hasShownToast, setHasShownToast] = useState(false);
 
   const isAccept = action === 'accept';
   const isReject = action === 'reject';
@@ -69,43 +72,38 @@ const BidConfirmationModal = ({
 
   // Handle success state changes
   useEffect(() => {
-    if (bidOperationSuccess) {
+    if (bidOperationSuccess && !hasShownToast) {
       setShowSuccess(true);
+      setHasShownToast(true);
       
-      if (isAccept) {
-        // For acceptance, redirect to accepted offers page after showing success
-        const timer = setTimeout(() => {
-          navigate('/accepted-offers');
-          onClose();
-          // Clear Redux state after navigation
-          setTimeout(() => {
-            dispatch(clearBidOperationStates());
-            setShowSuccess(false);
-          }, 300);
-        }, 2000);
-        
-        return () => clearTimeout(timer);
-      } else {
-        // For rejection, just show success and close modal
-        const timer = setTimeout(() => {
-          onClose();
-          // Clear Redux state after modal closes
-          setTimeout(() => {
-            dispatch(clearBidOperationStates());
-            setShowSuccess(false);
-          }, 300);
-        }, 2000);
-        
-        return () => clearTimeout(timer);
-      }
+      // // Show toast notification only once
+      // if (isAccept) {
+      //   toast.success('Bid accepted successfully!');
+      // } else {
+      //   toast.success('Bid rejected successfully!');
+      // }
+      
+      // Auto-close modal after showing success for 2 seconds
+      const timer = setTimeout(() => {
+        onClose();
+        // Clear Redux state after modal closes
+        setTimeout(() => {
+          dispatch(clearBidOperationStates());
+          setShowSuccess(false);
+          setHasShownToast(false);
+        }, 300);
+      }, 2000);
+      
+      return () => clearTimeout(timer);
     }
-  }, [bidOperationSuccess, onClose, dispatch, isAccept, navigate]);
+  }, [bidOperationSuccess, onClose, dispatch, isAccept, hasShownToast]);
 
   // Reset success state when modal opens
   useEffect(() => {
     if (isOpen) {
       setShowSuccess(false);
       setLocalError(null);
+      setHasShownToast(false);
     }
   }, [isOpen]);
 
@@ -214,12 +212,12 @@ const BidConfirmationModal = ({
               <motion.div 
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mx-6 mt-4 p-4 bg-success/10 border border-success/20 rounded-xl"
+                className="mx-6 mt-4 p-4 bg-green-50 border border-green-200 rounded-xl"
               >
                 <div className="flex items-center space-x-2">
-                  <CheckCircle className="w-5 h-5 text-success" />
-                  <p className="text-success text-sm font-medium">
-                    {isAccept ? 'Offer accepted successfully!' : 'Offer rejected successfully!'}
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <p className="text-green-700 text-sm font-medium">
+                    {isAccept ? 'Bid accepted successfully!' : 'Bid rejected successfully!'}
                   </p>
                 </div>
               </motion.div>
@@ -254,37 +252,34 @@ const BidConfirmationModal = ({
             <div className="flex items-center justify-end gap-3 p-6 border-t border-neutral-200 bg-white">
               <button
                 onClick={onClose}
-                disabled={bidOperationLoading}
+                disabled={bidOperationLoading || showSuccess}
                 className="cursor-pointer px-6 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {config.cancelText}
+                {showSuccess ? 'Close' : config.cancelText}
               </button>
-              <button
-                onClick={handleConfirmAction}
-                disabled={bidOperationLoading || showSuccess}
-                className={`cursor-pointer px-6 py-2.5 ${config.confirmClass} rounded-xl font-medium transition-all duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg transform hover:scale-105`}
-              >
-                {bidOperationLoading ? (
-                  <>
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
-                    />
-                    <span>Processing...</span>
-                  </>
-                ) : showSuccess ? (
-                  <>
-                    <CheckCircle className="w-4 h-4" />
-                    <span>Success!</span>
-                  </>
-                ) : (
-                  <>
-                    <IconComponent className="w-4 h-4" />
-                    <span>{config.confirmText}</span>
-                  </>
-                )}
-              </button>
+              {!showSuccess && (
+                <button
+                  onClick={handleConfirmAction}
+                  disabled={bidOperationLoading}
+                  className={`cursor-pointer px-6 py-2.5 ${config.confirmClass} rounded-xl font-medium transition-all duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg transform hover:scale-105`}
+                >
+                  {bidOperationLoading ? (
+                    <>
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                      />
+                      <span>Processing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <IconComponent className="w-4 h-4" />
+                      <span>{config.confirmText}</span>
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           </motion.div>
         </motion.div>

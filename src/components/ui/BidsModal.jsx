@@ -21,14 +21,12 @@ const BidsModal = ({
     setSelectedBid(bid);
     setActionType("accept");
     setIsConfirmationModalOpen(true);
-    onClose();
   };
 
   const handleRejectBid = (bid) => {
     setSelectedBid(bid);
     setActionType("reject");
     setIsConfirmationModalOpen(true);
-    onClose();
   };
 
   const handleConfirmAction = () => {
@@ -43,6 +41,14 @@ const BidsModal = ({
     setIsConfirmationModalOpen(false);
     setSelectedBid(null);
     setActionType(null);
+  };
+
+  const handleConfirmationSuccess = () => {
+    // Close both modals after successful action
+    setIsConfirmationModalOpen(false);
+    setSelectedBid(null);
+    setActionType(null);
+    onClose(); // Close the parent BidsModal
   };
 
   return (

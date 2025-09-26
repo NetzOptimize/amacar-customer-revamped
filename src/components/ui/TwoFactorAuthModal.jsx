@@ -218,7 +218,7 @@ export default function TwoFactorAuthModal({
                   <button
                     onClick={handleConfirm}
                     disabled={status === 'loading'}
-                    className={`flex-1 h-11 rounded-xl text-white text-sm font-semibold shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed ${
+                    className={`cursor-pointer flex-1 h-11 rounded-xl text-white text-sm font-semibold shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed ${
                       isDisabling
                         ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-500/20'
                         : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-green-500/20'

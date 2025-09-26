@@ -61,7 +61,7 @@ export default function LogoutModal({ isOpen, onClose, onConfirm }) {
                 <DialogFooter className="mt-6 flex justify-end gap-3">
                   <Button
                     variant="outline"
-                    className="rounded-lg border-slate-300 text-slate-700 hover:bg-slate-100"
+                    className="cursor-pointer rounded-lg border-slate-300 text-slate-700 hover:bg-slate-100"
                     onClick={onClose}
                   >
                     Cancel
