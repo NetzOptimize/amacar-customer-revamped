@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import Modal from '@/components/ui/modal';
 import AuctionModal from '@/components/ui/AuctionYourRideModal';
 import './ModernCarousel.css';
+import { useNavigate } from 'react-router-dom';
 
 // Import images (you'll need to add these imports based on your actual image paths)
 import img1 from '../../../assets/get_an_instant_offer_for_your_car.jpg';
@@ -54,7 +55,7 @@ const ModernCarousel = ({ className = "" }) => {
   const [current, setCurrent] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [auctionOpen, setAuctionOpen] = useState(false);
-
+  const navigate = useNavigate();
   // Auto-play functionality
   useEffect(() => {
     if (!api) return;
@@ -81,7 +82,7 @@ const ModernCarousel = ({ className = "" }) => {
     if (ctaText === 'Get Instant Offer' || ctaText === 'Get Started Today') {
       setIsModalOpen(true);
     } else if (ctaText === 'Learn More') {
-      setAuctionOpen(true);
+      navigate('/about-us');
     }
   };
 
@@ -94,6 +95,12 @@ const ModernCarousel = ({ className = "" }) => {
           loop: true,
         }}
         className="w-full"
+        // Pause on hover (desktop)
+    //   onMouseEnter={() => autoplay.current.stop()}
+    //   onMouseLeave={() => autoplay.current.reset()}
+    //   // Pause on hold (mobile touch)
+    //   onTouchStart={() => autoplay.current.stop()}
+    //   onTouchEnd={() => autoplay.current.reset()}
       >
         <CarouselContent className="-ml-0">
           {slides.map((slide, index) => (
