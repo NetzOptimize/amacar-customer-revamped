@@ -79,8 +79,8 @@ const useEmailValidation = (email, isRegisterMode, shouldReset = false) => {
     }));
 
     try {
-      // Random delay between 0-5000ms
-      const randomDelay = Math.random() * 5000;
+      // Random delay between 0-1000ms
+      const randomDelay = Math.random() * 1000;
       console.log('⏱️ [EmailValidation] Adding random delay:', randomDelay, 'ms');
       await new Promise(resolve => setTimeout(resolve, randomDelay));
 

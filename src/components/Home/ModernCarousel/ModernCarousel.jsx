@@ -96,11 +96,11 @@ const ModernCarousel = ({ className = "" }) => {
         }}
         className="w-full"
         // Pause on hover (desktop)
-    //   onMouseEnter={() => autoplay.current.stop()}
-    //   onMouseLeave={() => autoplay.current.reset()}
-    //   // Pause on hold (mobile touch)
-    //   onTouchStart={() => autoplay.current.stop()}
-    //   onTouchEnd={() => autoplay.current.reset()}
+        //   onMouseEnter={() => autoplay.current.stop()}
+        //   onMouseLeave={() => autoplay.current.reset()}
+        //   // Pause on hold (mobile touch)
+        //   onTouchStart={() => autoplay.current.stop()}
+        //   onTouchEnd={() => autoplay.current.reset()}
       >
         <CarouselContent className="-ml-0">
           {slides.map((slide, index) => (

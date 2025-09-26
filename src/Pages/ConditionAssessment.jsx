@@ -32,7 +32,8 @@ export default function ConditionAssessment() {
 
   useEffect(() => {
     console.log("vehicleDetails", vehicleDetails)
-  }, [vehicleDetails]);
+    console.log("userState", userState)
+  }, [vehicleDetails, userState]);
   useEffect(() => {
     const result = dispatch(fetchCityStateByZip(stateZip))
     setLocalCity(result.city)
@@ -107,6 +108,14 @@ export default function ConditionAssessment() {
     if (!phone) return false;
     const digitsOnly = phone.replace(/\D/g, "");
     return digitsOnly.length === 10;
+  };
+
+  // Helper function to get full name from userState
+  const getUserFullName = () => {
+    if (userState?.first_name && userState?.last_name) {
+      return `${userState.first_name} ${userState.last_name}`;
+    }
+    return userState?.first_name || userState?.last_name || "";
   };
   
   // Email validation for non-prefilled emails only
@@ -435,7 +444,7 @@ export default function ConditionAssessment() {
                 <div className="mb-6">
                   <h2 className="text-xl font-semibold text-slate-900">Your Details</h2>
                   <p className="text-sm text-slate-600">
-                    {userState?.display_name ? "Verify your information below." : "Provide contact and address information to proceed."}
+                    {getUserFullName() ? "Verify your information below." : "Provide contact and address information to proceed."}
                   </p>
                 </div>
 
@@ -446,22 +455,22 @@ export default function ConditionAssessment() {
                     </label>
                     <div className="relative">
                       <User className={`h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 ${
-                        userState?.display_name ? "text-orange-500" : "text-slate-400"
+                        getUserFullName() ? "text-orange-500" : "text-slate-400"
                       }`} />
                       <input
-                        value={user.fullName || userState?.display_name || ""}
+                        value={user.fullName || getUserFullName() || ""}
                         onChange={(e) => setUser({ ...user, fullName: e.target.value })}
                         placeholder="Enter full name"
-                        disabled={!!userState?.display_name}
+                        disabled={!!getUserFullName()}
                         className={`h-11 w-full rounded-xl border bg-white pl-9 pr-3 text-base outline-none transition-shadow ${
-                          userState?.display_name 
+                          getUserFullName() 
                             ? "bg-green-50 border-orange-200 text-orange-800 cursor-not-allowed" 
                             : userErrors.fullName 
                               ? "border-red-300" 
                               : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"
                         }`}
                       />
-                      {userState?.display_name && (
+                      {getUserFullName() && (
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
                           <div className="h-2 w-2 bg-orange-500 rounded-full"></div>
                         </div>
@@ -688,7 +697,7 @@ export default function ConditionAssessment() {
                     <button
                       onClick={() => {
                         const finalUserData = {
-                          fullName: user.fullName || userState?.display_name || "",
+                          fullName: user.fullName || getUserFullName() || "",
                           email: user.email || userState?.email || "",
                           phone: user.phone || userState?.meta?.phone || "",
                           zipcode: user.zipcode || stateZip || "",
