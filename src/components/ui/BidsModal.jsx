@@ -21,12 +21,14 @@ const BidsModal = ({
     setSelectedBid(bid);
     setActionType("accept");
     setIsConfirmationModalOpen(true);
+    onClose();
   };
 
   const handleRejectBid = (bid) => {
     setSelectedBid(bid);
     setActionType("reject");
     setIsConfirmationModalOpen(true);
+    onClose();
   };
 
   const handleConfirmAction = () => {

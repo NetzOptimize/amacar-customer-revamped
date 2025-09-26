@@ -220,7 +220,6 @@ const BidConfirmationModal = ({
                   <CheckCircle className="w-5 h-5 text-success" />
                   <p className="text-success text-sm font-medium">
                     {isAccept ? 'Offer accepted successfully!' : 'Offer rejected successfully!'}
-                    {isAccept && <span className="block text-xs mt-1">Redirecting to accepted offers...</span>}
                   </p>
                 </div>
               </motion.div>
