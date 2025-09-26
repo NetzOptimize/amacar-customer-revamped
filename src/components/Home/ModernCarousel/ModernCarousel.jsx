@@ -188,8 +188,8 @@ const ModernCarousel = ({ className = "" }) => {
         </CarouselContent>
 
         {/* Navigation Arrows */}
-        <CarouselPrevious className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-gray-800 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 w-10 h-10 md:w-12 md:h-12" />
-        <CarouselNext className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-gray-800 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 w-10 h-10 md:w-12 md:h-12" />
+        <CarouselPrevious className="absolute left-0 md:left-0 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-gray-800 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 w-10 h-10 md:w-12 md:h-12" />
+        <CarouselNext className="absolute right-0 md:right-0 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-gray-800 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 w-10 h-10 md:w-12 md:h-12" />
 
         {/* Dots Navigation */}
         <CarouselDots className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20" />
