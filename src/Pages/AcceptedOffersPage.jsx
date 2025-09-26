@@ -409,7 +409,7 @@ const AcceptedOffersPage = () => {
                 variants={itemVariants}
                 onClick={() => dispatch(fetchAcceptedOffers())}
                 disabled={loading}
-                className="btn-ghost flex items-center space-x-2 w-full sm:w-auto justify-center sm:justify-start"
+                className="btn-ghost cursor-pointer  flex items-center space-x-2 w-full sm:w-auto justify-center sm:justify-start"
               >
                 <RefreshCw
                   className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}

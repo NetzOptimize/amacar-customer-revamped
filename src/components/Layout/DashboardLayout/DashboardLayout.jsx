@@ -371,7 +371,7 @@ const DashboardLayout = ({ children }) => {
                         </Link>
                         <button
                           onClick={handleLogoutClick}
-                          className="w-full px-4 py-2 text-sm text-neutral-600 hover:bg-primary-50 hover:text-primary-600 transition-colors duration-200 flex items-center space-x-2"
+                          className="cursor-pointer w-full px-4 py-2 text-sm text-neutral-600 hover:bg-primary-50 hover:text-primary-600 transition-colors duration-200 flex items-center space-x-2"
                         >
                           <LogOut className="w-4 h-4" />
                           <span>Logout</span>

@@ -738,13 +738,13 @@ const PendingOffersPage = () => {
                       {offer.bidCount > 0 ? (
                         // Show accept/reject buttons when there are active bids
                         <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
-                          <button
+                          {/* <button
                             onClick={() => handleRejectOffer(offer)}
                             className="cursor-pointer btn-ghost text-error hover:bg-error/10 flex items-center justify-center space-x-2 px-3 py-2 text-xs sm:text-sm"
                           >
                             <X className="w-3 h-3 sm:w-4 sm:h-4" />
                             <span>Reject</span>
-                          </button>
+                          </button> */}
                           <button
                             onClick={() => handleAcceptOffer(offer)}
                             className="btn-primary flex items-center justify-center space-x-2 px-3 py-2 text-xs sm:text-sm"

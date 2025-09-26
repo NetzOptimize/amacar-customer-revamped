@@ -95,7 +95,7 @@ const BidConfirmationModal = ({
   useEffect(() => {
     if (bidOperationSuccess && !hasShownToast) {
       setShowSuccess(true);
-      if (!hasShownToast) {
+      if (!hasShownToast && action) {
         toast.success(`Bid ${action}ed successfully!`);
       }
       setHasShownToast(true);
