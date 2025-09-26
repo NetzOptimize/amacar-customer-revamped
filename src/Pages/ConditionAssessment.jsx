@@ -115,7 +115,7 @@ export default function ConditionAssessment() {
     if (userState?.first_name && userState?.last_name) {
       return `${userState.first_name} ${userState.last_name}`;
     }
-    return userState?.first_name || userState?.last_name || "";
+    return userState?.first_name || userState?.last_name || userState?.display_name || "";
   };
   
   // Email validation for non-prefilled emails only
