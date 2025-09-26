@@ -75,10 +75,10 @@ export default function AuctionModal({
   const [shouldResetEmailValidation, setShouldResetEmailValidation] =
     useState(false);
 
-  // Email validation hook - only validate when email is not empty and modal is open
+  // Email validation hook - validate when email is not empty and modal is open
   const emailValidation = useEmailValidation(
     email && isOpen ? email : "",
-    true,
+    true, // Always in register mode for auction modal
     shouldResetEmailValidation
   );
   const navigate = useNavigate();
@@ -97,8 +97,19 @@ export default function AuctionModal({
 
   // Memoized email change handler to prevent cursor jumping
   const handleEmailChange = useCallback((e) => {
+    console.log('📝 [AuctionModal] Email field changed:', e.target.value);
     setEmail(e.target.value);
   }, []);
+
+  // Debug email validation state changes
+  useEffect(() => {
+    console.log('📧 [AuctionModal] Email validation state changed:', {
+      email,
+      isOpen,
+      emailValidation,
+      shouldResetEmailValidation
+    });
+  }, [emailValidation, email, isOpen, shouldResetEmailValidation]);
 
   // Debounced ZIP code lookup
   const debouncedZipLookup = useCallback(
@@ -278,9 +289,16 @@ export default function AuctionModal({
         newErrors.email = "Please enter a valid email address.";
       }
     } else if (email && isOpen && emailValidation.isDisposable === true && !emailValidation.isValidating) {
+      console.log('🚫 [AuctionModal] Email validation failed - disposable email');
       newErrors.email = "Disposable email addresses are not allowed.";
+    } else if (email && isOpen && emailValidation.isRegistered === true && !emailValidation.isValidating) {
+      console.log('🚫 [AuctionModal] Email validation failed - email already registered');
+      newErrors.email = "This email is already registered. Please use a different email or try logging in.";
     } else if (email && isOpen && emailValidation.error && !emailValidation.isValidating) {
+      console.log('❌ [AuctionModal] Email validation failed - API error:', emailValidation.error);
       newErrors.email = "Unable to verify email. Please try again.";
+    } else if (email && isOpen && emailValidation.isValid === true && !emailValidation.isValidating) {
+      console.log('✅ [AuctionModal] Email validation passed - both checks successful');
     }
 
     // Phone validation
@@ -558,6 +576,8 @@ export default function AuctionModal({
                         content={
                           email && isOpen && emailValidation.isDisposable === true && !emailValidation.isValidating
                             ? "Disposable email addresses are not allowed"
+                            : email && isOpen && emailValidation.isRegistered === true && !emailValidation.isValidating
+                            ? "This email is already registered. Please use a different email or try logging in."
                             : email && isOpen && emailValidation.error && !emailValidation.isValidating
                             ? "Unable to verify email. Please try again."
                             : errors.email
@@ -567,6 +587,7 @@ export default function AuctionModal({
                         disabled={
                           !errors.email && 
                           !(email && isOpen && emailValidation.isDisposable === true && !emailValidation.isValidating) &&
+                          !(email && isOpen && emailValidation.isRegistered === true && !emailValidation.isValidating) &&
                           !(email && isOpen && emailValidation.error && !emailValidation.isValidating)
                         }
                       >
@@ -577,7 +598,7 @@ export default function AuctionModal({
                                 ? "text-green-500"
                                 : email &&
                                   isOpen &&
-                                  emailValidation.isDisposable === true
+                                  (emailValidation.isDisposable === true || emailValidation.isRegistered === true)
                                 ? "text-red-500"
                                 : "text-slate-400"
                             }`}
@@ -596,7 +617,7 @@ export default function AuctionModal({
                                 ? "border-green-300 bg-green-50 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.5)]"
                                 : email &&
                                   isOpen &&
-                                  emailValidation.isDisposable === true && !emailValidation.isValidating
+                                  (emailValidation.isDisposable === true || emailValidation.isRegistered === true) && !emailValidation.isValidating
                                 ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
                                 : errors.email && !emailValidation.isValidating
                                 ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
@@ -617,7 +638,7 @@ export default function AuctionModal({
                             {!emailValidation.isValidating &&
                               email &&
                               isOpen &&
-                              emailValidation.isDisposable === true && (
+                              (emailValidation.isDisposable === true || emailValidation.isRegistered === true) && (
                                 <XCircle className="h-4 w-4 text-red-500" />
                               )}
                           </div>
@@ -1023,15 +1044,31 @@ export default function AuctionModal({
                 <div className="pt-2 mt-auto">
                   <button
                     type="submit"
-                    disabled={
-                      modalState.isLoading ||
-                      !auctionConsent ||
-                      !registerConsent ||
-                      (email &&
-                        isOpen &&
-                        (emailValidation.isValidating ||
-                          emailValidation.isDisposable === true))
-                    }
+                    disabled={(() => {
+                      const isDisabled = modalState.isLoading ||
+                        !auctionConsent ||
+                        !registerConsent ||
+                        (email &&
+                          isOpen &&
+                          (emailValidation.isValidating ||
+                            emailValidation.isDisposable === true ||
+                            emailValidation.isRegistered === true));
+                      
+                      console.log('🔘 [AuctionModal] Submit button state:', {
+                        isDisabled,
+                        modalState: modalState.isLoading,
+                        auctionConsent,
+                        registerConsent,
+                        emailValidation: {
+                          isValidating: emailValidation.isValidating,
+                          isDisposable: emailValidation.isDisposable,
+                          isRegistered: emailValidation.isRegistered,
+                          isValid: emailValidation.isValid
+                        }
+                      });
+                      
+                      return isDisabled;
+                    })()}
                     className="cursor-pointer w-full h-12 sm:h-11 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-base font-semibold shadow-lg shadow-orange-500/20  disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {modalState.isLoading ? (
