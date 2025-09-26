@@ -495,13 +495,11 @@ export default function ConditionAssessment() {
                         className={`h-11 w-full rounded-xl border bg-white pl-9 pr-10 text-base outline-none transition-all duration-200 ${
                           userState?.email 
                             ? "bg-orange-50 border-orange-200 text-orange-800 cursor-not-allowed" 
-                            : !isEmailPrefilled && emailValidation.isValid === true
-                              ? "border-green-300 bg-green-50 focus:shadow-[0_0_0_4px_rgba(34,197,94,0.18)]"
-                              : !isEmailPrefilled && emailValidation.isDisposable === true
+                            : !isEmailPrefilled && emailValidation.isDisposable === true
+                              ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.18)]"
+                              : userErrors.email && !emailValidation.isValidating
                                 ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.18)]"
-                                : userErrors.email && !emailValidation.isValidating
-                                  ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.18)]"
-                                  : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"
+                                : "border-slate-200 focus:shadow-[0_0_0_4px_rgba(246,133,31,0.18)]"
                         }`}
                       />
                       {/* Validation status indicator - only show for non-prefilled emails */}
