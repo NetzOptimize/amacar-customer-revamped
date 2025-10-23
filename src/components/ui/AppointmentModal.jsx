@@ -53,9 +53,6 @@ export default function AppointmentModal({
   const {acceptedOffers, appointmentOperationLoading} = useSelector(state => state.offers);
   const {user} = useSelector(state => state.user);
 
-  useEffect(() => {
-    console.log("user.id", user.id)
-  })
 
   // Simplified time slots (hourly only)
   const timeSlots = [

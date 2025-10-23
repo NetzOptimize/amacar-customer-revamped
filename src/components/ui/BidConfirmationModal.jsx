@@ -40,31 +40,16 @@ const BidConfirmationModal = ({
 
   // Ref to track if we've already processed the success to prevent multiple triggers
   const hasProcessedSuccess = useRef(false);
+  
+  // Store action and isAccept in refs to prevent them from changing during the flow
+  const actionRef = useRef(action);
+  const isAcceptRef = useRef(action === "accept");
 
-  // Debug logging for state changes
+  // Update refs when action changes
   useEffect(() => {
-    console.log("🔍 BidConfirmationModal State Debug:", {
-      isOpen,
-      action,
-      showSuccess,
-      showAppointmentModal,
-      hasShownToast,
-      bidOperationLoading,
-      bidOperationSuccess,
-      bidOperationError,
-      localError,
-      hasProcessedSuccess: hasProcessedSuccess.current
-    });
-  }, [isOpen, action, showSuccess, showAppointmentModal, hasShownToast, bidOperationLoading, bidOperationSuccess, bidOperationError, localError]);
-
-  // Debug appointment modal state changes specifically
-  useEffect(() => {
-    console.log("📅 Appointment Modal State Change:", {
-      showAppointmentModal,
-      isOpen,
-      hasProcessedSuccess: hasProcessedSuccess.current
-    });
-  }, [showAppointmentModal, isOpen]);
+    actionRef.current = action;
+    isAcceptRef.current = action === "accept";
+  }, [action]);
 
   const isAccept = action === "accept";
   const isReject = action === "reject";
@@ -134,6 +119,12 @@ const BidConfirmationModal = ({
 
   // Handle success state changes
   useEffect(() => {
+    // Don't run this effect if bidOperationSuccess is false
+    if (!bidOperationSuccess) {
+      console.log("🔄 bidOperationSuccess is false, skipping effect");
+      return;
+    }
+
     console.log("🎯 Success effect triggered:", {
       bidOperationSuccess,
       hasShownToast,
@@ -144,40 +135,34 @@ const BidConfirmationModal = ({
       hasProcessedSuccess: hasProcessedSuccess.current
     });
 
-    if (bidOperationSuccess && !hasProcessedSuccess.current) {
+    // Only process when we haven't processed it yet
+    if (!hasProcessedSuccess.current) {
       console.log("✅ Processing success for the first time");
       hasProcessedSuccess.current = true;
       
-      setShowSuccess(true);
+      // Don't show success state, just show toast
       setHasShownToast(true);
       
-      if (action) {
-        toast.success(`Bid ${action}ed successfully!`);
-        console.log(`🍞 Toast shown: Bid ${action}ed successfully!`);
+      if (actionRef.current) {
+        toast.success(`Bid ${actionRef.current}ed successfully!`);
+        console.log(`🍞 Toast shown: Bid ${actionRef.current}ed successfully!`);
       }
 
       // Call onSuccess to let parent know operation completed (but not for accepted bids that will show appointment modal)
-      if (onSuccess && !isAccept) {
+      if (onSuccess && !isAcceptRef.current) {
         console.log("📞 Calling onSuccess callback for non-accept actions");
         onSuccess();
-      } else if (isAccept) {
+      } else if (isAcceptRef.current) {
         console.log("📞 Skipping onSuccess for accepted bid - will call after appointment modal");
       }
 
-      // If bid was accepted, open appointment modal after a short delay
-      if (isAccept) {
-        console.log("📅 Scheduling appointment modal to open in 1 second");
-        const appointmentTimer = setTimeout(() => {
-          console.log("📅 Opening appointment modal");
-          setShowAppointmentModal(true);
-        }, 1000); // Show appointment modal after 1 second
-        
-        return () => {
-          console.log("🧹 Cleaning up appointment timer");
-          clearTimeout(appointmentTimer);
-        };
+      // If bid was accepted, open appointment modal immediately
+      if (isAcceptRef.current) {
+        console.log("📅 Opening appointment modal immediately");
+        setShowAppointmentModal(true);
+        // Don't close the main modal - let it stay open to show the appointment modal
       } else {
-        // For rejected bids, auto-close modal after showing success for 2 seconds
+        // For rejected bids, auto-close modal after a short delay
         console.log("❌ Scheduling modal close for rejected bid in 2 seconds");
         const timer = setTimeout(() => {
           console.log("❌ Auto-closing modal for rejected bid");
@@ -185,7 +170,6 @@ const BidConfirmationModal = ({
           setTimeout(() => {
             console.log("🧹 Clearing Redux states");
             dispatch(clearBidOperationStates());
-            setShowSuccess(false);
           }, 300);
         }, 2000);
 
@@ -194,48 +178,37 @@ const BidConfirmationModal = ({
           clearTimeout(timer);
         };
       }
-    } else if (bidOperationSuccess && hasProcessedSuccess.current) {
+    } else {
       console.log("⏭️ Success already processed, skipping");
     }
-  }, [bidOperationSuccess, isAccept, action, onSuccess, dispatch]); // Intentionally excluding hasShownToast, showAppointmentModal, showSuccess to prevent infinite loops
+  }, [bidOperationSuccess, action, isAccept, onSuccess, dispatch, hasShownToast, showAppointmentModal, showSuccess]);
 
   // Reset success state when modal opens
   useEffect(() => {
-    console.log("🔄 Modal open/close effect triggered:", { 
-      isOpen, 
-      showAppointmentModal, 
-      hasProcessedSuccess: hasProcessedSuccess.current 
-    });
-    
     // Only reset states when modal is first opened (not when appointment modal is open)
     if (isOpen && !hasProcessedSuccess.current && !showAppointmentModal) {
-      console.log("🔄 Resetting all states for new modal session");
       setShowSuccess(false);
       setLocalError(null);
       setHasShownToast(false);
       setShowAppointmentModal(false);
       hasProcessedSuccess.current = false; // Reset the ref
-    } else if (isOpen && hasProcessedSuccess.current) {
-      console.log("🔄 Modal is open but success already processed - not resetting states");
-    } else if (isOpen && showAppointmentModal) {
-      console.log("🔄 Modal is open and appointment modal is open - not resetting states");
-    } else if (!isOpen && showAppointmentModal) {
-      // If modal is being closed but appointment modal is open, don't reset states
-      console.log("🔄 Modal closing but appointment modal is open - keeping states");
-    } else if (!isOpen && !showAppointmentModal) {
-      console.log("🔄 Modal closing and no appointment modal - resetting states");
+      // Reset the action refs
+      actionRef.current = action;
+      isAcceptRef.current = action === "accept";
+    }
+  }, [isOpen, showAppointmentModal, action]);
+
+  // Reset states when both modals are completely closed
+  useEffect(() => {
+    if (!isOpen && !showAppointmentModal && hasProcessedSuccess.current) {
       setShowSuccess(false);
       setLocalError(null);
       setHasShownToast(false);
-      setShowAppointmentModal(false);
       hasProcessedSuccess.current = false;
     }
   }, [isOpen, showAppointmentModal]);
 
-  useEffect(() => {
-    console.log("Bid data:", bidData);
-    console.log("Auction data:", auctionData);
-  }, [bidData, auctionData]);
+  // Debug logging removed to prevent excessive console output
 
   // Handle appointment modal close
   const handleAppointmentClose = () => {
@@ -267,37 +240,29 @@ const BidConfirmationModal = ({
     onClose();
   };
 
-  // Add debugging for onClose calls
-  const handleMainModalClose = () => {
-    console.log("🚪 Main modal close called", { 
-      showAppointmentModal, 
-      isOpen, 
-      hasProcessedSuccess: hasProcessedSuccess.current 
-    });
-    if (!showAppointmentModal) {
-      console.log("🚪 Closing main modal - no appointment modal open");
-      onClose();
-    } else {
-      console.log("🚪 Preventing main modal close - appointment modal is open");
+  // Removed unused handleMainModalClose function
+
+  // Override onClose to prevent closing when appointment modal should be shown
+  const handleClose = () => {
+    if (showAppointmentModal) {
+      console.log("🚪 Preventing close - appointment modal is open");
+      return;
     }
+    onClose();
   };
 
   // Don't render if modal is closed and appointment modal is not open
   if (!isOpen && !showAppointmentModal) {
-    console.log("🚫 Not rendering - modal closed and no appointment modal");
     return null;
   }
   
   // Don't render if no bid data and appointment modal is not open
   if (!bidData && !showAppointmentModal) {
-    console.log("🚫 Not rendering - no bid data and no appointment modal");
     return null;
   }
 
   // If appointment modal is open, always render (even if main modal is closed)
-  if (showAppointmentModal) {
-    console.log("📅 Rendering with appointment modal open");
-  }
+  const shouldRenderMainModal = isOpen || showAppointmentModal;
 
   const getModalConfig = () => {
     // Cash offers cannot be accepted or rejected through this modal
@@ -347,13 +312,13 @@ const BidConfirmationModal = ({
   return (
     <>
       <AnimatePresence>
-        {isOpen && (
+        {shouldRenderMainModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4"
-            onClick={handleMainModalClose}
+            onClick={handleClose}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -398,8 +363,8 @@ const BidConfirmationModal = ({
                 </motion.div>
               )}
 
-              {/* Success Display */}
-              {showSuccess && (
+              {/* Success Display - Removed for accepted bids, only show for rejected bids */}
+              {showSuccess && !isAccept && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -408,9 +373,7 @@ const BidConfirmationModal = ({
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="w-5 h-5 text-green-600" />
                     <p className="text-green-700 text-sm font-medium">
-                      {isAccept
-                        ? "Bid accepted successfully!"
-                        : "Bid rejected successfully!"}
+                      Bid rejected successfully!
                     </p>
                   </div>
                 </motion.div>
@@ -450,13 +413,13 @@ const BidConfirmationModal = ({
               {/* Action Buttons */}
               <div className="flex items-center justify-end gap-3 p-6 border-t border-neutral-200 bg-white">
               <button
-                onClick={handleMainModalClose}
-                disabled={bidOperationLoading || showSuccess}
+                onClick={handleClose}
+                disabled={bidOperationLoading || (showSuccess && !isAccept)}
                 className="cursor-pointer px-6 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                  {showSuccess ? "Close" : config.cancelText}
+                  {(showSuccess && !isAccept) ? "Close" : config.cancelText}
                 </button>
-                {!showSuccess && (
+                {!(showSuccess && !isAccept) && (
                   <button
                     onClick={handleConfirmAction}
                     disabled={bidOperationLoading}

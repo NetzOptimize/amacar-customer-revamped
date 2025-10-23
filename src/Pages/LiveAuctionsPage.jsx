@@ -72,6 +72,14 @@ const LiveAuctionsPage = () => {
   const [sortProgress, setSortProgress] = useState(0);
   const dropdownRef = useRef(null);
 
+  const [selectedAuction, setSelectedAuction] = useState(null);
+  const [isActionDropdownOpen, setIsActionDropdownOpen] = useState(false);
+  const [isBidsModalOpen, setIsBidsModalOpen] = useState(false);
+  const [selectedAuctionBids, setSelectedAuctionBids] = useState(null);
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [confirmationData, setConfirmationData] = useState(null);
+  const [currentTime, setCurrentTime] = useState(Date.now());
+
   // Load more configuration
   const itemsPerPage = 6;
 
@@ -162,17 +170,20 @@ const LiveAuctionsPage = () => {
       // Refresh live auctions to get updated data
       dispatch(fetchLiveAuctions());
 
-      // Auto-close modal after a short delay to show success message
-      const timer = setTimeout(() => {
-        setIsConfirmationModalOpen(false);
-        setIsBidsModalOpen(false);
-        setConfirmationData(null);
-        dispatch(clearBidOperationStates());
-      }, 2000);
+      // Only auto-close modal and clear states for rejected bids
+      // For accepted bids, let BidConfirmationModal handle the appointment flow
+      if (confirmationData?.action === "reject") {
+        const timer = setTimeout(() => {
+          setIsConfirmationModalOpen(false);
+          setIsBidsModalOpen(false);
+          setConfirmationData(null);
+          dispatch(clearBidOperationStates());
+        }, 2000);
 
-      return () => clearTimeout(timer);
+        return () => clearTimeout(timer);
+      }
     }
-  }, [bidOperationSuccess, dispatch]);
+  }, [bidOperationSuccess, dispatch, confirmationData]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -188,13 +199,7 @@ const LiveAuctionsPage = () => {
     };
   }, []);
 
-  const [selectedAuction, setSelectedAuction] = useState(null);
-  const [isActionDropdownOpen, setIsActionDropdownOpen] = useState(false);
-  const [isBidsModalOpen, setIsBidsModalOpen] = useState(false);
-  const [selectedAuctionBids, setSelectedAuctionBids] = useState(null);
-  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
-  const [confirmationData, setConfirmationData] = useState(null);
-  const [currentTime, setCurrentTime] = useState(Date.now());
+  
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -492,8 +497,11 @@ const LiveAuctionsPage = () => {
     if (!bidOperationLoading) {
       setIsConfirmationModalOpen(false);
       setConfirmationData(null);
-      // Clear any bid operation states
-      dispatch(clearBidOperationStates());
+      // Only clear bid operation states for rejected bids
+      // For accepted bids, let BidConfirmationModal handle the appointment flow
+      if (confirmationData?.action === "reject") {
+        dispatch(clearBidOperationStates());
+      }
     }
   };
 
