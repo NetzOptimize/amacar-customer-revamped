@@ -357,7 +357,7 @@ export default function AppointmentDetailsModal({
                     {appointment.status !== "cancelled" && (
                       <div className="grid grid-cols-1 gap-2">
                         {/* Confirm Button - Only show for pending appointments */}
-                        {appointment.status === "pending" &&
+                        {(appointment.status === "pending" && appointment.booked_by === "dealer") &&
                            (
                             <button
                               onClick={handleConfirmClick}
@@ -482,6 +482,7 @@ export default function AppointmentDetailsModal({
                   Close
                 </button>
               </div>
+              {console.log("appointment", appointment)}
             </motion.div>
           ) : (
             <div className="flex flex-col items-center justify-center text-center gap-3 sm:gap-4 py-6 sm:py-8">

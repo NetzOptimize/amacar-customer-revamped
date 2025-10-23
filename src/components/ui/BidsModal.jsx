@@ -44,7 +44,15 @@ const BidsModal = ({
   };
 
   const handleConfirmationSuccess = () => {
-    // Close both modals after successful action
+    // For accepted bids, the BidConfirmationModal will handle the appointment flow
+    // and call onSuccess after the appointment is complete
+    if (actionType === "accept") {
+      // Don't close the BidsModal immediately for accepted bids
+      // The appointment modal will be shown by BidConfirmationModal
+      return;
+    }
+    
+    // For rejected bids, close both modals immediately
     setIsConfirmationModalOpen(false);
     setSelectedBid(null);
     setActionType(null);
