@@ -40,10 +40,21 @@ const BidConfirmationModal = ({
   
   // Get the accepted bid data for appointment modal
   const getAcceptedBidData = () => {
-    if (!bidData || !auctionData) return null;
+    if (!bidData || !auctionData) {
+      console.log("❌ Missing data:", { bidData, auctionData });
+      return null;
+    }
+    
+    console.log("🔍 Looking for bid data:", {
+      bidDataId: bidData.id,
+      auctionDataBids: auctionData.bids,
+      auctionDataKeys: Object.keys(auctionData)
+    });
     
     // Find the accepted bid in the auction data
     const acceptedBid = auctionData.bids?.find(bid => bid.id === bidData.id);
+    console.log("🎯 Found accepted bid:", acceptedBid);
+    
     if (!acceptedBid) return null;
     
     return {
@@ -181,6 +192,8 @@ const BidConfirmationModal = ({
       // If bid was accepted, open appointment modal immediately
       if (isAcceptRef.current) {
         console.log("📅 Opening appointment modal immediately");
+        console.log("📅 Current bidData:", bidData);
+        console.log("📅 Current auctionData:", auctionData);
         setShowAppointmentModal(true);
         // Don't close the main modal - let it stay open to show the appointment modal
       } else {
@@ -203,7 +216,7 @@ const BidConfirmationModal = ({
     } else {
       console.log("⏭️ Success already processed, skipping");
     }
-  }, [bidOperationSuccess, action, isAccept, onSuccess, dispatch, hasShownToast, showAppointmentModal, showSuccess]);
+  }, [bidOperationSuccess, action, isAccept, onSuccess, dispatch, hasShownToast, showAppointmentModal, showSuccess, auctionData, bidData]);
 
   // Reset success state when modal opens
   useEffect(() => {
@@ -477,7 +490,9 @@ const BidConfirmationModal = ({
       
       {/* Appointment Modal */}
       {showAppointmentModal && (() => {
+        console.log("🎯 Rendering appointment modal, showAppointmentModal:", showAppointmentModal);
         const acceptedBidData = getAcceptedBidData();
+        console.log("🎯 Accepted bid data for appointment:", acceptedBidData);
         return (
           <AppointmentModal
             isOpen={showAppointmentModal}

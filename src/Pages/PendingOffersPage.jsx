@@ -136,17 +136,20 @@ const PendingOffersPage = () => {
       // Refresh pending offers to get updated data
       dispatch(fetchPendingOffers());
 
-      // Auto-close modal after a short delay to show success message
-      const timer = setTimeout(() => {
-        setIsConfirmationModalOpen(false);
-        setIsBidsModalOpen(false);
-        setConfirmationData(null);
-        dispatch(clearBidOperationStates());
-      }, 2000);
+      // Only auto-close modal and clear states for rejected bids
+      // For accepted bids, let BidConfirmationModal handle the appointment flow
+      if (confirmationData?.action === "reject") {
+        const timer = setTimeout(() => {
+          setIsConfirmationModalOpen(false);
+          setIsBidsModalOpen(false);
+          setConfirmationData(null);
+          dispatch(clearBidOperationStates());
+        }, 2000);
 
-      return () => clearTimeout(timer);
+        return () => clearTimeout(timer);
+      }
     }
-  }, [bidOperationSuccess, dispatch]);
+  }, [bidOperationSuccess, dispatch, confirmationData]);
 
   useEffect(() => {
     console.log("Selected offer:", selectedOffer);
@@ -230,8 +233,11 @@ const PendingOffersPage = () => {
   const handleCloseConfirmationModal = () => {
     setIsConfirmationModalOpen(false);
     setConfirmationData(null);
-    // Clear any bid operation states
-    dispatch(clearBidOperationStates());
+    // Only clear bid operation states for rejected bids
+    // For accepted bids, let BidConfirmationModal handle the appointment flow
+    if (confirmationData?.action === "reject") {
+      dispatch(clearBidOperationStates());
+    }
   };
 
   // Sort options
@@ -915,6 +921,11 @@ const PendingOffersPage = () => {
         action={confirmationData?.action}
         bidData={confirmationData?.bid}
         auctionData={confirmationData?.offer}
+        onSuccess={() => {
+          // Close the confirmation modal after successful operation
+          setIsConfirmationModalOpen(false);
+          setConfirmationData(null);
+        }}
       />
 
       <Modal
