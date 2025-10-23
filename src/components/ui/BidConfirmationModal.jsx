@@ -37,6 +37,27 @@ const BidConfirmationModal = ({
   
   // State for AppointmentModal
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
+  
+  // Get the accepted bid data for appointment modal
+  const getAcceptedBidData = () => {
+    if (!bidData || !auctionData) return null;
+    
+    // Find the accepted bid in the auction data
+    const acceptedBid = auctionData.bids?.find(bid => bid.id === bidData.id);
+    if (!acceptedBid) return null;
+    
+    return {
+      dealerName: acceptedBid.bidder_display_name || "Auto Dealer",
+      dealerId: acceptedBid.bidder_id,
+      dealerEmail: acceptedBid.bidder_email || "contact@dealer.com",
+      vehicleInfo: auctionData.year && auctionData.make && auctionData.model 
+        ? `${auctionData.year} ${auctionData.make} ${auctionData.model}` 
+        : auctionData.vehicle || "Vehicle",
+      bidderName: acceptedBid.bidder_display_name || "Bidder",
+      bidderEmail: acceptedBid.bidder_email,
+      bidAmount: acceptedBid.amount
+    };
+  };
 
   // Ref to track if we've already processed the success to prevent multiple triggers
   const hasProcessedSuccess = useRef(false);
@@ -56,6 +77,7 @@ const BidConfirmationModal = ({
 
   // Handle API call when user confirms action
   const handleConfirmAction = async () => {
+    
     console.log("🚀 handleConfirmAction called:", {
       action,
       isAccept,
@@ -412,6 +434,7 @@ const BidConfirmationModal = ({
 
               {/* Action Buttons */}
               <div className="flex items-center justify-end gap-3 p-6 border-t border-neutral-200 bg-white">
+                  {/* {console.log("auction data", auctionData)} */}
               <button
                 onClick={handleClose}
                 disabled={bidOperationLoading || (showSuccess && !isAccept)}
@@ -453,17 +476,22 @@ const BidConfirmationModal = ({
       </AnimatePresence>
       
       {/* Appointment Modal */}
-      <AppointmentModal
-        isOpen={showAppointmentModal}
-        onClose={handleAppointmentClose}
-        onAppointmentSubmit={handleAppointmentSuccess}
-        dealerName={auctionData?.dealer_name || "Auto Dealer"}
-        dealerId={auctionData?.dealer_id}
-        dealerEmail={auctionData?.dealer_email || "contact@dealer.com"}
-        vehicleInfo={auctionData?.vehicle_info || auctionData?.title || "Vehicle"}
-        title="Schedule Your Appointment"
-        description="Now that your bid has been accepted, let's schedule your appointment to complete the transaction."
-      />
+      {showAppointmentModal && (() => {
+        const acceptedBidData = getAcceptedBidData();
+        return (
+          <AppointmentModal
+            isOpen={showAppointmentModal}
+            onClose={handleAppointmentClose}
+            onAppointmentSubmit={handleAppointmentSuccess}
+            dealerName={acceptedBidData?.dealerName || "Auto Dealer"}
+            dealerId={acceptedBidData?.dealerId}
+            dealerEmail={acceptedBidData?.dealerEmail || "contact@dealer.com"}
+            vehicleInfo={acceptedBidData?.vehicleInfo || "Vehicle"}
+            title="Schedule Your Appointment"
+            description={`Now that your bid of ${acceptedBidData?.bidAmount ? formatCurrency(parseFloat(acceptedBidData.bidAmount)) : 'N/A'} has been accepted by ${acceptedBidData?.dealerName || 'the dealer'}, let's schedule your appointment to complete the transaction.`}
+          />
+        );
+      })()}
     </>
   );
 };
