@@ -109,7 +109,7 @@ export default function ReviewPage() {
               
               <div className="flex items-center justify-center gap-4 sm:gap-6 text-sm sm:text-lg text-slate-600 mb-6 sm:mb-8">
                 <div className="flex items-center gap-2">
-                  <span>Mileage: {vehicleDetails.mileage || vehicleDetails.mileage_km || 'N/A'} km</span>
+                  <span>Mileage: {vehicleDetails.mileage || vehicleDetails.mileage_km || 'N/A'}</span>
                 </div>
               </div>
             </div>

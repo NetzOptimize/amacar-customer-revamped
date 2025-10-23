@@ -123,7 +123,7 @@ useEffect(() => {
         placeholder: "Select color",
         Icon: Droplet,
         type: "select",
-        options: ["Black", "Beige", "Brown", "Gray", "White"],
+        options: ["Black", "Beige", "Brown", "Gray", "White", "Red"],
       },
       {
         key: "bodyType",
@@ -551,11 +551,7 @@ useEffect(() => {
                                   }`}
                                 />
                                
-                                {key === "mileage" && (
-                                  <p className="text-xs text-slate-500 mt-1">
-                                    Average: {vehicleDetails.averagemileage ? Number(vehicleDetails.averagemileage) + ' km' : 'N/A'}
-                                  </p>
-                                )}
+                               
                                 
                               </div>
                             )}

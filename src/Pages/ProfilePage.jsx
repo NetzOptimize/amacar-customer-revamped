@@ -43,6 +43,7 @@ const ProfilePage = () => {
   // Get 2FA status from user data
   const isTwoFactorEnabled = user?.two_fa === 'enabled' || user?.two_fa === true || user?.two_fa === 1;
 
+  
   // Load user data from Redux state
   useEffect(() => {
     console.log("profile page user data: ", user);

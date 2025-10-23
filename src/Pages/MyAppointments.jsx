@@ -3,13 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Clock, MapPin, Phone, Video, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown, ChevronDown, RefreshCw, Eye } from 'lucide-react';
 import { formatDate, formatTimeRemaining } from '../lib/utils';
-import { fetchAppointments, selectAppointments, selectOffersLoading, selectOffersError, cancelAppointment } from '../redux/slices/offersSlice';
+import { fetchAppointments, selectAppointments, selectOffersLoading, selectOffersError, cancelAppointment, confirmAppointment } from '../redux/slices/offersSlice';
 import MyAppointmentsSkeleton from '../components/skeletons/MyAppointmentsSkeleton';
 import MyAppointmentsSortingSkeleton from '../components/skeletons/MyAppointmentsSortingSkeleton';
 import LoadMore from '../components/ui/load-more';
 import useLoadMore from '../hooks/useLoadMore';
 import AppointmentDetailsModal from '../components/ui/AppointmentDetailsModal';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const MyAppointments = () => {
   const dispatch = useDispatch();
@@ -173,6 +174,33 @@ const MyAppointments = () => {
     }
   };
 
+  // Handle confirm appointment
+  const handleConfirmAppointment = async (appointment) => {
+    try {
+      setIsProcessing(true);
+      setProcessingAction('confirm');
+      
+      const response = await dispatch(confirmAppointment({
+        appointmentId: appointment.id
+      }));
+
+      if (confirmAppointment.fulfilled.match(response)) {
+        toast.success('Appointment confirmed successfully!');
+        // Refresh appointments list
+        await fetchAppointments();
+        handleCloseDetailsModal();
+      } else {
+        throw new Error(response.payload || 'Failed to confirm appointment');
+      }
+    } catch (error) {
+      console.error('Error confirming appointment:', error);
+      toast.error(error.message || 'Failed to confirm appointment');
+    } finally {
+      setIsProcessing(false);
+      setProcessingAction('');
+    }
+  };
+
   // Handle status filter selection with loading animation
   const handleStatusFilter = (value) => {
     if (value === statusFilter) return;
@@ -333,6 +361,7 @@ const MyAppointments = () => {
 
   return (
     <div className="lg:mt-16 min-h-screen bg-gradient-hero px-4 sm:px-6 lg:px-8 py-8 sm:py-6 lg:py-8">
+    {/* {console.log("filteredAndSortedAppointments", filteredAndSortedAppointments)} */}
       <div className="max-w-8xl mx-auto">
         <motion.div
           variants={containerVariants}
@@ -735,6 +764,7 @@ const MyAppointments = () => {
         onClose={handleCloseDetailsModal}
         appointment={selectedAppointment}
         onCancel={handleCancel}
+        onConfirm={handleConfirmAppointment}
         onReschedule={handleReschedule}
         onCall={handleCall}
         onJoin={handleJoin}

@@ -1063,7 +1063,7 @@ export default function ConditionAssessment() {
                             {vehicleDetails?.mileage
                               ? Number(
                                   vehicleDetails.mileage
-                                ).toLocaleString() + " km"
+                                ).toLocaleString()
                               : "N/A"}
                           </span>
                         </div>
