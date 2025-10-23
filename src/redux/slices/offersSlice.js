@@ -20,7 +20,7 @@ export const fetchPreviousOffers = createAsyncThunk(
           "Failed to fetch previous offers"
       );
     }
-  }
+  } 
 );
 
 // Async thunk to fetch pending offers
