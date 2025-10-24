@@ -136,11 +136,11 @@ export default function AuctionSelectionModal({
         Major: 600, // $600 Less
       },
       features: {
-        Navigation: -150, // Add $150
-        Leather: -150, // Add $150
-        Sunroof: -150, // Add $150
-        "Alloy Wheels": -170, // Add $170
-        "Premium Audio": -180, // Add $180
+        Navigation: -100, // Add $100
+        Leather: -100, // Add $100
+        Sunroof: -100, // Add $100
+        "Alloy Wheels": -100, // Add $100
+        "Premium Audio": -100, // Add $100
         "None of the above": 0,
       },
       modifications: {

@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { useDispatch, useSelector } from "react-redux";
 import { cancelAppointment, selectAppointmentOperationLoading, selectAppointmentOperationError, selectAppointmentOperationSuccess } from "@/redux/slices/offersSlice";
+import toast from "react-hot-toast";
 
 export default function CancelAppointmentModal({
   isOpen,
@@ -73,7 +74,6 @@ export default function CancelAppointmentModal({
       }));
       
       if (response.payload && response.payload.success) {
-        setPhase("success");
         // Call the parent callback if provided
         if (onConfirmCancel) {
           await onConfirmCancel(appointment, notes.trim());

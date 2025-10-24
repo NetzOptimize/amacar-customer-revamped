@@ -20,7 +20,7 @@ export const fetchPreviousOffers = createAsyncThunk(
           "Failed to fetch previous offers"
       );
     }
-  } 
+  }
 );
 
 // Async thunk to fetch pending offers
@@ -209,7 +209,7 @@ export const confirmAppointment = createAsyncThunk(
   "appointments/confirmAppointment",
   async (confirmData, { rejectWithValue }) => {
     try {
-      const response = await api.post("/appointments/update-status", {
+      const response = await api.post("/appointment/update-status", {
         appointment_id: confirmData.appointmentId,
         status: "confirmed",
       });
@@ -687,10 +687,13 @@ const offersSlice = createSlice({
         const cancelledAppointment = action.payload.appointment;
         if (cancelledAppointment) {
           const index = state.appointments.findIndex(
-            (apt) => apt.id === cancelledAppointment.id
+            (apt) => apt.id === cancelledAppointment.id || apt.id === cancelledAppointment.id.toString()
           );
           if (index !== -1) {
             state.appointments[index] = cancelledAppointment;
+          } else {
+            // If appointment not found in existing list, add it
+            state.appointments.push(cancelledAppointment);
           }
         }
       })
@@ -714,10 +717,13 @@ const offersSlice = createSlice({
         const rescheduledAppointment = action.payload.appointment;
         if (rescheduledAppointment) {
           const index = state.appointments.findIndex(
-            (apt) => apt.id === rescheduledAppointment.id
+            (apt) => apt.id === rescheduledAppointment.id || apt.id === rescheduledAppointment.id.toString()
           );
           if (index !== -1) {
             state.appointments[index] = rescheduledAppointment;
+          } else {
+            // If appointment not found in existing list, add it
+            state.appointments.push(rescheduledAppointment);
           }
         }
       })
@@ -836,7 +842,17 @@ const offersSlice = createSlice({
             (apt) => apt.id === confirmedAppointment.id
           );
           if (index !== -1) {
-            state.appointments[index] = confirmedAppointment;
+            state.appointments[index] = {
+              ...state.appointments[index],
+              ...confirmedAppointment,
+              status: confirmedAppointment.status,
+              formatted_start_time: confirmedAppointment.formatted_start_time,
+              can_reschedule: confirmedAppointment.can_reschedule,
+              can_cancel: confirmedAppointment.can_cancel,
+            };
+          } else {
+            // If appointment not found in list, add it
+            state.appointments.push(confirmedAppointment);
           }
         }
       })

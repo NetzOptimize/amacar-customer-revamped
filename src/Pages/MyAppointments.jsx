@@ -164,8 +164,8 @@ const MyAppointments = () => {
 
       if (response.payload && response.payload.success) {
         console.log('Appointment cancelled successfully:', response.payload);
+        toast.success("appointment cancelled successfully")
         // Refresh appointments list
-        dispatch(fetchAppointments());
       } else {
         console.error('Failed to cancel appointment:', response.payload?.message);
       }
@@ -187,7 +187,7 @@ const MyAppointments = () => {
       if (confirmAppointment.fulfilled.match(response)) {
         toast.success('Appointment confirmed successfully!');
         // Refresh appointments list
-        await fetchAppointments();
+        await dispatch(fetchAppointments());
         handleCloseDetailsModal();
       } else {
         throw new Error(response.payload || 'Failed to confirm appointment');

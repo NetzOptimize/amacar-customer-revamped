@@ -29,6 +29,8 @@ import {
 } from "@/components/ui/dialog";
 import CancelAppointmentModal from "./CancelAppointmentModal";
 import AppointmentModal from "./AppointmentModal";
+import { fetchAppointments } from "@/redux/slices/offersSlice";
+import { useDispatch } from "react-redux";
 
 export default function AppointmentDetailsModal({
   isOpen,
@@ -45,6 +47,7 @@ export default function AppointmentDetailsModal({
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isCancelProcessing, setIsCancelProcessing] = useState(false);
   const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false);
+  const dispatch = useDispatch();
 
   // Handle modal close
   const handleClose = (open) => {
@@ -98,6 +101,7 @@ export default function AppointmentDetailsModal({
       // Close both modals after successful cancellation
       setIsCancelModalOpen(false);
       onClose(false);
+      dispatch(fetchAppointments());
     } catch (error) {
       console.error("Error cancelling appointment:", error);
     } finally {
@@ -314,10 +318,17 @@ export default function AppointmentDetailsModal({
               {/* Notes Section */}
               {appointment.notes && (
                 <div className="bg-slate-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-slate-100">
-                  <h4 className="text-xs sm:text-sm font-semibold text-slate-800 mb-2 flex items-center gap-2">
-                    <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
-                    Cancel Note
-                  </h4>
+                  {appointment.status == "cancelled" ? (
+                    <h4 className="text-xs sm:text-sm font-semibold text-slate-800 mb-2 flex items-center gap-2">
+                      <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
+                      Cancel Notes
+                    </h4>
+                  ) : (
+                    <h4 className="text-xs sm:text-sm font-semibold text-slate-800 mb-2 flex items-center gap-2">
+                      <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
+                      Notes
+                    </h4>
+                  )}
                   <p className="text-xs sm:text-sm text-slate-700">
                     {appointment.notes}
                   </p>
@@ -522,6 +533,7 @@ export default function AppointmentDetailsModal({
       <AppointmentModal
         isOpen={isRescheduleModalOpen}
         onClose={handleRescheduleModalClose}
+        onParentClose={handleClose}
         dealerName={appointment?.dealer_name}
         dealerId={appointment?.dealer_id || appointment?.dealerId}
         dealerEmail={appointment?.dealer_email}

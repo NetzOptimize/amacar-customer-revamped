@@ -23,11 +23,13 @@ import {
 } from "@/components/ui/dialog";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { useSelector, useDispatch } from "react-redux";
-import { createAppointments, rescheduleAppointment } from "@/redux/slices/offersSlice";
+import { createAppointments, fetchAppointments, rescheduleAppointment } from "@/redux/slices/offersSlice";
+import { useNavigate } from "react-router-dom";
 
 export default function AppointmentModal({
   isOpen,
   onClose,
+  onParentClose,
   dealerName = "Premium Auto Dealer",
   dealerId,
   dealerEmail = "contact@premiumauto.com",
@@ -51,6 +53,7 @@ export default function AppointmentModal({
   const calendarRef = useRef(null);
   const dispatch = useDispatch();
   const {acceptedOffers, appointmentOperationLoading} = useSelector(state => state.offers);
+  const navigate = useNavigate();
   const {user} = useSelector(state => state.user);
 
 
@@ -171,7 +174,7 @@ export default function AppointmentModal({
     
     try {
       // Format date as YYYY-MM-DD
-      const formattedDate = selectedDate.toISOString().split('T')[0];
+      const formattedDate = selectedDate.toLocaleDateString('en-CA');
       // Format time as HH:mm
       const formattedTime = selectedTime.padStart(5, '0');
       
@@ -189,6 +192,12 @@ export default function AppointmentModal({
         };
         
         response = await dispatch(rescheduleAppointment(reschedulePayload));
+        if(response.payload.success) {
+          onParentClose(false);
+          setTimeout(async () => {
+            await dispatch(fetchAppointments());
+          }, 1000);
+        }
         console.log("reschedule response", response);
       } else {
         // Create new appointment
@@ -223,6 +232,9 @@ export default function AppointmentModal({
           setAppointmentData(appointmentCopy);
         }
         setPhase("success");
+        setTimeout(() => {
+          navigate('/appointments');
+        }, 1000);
       } else if (response.payload && !response.payload.success) {
         // Error cases (400, 403)
         const errorMessage = response.payload.message || "Something went wrong. Please try again.";
