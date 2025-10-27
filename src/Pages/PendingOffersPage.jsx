@@ -724,8 +724,8 @@ const PendingOffersPage = () => {
                     {/* Action Buttons */}
                     <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
-                        <button 
-                          onClick={() => navigate('/car-details', { state: { productId: offer.id } })} 
+                        <button
+                          onClick={() => navigate('/car-details', { state: { productId: offer.id } })}
                           className="cursor-pointer btn-ghost flex items-center justify-center space-x-2 px-3 py-2 text-xs sm:text-sm"
                         >
                           <Eye className="w-3 h-3 sm:w-4 sm:h-4" />

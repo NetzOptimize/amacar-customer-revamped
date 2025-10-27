@@ -173,28 +173,35 @@ const BidConfirmationModal = ({
       console.log("✅ Processing success for the first time");
       hasProcessedSuccess.current = true;
 
+      // Store the original action before any re-renders can change it
+      const currentAction = actionRef.current;
+      const currentIsAccept = isAcceptRef.current;
+
       // Don't show success state, just show toast
       setHasShownToast(true);
 
-      if (actionRef.current) {
-        toast.success(`Bid ${actionRef.current}ed successfully!`);
-        console.log(`🍞 Toast shown: Bid ${actionRef.current}ed successfully!`);
+      if (currentAction) {
+        toast.success(`Bid ${currentAction}ed successfully!`);
+        console.log(`🍞 Toast shown: Bid ${currentAction}ed successfully!`);
       }
 
       // Call onSuccess to let parent know operation completed (but not for accepted bids that will show appointment modal)
-      if (onSuccess && !isAcceptRef.current) {
+      if (onSuccess && !currentIsAccept) {
         console.log("📞 Calling onSuccess callback for non-accept actions");
         onSuccess();
-      } else if (isAcceptRef.current) {
+      } else if (currentIsAccept) {
         console.log("📞 Skipping onSuccess for accepted bid - will call after appointment modal");
       }
 
       // If bid was accepted, open appointment modal immediately
-      if (isAcceptRef.current) {
+      if (currentIsAccept) {
         console.log("📅 Opening appointment modal immediately");
         console.log("📅 Current bidData:", bidData);
         console.log("📅 Current auctionData:", auctionData);
-        setShowAppointmentModal(true);
+        setTimeout(() => {
+          setShowAppointmentModal(true);
+          console.log("📅 Show appointment modal", showAppointmentModal);
+        }, 2000);
         // Don't close the main modal - let it stay open to show the appointment modal
       } else {
         // // For rejected bids, auto-close modal after a short delay
@@ -220,22 +227,31 @@ const BidConfirmationModal = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bidOperationSuccess]);
 
+  // Track previous isOpen to detect when it changes from false to true
+  const prevIsOpenRef = useRef(isOpen);
+
   // Reset success state when modal opens
   useEffect(() => {
-    // Only reset states when modal is first opened (not when appointment modal is open)
-    if (isOpen && !hasProcessedSuccess.current && !showAppointmentModal) {
+    // Only reset states when modal transitions from closed to open
+    // Never reset if appointment modal is already showing or success was processed
+    const isOpening = isOpen && !prevIsOpenRef.current;
+
+    if (isOpening && !hasProcessedSuccess.current && !showAppointmentModal) {
       setShowSuccess(false);
       setLocalError(null);
       setHasShownToast(false);
-      setShowAppointmentModal(false);
-      hasProcessedSuccess.current = false; // Reset the ref
-      // Reset the action refs
+      setTimeout(() => {
+        setShowAppointmentModal(true);
+        console.log("📅 Show appointment modal", showAppointmentModal);
+      }, 2000);
+      // Reset the action refs only on fresh open
       actionRef.current = action;
       isAcceptRef.current = action === "accept";
     }
-    // Only depend on isOpen and showAppointmentModal - action is handled by refs
+
+    prevIsOpenRef.current = isOpen;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, showAppointmentModal]);
+  }, [isOpen]);
 
   // Reset states when both modals are completely closed
   useEffect(() => {
@@ -300,8 +316,9 @@ const BidConfirmationModal = ({
     return null;
   }
 
-  // If appointment modal is open, always render (even if main modal is closed)
-  const shouldRenderMainModal = isOpen || showAppointmentModal;
+  // If appointment modal is open, don't render the confirmation modal backdrop
+  // Only render it if the main modal is open AND the appointment modal is not showing
+  const shouldRenderMainModal = isOpen && !showAppointmentModal;
 
   const getModalConfig = () => {
     // Cash offers cannot be accepted or rejected through this modal
@@ -421,6 +438,7 @@ const BidConfirmationModal = ({
                   </div>
                 </motion.div>
               )}
+              {console.log("actionTyepo", action)}
 
               {/* Bid Details */}
               <div className="p-6 bg-neutral-50">
@@ -507,7 +525,7 @@ const BidConfirmationModal = ({
           dealerEmail={appointmentModalData.dealerEmail || "contact@dealer.com"}
           vehicleInfo={appointmentModalData.vehicleInfo || "Vehicle"}
           title="Schedule Your Appointment"
-          description={`Now that your bid of ${appointmentModalData.bidAmount ? formatCurrency(parseFloat(appointmentModalData.bidAmount)) : 'N/A'} has been accepted by ${appointmentModalData.dealerName || 'the dealer'}, let's schedule your appointment to complete the transaction.`}
+          description={`Now that your bid of ${appointmentModalData.bidAmount ? formatCurrency(parseFloat(appointmentModalData.bidAmount)) : 'N/A'} has been accepted , let's schedule your appointment to complete the transaction.`}
         />
       )}
     </>

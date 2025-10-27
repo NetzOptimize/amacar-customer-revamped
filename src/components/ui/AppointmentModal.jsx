@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Loader2, 
-  CheckCircle2, 
-  Calendar, 
-  Clock, 
-  User, 
-  Mail, 
-  Car, 
-  Sparkles, 
+import {
+  Loader2,
+  CheckCircle2,
+  Calendar,
+  Clock,
+  User,
+  Mail,
+  Car,
+  Sparkles,
   XCircle,
   ChevronDown,
   FileText,
@@ -52,15 +52,15 @@ export default function AppointmentModal({
   const [appointmentData, setAppointmentData] = useState(null);
   const calendarRef = useRef(null);
   const dispatch = useDispatch();
-  const {acceptedOffers, appointmentOperationLoading} = useSelector(state => state.offers);
+  const { acceptedOffers, appointmentOperationLoading } = useSelector(state => state.offers);
   const navigate = useNavigate();
-  const {user} = useSelector(state => state.user);
+  const { user } = useSelector(state => state.user);
 
 
   // Simplified time slots (hourly only)
   const timeSlots = [
-    "9:00", "10:00", "11:00", "12:00", 
-    "13:00", "14:00", "15:00", "16:00", 
+    "9:00", "10:00", "11:00", "12:00",
+    "13:00", "14:00", "15:00", "16:00",
     "17:00", "18:00"
   ];
 
@@ -91,7 +91,7 @@ export default function AppointmentModal({
   // Disable past dates - ensure we're working with today's date properly
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
+
   // Function to check if a date is before today
   const isDateDisabled = (date) => {
     const dateToCheck = new Date(date);
@@ -109,14 +109,14 @@ export default function AppointmentModal({
     setShowCalendar(false);
     setErrorMessage("");
     setAppointmentData(null);
-    
+
     // Pre-populate form for reschedule mode
     if (isReschedule && appointmentToReschedule) {
       // Parse the existing appointment date and time
       if (appointmentToReschedule.start_time && appointmentToReschedule.start_time !== "0000-00-00 00:00:00") {
         const appointmentDate = new Date(appointmentToReschedule.start_time);
         setSelectedDate(appointmentDate);
-        
+
         // Extract time from start_time
         const timeString = appointmentToReschedule.start_time.split(' ')[1];
         if (timeString) {
@@ -124,7 +124,7 @@ export default function AppointmentModal({
           setSelectedTime(`${hours}:${minutes}`);
         }
       }
-      
+
       // Pre-populate notes if available
       if (appointmentToReschedule.notes) {
         setNotes(appointmentToReschedule.notes);
@@ -135,30 +135,30 @@ export default function AppointmentModal({
   // Validation
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!selectedDate) {
       newErrors.date = "Please select a date";
     }
-    
+
     if (!selectedTime) {
       newErrors.time = "Please select a time";
     }
-    
+
     // For reschedule mode, check if the new time is at least 2 hours from now
     if (isReschedule && selectedDate && selectedTime) {
       const now = new Date();
       const selectedDateTime = new Date(selectedDate);
       const [hours, minutes] = selectedTime.split(':');
       selectedDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-      
+
       const timeDifference = selectedDateTime.getTime() - now.getTime();
       const hoursDifference = timeDifference / (1000 * 60 * 60);
-      
+
       if (hoursDifference < 2 && hoursDifference > 0) {
         newErrors.time = "Appointment must be scheduled at least 2 hours from now";
       }
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -166,23 +166,23 @@ export default function AppointmentModal({
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setPhase("loading");
     setErrorMessage("");
-    
+
     try {
       // Format date as YYYY-MM-DD
       const formattedDate = selectedDate.toLocaleDateString('en-CA');
       // Format time as HH:mm
       const formattedTime = selectedTime.padStart(5, '0');
-      
+
       // Merge into one string
       const start_time = `${formattedDate} ${formattedTime}:00`;
-      
+
       let response;
-      
+
       if (isReschedule && appointmentToReschedule) {
         // Reschedule existing appointment
         const reschedulePayload = {
@@ -190,9 +190,9 @@ export default function AppointmentModal({
           start_time: start_time,
           notes: notes.trim()
         };
-        
+
         response = await dispatch(rescheduleAppointment(reschedulePayload));
-        if(response.payload.success) {
+        if (response.payload.success) {
           onParentClose(false);
           setTimeout(async () => {
             await dispatch(fetchAppointments());
@@ -207,18 +207,18 @@ export default function AppointmentModal({
           start_time: start_time,
           notes: notes.trim()
         };
-        
+
         response = await dispatch(createAppointments(appointmentPayload));
         console.log("create response", response);
       }
-      
+
       if (response.payload && response.payload.success) {
         // Success case (201) - Handle invalid date formatting
         const appointment = response.payload.appointment;
         if (appointment) {
           // Create a copy of the appointment object to avoid read-only property error
           const appointmentCopy = { ...appointment };
-          
+
           // Fix invalid date formatting
           if (appointmentCopy.start_time === "0000-00-00 00:00:00" || appointmentCopy.formatted_start_time?.includes("-0001")) {
             // Use the selected date and time for display
@@ -238,10 +238,10 @@ export default function AppointmentModal({
       } else if (response.payload && !response.payload.success) {
         // Error cases (400, 403)
         const errorMessage = response.payload.message || "Something went wrong. Please try again.";
-        
+
         // Log the full error response for debugging
         console.log("Appointment error response:", response.payload);
-        
+
         // Handle specific error cases
         if (errorMessage.includes("Cannot reschedule appointment") && errorMessage.includes("hours")) {
           // Too late to reschedule error
@@ -256,14 +256,14 @@ export default function AppointmentModal({
           // Generic error
           setErrorMessage(errorMessage);
         }
-        
+
         setPhase("failed");
       } else {
         // Unexpected response format
         setErrorMessage("Something went wrong. Please try again.");
         setPhase("failed");
       }
-      
+
     } catch (error) {
       console.error("Appointment operation error:", error);
       setErrorMessage("Network error. Please check your connection and try again.");
@@ -313,7 +313,8 @@ export default function AppointmentModal({
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
-        className="sm:max-w-[800px] w-full max-h-[90vh] sm:max-h-[85vh] rounded-2xl shadow-2xl p-0 overflow-y-auto overflow-x-hidden bg-white border-0 "
+        className="sm:max-w-[800px] w-full max-h-[90vh] sm:max-h-[85vh] rounded-2xl shadow-2xl p-0 overflow-y-auto overflow-x-hidden bg-white border-0 !z-[100]"
+        style={{ zIndex: 100 }}
         showCloseButton={!isCloseDisabled}
       >
         <div className="flex flex-col h-full">
@@ -384,8 +385,8 @@ export default function AppointmentModal({
                     </div>
                   </div>
 
-                   {/* Selected Appointment Summary - Mobile: Below details, Desktop: Side by side */}
-                   {selectedDate && selectedTime && (
+                  {/* Selected Appointment Summary - Mobile: Below details, Desktop: Side by side */}
+                  {selectedDate && selectedTime && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -433,38 +434,38 @@ export default function AppointmentModal({
                             className="absolute z-50 mt-2 bg-white rounded-lg border border-slate-200 shadow-lg p-2 sm:p-4 w-full max-w-[calc(100vw-0.5rem)] sm:max-w-none left-0 right-0"
                           >
                             <div className="w-full text-center">
-                                <CalendarComponent
+                              <CalendarComponent
                                 mode="single"
                                 selected={selectedDate}
                                 onSelect={(date) => {
-                                    setSelectedDate(date);
-                                    setShowCalendar(false);
+                                  setSelectedDate(date);
+                                  setShowCalendar(false);
                                 }}
                                 disabled={isDateDisabled}
                                 className="rounded-lg w-full"
                                 classNames={{
-                                    months: "flex flex-col space-y-4",
-                                    month: "space-y-4",
-                                    caption: "flex justify-center pt-1 relative items-center",
-                                    caption_label: "text-sm font-medium",
-                                    nav: "space-x-1 flex items-center",
-                                    nav_button: "h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100",
-                                    nav_button_previous: "absolute left-1",
-                                    nav_button_next: "absolute right-1",
-                                    table: "w-full border-collapse space-y-1",
-                                    head_row: "flex",
-                                    head_cell: "text-slate-500 rounded-md w-9 font-normal text-[0.8rem] flex items-center justify-center",
-                                    row: "flex w-full mt-1",
-                                    cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-orange-500 [&:has([aria-selected])]:text-white first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-slate-100 rounded-md ",
-                                    day_selected: "bg-orange-500 text-white hover:bg-orange-600 hover:text-white focus:bg-orange-500 focus:text-white",
-                                    day_today: "bg-orange-100 text-orange-700 font-semibold",
-                                    day_outside: "text-slate-300 opacity-50",
-                                    day_disabled: "text-slate-300 opacity-50",
-                                    day_range_middle: "aria-selected:bg-orange-100 aria-selected:text-orange-700",
-                                    day_hidden: "invisible",
+                                  months: "flex flex-col space-y-4",
+                                  month: "space-y-4",
+                                  caption: "flex justify-center pt-1 relative items-center",
+                                  caption_label: "text-sm font-medium",
+                                  nav: "space-x-1 flex items-center",
+                                  nav_button: "h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100",
+                                  nav_button_previous: "absolute left-1",
+                                  nav_button_next: "absolute right-1",
+                                  table: "w-full border-collapse space-y-1",
+                                  head_row: "flex",
+                                  head_cell: "text-slate-500 rounded-md w-9 font-normal text-[0.8rem] flex items-center justify-center",
+                                  row: "flex w-full mt-1",
+                                  cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-orange-500 [&:has([aria-selected])]:text-white first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+                                  day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-slate-100 rounded-md ",
+                                  day_selected: "bg-orange-500 text-white hover:bg-orange-600 hover:text-white focus:bg-orange-500 focus:text-white",
+                                  day_today: "bg-orange-100 text-orange-700 font-semibold",
+                                  day_outside: "text-slate-300 opacity-50",
+                                  day_disabled: "text-slate-300 opacity-50",
+                                  day_range_middle: "aria-selected:bg-orange-100 aria-selected:text-orange-700",
+                                  day_hidden: "invisible",
                                 }}
-                                />
+                              />
                             </div>
                           </motion.div>
                         )}
@@ -492,11 +493,10 @@ export default function AppointmentModal({
                             key={time}
                             type="button"
                             onClick={() => setSelectedTime(time)}
-                            className={`cursor-pointer h-8 sm:h-10 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 ${
-                              selectedTime === time
-                                ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25'
-                                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                            }`}
+                            className={`cursor-pointer h-8 sm:h-10 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 ${selectedTime === time
+                              ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25'
+                              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                              }`}
                           >
                             {time}
                           </button>
@@ -531,7 +531,7 @@ export default function AppointmentModal({
                     />
                   </div>
 
-                 
+
 
                   {/* Submit Button */}
                   <div className="pt-1 sm:pt-2">
@@ -679,13 +679,13 @@ export default function AppointmentModal({
                     {errorMessage && (
                       <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-xs sm:text-sm w-full max-w-sm sm:max-w-md">
                         <p className="text-orange-800 font-medium break-words text-center sm:text-left">
-                          {errorMessage.includes("Cannot reschedule appointment") && errorMessage.includes("hours") ? 
+                          {errorMessage.includes("Cannot reschedule appointment") && errorMessage.includes("hours") ?
                             "⏰ Tip: You can only reschedule appointments at least 2 hours before the scheduled time." :
                             errorMessage.includes("already have an appointment scheduled") || errorMessage.includes("You already have an appointment scheduled") ?
-                            "💡 Tip: You already have an appointment with this dealer. Please choose a different date or contact the dealer to modify your existing appointment." :
-                            errorMessage.includes("not authorized") ?
-                            "🔒 Tip: You don't have permission to reschedule this appointment. Contact support if this is an error." :
-                            "💡 Tip: Please check your input and try again, or contact support if the issue persists."
+                              "💡 Tip: You already have an appointment with this dealer. Please choose a different date or contact the dealer to modify your existing appointment." :
+                              errorMessage.includes("not authorized") ?
+                                "🔒 Tip: You don't have permission to reschedule this appointment. Contact support if this is an error." :
+                                "💡 Tip: Please check your input and try again, or contact support if the issue persists."
                           }
                         </p>
                       </div>

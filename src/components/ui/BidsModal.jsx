@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, DollarSign, CheckCircle, XCircle } from "lucide-react";
 import { formatCurrency } from "../../lib/utils";
 import BidConfirmationModal from "./BidConfirmationModal";
+import AppointmentModal from "./AppointmentModal";
+import { clearBidOperationStates } from "@/redux/slices/offersSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const BidsModal = ({
   isOpen,
@@ -14,7 +17,55 @@ const BidsModal = ({
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [selectedBid, setSelectedBid] = useState(null);
   const [actionType, setActionType] = useState(null);
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
+  const [acceptedBidData, setAcceptedBidData] = useState(null);
+  const hasOpenedAppointmentModal = useRef(false);
+  const dispatch = useDispatch();
+  const bidOperationLoading = useSelector(
+    (state) => state.offers.bidOperationLoading
+  );
+  const bidOperationSuccess = useSelector(
+    (state) => state.offers.bidOperationSuccess
+  );
 
+  // Reset the ref when modal closes or action changes
+  useEffect(() => {
+    if (!isOpen) {
+      hasOpenedAppointmentModal.current = false;
+    }
+    if (actionType !== "accept") {
+      hasOpenedAppointmentModal.current = false;
+    }
+  }, [isOpen, actionType]);
+
+  // Handle bid acceptance success - open appointment modal
+  useEffect(() => {
+    if (
+      bidOperationSuccess &&
+      actionType === "accept" &&
+      selectedBid &&
+      !showAppointmentModal &&
+      !hasOpenedAppointmentModal.current
+    ) {
+      // Get the accepted bid data
+      const bidData = {
+        dealerName: selectedBid.bidder_display_name || "Auto Dealer",
+        dealerId: selectedBid.bidder_id,
+        dealerEmail: selectedBid.bidder_email || "contact@dealer.com",
+        vehicleInfo: auctionData.year && auctionData.make && auctionData.model
+          ? `${auctionData.year} ${auctionData.make} ${auctionData.model}`
+          : auctionData.vehicle || "Vehicle",
+        bidderName: selectedBid.bidder_display_name || "Bidder",
+        bidderEmail: selectedBid.bidder_email,
+        bidAmount: selectedBid.amount
+      };
+      setAcceptedBidData(bidData);
+      setShowAppointmentModal(true);
+      hasOpenedAppointmentModal.current = true;
+    }
+  }, [bidOperationSuccess, actionType, selectedBid, auctionData]);
+
+  // Early return after all hooks
   if (!isOpen || !auctionData) return null;
 
   const handleAcceptBid = (bid) => {
@@ -37,10 +88,18 @@ const BidsModal = ({
     }
   };
 
+
+
   const handleCloseConfirmationModal = () => {
-    setIsConfirmationModalOpen(false);
-    setSelectedBid(null);
-    setActionType(null);
+    if (!bidOperationLoading) {
+      setIsConfirmationModalOpen(false);
+      setSelectedBid(null);
+      // Only clear bid operation states for rejected bids
+      // For accepted bids, let BidConfirmationModal handle the appointment flow
+      if (actionType === "reject") {
+        dispatch(clearBidOperationStates());
+      }
+    }
   };
 
   const handleConfirmationSuccess = () => {
@@ -49,6 +108,7 @@ const BidsModal = ({
     if (actionType === "accept") {
       // Don't close the BidsModal immediately for accepted bids
       // The appointment modal will be shown by BidConfirmationModal
+      // Keep it in the background
       return;
     }
 
@@ -57,6 +117,30 @@ const BidsModal = ({
     setSelectedBid(null);
     setActionType(null);
     onClose(); // Close the parent BidsModal
+  };
+
+  // Handle appointment modal close
+  const handleAppointmentClose = () => {
+    setShowAppointmentModal(false);
+    setAcceptedBidData(null);
+    // Close the BidsModal and clear states
+    dispatch(clearBidOperationStates());
+    setIsConfirmationModalOpen(false);
+    setSelectedBid(null);
+    setActionType(null);
+    onClose();
+  };
+
+  // Handle appointment submission success
+  const handleAppointmentSuccess = () => {
+    setShowAppointmentModal(false);
+    setAcceptedBidData(null);
+    // Close all modals and clear states
+    dispatch(clearBidOperationStates());
+    setIsConfirmationModalOpen(false);
+    setSelectedBid(null);
+    setActionType(null);
+    onClose();
   };
 
   return (
@@ -68,15 +152,27 @@ const BidsModal = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto"
-          onClick={onClose}
+          onClick={(e) => {
+            // Don't close if confirmation modal or appointment modal is open
+            if (isConfirmationModalOpen || showAppointmentModal) {
+              e.stopPropagation();
+              return;
+            }
+            onClose();
+          }}
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
+            animate={{
+              opacity: showAppointmentModal ? 0 : 1,
+              scale: showAppointmentModal ? 0.95 : 1,
+              y: 0
+            }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
             className="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] min-h-[60vh] sm:min-h-[50vh] flex flex-col overflow-hidden"
             onClick={(e) => e.stopPropagation()}
+            style={{ pointerEvents: showAppointmentModal ? 'none' : 'auto' }}
           >
             {/* Modal Header */}
             <div className="flex items-start sm:items-center justify-between p-3 sm:p-4 lg:p-6 border-b border-neutral-200 flex-shrink-0">
@@ -92,9 +188,13 @@ const BidsModal = ({
                 </p>
               </div>
               <button
-                onClick={onClose}
+                onClick={() => {
+                  if (!showAppointmentModal) {
+                    onClose();
+                  }
+                }}
                 className="p-2 hover:bg-neutral-100 rounded-lg transition-colors flex-shrink-0"
-                disabled={isLoading}
+                disabled={isLoading || showAppointmentModal}
               >
                 <X className="w-5 h-5 sm:w-6 sm:h-6 text-neutral-500" />
               </button>
@@ -270,8 +370,12 @@ const BidsModal = ({
             {/* Modal Footer */}
             <div className="flex items-center justify-end gap-3 p-3 sm:p-4 lg:p-6 border-t border-neutral-200 bg-neutral-50 flex-shrink-0">
               <button
-                onClick={onClose}
-                disabled={isLoading}
+                onClick={() => {
+                  if (!showAppointmentModal) {
+                    onClose();
+                  }
+                }}
+                disabled={isLoading || showAppointmentModal}
                 className="cursor-pointer btn-ghost disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base px-3 sm:px-4 py-2"
               >
                 Close
@@ -290,6 +394,22 @@ const BidsModal = ({
         auctionData={auctionData}
         onSuccess={handleConfirmationSuccess}
       />
+
+      {/* Appointment Modal */}
+      {showAppointmentModal && acceptedBidData && (
+        <AppointmentModal
+          key="appointment-modal"
+          isOpen={showAppointmentModal}
+          onClose={handleAppointmentClose}
+          onAppointmentSubmit={handleAppointmentSuccess}
+          dealerName={acceptedBidData.dealerName || "Auto Dealer"}
+          dealerId={acceptedBidData.dealerId}
+          dealerEmail={acceptedBidData.dealerEmail || "contact@dealer.com"}
+          vehicleInfo={acceptedBidData.vehicleInfo || "Vehicle"}
+          title="Schedule Your Appointment"
+          description={`Now that your bid of ${acceptedBidData.bidAmount ? formatCurrency(parseFloat(acceptedBidData.bidAmount)) : 'N/A'} has been accepted, let's schedule your appointment to complete the transaction.`}
+        />
+      )}
     </AnimatePresence>
   );
 };
