@@ -51,7 +51,7 @@ const BidsModal = ({
       // The appointment modal will be shown by BidConfirmationModal
       return;
     }
-    
+
     // For rejected bids, close both modals immediately
     setIsConfirmationModalOpen(false);
     setSelectedBid(null);
@@ -63,6 +63,7 @@ const BidsModal = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
+          key="bids-modal-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -125,22 +126,20 @@ const BidsModal = ({
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className={`bg-neutral-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border ${
-                          index === 0
-                            ? "border-success/30 bg-success/5"
-                            : "border-neutral-200"
-                        }`}
+                        className={`bg-neutral-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border ${index === 0
+                          ? "border-success/30 bg-success/5"
+                          : "border-neutral-200"
+                          }`}
                       >
                         {/* Mobile-first layout */}
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
                           {/* Bidder Info */}
                           <div className="flex items-start sm:items-center gap-3">
                             <div
-                              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                index === 0
-                                  ? "bg-success/20 text-success"
-                                  : "bg-primary-100 text-primary-600"
-                              }`}
+                              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${index === 0
+                                ? "bg-success/20 text-success"
+                                : "bg-primary-100 text-primary-600"
+                                }`}
                             >
                               <span className="font-semibold text-xs sm:text-sm">
                                 {index + 1}
@@ -159,32 +158,30 @@ const BidsModal = ({
                           {/* Bid Amount and Status */}
                           <div className="flex items-center justify-between sm:flex-col sm:items-end gap-2">
                             <div
-                              className={`text-lg sm:text-xl lg:text-2xl font-bold ${
-                                index === 0
-                                  ? "text-success"
-                                  : "text-primary-600"
-                              }`}
+                              className={`text-lg sm:text-xl lg:text-2xl font-bold ${index === 0
+                                ? "text-success"
+                                : "text-primary-600"
+                                }`}
                             >
                               {formatCurrency(parseFloat(bid.amount))}
                             </div>
                             <div
-                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                bid.is_accepted
-                                  ? "bg-success/10 text-success"
-                                  : bid.is_expired
+                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${bid.is_accepted
+                                ? "bg-success/10 text-success"
+                                : bid.is_expired
                                   ? "bg-warning/10 text-warning"
                                   : bid.status === "rejected"
-                                  ? "bg-error/10 text-error"
-                                  : "bg-primary/10 text-primary"
-                              }`}
+                                    ? "bg-error/10 text-error"
+                                    : "bg-primary/10 text-primary"
+                                }`}
                             >
                               {bid.is_accepted
                                 ? "Accepted"
                                 : bid.is_expired
-                                ? "Expired"
-                                : bid.status === "rejected"
-                                ? "Rejected"
-                                : "Pending"}
+                                  ? "Expired"
+                                  : bid.status === "rejected"
+                                    ? "Rejected"
+                                    : "Pending"}
                             </div>
                           </div>
                         </div>

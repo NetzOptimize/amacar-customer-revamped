@@ -34,35 +34,35 @@ const BidConfirmationModal = ({
   const [showSuccess, setShowSuccess] = useState(false);
   const [localError, setLocalError] = useState(null);
   const [hasShownToast, setHasShownToast] = useState(false);
-  
+
   // State for AppointmentModal
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
-  
+
   // Get the accepted bid data for appointment modal
   const getAcceptedBidData = () => {
     if (!bidData || !auctionData) {
       console.log("❌ Missing data:", { bidData, auctionData });
       return null;
     }
-    
+
     console.log("🔍 Looking for bid data:", {
       bidDataId: bidData.id,
       auctionDataBids: auctionData.bids,
       auctionDataKeys: Object.keys(auctionData)
     });
-    
+
     // Find the accepted bid in the auction data
     const acceptedBid = auctionData.bids?.find(bid => bid.id === bidData.id);
     console.log("🎯 Found accepted bid:", acceptedBid);
-    
+
     if (!acceptedBid) return null;
-    
+
     return {
       dealerName: acceptedBid.bidder_display_name || "Auto Dealer",
       dealerId: acceptedBid.bidder_id,
       dealerEmail: acceptedBid.bidder_email || "contact@dealer.com",
-      vehicleInfo: auctionData.year && auctionData.make && auctionData.model 
-        ? `${auctionData.year} ${auctionData.make} ${auctionData.model}` 
+      vehicleInfo: auctionData.year && auctionData.make && auctionData.model
+        ? `${auctionData.year} ${auctionData.make} ${auctionData.model}`
         : auctionData.vehicle || "Vehicle",
       bidderName: acceptedBid.bidder_display_name || "Bidder",
       bidderEmail: acceptedBid.bidder_email,
@@ -72,7 +72,7 @@ const BidConfirmationModal = ({
 
   // Ref to track if we've already processed the success to prevent multiple triggers
   const hasProcessedSuccess = useRef(false);
-  
+
   // Store action and isAccept in refs to prevent them from changing during the flow
   const actionRef = useRef(action);
   const isAcceptRef = useRef(action === "accept");
@@ -88,7 +88,7 @@ const BidConfirmationModal = ({
 
   // Handle API call when user confirms action
   const handleConfirmAction = async () => {
-    
+
     console.log("🚀 handleConfirmAction called:", {
       action,
       isAccept,
@@ -96,7 +96,7 @@ const BidConfirmationModal = ({
       auctionData: auctionData?.id,
       bidData: bidData?.id
     });
-    
+
     if (!auctionData) {
       console.log("❌ No auction data, returning");
       return;
@@ -121,7 +121,7 @@ const BidConfirmationModal = ({
       auctionId: auctionData.id,
       bidId: bidData.id
     });
-    
+
     const bidDataPayload = {
       bidId: bidData.id,
       productId: auctionData.id || auctionData.product_id,
@@ -129,7 +129,7 @@ const BidConfirmationModal = ({
     };
 
     console.log("📦 Bid data payload:", bidDataPayload);
-    
+
     try {
       if (isAccept) {
         console.log("✅ Dispatching acceptBid...");
@@ -161,8 +161,8 @@ const BidConfirmationModal = ({
     console.log("🎯 Success effect triggered:", {
       bidOperationSuccess,
       hasShownToast,
-      isAccept,
-      action,
+      isAcceptRef: isAcceptRef.current,
+      actionRef: actionRef.current,
       showSuccess,
       showAppointmentModal,
       hasProcessedSuccess: hasProcessedSuccess.current
@@ -172,10 +172,10 @@ const BidConfirmationModal = ({
     if (!hasProcessedSuccess.current) {
       console.log("✅ Processing success for the first time");
       hasProcessedSuccess.current = true;
-      
+
       // Don't show success state, just show toast
       setHasShownToast(true);
-      
+
       if (actionRef.current) {
         toast.success(`Bid ${actionRef.current}ed successfully!`);
         console.log(`🍞 Toast shown: Bid ${actionRef.current}ed successfully!`);
@@ -197,26 +197,28 @@ const BidConfirmationModal = ({
         setShowAppointmentModal(true);
         // Don't close the main modal - let it stay open to show the appointment modal
       } else {
-        // For rejected bids, auto-close modal after a short delay
-        console.log("❌ Scheduling modal close for rejected bid in 2 seconds");
-        const timer = setTimeout(() => {
-          console.log("❌ Auto-closing modal for rejected bid");
-          // Clear Redux state after modal closes
-          setTimeout(() => {
-            console.log("🧹 Clearing Redux states");
-            dispatch(clearBidOperationStates());
-          }, 300);
-        }, 2000);
+        // // For rejected bids, auto-close modal after a short delay
+        // console.log("❌ Scheduling modal close for rejected bid in 2 seconds");
+        // const timer = setTimeout(() => {
+        //   console.log("❌ Auto-closing modal for rejected bid");
+        //   // Clear Redux state after modal closes
+        //   setTimeout(() => {
+        //     console.log("🧹 Clearing Redux states");
+        //     dispatch(clearBidOperationStates());
+        //   }, 300);
+        // }, 2000);
 
-        return () => {
-          console.log("🧹 Cleaning up reject timer");
-          clearTimeout(timer);
-        };
+        // return () => {
+        //   console.log("🧹 Cleaning up reject timer");
+        //   clearTimeout(timer);
+        // };
       }
     } else {
       console.log("⏭️ Success already processed, skipping");
     }
-  }, [bidOperationSuccess, action, isAccept, onSuccess, dispatch, hasShownToast, showAppointmentModal, showSuccess, auctionData, bidData]);
+    // Only depend on bidOperationSuccess - remove other dependencies to prevent infinite loops
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bidOperationSuccess]);
 
   // Reset success state when modal opens
   useEffect(() => {
@@ -231,7 +233,9 @@ const BidConfirmationModal = ({
       actionRef.current = action;
       isAcceptRef.current = action === "accept";
     }
-  }, [isOpen, showAppointmentModal, action]);
+    // Only depend on isOpen and showAppointmentModal - action is handled by refs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, showAppointmentModal]);
 
   // Reset states when both modals are completely closed
   useEffect(() => {
@@ -290,7 +294,7 @@ const BidConfirmationModal = ({
   if (!isOpen && !showAppointmentModal) {
     return null;
   }
-  
+
   // Don't render if no bid data and appointment modal is not open
   if (!bidData && !showAppointmentModal) {
     return null;
@@ -344,11 +348,15 @@ const BidConfirmationModal = ({
 
   const IconComponent = config.icon;
 
+  // Get appointment modal data
+  const appointmentModalData = showAppointmentModal ? getAcceptedBidData() : null;
+
   return (
     <>
       <AnimatePresence>
         {shouldRenderMainModal && (
           <motion.div
+            key="bid-confirmation-modal-overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -425,9 +433,8 @@ const BidConfirmationModal = ({
                     </div>
                     <div className="text-right">
                       <div
-                        className={`text-2xl font-bold ${
-                          isAccept ? "text-success" : "text-red-500"
-                        }`}
+                        className={`text-2xl font-bold ${isAccept ? "text-success" : "text-red-500"
+                          }`}
                       >
                         {formatCurrency(parseFloat(bidData.amount))}
                       </div>
@@ -447,12 +454,12 @@ const BidConfirmationModal = ({
 
               {/* Action Buttons */}
               <div className="flex items-center justify-end gap-3 p-6 border-t border-neutral-200 bg-white">
-                  {/* {console.log("auction data", auctionData)} */}
-              <button
-                onClick={handleClose}
-                disabled={bidOperationLoading || (showSuccess && !isAccept)}
-                className="cursor-pointer px-6 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
+                {/* {console.log("auction data", auctionData)} */}
+                <button
+                  onClick={handleClose}
+                  disabled={bidOperationLoading || (showSuccess && !isAccept)}
+                  className="cursor-pointer px-6 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                   {(showSuccess && !isAccept) ? "Close" : config.cancelText}
                 </button>
                 {!(showSuccess && !isAccept) && (
@@ -487,26 +494,22 @@ const BidConfirmationModal = ({
           </motion.div>
         )}
       </AnimatePresence>
-      
+
       {/* Appointment Modal */}
-      {showAppointmentModal && (() => {
-        console.log("🎯 Rendering appointment modal, showAppointmentModal:", showAppointmentModal);
-        const acceptedBidData = getAcceptedBidData();
-        console.log("🎯 Accepted bid data for appointment:", acceptedBidData);
-        return (
-          <AppointmentModal
-            isOpen={showAppointmentModal}
-            onClose={handleAppointmentClose}
-            onAppointmentSubmit={handleAppointmentSuccess}
-            dealerName={acceptedBidData?.dealerName || "Auto Dealer"}
-            dealerId={acceptedBidData?.dealerId}
-            dealerEmail={acceptedBidData?.dealerEmail || "contact@dealer.com"}
-            vehicleInfo={acceptedBidData?.vehicleInfo || "Vehicle"}
-            title="Schedule Your Appointment"
-            description={`Now that your bid of ${acceptedBidData?.bidAmount ? formatCurrency(parseFloat(acceptedBidData.bidAmount)) : 'N/A'} has been accepted by ${acceptedBidData?.dealerName || 'the dealer'}, let's schedule your appointment to complete the transaction.`}
-          />
-        );
-      })()}
+      {showAppointmentModal && appointmentModalData && (
+        <AppointmentModal
+          key="appointment-modal"
+          isOpen={showAppointmentModal}
+          onClose={handleAppointmentClose}
+          onAppointmentSubmit={handleAppointmentSuccess}
+          dealerName={appointmentModalData.dealerName || "Auto Dealer"}
+          dealerId={appointmentModalData.dealerId}
+          dealerEmail={appointmentModalData.dealerEmail || "contact@dealer.com"}
+          vehicleInfo={appointmentModalData.vehicleInfo || "Vehicle"}
+          title="Schedule Your Appointment"
+          description={`Now that your bid of ${appointmentModalData.bidAmount ? formatCurrency(parseFloat(appointmentModalData.bidAmount)) : 'N/A'} has been accepted by ${appointmentModalData.dealerName || 'the dealer'}, let's schedule your appointment to complete the transaction.`}
+        />
+      )}
     </>
   );
 };
