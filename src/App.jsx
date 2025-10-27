@@ -30,6 +30,9 @@ import Testimonials from './Pages/Testimonials.jsx';
 import FAQ from './Pages/FAQ.jsx';
 import ScrollToTop from './components/ui/ScrollToTop.jsx';
 
+
+
+
 function App() {
   const location = useLocation();
   const hideHeaderFooter =
@@ -79,7 +82,7 @@ function App() {
           {!hideHeaderFooter && <Header />}
 
           <main className="pt-0 bg-white">
-          <ScrollToTop />
+            <ScrollToTop />
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<HomePage />} />
