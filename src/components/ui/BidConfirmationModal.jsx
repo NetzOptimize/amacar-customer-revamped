@@ -198,10 +198,7 @@ const BidConfirmationModal = ({
         console.log("📅 Opening appointment modal immediately");
         console.log("📅 Current bidData:", bidData);
         console.log("📅 Current auctionData:", auctionData);
-        setTimeout(() => {
-          setShowAppointmentModal(true);
-          console.log("📅 Show appointment modal", showAppointmentModal);
-        }, 2000);
+
         // Don't close the main modal - let it stay open to show the appointment modal
       } else {
         // // For rejected bids, auto-close modal after a short delay
@@ -240,10 +237,7 @@ const BidConfirmationModal = ({
       setShowSuccess(false);
       setLocalError(null);
       setHasShownToast(false);
-      setTimeout(() => {
-        setShowAppointmentModal(true);
-        console.log("📅 Show appointment modal", showAppointmentModal);
-      }, 2000);
+
       // Reset the action refs only on fresh open
       actionRef.current = action;
       isAcceptRef.current = action === "accept";

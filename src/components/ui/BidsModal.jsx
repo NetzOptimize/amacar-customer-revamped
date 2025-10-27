@@ -387,6 +387,7 @@ const BidsModal = ({
 
       {/* Bid Confirmation Modal */}
       <BidConfirmationModal
+        parentBidOnClose={onClose}
         isOpen={isConfirmationModalOpen}
         onClose={handleCloseConfirmationModal}
         action={actionType}
