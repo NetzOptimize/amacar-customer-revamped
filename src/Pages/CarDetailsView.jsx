@@ -71,8 +71,8 @@ const CarDetailsView = () => {
         console.error("Error fetching vehicle details:", err);
         setError(
           err.response?.data?.message ||
-            err.message ||
-            "Failed to fetch vehicle details"
+          err.message ||
+          "Failed to fetch vehicle details"
         );
       } finally {
         setLoading(false);
@@ -489,11 +489,10 @@ const CarDetailsView = () => {
                         Status
                       </p>
                       <span
-                        className={`px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
-                          auction?.is_active
+                        className={`px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${auction?.is_active
                             ? "bg-green-100 text-green-800"
                             : "bg-gray-100 text-gray-800"
-                        }`}
+                          }`}
                       >
                         {auction?.is_active ? "Active" : "Inactive"}
                       </span>
@@ -638,6 +637,14 @@ const CarDetailsView = () => {
                         </span>
                         <span className="font-semibold text-neutral-800 text-sm sm:text-base">
                           {basic_info?.trim || "N/A"}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-neutral-600 text-xs sm:text-sm">
+                          VIN:
+                        </span>
+                        <span className="font-semibold text-neutral-800 text-sm sm:text-base">
+                          {basic_info?.vin || "N/A"}
                         </span>
                       </div>
                       <div className="flex flex-col gap-1">
@@ -849,9 +856,9 @@ const CarDetailsView = () => {
                           ? Array.isArray(condition_assessment.features)
                             ? condition_assessment.features.join(", ") // normal array
                             : String(condition_assessment.features).replace(
-                                /^a:\d+:\{i:\d+;s:\d+:"([^"]+)";\}$/,
-                                "$1"
-                              ) // serialized PHP string
+                              /^a:\d+:\{i:\d+;s:\d+:"([^"]+)";\}$/,
+                              "$1"
+                            ) // serialized PHP string
                           : "N/A"}
                       </p>
                     </div>
@@ -938,7 +945,7 @@ const CarDetailsView = () => {
                           </span>
                         </div>
 
-                      
+
                       </div>
                     </div>
                   ))}
@@ -961,7 +968,7 @@ const CarDetailsView = () => {
                         <th className="text-left py-3 sm:py-4 px-2 sm:px-4 font-semibold text-neutral-700 text-xs sm:text-sm">
                           Date & Time
                         </th>
-                    
+
                       </tr>
                     </thead>
                     <tbody>
@@ -1003,7 +1010,7 @@ const CarDetailsView = () => {
                               </p>
                             </div>
                           </td>
-                        
+
                         </tr>
                       ))}
                     </tbody>
