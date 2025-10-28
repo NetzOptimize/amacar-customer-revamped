@@ -92,6 +92,7 @@ const PendingOffersPage = () => {
         trim: offer.trim || 'N/A',
         vin: offer.vin || 'N/A',
         mileage: 'N/A', // Not provided in API
+        cashOffer: parseFloat(offer.cash_offer || '0'),
         highestBid: parseFloat(highestBid?.amount || '0'),
         bidCount: activeBids.length,
         timeRemaining: auctionEndTime,
@@ -632,28 +633,32 @@ const PendingOffersPage = () => {
                       </div>
 
                       <div className="flex flex-col sm:flex-col items-start sm:items-end gap-2 sm:gap-0">
-                        {/* Highest Bid or Cash Offer Badge */}
-                        <div className="mb-2">
-                          {(() => {
-                            const hasActiveBids = offer.bidCount > 0;
-                            const cashOfferHigher = offer.cashOffer > offer.highestBid;
-                            const showCashOffer = !hasActiveBids || cashOfferHigher;
+                        {/* Cash Offer and Highest Bid Badges */}
+                        <div className="mb-2 flex gap-2">
+                          {/* Cash Offer Badge */}
+                          {offer.cashOffer > 0 && (
+                            <div className="inline-flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold bg-blue-100 text-blue-800 border border-blue-200">
+                              <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                              <span className="truncate">
+                                Initial Offer: {formatCurrency(offer.cashOffer)}
+                              </span>
+                            </div>
+                          )}
 
-                            return (
-                              <div className={`inline-flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold ${showCashOffer
-                                ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                                : 'bg-green-100 text-green-800 border border-green-200'
-                                }`}>
-                                <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                                <span className="truncate">
-                                  {showCashOffer
-                                    ? `Cash: ${formatCurrency(offer.cashOffer)}`
-                                    : `Highest: ${formatCurrency(offer.highestBid)}`
-                                  }
-                                </span>
-                              </div>
-                            );
-                          })()}
+                          {/* Highest Bid Badge */}
+                          {offer.bidCount > 0 && offer.highestBid > 0 && (
+                            <div className="inline-flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold bg-green-100 text-green-800 border border-green-200">
+                              <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                              <span className="truncate">
+                                Highest: {formatCurrency(offer.highestBid)}
+                                {offer.highestBid > offer.cashOffer && (
+                                  <span className="ml-1 text-green-700 font-bold">
+                                    (+{((offer.highestBid - offer.cashOffer) / offer.cashOffer * 100).toFixed(1)}%)
+                                  </span>
+                                )}
+                              </span>
+                            </div>
+                          )}
                         </div>
 
                         <div className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(offer.status)}`}>
@@ -681,6 +686,12 @@ const PendingOffersPage = () => {
                                   <>
                                     <span className="hidden sm:inline">•</span>
                                     <span className="truncate">{offer.highestBidData.bidder_email}</span>
+                                  </>
+                                )}
+                                {offer.highestBidData?.bidder_phone && (
+                                  <>
+                                    <span className="hidden sm:inline">•</span>
+                                    <span className="truncate">{offer.highestBidData.bidder_phone}</span>
                                   </>
                                 )}
                               </div>
