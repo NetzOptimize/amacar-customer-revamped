@@ -3,13 +3,13 @@ import { motion } from 'framer-motion';
 import { CheckCircle, Gavel, Car as CarIcon, Calendar as CalendarIcon, DollarSign as DollarIcon, TrendingUp, Clock, Car, GavelIcon } from 'lucide-react';
 import CountUp from 'react-countup';
 
-const StatsCards = ({ 
-  data, 
-  loading = false, 
+const StatsCards = ({
+  data,
+  loading = false,
   className = "",
   showAcceptedOffers = true,
   showActiveAuctions = true,
-  showTotalVehicles = true,
+  showAppraisedVehicles = true,
   showUpcomingAppointments = true,
   showTotalBidValue = true
 }) => {
@@ -17,7 +17,7 @@ const StatsCards = ({
   const stats = {
     acceptedOffers: data?.accepted_offers || 0,
     activeAuctions: data?.active_auctions || 0,
-    totalVehicles: data?.total_vehicles || 0,
+    appraisedVehicles: data?.appraised_vehicles || 0,
     upcomingAppointments: data?.upcoming_appointments || 0,
     totalOffers: data?.total_offers || 0,
   };
@@ -69,15 +69,15 @@ const StatsCards = ({
       subIcon: Clock
     },
     {
-      key: 'totalVehicles',
-      show: showTotalVehicles,
-      title: 'Total Vehicles',
-      value: stats.totalVehicles,
+      key: 'appraisedVehicles',
+      show: showAppraisedVehicles,
+      title: 'Appraised Vehicles',
+      value: stats.appraisedVehicles,
       icon: CarIcon,
       iconBg: 'bg-blue-100',
       iconColor: 'text-blue-600',
       textColor: 'text-blue-600',
-      description: 'In your fleet',
+      description: 'Total vehicles appraised',
       subIcon: Car
     },
     {
@@ -141,7 +141,7 @@ const StatsCards = ({
       {visibleCards.map((card) => {
         const IconComponent = card.icon;
         const SubIconComponent = card.subIcon;
-        
+
         return (
           <motion.div key={card.key} variants={itemVariants} className="bg-white rounded-xl p-6 shadow-sm border border-neutral-200 hover:shadow-md transition-all duration-300">
             <div className="flex items-start justify-between mb-4">
@@ -151,11 +151,11 @@ const StatsCards = ({
               <div className="text-right">
                 <div className="text-2xl lg:text-3xl font-bold text-neutral-800">
                   {card.isCurrency ? (
-                    <CountUp 
-                      end={card.value} 
-                      duration={1} 
-                      prefix="$" 
-                      separator="," 
+                    <CountUp
+                      end={card.value}
+                      duration={1}
+                      prefix="$"
+                      separator=","
                     />
                   ) : (
                     <CountUp end={card.value} duration={1} />
