@@ -13,6 +13,7 @@ import { Link } from "react-router-dom"
 import { useSelector } from "react-redux"
 import LoginModal from "@/components/ui/LoginModal"
 // import { AuthContext } from "@/contexts/AuthContext"
+import SearchModule from "@/features/reverseBidding/components/SearchModule"
 
 
 export default function Hero() {
@@ -67,25 +68,28 @@ export default function Hero() {
           Get top offers on your used car in minutes—without the usual hassle.
         </motion.p>
 
-        <motion.div className="hero-ctas " variants={fadeUp} custom={0.4}>
-         
+        <motion.div className="space-y-4 w-full max-w-3xl" variants={fadeUp} custom={0.4}>
+          <SearchModule />
+          <div className="hero-ctas ">
+
             <button className="cursor-pointer text-left btn-white" onClick={(e) => {
               e.preventDefault()
               setOpen(true)
             }}>
-            Get Your Instant Offer
-          </button>
-          {
-            !user ? <button
-            onClick={(e) => {
-              e.preventDefault()
-              setAuctionOpen(true)
-            }}
-            className="cursor-pointer sm:text-left sm:justify-left sm:align-left btn-purple"
-          >
-            Auction Your Ride
-          </button  > : <Link to={'/dashboard'} className="cursor-pointer btn-purple">Dashboard</Link>
-          }
+              Get Your Instant Offer
+            </button>
+            {
+              !user ? <button
+                onClick={(e) => {
+                  e.preventDefault()
+                  setAuctionOpen(true)
+                }}
+                className="cursor-pointer sm:text-left sm:justify-left sm:align-left btn-purple"
+              >
+                Auction Your Ride
+              </button  > : <Link to={'/dashboard'} className="cursor-pointer btn-purple">Dashboard</Link>
+            }
+          </div>
         </motion.div>
       </motion.div>
 
@@ -95,12 +99,12 @@ export default function Hero() {
         onClose={setAuctionOpen}
       />
 
-        <LoginModal
-          isOpen={loginModalOpen}
-          onClose={() => setLoginModalOpen(false)}
-          onForgotPassword={handleForgotPassword}
-          onRegister={handleRegister}
-        />
+      <LoginModal
+        isOpen={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onForgotPassword={handleForgotPassword}
+        onRegister={handleRegister}
+      />
 
       {/* 🔹 Reusable Modal */}
       <Modal

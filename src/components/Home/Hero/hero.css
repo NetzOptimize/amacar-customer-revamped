@@ -15,7 +15,7 @@
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(27, 27, 27, 0.12); /* extra subtle overlay */
+    background: rgba(15, 15, 15, 0.10); /* slightly lighter for clearer image */
     z-index: 1;
 }
 
@@ -65,20 +65,22 @@
 }
 
 .btn-white {
-    background: #fff;
-    color: #394da1;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    background: rgba(255,255,255,0.14);
+    color: #ffffff;
+    border: 1px solid rgba(255,255,255,0.25);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
 }
 
 .btn-white:hover {
-    background: #f3f3f3;
-    transform: scale(1.05);
+    background: rgba(255,255,255,0.22);
+    transform: translateY(-1px);
 }
 
 .btn-purple {
-    background: var(--brand-purple);
-    color: #fff;
-    box-shadow: 0 8px 24px rgba(38, 81, 220, 0.3);
+    background: rgba(255,255,255,0.10);
+    color: #ffffff;
+    border: 1px solid rgba(255,255,255,0.22);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.10);
     text-align: left;
     display: flex;
     align-items: center;
@@ -86,8 +88,8 @@
 }
 
 .btn-purple:hover {
-    background: black;
-    transform: scale(1.05);
+    background: rgba(255,255,255,0.18);
+    transform: translateY(-1px);
 }
 
 /* Mobile tweaks */

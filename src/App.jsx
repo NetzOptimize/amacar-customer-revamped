@@ -29,6 +29,8 @@ import CookiesPolicy from './Pages/CookiesPolicy.jsx';
 import Testimonials from './Pages/Testimonials.jsx';
 import FAQ from './Pages/FAQ.jsx';
 import ScrollToTop from './components/ui/ScrollToTop.jsx';
+import ResultsPage from '@/features/reverseBidding/pages/ResultsPage.jsx';
+import SessionPage from '@/features/reverseBidding/pages/SessionPage.jsx';
 
 
 
@@ -86,6 +88,8 @@ function App() {
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<HomePage />} />
+              <Route path="/reverse-bidding/results" element={<ResultsPage />} />
+              <Route path="/reverse-bidding/session/:sessionId" element={<SessionPage />} />
               <Route path="/auction-page" element={<AuctionPage />} />
               <Route path="/condition-assessment" element={<ConditionAssessment />} />
               <Route path="/local-auction" element={<ExteriorPhotos />} />
