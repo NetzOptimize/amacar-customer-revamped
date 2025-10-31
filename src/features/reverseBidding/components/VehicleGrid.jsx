@@ -23,7 +23,7 @@ import {
     PaginationEllipsis,
 } from '../../../components/ui/pagination';
 
-export default function VehicleGrid({ cars }) {
+export default function VehicleGrid({ cars, showFilters = true }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { loading, pagination, filters } = useSelector((s) => s.reverseBid);
@@ -224,29 +224,33 @@ export default function VehicleGrid({ cars }) {
 
     return (
         <>
-            <div className="flex flex-col lg:flex-row gap-0">
+            <div className={`flex flex-col ${showFilters ? 'lg:flex-row gap-0' : ''}`}>
                 {/* Filter Sidebar - Desktop */}
-                <div className="hidden lg:block lg:flex-shrink-0">
-                    <FilterSidebar cars={cars} />
-                </div>
+                {showFilters && (
+                    <div className="hidden lg:block lg:flex-shrink-0">
+                        <FilterSidebar cars={cars} />
+                    </div>
+                )}
 
                 {/* Vehicle Grid */}
-                <div className="flex-1 lg:pl-6">
+                <div className={`${showFilters ? 'flex-1 lg:pl-6' : 'w-full'}`}>
                     {/* Mobile Filter Button */}
-                    <div className="lg:hidden mb-4 flex items-center justify-between">
-                        <button
-                            onClick={() => setDrawerOpen(true)}
-                            className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-sm font-semibold shadow-lg transition-all duration-200 hover:shadow-xl"
-                        >
-                            <Filter className="w-4 h-4" />
-                            Filters
-                            {cars.length > 0 && (
-                                <span className="ml-1 px-2 py-0.5 rounded-full bg-white/20 text-xs font-bold">
-                                    {cars.length}
-                                </span>
-                            )}
-                        </button>
-                    </div>
+                    {showFilters && (
+                        <div className="lg:hidden mb-4 flex items-center justify-between">
+                            <button
+                                onClick={() => setDrawerOpen(true)}
+                                className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-sm font-semibold shadow-lg transition-all duration-200 hover:shadow-xl"
+                            >
+                                <Filter className="w-4 h-4" />
+                                Filters
+                                {cars.length > 0 && (
+                                    <span className="ml-1 px-2 py-0.5 rounded-full bg-white/20 text-xs font-bold">
+                                        {cars.length}
+                                    </span>
+                                )}
+                            </button>
+                        </div>
+                    )}
 
                     {!cars?.length ? (
                         <div className="text-center py-16">
@@ -255,7 +259,7 @@ export default function VehicleGrid({ cars }) {
                         </div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2 gap-6">
+                            <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${showFilters ? 'lg:grid-cols-2' : 'lg:grid-cols-3'}`}>
                                 {cars.map((c) => (
                                     <VehicleCard key={c.id} car={c} onStart={handleStart} loading={loading.session} />
                                 ))}
@@ -278,25 +282,27 @@ export default function VehicleGrid({ cars }) {
             </div>
 
             {/* Mobile Filter Drawer */}
-            <Drawer open={drawerOpen} onOpenChange={setDrawerOpen} direction="left">
-                <DrawerContent className="h-full max-h-[100vh] w-full max-w-sm rounded-r-2xl rounded-l-none backdrop-blur-xl bg-white/95 border-l border-white/30">
-                    <DrawerHeader className="flex-shrink-0 p-6 pb-4 border-b border-white/20 bg-gradient-to-b from-white/60 to-white/40 backdrop-blur-sm">
-                        <div className="flex items-center justify-between">
-                            <DrawerTitle className="flex items-center gap-2 text-lg font-bold text-neutral-900">
-                                <Filter className="w-4 h-4 text-orange-500" />
-                                Filters
-                            </DrawerTitle>
-                            <DrawerClose className="cursor-pointer p-2 rounded-lg hover:bg-white/60 backdrop-blur-sm transition-colors border border-white/30 hover:border-orange-400/50">
-                                <X className="w-4 h-4 text-neutral-600" />
-                            </DrawerClose>
+            {showFilters && (
+                <Drawer open={drawerOpen} onOpenChange={setDrawerOpen} direction="left">
+                    <DrawerContent className="h-full max-h-[100vh] w-full max-w-sm rounded-r-2xl rounded-l-none backdrop-blur-xl bg-white/95 border-l border-white/30">
+                        <DrawerHeader className="flex-shrink-0 p-6 pb-4 border-b border-white/20 bg-gradient-to-b from-white/60 to-white/40 backdrop-blur-sm">
+                            <div className="flex items-center justify-between">
+                                <DrawerTitle className="flex items-center gap-2 text-lg font-bold text-neutral-900">
+                                    <Filter className="w-4 h-4 text-orange-500" />
+                                    Filters
+                                </DrawerTitle>
+                                <DrawerClose className="cursor-pointer p-2 rounded-lg hover:bg-white/60 backdrop-blur-sm transition-colors border border-white/30 hover:border-orange-400/50">
+                                    <X className="w-4 h-4 text-neutral-600" />
+                                </DrawerClose>
+                            </div>
+                            <div className="text-sm text-orange-600 font-semibold mt-1">{cars.length} matches</div>
+                        </DrawerHeader>
+                        <div className="flex-1 overflow-y-auto">
+                            <FilterContent cars={cars} />
                         </div>
-                        <div className="text-sm text-orange-600 font-semibold mt-1">{cars.length} matches</div>
-                    </DrawerHeader>
-                    <div className="flex-1 overflow-y-auto">
-                        <FilterContent cars={cars} />
-                    </div>
-                </DrawerContent>
-            </Drawer>
+                    </DrawerContent>
+                </Drawer>
+            )}
         </>
     );
 }

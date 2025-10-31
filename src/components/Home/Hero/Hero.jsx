@@ -13,7 +13,6 @@ import { Link } from "react-router-dom"
 import { useSelector } from "react-redux"
 import LoginModal from "@/components/ui/LoginModal"
 // import { AuthContext } from "@/contexts/AuthContext"
-import SearchModule from "@/features/reverseBidding/components/SearchModule"
 
 
 export default function Hero() {
@@ -69,7 +68,6 @@ export default function Hero() {
         </motion.p>
 
         <motion.div className="space-y-4 w-full max-w-3xl" variants={fadeUp} custom={0.4}>
-          <SearchModule />
           <div className="hero-ctas ">
 
             <button className="cursor-pointer text-left btn-white" onClick={(e) => {

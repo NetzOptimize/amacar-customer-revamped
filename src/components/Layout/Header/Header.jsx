@@ -91,6 +91,14 @@ export default function Header() {
               </Link>
               <Link
                 className={`nav-link ${
+                  isActive("/reverse-bidding") ? "active" : ""
+                }`}
+                to="/reverse-bidding"
+              >
+                Reverse Bidding
+              </Link>
+              <Link
+                className={`nav-link ${
                   isActive("/testimonials") ? "active" : ""
                 }`}
                 to="/testimonials"
@@ -155,6 +163,15 @@ export default function Header() {
                 onClick={() => setOpen(false)}
               >
                 Home
+              </Link>
+              <Link
+                className={`nav-link-mobile ${
+                  isActive("/reverse-bidding") ? "active" : ""
+                }`}
+                to="/reverse-bidding"
+                onClick={() => setOpen(false)}
+              >
+                Reverse Bidding
               </Link>
               <Link
                 className={`nav-link-mobile ${
