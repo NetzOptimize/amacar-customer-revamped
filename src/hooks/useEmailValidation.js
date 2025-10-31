@@ -34,12 +34,12 @@ const useEmailValidation = (email, isRegisterMode, shouldReset = false) => {
     try {
       const response = await api.post('/user/check-email', { email: emailToCheck });
       console.log('📡 [EmailValidation] API response received:', response.data);
-      
+
       if (!response.data.success) {
         console.warn('⚠️ [EmailValidation] API returned success: false');
         throw new Error('Failed to check email availability');
       }
-      
+
       const data = await response.data;
       const isRegistered = data.user_id !== false;
       console.log('✅ [EmailValidation] Email registration status:', isRegistered);
@@ -52,10 +52,10 @@ const useEmailValidation = (email, isRegisterMode, shouldReset = false) => {
 
   const checkDisposableEmail = useCallback(async (emailToCheck) => {
     console.log('🚀 [EmailValidation] Starting validation process for:', emailToCheck);
-    console.log('📋 [EmailValidation] Validation context:', { 
-      emailToCheck, 
-      isRegisterMode, 
-      isEmailFormatValid 
+    console.log('📋 [EmailValidation] Validation context:', {
+      emailToCheck,
+      isRegisterMode,
+      isEmailFormatValid
     });
 
     if (!emailToCheck || !isEmailFormatValid) {
@@ -86,16 +86,16 @@ const useEmailValidation = (email, isRegisterMode, shouldReset = false) => {
 
       console.log('🌐 [EmailValidation] Checking disposable email via debounce.io');
       const response = await fetch(`https://disposable.debounce.io/?email=${encodeURIComponent(emailToCheck)}`);
-      
+
       if (!response.ok) {
         throw new Error('Failed to validate email');
       }
 
       const data = await response.json();
       const isDisposable = data.disposable === 'true';
-      console.log('📊 [EmailValidation] Disposable check result:', { 
-        isDisposable, 
-        rawData: data 
+      console.log('📊 [EmailValidation] Disposable check result:', {
+        isDisposable,
+        rawData: data
       });
 
       // If email is disposable, stop here and show error
@@ -115,7 +115,7 @@ const useEmailValidation = (email, isRegisterMode, shouldReset = false) => {
       // If not disposable, check email registration status
       console.log('✅ [EmailValidation] Email is not disposable - checking registration status');
       const isRegistered = await checkEmailAvailability(emailToCheck);
-      
+
       // Determine validation result based on mode
       let isValid;
       if (isRegisterMode) {
@@ -127,14 +127,14 @@ const useEmailValidation = (email, isRegisterMode, shouldReset = false) => {
         isValid = isRegistered;
         console.log('🎯 [EmailValidation] Login mode - email can be used for login:', isValid);
       }
-      
+
       console.log('🎯 [EmailValidation] Final validation result:', {
         isDisposable: false,
         isRegistered,
         isRegisterMode,
         isValid
       });
-      
+
       setValidationState({
         isValidating: false,
         isDisposable: false,
@@ -157,12 +157,12 @@ const useEmailValidation = (email, isRegisterMode, shouldReset = false) => {
   }, [isRegisterMode, isEmailFormatValid, checkEmailAvailability]);
 
   useEffect(() => {
-    console.log('🔄 [EmailValidation] useEffect triggered with:', { 
-      email, 
-      isRegisterMode, 
-      isEmailFormatValid 
+    console.log('🔄 [EmailValidation] useEffect triggered with:', {
+      email,
+      isRegisterMode,
+      isEmailFormatValid
     });
-    
+
     const timeoutId = setTimeout(() => {
       if (email && isEmailFormatValid) {
         console.log('🎯 [EmailValidation] Starting validation after debounce');
@@ -190,9 +190,6 @@ const useEmailValidation = (email, isRegisterMode, shouldReset = false) => {
   }, [email, isRegisterMode, isEmailFormatValid, checkDisposableEmail]);
 
   // Debug final validation state
-  useEffect(() => {
-    console.log('📊 [EmailValidation] Current validation state:', validationState);
-  }, [validationState]);
 
   return validationState;
 };

@@ -24,6 +24,7 @@ export default function SearchModule({ onSearch: customOnSearch, showResults = f
         budgetMin: filters.budgetMin ? String(filters.budgetMin) : '',
         budgetMax: filters.budgetMax ? String(filters.budgetMax) : '',
     });
+    const [isSearching, setIsSearching] = useState(false); // Local loading state for button only
 
     // Fetch filters on component mount
     useEffect(() => {
@@ -50,21 +51,28 @@ export default function SearchModule({ onSearch: customOnSearch, showResults = f
 
     // All filters are optional - search can be performed with any combination
     const onSearch = async () => {
-        const filtersToDispatch = {
-            make: local.make || null,
-            model: local.model || null,
-            year: local.year || null,
-            budgetMin: local.budgetMin ? Number(local.budgetMin) : null,
-            budgetMax: local.budgetMax ? Number(local.budgetMax) : null,
-        };
-        dispatch(setFilters(filtersToDispatch));
-        await dispatch(fetchMockCarsThunk({ filters: filtersToDispatch, page: 1, perPage: 20 }));
+        setIsSearching(true);
+        try {
+            const filtersToDispatch = {
+                make: local.make || null,
+                model: local.model || null,
+                year: local.year || null,
+                budgetMin: local.budgetMin ? Number(local.budgetMin) : null,
+                budgetMax: local.budgetMax ? Number(local.budgetMax) : null,
+            };
+            dispatch(setFilters(filtersToDispatch));
+            // Don't await the fetch, let it happen in background
+            dispatch(fetchMockCarsThunk({ filters: filtersToDispatch, page: 1, perPage: 20 }));
 
-        // If custom search handler is provided, use it; otherwise navigate
-        if (customOnSearch) {
-            customOnSearch(filtersToDispatch);
-        } else {
-            navigate('/reverse-bidding/results');
+            // If custom search handler is provided, use it; otherwise navigate
+            if (customOnSearch) {
+                customOnSearch(filtersToDispatch);
+            } else {
+                navigate('/reverse-bidding/results');
+            }
+        } finally {
+            // Reset button loading state quickly, vehicles will continue loading below
+            setTimeout(() => setIsSearching(false), 300);
         }
     };
 
@@ -176,10 +184,10 @@ export default function SearchModule({ onSearch: customOnSearch, showResults = f
             <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <Button
                     onClick={onSearch}
-                    disabled={loading.search}
+                    disabled={isSearching}
                     className="inline-flex w-full sm:w-auto items-center justify-center rounded-lg bg-orange-500 hover:bg-orange-500/90 text-white px-4 py-2 text-sm font-semibold shadow disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                    {loading.search ? 'Searching…' : 'Search →'}
+                    {isSearching ? 'Searching…' : 'Search →'}
                 </Button>
                 <span className="text-neutral-600 text-xs">
                     {(local.year || 'Year')} • {(local.make || 'Make')} • {(local.model || 'Model')} • {local.budgetMin ? `$${local.budgetMin}` : 'Min'} - {local.budgetMax ? `$${local.budgetMax}` : 'Max'}

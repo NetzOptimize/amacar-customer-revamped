@@ -54,7 +54,7 @@ export const fetchMockCarsThunk = createAsyncThunk(
             }
 
             // Default radius is 50 (as per API docs)
-            params.radius = 50;
+            params.radius = 500;
 
             // Add pagination parameters
             params.page = page;
@@ -133,7 +133,7 @@ export const startReverseBiddingThunk = createAsyncThunk(
                     price: carData.price || filters.budgetMin || filters.budgetMax || null,
                     new_used: filters.condition === 'used' ? 'U' : 'N',
                     zip_code: filters.zipCode || carData.zip_code || '',
-                    radius: 50, // Default radius
+                    radius: 500, // Default radius
                 },
                 duration_hours: 4,
             };
