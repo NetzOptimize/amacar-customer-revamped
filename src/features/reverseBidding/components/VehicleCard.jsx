@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
+import 'photoswipe/dist/photoswipe.css';
+import { Gallery, Item } from 'react-photoswipe-gallery';
 import ReverseBiddingConfirmDialog from './ReverseBiddingConfirmDialog';
 import LoginModal from '../../../components/ui/LoginModal';
 
@@ -13,22 +15,45 @@ export default function VehicleCard({ car, onStart, loading = false }) {
 
     const { user } = useSelector((state) => state.user);
     const isLoggedIn = !!user;
-    // Get the primary image or first available image
-    // Handle both new API structure (objects with url/thumbnail) and old structure (array of strings)
-    let imageUrl = '';
-    if (car.images?.length) {
-        const primaryImage = car.images.find(img => img?.is_primary) || car.images[0];
-        if (typeof primaryImage === 'string') {
-            // Old structure: array of strings
-            imageUrl = primaryImage;
-        } else if (primaryImage?.url) {
-            // New structure: object with url
-            imageUrl = primaryImage.url;
-        } else if (primaryImage?.thumbnail) {
-            // New structure: object with thumbnail
-            imageUrl = primaryImage.thumbnail;
-        }
-    }
+
+    // Prepare images array for PhotoSwipe
+    const images = useMemo(() => {
+        if (!car.images?.length) return [];
+
+        return car.images.map((img, index) => {
+            let url = '';
+            let thumbnail = '';
+
+            if (typeof img === 'string') {
+                // Old structure: array of strings
+                url = img;
+                thumbnail = img;
+            } else if (img?.url) {
+                // New structure: object with url (full resolution)
+                url = img.url;
+                thumbnail = img.thumbnail || img.url;
+            } else if (img?.thumbnail) {
+                // New structure: object with thumbnail only
+                thumbnail = img.thumbnail;
+                url = img.url || img.thumbnail;
+            }
+
+            return {
+                src: url, // Full resolution image URL
+                thumbnail: thumbnail || url, // Thumbnail URL, fallback to full URL
+                width: img.width || 1200,
+                height: img.height || 800,
+                alt: car.title || `${car.year} ${car.make} ${car.model} - Image ${index + 1}`,
+                isPrimary: img?.is_primary || index === 0, // Track primary image
+            };
+        });
+    }, [car.images, car.title, car.year, car.make, car.model]);
+
+    // Get the primary image (marked as primary or first image)
+    const primaryImage = images.find(img => img.isPrimary) || images[0];
+    // Always use full resolution image (src) for display, not thumbnail
+    const imageUrl = primaryImage?.src || '';
+    const imageCount = images.length;
 
     // Determine condition badge - handle both new_used (U/N) and condition (new/used)
     const conditionValue = car.new_used || car.condition || 'new';
@@ -87,38 +112,65 @@ export default function VehicleCard({ car, onStart, loading = false }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
         >
-            <div className="relative h-56 overflow-hidden bg-neutral-100">
-                {imageUrl ? (
-                    <img
-                        src={imageUrl}
-                        alt={car.title || `${car.year} ${car.make} ${car.model}`}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-neutral-200 text-neutral-400">
-                        <span>No Image</span>
+            <Gallery>
+                <div className="relative h-56 overflow-hidden bg-neutral-100">
+                    {imageUrl && images.length > 0 ? (
+                        <>
+                            {/* Render all images but only show the first one */}
+                            {images.map((image, index) => (
+                                <Item
+                                    key={`gallery-${index}`}
+                                    original={image.src}
+                                    thumbnail={image.thumbnail || image.src}
+                                    width={image.width}
+                                    height={image.height}
+                                    alt={image.alt}
+                                >
+                                    {({ ref, open }) => (
+                                        <img
+                                            ref={ref}
+                                            onClick={open}
+                                            src={index === 0 ? image.src : image.thumbnail || image.src}
+                                            alt={image.alt}
+                                            className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 cursor-pointer ${index === 0 ? 'block' : 'hidden'}`}
+                                            loading={index === 0 ? 'eager' : 'lazy'}
+                                        />
+                                    )}
+                                </Item>
+                            ))}
+                        </>
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-neutral-200 text-neutral-400">
+                            <span>No Image</span>
+                        </div>
+                    )}
+                    {/* Heart/Save Button - Top Left */}
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsSaved(!isSaved);
+                            // TODO: Implement save vehicle functionality
+                        }}
+                        className={`absolute top-4 left-4 p-2 rounded-full backdrop-blur-md transition-all duration-200 hover:scale-110 z-10 ${isSaved
+                            ? 'bg-red-500/90 text-white shadow-lg'
+                            : 'bg-white/90 text-neutral-700 hover:bg-red-50 hover:text-red-600 shadow-md'
+                            }`}
+                        aria-label={isSaved ? 'Remove from saved' : 'Save vehicle'}
+                    >
+                        <Heart className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
+                    </button>
+                    {/* Condition Badge - Top Right */}
+                    <div className={`absolute top-4 right-4 px-2 py-1 rounded-md text-xs font-medium backdrop-blur-md text-white z-10 ${conditionColor}`}>
+                        {conditionBadge}
                     </div>
-                )}
-                {/* Heart/Save Button - Top Left */}
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setIsSaved(!isSaved);
-                        // TODO: Implement save vehicle functionality
-                    }}
-                    className={`absolute top-4 left-4 p-2 rounded-full backdrop-blur-md transition-all duration-200 hover:scale-110 ${isSaved
-                        ? 'bg-red-500/90 text-white shadow-lg'
-                        : 'bg-white/90 text-neutral-700 hover:bg-red-50 hover:text-red-600 shadow-md'
-                        }`}
-                    aria-label={isSaved ? 'Remove from saved' : 'Save vehicle'}
-                >
-                    <Heart className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
-                </button>
-                {/* Condition Badge - Top Right */}
-                <div className={`absolute top-4 right-4 px-2 py-1 rounded-md text-xs font-medium backdrop-blur-md text-white ${conditionColor}`}>
-                    {conditionBadge}
+                    {/* Image Count Badge - Bottom Right */}
+                    {imageCount > 0 && (
+                        <div className="absolute bottom-4 right-4 px-2.5 py-1 rounded-md text-xs font-semibold backdrop-blur-md bg-black/60 text-white z-10 pointer-events-none">
+                            {`1/${imageCount}`}
+                        </div>
+                    )}
                 </div>
-            </div>
+            </Gallery>
             <div className="p-5 space-y-3">
                 <h3 className="text-lg font-semibold tracking-tight truncate">
                     {car.year} {car.make} {car.model}
