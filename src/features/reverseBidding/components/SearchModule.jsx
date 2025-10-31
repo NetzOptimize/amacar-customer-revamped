@@ -36,6 +36,7 @@ export default function SearchModule() {
         Nissan: ['Sentra', 'Altima', 'Rogue'],
         Hyundai: ['Elantra', 'Sonata', 'Tucson'],
         Kia: ['Forte', 'Optima', 'Sportage'],
+        Mazda: ['CX-30', 'CX-5', '3', '6'],
     };
 
     const makes = Object.keys(makeToModels);
@@ -45,16 +46,17 @@ export default function SearchModule() {
         return local.make ? makeToModels[local.make] || [] : [];
     }, [local.make]);
 
-    const valid = useMemo(() => !!(local.make && local.model && local.year), [local]);
-
+    // All filters are optional - search can be performed with any combination
     const onSearch = async () => {
         const filtersToDispatch = {
-            ...local,
+            make: local.make || null,
+            model: local.model || null,
+            year: local.year || null,
             budgetMin: local.budgetMin ? Number(local.budgetMin) : null,
             budgetMax: local.budgetMax ? Number(local.budgetMax) : null,
         };
         dispatch(setFilters(filtersToDispatch));
-        await dispatch(fetchMockCarsThunk(filtersToDispatch));
+        await dispatch(fetchMockCarsThunk({ filters: filtersToDispatch, page: 1, perPage: 20 }));
         navigate('/reverse-bidding/results');
     };
 
@@ -96,10 +98,9 @@ export default function SearchModule() {
                 <Select
                     value={local.model}
                     onValueChange={(value) => setLocal((prev) => ({ ...prev, model: value }))}
-                    disabled={!local.make}
                 >
-                    <SelectTrigger className="bg-white/5 border-white/15 text-white disabled:opacity-40 h-10 w-full">
-                        <SelectValue placeholder={local.make ? 'Model' : 'Select Make'} />
+                    <SelectTrigger className="bg-white/5 border-white/15 text-white h-10 w-full">
+                        <SelectValue placeholder="Model" />
                     </SelectTrigger>
                     <SelectContent className="bg-neutral-900 text-white border-white/10">
                         {modelsForSelectedMake.map((model) => (
@@ -154,7 +155,7 @@ export default function SearchModule() {
             <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <Button
                     onClick={onSearch}
-                    disabled={!valid || loading.search}
+                    disabled={loading.search}
                     className="inline-flex w-full sm:w-auto items-center justify-center rounded-lg bg-orange-500 hover:bg-orange-500/90 text-white px-4 py-2 text-sm font-semibold shadow disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                     {loading.search ? 'Searching…' : 'Search →'}

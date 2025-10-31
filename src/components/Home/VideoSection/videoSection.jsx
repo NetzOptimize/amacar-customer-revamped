@@ -46,7 +46,7 @@ export default function VideoSection() {
         </p>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="cursor-pointer btn-purple mt-4 block mx-auto md:mx-0"
+          className="btn-primary mt-2"
         >
           See your car value
         </button>

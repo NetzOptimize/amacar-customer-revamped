@@ -6,7 +6,7 @@ const generateSessionId = () => `RB-${Math.random().toString(36).slice(2, 9)}`;
 
 export const fetchMockCarsThunk = createAsyncThunk(
     'reverseBid/fetchCars',
-    async (filters, { rejectWithValue, getState }) => {
+    async ({ filters, page = 1, perPage = 20 }, { rejectWithValue, getState }) => {
         try {
             // Build query parameters for the API
             const params = {};
@@ -34,11 +34,24 @@ export const fetchMockCarsThunk = createAsyncThunk(
             // Default radius is 50 (as per API docs)
             params.radius = 50;
 
+            // Add pagination parameters
+            params.page = page;
+            params.per_page = perPage;
+
             // Make API call
             const response = await api.get('/vehicles/search', { params });
 
             if (response.data.success && response.data.data) {
-                const vehiclesData = response.data.data.vehicles || [];
+                // API response structure: response.data.data.data (vehicles array)
+                const vehiclesData = response.data.data.data || [];
+                const pagination = response.data.data.pagination || {
+                    current_page: 1,
+                    per_page: perPage,
+                    total_items: 0,
+                    total_pages: 1,
+                    has_next: false,
+                    has_prev: false,
+                };
 
                 // Map API response to match component expectations
                 const vehicles = vehiclesData.map(vehicle => ({
@@ -61,13 +74,13 @@ export const fetchMockCarsThunk = createAsyncThunk(
                     url: vehicle.url,
                 }));
 
-                // Return empty array if no vehicles found (not an error)
-                return vehicles;
+                // Return vehicles and pagination
+                return { vehicles, pagination };
             } else {
                 // Return empty array if API indicates no vehicles found
                 if (response.data.message?.toLowerCase().includes('no vehicles') ||
                     response.data.message?.toLowerCase().includes('not found')) {
-                    return [];
+                    return { vehicles: [], pagination: { current_page: 1, per_page: perPage, total_items: 0, total_pages: 1, has_next: false, has_prev: false } };
                 }
                 return rejectWithValue(response.data.message || 'No vehicles found');
             }
@@ -75,7 +88,7 @@ export const fetchMockCarsThunk = createAsyncThunk(
             console.error('Vehicle search API error:', err);
             // If it's a 404 or empty result, return empty array instead of error
             if (err.response?.status === 404 || err.response?.data?.message?.toLowerCase().includes('no vehicles')) {
-                return [];
+                return { vehicles: [], pagination: { current_page: 1, per_page: 20, total_items: 0, total_pages: 1, has_next: false, has_prev: false } };
             }
             return rejectWithValue(err.response?.data?.message || err.message || 'Failed to fetch vehicles');
         }
@@ -162,6 +175,14 @@ const initialState = {
         zipCode: '',
     },
     searchResults: [],
+    pagination: {
+        current_page: 1,
+        per_page: 20,
+        total_items: 0,
+        total_pages: 1,
+        has_next: false,
+        has_prev: false,
+    },
     activeSession: {
         id: null,
         car: null,
@@ -185,6 +206,9 @@ const reverseBidSlice = createSlice({
     reducers: {
         setFilters(state, action) {
             state.filters = { ...state.filters, ...action.payload };
+        },
+        setPage(state, action) {
+            state.pagination.current_page = action.payload;
         },
         updateDealerBid(state, action) {
             const { dealerId, newOffer } = action.payload;
@@ -210,7 +234,12 @@ const reverseBidSlice = createSlice({
             })
             .addCase(fetchMockCarsThunk.fulfilled, (state, action) => {
                 state.loading.search = false;
-                state.searchResults = action.payload || [];
+                if (action.payload) {
+                    state.searchResults = action.payload.vehicles || [];
+                    state.pagination = action.payload.pagination || state.pagination;
+                } else {
+                    state.searchResults = [];
+                }
             })
             .addCase(fetchMockCarsThunk.rejected, (state, action) => {
                 state.loading.search = false;
@@ -256,7 +285,7 @@ const reverseBidSlice = createSlice({
     },
 });
 
-export const { setFilters, updateDealerBid, resetReverseBidState } = reverseBidSlice.actions;
+export const { setFilters, setPage, updateDealerBid, resetReverseBidState } = reverseBidSlice.actions;
 export default reverseBidSlice.reducer;
 
 
