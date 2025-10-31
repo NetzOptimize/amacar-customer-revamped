@@ -50,6 +50,7 @@ export default function SessionPage() {
 
     const onAcceptFlow = (bid) => {
         setConfirmBid(bid);
+        setViewBid(null); // Close BidDetailsDialog when opening AcceptConfirmDialog
     };
 
     const onConfirmAccept = async () => {
@@ -57,6 +58,7 @@ export default function SessionPage() {
         const res = await dispatch(acceptBidThunk({ sessionId, bidId: confirmBid.id }));
         if (res?.payload?.certificate) {
             setConfirmBid(null);
+            setViewBid(null); // Ensure BidDetailsDialog is closed
             setShowCert(true);
         }
     };

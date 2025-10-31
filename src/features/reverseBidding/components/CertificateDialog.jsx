@@ -1,43 +1,129 @@
 import { AnimatePresence, motion } from 'framer-motion';
+import { X, CheckCircle2, Download, ArrowRight, FileText, Calendar, Building2, DollarSign, Hash } from 'lucide-react';
 
 export default function CertificateDialog({ open, session, onDownload, onContinue, onClose }) {
+    if (!open) return null;
+
     return (
         <AnimatePresence>
             {open && (
-                <motion.div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
+                <motion.div
+                    key="certificate-dialog-overlay"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4"
+                    onClick={onClose}
+                >
                     <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
+                        className="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-2 sm:mx-0 border-2 border-green-200/50 overflow-hidden"
                         onClick={(e) => e.stopPropagation()}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ type: 'spring', damping: 24, stiffness: 280 }}
-                        className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden"
                     >
-                        <div className="flex items-center justify-between p-4 border-b">
-                            <div className="font-semibold">✅ Offer Accepted!</div>
-                            <button className="cursor-pointer px-2 py-1" onClick={onClose}>✕</button>
+                        {/* Header with Success Icon */}
+                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 sm:p-5 border-b border-green-200/50">
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center shadow-lg">
+                                        <CheckCircle2 className="w-7 h-7 text-white" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-xl font-bold text-neutral-900">Offer Accepted!</h2>
+                                        <p className="text-sm text-neutral-600">Your certificate is ready</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={onClose}
+                                    className="cursor-pointer p-2 rounded-lg hover:bg-white/50 transition-colors duration-200"
+                                >
+                                    <X className="w-5 h-5 text-neutral-600" />
+                                </button>
+                            </div>
                         </div>
-                        <div className="p-6 space-y-4">
-                            <div className="text-lg font-semibold">Your Reverse Bidding Certificate</div>
-                            <div className="rounded-xl border p-5">
-                                <div className="text-center text-xl font-bold">AMACAR REVERSE BIDDING</div>
-                                <div className="text-center text-sm mb-4">CERTIFICATE OF ACCEPTANCE</div>
-                                <div className="text-sm space-y-1">
-                                    <div>Session ID: {session?.id}</div>
-                                    <div>Date: {new Date().toLocaleDateString()}</div>
-                                    {session?.acceptedBid && (
-                                        <>
-                                            <div>Dealer: {session.acceptedBid.dealerName}</div>
-                                            <div>Final Price: ${session.acceptedBid.currentOffer.toLocaleString()}</div>
-                                        </>
-                                    )}
+
+                        {/* Compact Certificate */}
+                        <div className="p-5 sm:p-6 space-y-4">
+                            <div className="relative overflow-hidden rounded-xl border-2 border-green-200/50 bg-gradient-to-br from-green-50/50 to-white p-5 shadow-lg">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-green-200/10 rounded-full -mr-16 -mt-16"></div>
+                                <div className="absolute bottom-0 left-0 w-24 h-24 bg-green-200/10 rounded-full -ml-12 -mb-12"></div>
+
+                                <div className="relative space-y-4">
+                                    {/* Certificate Header */}
+                                    <div className="text-center border-b border-green-200/50 pb-3">
+                                        <FileText className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                                        <div className="text-lg font-bold text-green-700">AMACAR</div>
+                                        <div className="text-xs font-semibold text-neutral-600 uppercase tracking-wider">Certificate of Acceptance</div>
+                                    </div>
+
+                                    {/* Certificate Details - Compact Grid */}
+                                    <div className="grid grid-cols-1 gap-3 text-sm">
+                                        {session?.acceptedBid && (
+                                            <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/60 border border-green-100">
+                                                <div className="flex items-center gap-2 text-neutral-600">
+                                                    <DollarSign className="w-4 h-4" />
+                                                    <span className="font-medium">Final Price</span>
+                                                </div>
+                                                <span className="font-bold text-green-700 text-base">
+                                                    ${session.acceptedBid.currentOffer.toLocaleString()}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {session?.acceptedBid && (
+                                            <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/60 border border-green-100">
+                                                <div className="flex items-center gap-2 text-neutral-600">
+                                                    <Building2 className="w-4 h-4" />
+                                                    <span className="font-medium">Dealer</span>
+                                                </div>
+                                                <span className="font-semibold text-neutral-900 text-right max-w-[60%] truncate">
+                                                    {session.acceptedBid.dealerName}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/60 border border-green-100">
+                                            <div className="flex items-center gap-2 text-neutral-600">
+                                                <Hash className="w-4 h-4" />
+                                                <span className="font-medium">Session ID</span>
+                                            </div>
+                                            <span className="font-mono text-xs font-semibold text-neutral-700">
+                                                {session?.id}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/60 border border-green-100">
+                                            <div className="flex items-center gap-2 text-neutral-600">
+                                                <Calendar className="w-4 h-4" />
+                                                <span className="font-medium">Date</span>
+                                            </div>
+                                            <span className="font-semibold text-neutral-700">
+                                                {new Date().toLocaleDateString()}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="p-4 border-t flex items-center justify-between">
-                            <button className="cursor-pointer px-3 py-2 rounded-lg border" onClick={onDownload}>Download PDF</button>
-                            <button className="cursor-pointer px-3 py-2 rounded-lg bg-neutral-900 text-white" onClick={onContinue}>Continue →</button>
+
+                        {/* Footer with Actions */}
+                        <div className="p-5 border-t border-neutral-200 bg-white flex flex-col sm:flex-row items-center justify-between gap-3">
+                            <button
+                                onClick={onDownload}
+                                className="cursor-pointer px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 w-full sm:w-auto"
+                            >
+                                <Download className="w-4 h-4" />
+                                Download PDF
+                            </button>
+                            <button
+                                onClick={onContinue}
+                                className="cursor-pointer px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 w-full sm:w-auto hover:shadow-lg transform hover:scale-105"
+                            >
+                                Continue
+                                <ArrowRight className="w-4 h-4" />
+                            </button>
                         </div>
                     </motion.div>
                 </motion.div>

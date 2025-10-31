@@ -15,7 +15,6 @@ export default function AcceptConfirmDialog({ open, bid, onCancel, onConfirm, lo
                         className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden"
                     >
                         <div className="p-6 space-y-3">
-                            <div className="text-2xl">⚠️</div>
                             <div className="text-lg font-semibold">Confirm Offer Acceptance</div>
                             <div className="text-sm text-neutral-700">You're about to accept:</div>
                             <div className="rounded-lg border p-3 text-sm">
