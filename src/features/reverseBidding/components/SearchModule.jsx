@@ -157,7 +157,7 @@ export default function SearchModule() {
                     disabled={!valid || loading.search}
                     className="inline-flex w-full sm:w-auto items-center justify-center rounded-lg bg-orange-500 hover:bg-orange-500/90 text-white px-4 py-2 text-sm font-semibold shadow disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                    {loading.search ? 'Searching…' : 'Start Reverse Bidding →'}
+                    {loading.search ? 'Searching…' : 'Search →'}
                 </Button>
                 <span className="text-white/80 text-xs">
                     {(local.year || 'Year')} • {(local.make || 'Make')} • {(local.model || 'Model')} • {local.budgetMin ? `$${local.budgetMin}` : 'Min'} - {local.budgetMax ? `$${local.budgetMax}` : 'Max'}

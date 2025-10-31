@@ -1,18 +1,83 @@
 import { createSlice, createAsyncThunk, nanoid } from '@reduxjs/toolkit';
+import api from '../../../lib/apiRev';
 
 // Lightweight mock data generators (detailed mocks in utils/mockData)
 const generateSessionId = () => `RB-${Math.random().toString(36).slice(2, 9)}`;
 
 export const fetchMockCarsThunk = createAsyncThunk(
     'reverseBid/fetchCars',
-    async (filters, { rejectWithValue, extra }) => {
+    async (filters, { rejectWithValue, getState }) => {
         try {
-            await new Promise((r) => setTimeout(r, 800));
-            const { getMockCars } = await import('../utils/mockData');
-            const cars = getMockCars(filters);
-            return cars;
+            // Build query parameters for the API
+            const params = {};
+
+            if (filters.make) params.make = filters.make;
+            if (filters.model) params.model = filters.model;
+            if (filters.year) params.year = typeof filters.year === 'string' ? parseInt(filters.year, 10) : filters.year;
+
+            // Use budgetMin as price, or calculate average if both are provided
+            if (filters.budgetMin && filters.budgetMax) {
+                params.price = Math.floor((Number(filters.budgetMin) + Number(filters.budgetMax)) / 2);
+            } else if (filters.budgetMin) {
+                params.price = Number(filters.budgetMin);
+            } else if (filters.budgetMax) {
+                params.price = Number(filters.budgetMax);
+            }
+
+            // Get zip_code from filters or user state
+            const state = getState();
+            const zipCode = filters.zipCode || state.reverseBid.filters.zipCode || '';
+            if (zipCode) {
+                params.zip_code = zipCode;
+            }
+
+            // Default radius is 50 (as per API docs)
+            params.radius = 50;
+
+            // Make API call
+            const response = await api.get('/vehicles/search', { params });
+
+            if (response.data.success && response.data.data) {
+                const vehiclesData = response.data.data.vehicles || [];
+
+                // Map API response to match component expectations
+                const vehicles = vehiclesData.map(vehicle => ({
+                    id: vehicle.id,
+                    title: vehicle.title,
+                    vin: vehicle.vin,
+                    make: vehicle.make,
+                    model: vehicle.model,
+                    year: vehicle.year,
+                    new_used: vehicle.new_used,
+                    condition: vehicle.new_used === 'N' ? 'new' : 'used',
+                    price: vehicle.price,
+                    basePrice: vehicle.price, // For backward compatibility
+                    zip_code: vehicle.zip_code,
+                    city: vehicle.city,
+                    state: vehicle.state,
+                    owned_by: vehicle.owned_by,
+                    is_reverse_biddable: vehicle.is_reverse_biddable,
+                    images: vehicle.images || [], // Already in the correct format
+                    url: vehicle.url,
+                }));
+
+                // Return empty array if no vehicles found (not an error)
+                return vehicles;
+            } else {
+                // Return empty array if API indicates no vehicles found
+                if (response.data.message?.toLowerCase().includes('no vehicles') ||
+                    response.data.message?.toLowerCase().includes('not found')) {
+                    return [];
+                }
+                return rejectWithValue(response.data.message || 'No vehicles found');
+            }
         } catch (err) {
-            return rejectWithValue(err?.message || 'Failed to fetch cars');
+            console.error('Vehicle search API error:', err);
+            // If it's a 404 or empty result, return empty array instead of error
+            if (err.response?.status === 404 || err.response?.data?.message?.toLowerCase().includes('no vehicles')) {
+                return [];
+            }
+            return rejectWithValue(err.response?.data?.message || err.message || 'Failed to fetch vehicles');
         }
     }
 );
