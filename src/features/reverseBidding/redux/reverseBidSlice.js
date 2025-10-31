@@ -4,6 +4,28 @@ import api from '../../../lib/apiRev';
 // Lightweight mock data generators (detailed mocks in utils/mockData)
 const generateSessionId = () => `RB-${Math.random().toString(36).slice(2, 9)}`;
 
+export const fetchFiltersThunk = createAsyncThunk(
+    'reverseBid/fetchFilters',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await api.get('/vehicles/filters');
+
+            if (response.data.success && response.data.data) {
+                const data = response.data.data;
+                return {
+                    makes: data.makes || {},
+                    years: data.years || [],
+                    priceRange: data.price_range || { min: 0, max: 100000 },
+                };
+            }
+            return rejectWithValue('Failed to fetch filters');
+        } catch (err) {
+            console.error('Filters API error:', err);
+            return rejectWithValue(err.response?.data?.message || err.message || 'Failed to fetch filters');
+        }
+    }
+);
+
 export const fetchMockCarsThunk = createAsyncThunk(
     'reverseBid/fetchCars',
     async ({ filters, page = 1, perPage = 20 }, { rejectWithValue, getState }) => {
@@ -174,6 +196,13 @@ const initialState = {
         condition: 'new',
         zipCode: '',
     },
+    filterOptions: {
+        makes: {},
+        years: [],
+        priceRange: { min: 0, max: 100000 },
+        loading: false,
+        error: null,
+    },
     searchResults: [],
     pagination: {
         current_page: 1,
@@ -227,6 +256,23 @@ const reverseBidSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            // fetch filters
+            .addCase(fetchFiltersThunk.pending, (state) => {
+                state.filterOptions.loading = true;
+                state.filterOptions.error = null;
+            })
+            .addCase(fetchFiltersThunk.fulfilled, (state, action) => {
+                state.filterOptions.loading = false;
+                if (action.payload) {
+                    state.filterOptions.makes = action.payload.makes || {};
+                    state.filterOptions.years = action.payload.years || [];
+                    state.filterOptions.priceRange = action.payload.priceRange || { min: 0, max: 100000 };
+                }
+            })
+            .addCase(fetchFiltersThunk.rejected, (state, action) => {
+                state.filterOptions.loading = false;
+                state.filterOptions.error = action.payload || 'Failed to fetch filters';
+            })
             // search
             .addCase(fetchMockCarsThunk.pending, (state) => {
                 state.loading.search = true;

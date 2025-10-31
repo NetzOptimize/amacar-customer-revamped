@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { X, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { setFilters, fetchMockCarsThunk } from '../redux/reverseBidSlice';
+import { setFilters, fetchMockCarsThunk, fetchFiltersThunk } from '../redux/reverseBidSlice';
 import {
     Select,
     SelectTrigger,
@@ -14,8 +14,15 @@ import { Input } from '../../../components/ui/input';
 
 export default function FilterContent({ cars = [] }) {
     const dispatch = useDispatch();
-    const { filters } = useSelector((s) => s.reverseBid);
+    const { filters, filterOptions } = useSelector((s) => s.reverseBid);
     const { user } = useSelector((s) => s.user);
+
+    // Fetch filters on component mount
+    useEffect(() => {
+        if (Object.keys(filterOptions.makes).length === 0 && !filterOptions.loading) {
+            dispatch(fetchFiltersThunk());
+        }
+    }, [dispatch, filterOptions.makes, filterOptions.loading]);
 
     // Expandable sections state
     const [expandedSections, setExpandedSections] = useState({
@@ -54,25 +61,21 @@ export default function FilterContent({ cars = [] }) {
         });
     }, [filters.make, filters.model, filters.year, filters.budgetMin, filters.budgetMax, filters.condition, filters.zipCode, user]);
 
-    const makeToModels = {
-        Toyota: ['Corolla', 'Camry', 'RAV4', 'Prius'],
-        Honda: ['Civic', 'Accord', 'CR-V', 'Fit'],
-        BMW: ['3 Series', '5 Series', 'X3', 'X5'],
-        Mercedes: ['C-Class', 'E-Class', 'GLC', 'GLE'],
-        Audi: ['A3', 'A4', 'Q5', 'Q7'],
-        Ford: ['Focus', 'Fusion', 'Escape', 'F-150'],
-        Chevrolet: ['Cruze', 'Malibu', 'Equinox', 'Silverado'],
-        Nissan: ['Sentra', 'Altima', 'Rogue'],
-        Hyundai: ['Elantra', 'Sonata', 'Tucson'],
-        Kia: ['Forte', 'Optima', 'Sportage'],
-    };
+    // Get makes from API
+    const makes = useMemo(() => {
+        return Object.keys(filterOptions.makes || {}).sort();
+    }, [filterOptions.makes]);
 
-    const makes = Object.keys(makeToModels);
-    const years = Array.from({ length: 2025 - 2000 + 1 }, (_, i) => String(2025 - i));
+    // Get years from API (sorted descending)
+    const years = useMemo(() => {
+        return (filterOptions.years || []).map(y => String(y)).sort((a, b) => Number(b) - Number(a));
+    }, [filterOptions.years]);
 
+    // Get models for selected make from API
     const modelsForSelectedMake = useMemo(() => {
-        return localFilters.make ? makeToModels[localFilters.make] || [] : [];
-    }, [localFilters.make]);
+        if (!localFilters.make || !filterOptions.makes) return [];
+        return filterOptions.makes[localFilters.make] || [];
+    }, [localFilters.make, filterOptions.makes]);
 
     // Calculate model counts from actual cars
     const modelCounts = useMemo(() => {
@@ -236,8 +239,8 @@ export default function FilterContent({ cars = [] }) {
                 </div>
             )}
 
-            {/* Filter Sections - Scrollable */}
-            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-4">
+            {/* Filter Sections - Dynamic height on desktop, scrollable on mobile */}
+            <div className="flex-1 lg:flex-none px-4 sm:px-6 py-4 space-y-4 overflow-y-auto lg:overflow-visible">
                 {/* Basics - Expandable */}
                 <div className="bg-white/40 backdrop-blur-sm border border-white/30 rounded-xl overflow-hidden shadow-sm">
                     <button

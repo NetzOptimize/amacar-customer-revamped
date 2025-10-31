@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
-import { setFilters, fetchMockCarsThunk } from '../redux/reverseBidSlice';
+import { setFilters, fetchMockCarsThunk, fetchFiltersThunk } from '../redux/reverseBidSlice';
 import { useNavigate } from 'react-router-dom';
 import {
     Select,
@@ -16,7 +16,7 @@ import { Input } from '../../../components/ui/input';
 export default function SearchModule() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { filters, loading } = useSelector((s) => s.reverseBid);
+    const { filters, loading, filterOptions } = useSelector((s) => s.reverseBid);
     const [local, setLocal] = useState({
         make: filters.make || '',
         model: filters.model || '',
@@ -25,26 +25,28 @@ export default function SearchModule() {
         budgetMax: filters.budgetMax ? String(filters.budgetMax) : '',
     });
 
-    const makeToModels = {
-        Toyota: ['Corolla', 'Camry', 'RAV4', 'Prius'],
-        Honda: ['Civic', 'Accord', 'CR-V', 'Fit'],
-        BMW: ['3 Series', '5 Series', 'X3', 'X5'],
-        Mercedes: ['C-Class', 'E-Class', 'GLC', 'GLE'],
-        Audi: ['A3', 'A4', 'Q5', 'Q7'],
-        Ford: ['Focus', 'Fusion', 'Escape', 'F-150'],
-        Chevrolet: ['Cruze', 'Malibu', 'Equinox', 'Silverado'],
-        Nissan: ['Sentra', 'Altima', 'Rogue'],
-        Hyundai: ['Elantra', 'Sonata', 'Tucson'],
-        Kia: ['Forte', 'Optima', 'Sportage'],
-        Mazda: ['CX-30', 'CX-5', '3', '6'],
-    };
+    // Fetch filters on component mount
+    useEffect(() => {
+        if (Object.keys(filterOptions.makes).length === 0 && !filterOptions.loading) {
+            dispatch(fetchFiltersThunk());
+        }
+    }, [dispatch, filterOptions.makes, filterOptions.loading]);
 
-    const makes = Object.keys(makeToModels);
-    const years = Array.from({ length: 2025 - 2000 + 1 }, (_, i) => String(2025 - i));
+    // Get makes from API
+    const makes = useMemo(() => {
+        return Object.keys(filterOptions.makes || {}).sort();
+    }, [filterOptions.makes]);
 
+    // Get years from API (sorted descending)
+    const years = useMemo(() => {
+        return (filterOptions.years || []).map(y => String(y)).sort((a, b) => Number(b) - Number(a));
+    }, [filterOptions.years]);
+
+    // Get models for selected make from API
     const modelsForSelectedMake = useMemo(() => {
-        return local.make ? makeToModels[local.make] || [] : [];
-    }, [local.make]);
+        if (!local.make || !filterOptions.makes) return [];
+        return filterOptions.makes[local.make] || [];
+    }, [local.make, filterOptions.makes]);
 
     // All filters are optional - search can be performed with any combination
     const onSearch = async () => {
