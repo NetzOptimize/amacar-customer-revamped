@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
+import { Heart } from 'lucide-react';
 import ReverseBiddingConfirmDialog from './ReverseBiddingConfirmDialog';
 import LoginModal from '../../../components/ui/LoginModal';
 
@@ -8,6 +9,7 @@ export default function VehicleCard({ car, onStart, loading = false }) {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const [pendingAction, setPendingAction] = useState(false); // Track if we need to open dialog after login
+    const [isSaved, setIsSaved] = useState(false); // Track if vehicle is saved
 
     const { user } = useSelector((state) => state.user);
     const isLoggedIn = !!user;
@@ -97,6 +99,22 @@ export default function VehicleCard({ car, onStart, loading = false }) {
                         <span>No Image</span>
                     </div>
                 )}
+                {/* Heart/Save Button - Top Left */}
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setIsSaved(!isSaved);
+                        // TODO: Implement save vehicle functionality
+                    }}
+                    className={`absolute top-4 left-4 p-2 rounded-full backdrop-blur-md transition-all duration-200 hover:scale-110 ${isSaved
+                        ? 'bg-red-500/90 text-white shadow-lg'
+                        : 'bg-white/90 text-neutral-700 hover:bg-red-50 hover:text-red-600 shadow-md'
+                        }`}
+                    aria-label={isSaved ? 'Remove from saved' : 'Save vehicle'}
+                >
+                    <Heart className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
+                </button>
+                {/* Condition Badge - Top Right */}
                 <div className={`absolute top-4 right-4 px-2 py-1 rounded-md text-xs font-medium backdrop-blur-md text-white ${conditionColor}`}>
                     {conditionBadge}
                 </div>
