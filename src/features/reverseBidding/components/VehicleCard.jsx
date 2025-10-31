@@ -1,9 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import ReverseBiddingConfirmDialog from './ReverseBiddingConfirmDialog';
+import LoginModal from '../../../components/ui/LoginModal';
 
 export default function VehicleCard({ car, onStart, loading = false }) {
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [loginModalOpen, setLoginModalOpen] = useState(false);
+    const [pendingAction, setPendingAction] = useState(false); // Track if we need to open dialog after login
+
+    const { user } = useSelector((state) => state.user);
+    const isLoggedIn = !!user;
     // Get the primary image or first available image
     // Handle both new API structure (objects with url/thumbnail) and old structure (array of strings)
     let imageUrl = '';
@@ -39,6 +46,38 @@ export default function VehicleCard({ car, onStart, loading = false }) {
 
     // Get price - handle both price and basePrice (old structure)
     const price = car.price || car.basePrice || 0;
+
+    // Handle button click - check authentication first
+    const handleStartBidding = () => {
+        if (!isLoggedIn) {
+            // User not logged in, open login modal
+            setPendingAction(true);
+            setLoginModalOpen(true);
+        } else {
+            // User is logged in, open confirmation dialog
+            setDialogOpen(true);
+        }
+    };
+
+    // When user logs in successfully, open the confirmation dialog
+    useEffect(() => {
+        if (isLoggedIn && pendingAction && !loginModalOpen) {
+            // User just logged in and we have a pending action
+            setPendingAction(false);
+            setDialogOpen(true);
+        }
+    }, [isLoggedIn, pendingAction, loginModalOpen]);
+
+    // Handle login modal close
+    const handleLoginModalClose = (open) => {
+        if (!open) {
+            setLoginModalOpen(false);
+            // If user didn't log in, clear pending action
+            if (!isLoggedIn) {
+                setPendingAction(false);
+            }
+        }
+    };
 
     return (
         <motion.div
@@ -77,7 +116,7 @@ export default function VehicleCard({ car, onStart, loading = false }) {
                     )}
                 </div>
                 <button
-                    onClick={() => setDialogOpen(true)}
+                    onClick={handleStartBidding}
                     className="cursor-pointer w-full mt-2 inline-flex items-center justify-center rounded-lg px-3 py-2 bg-neutral-900 text-white font-medium hover:bg-neutral-800 transition-colors group/btn"
                 >
                     <span>Start Reverse Bidding</span>
@@ -97,6 +136,13 @@ export default function VehicleCard({ car, onStart, loading = false }) {
                 }}
                 car={car}
                 loading={loading}
+            />
+
+            <LoginModal
+                isOpen={loginModalOpen}
+                onClose={handleLoginModalClose}
+                title="Login Required"
+                description="Please log in to start reverse bidding on this vehicle"
             />
         </motion.div>
     );
