@@ -168,7 +168,24 @@ export default function SessionPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
                 >
-                    <LeaderboardTable rows={rows} onView={setViewBid} onAccept={onAcceptFlow} timeRemaining={timeRemaining} />
+                    <LeaderboardTable
+                        rows={rows}
+                        onView={setViewBid}
+                        onAccept={onAcceptFlow}
+                        timeRemaining={timeRemaining}
+                        vehicleImage={(() => {
+                            if (!activeSession?.car?.images?.length) return null;
+                            const primaryImage = activeSession.car.images.find(img => img?.is_primary) || activeSession.car.images[0];
+                            if (typeof primaryImage === 'string') {
+                                return primaryImage;
+                            } else if (primaryImage?.url) {
+                                return primaryImage.url;
+                            } else if (primaryImage?.thumbnail) {
+                                return primaryImage.thumbnail;
+                            }
+                            return null;
+                        })()}
+                    />
                 </motion.div>
             </div>
 
