@@ -157,18 +157,14 @@ const useEmailValidation = (email, isRegisterMode, shouldReset = false) => {
   }, [isRegisterMode, isEmailFormatValid, checkEmailAvailability]);
 
   useEffect(() => {
-    console.log('🔄 [EmailValidation] useEffect triggered with:', {
-      email,
-      isRegisterMode,
-      isEmailFormatValid
-    });
+
 
     const timeoutId = setTimeout(() => {
       if (email && isEmailFormatValid) {
-        console.log('🎯 [EmailValidation] Starting validation after debounce');
+        // console.log('🎯 [EmailValidation] Starting validation after debounce');
         checkDisposableEmail(email);
       } else if (email && !isEmailFormatValid) {
-        console.log('🔄 [EmailValidation] Resetting state - invalid email format');
+        // console.log('🔄 [EmailValidation] Resetting state - invalid email format');
         // Reset validation state if email format is invalid
         setValidationState({
           isValidating: false,
@@ -179,12 +175,12 @@ const useEmailValidation = (email, isRegisterMode, shouldReset = false) => {
           isValid: null
         });
       } else {
-        console.log('⏭️ [EmailValidation] No validation needed - conditions not met');
+        // console.log('⏭️ [EmailValidation] No validation needed - conditions not met');
       }
     }, 500); // 500ms debounce
 
     return () => {
-      console.log('🧹 [EmailValidation] Cleaning up timeout');
+      // console.log('🧹 [EmailValidation] Cleaning up timeout');
       clearTimeout(timeoutId);
     };
   }, [email, isRegisterMode, isEmailFormatValid, checkDisposableEmail]);

@@ -101,15 +101,6 @@ export default function AuctionModal({
     setEmail(e.target.value);
   }, []);
 
-  // Debug email validation state changes
-  useEffect(() => {
-    console.log('📧 [AuctionModal] Email validation state changed:', {
-      email,
-      isOpen,
-      emailValidation,
-      shouldResetEmailValidation
-    });
-  }, [emailValidation, email, isOpen, shouldResetEmailValidation]);
 
   // Debounced ZIP code lookup
   const debouncedZipLookup = useCallback(
@@ -238,9 +229,9 @@ export default function AuctionModal({
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (emailRegex.test(email)) {
         // Only clear if not currently validating and no disposable/error states
-        if (!emailValidation.isValidating && 
-            emailValidation.isDisposable !== true && 
-            !emailValidation.error) {
+        if (!emailValidation.isValidating &&
+          emailValidation.isDisposable !== true &&
+          !emailValidation.error) {
           setErrors(prev => prev.email ? { ...prev, email: "" } : prev);
         }
       }
@@ -509,11 +500,10 @@ export default function AuctionModal({
                             value={vin}
                             onChange={(e) => setVin(e.target.value)}
                             placeholder="Enter vehicle's VIN number"
-                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${
-                              errors.vin 
-                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]" 
-                                : "border-slate-200"
-                            }`}
+                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${errors.vin
+                              ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
+                              : "border-slate-200"
+                              }`}
                           />
                           {vin && vin.length > 0 && (
                             <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">
@@ -549,11 +539,10 @@ export default function AuctionModal({
                             value={firstName}
                             onChange={(e) => setFirstName(e.target.value)}
                             placeholder="Enter first name"
-                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${
-                              errors.firstName 
-                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]" 
-                                : "border-slate-200"
-                            }`}
+                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${errors.firstName
+                              ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
+                              : "border-slate-200"
+                              }`}
                           />
                         </div>
                       </ReusableTooltip>
@@ -577,15 +566,15 @@ export default function AuctionModal({
                           email && isOpen && emailValidation.isDisposable === true && !emailValidation.isValidating
                             ? "Disposable email addresses are not allowed"
                             : email && isOpen && emailValidation.isRegistered === true && !emailValidation.isValidating
-                            ? "This email is already registered. Please use a different email or try logging in."
-                            : email && isOpen && emailValidation.error && !emailValidation.isValidating
-                            ? "Unable to verify email. Please try again."
-                            : errors.email
+                              ? "This email is already registered. Please use a different email or try logging in."
+                              : email && isOpen && emailValidation.error && !emailValidation.isValidating
+                                ? "Unable to verify email. Please try again."
+                                : errors.email
                         }
                         side="top"
                         align="start"
                         disabled={
-                          !errors.email && 
+                          !errors.email &&
                           !(email && isOpen && emailValidation.isDisposable === true && !emailValidation.isValidating) &&
                           !(email && isOpen && emailValidation.isRegistered === true && !emailValidation.isValidating) &&
                           !(email && isOpen && emailValidation.error && !emailValidation.isValidating)
@@ -593,15 +582,14 @@ export default function AuctionModal({
                       >
                         <div className="relative">
                           <div
-                            className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 ${
-                              email && isOpen && emailValidation.isValid === true
-                                ? "text-green-500"
-                                : email &&
-                                  isOpen &&
-                                  (emailValidation.isDisposable === true || emailValidation.isRegistered === true)
+                            className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 ${email && isOpen && emailValidation.isValid === true
+                              ? "text-green-500"
+                              : email &&
+                                isOpen &&
+                                (emailValidation.isDisposable === true || emailValidation.isRegistered === true)
                                 ? "text-red-500"
                                 : "text-slate-400"
-                            }`}
+                              }`}
                           >
                             <Mail className="h-4 w-4" />
                           </div>
@@ -612,17 +600,16 @@ export default function AuctionModal({
                             value={email}
                             onChange={handleEmailChange}
                             placeholder="Enter email address"
-                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-all duration-200 ${
-                              email && isOpen && emailValidation.isValid === true && !emailValidation.isValidating
-                                ? "border-green-300 bg-green-50 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.5)]"
-                                : email &&
-                                  isOpen &&
-                                  (emailValidation.isDisposable === true || emailValidation.isRegistered === true) && !emailValidation.isValidating
+                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-all duration-200 ${email && isOpen && emailValidation.isValid === true && !emailValidation.isValidating
+                              ? "border-green-300 bg-green-50 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.5)]"
+                              : email &&
+                                isOpen &&
+                                (emailValidation.isDisposable === true || emailValidation.isRegistered === true) && !emailValidation.isValidating
                                 ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
                                 : errors.email && !emailValidation.isValidating
-                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
-                                : "border-slate-200 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
-                            }`}
+                                  ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
+                                  : "border-slate-200 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
+                              }`}
                           />
                           {/* Validation status indicator */}
                           <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -671,11 +658,10 @@ export default function AuctionModal({
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Enter password"
-                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${
-                              errors.password || errors.passwordMismatch
-                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]" 
-                                : "border-slate-200"
-                            }`}
+                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${errors.password || errors.passwordMismatch
+                              ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
+                              : "border-slate-200"
+                              }`}
                           />
                           <button
                             type="button"
@@ -719,13 +705,12 @@ export default function AuctionModal({
                             locationStatus === "loading" ||
                             (locationStatus === "succeeded" && city)
                           }
-                          className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow ${
-                            locationStatus === "loading"
-                              ? "border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed"
-                              : locationStatus === "succeeded" && city
+                          className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow ${locationStatus === "loading"
+                            ? "border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed"
+                            : locationStatus === "succeeded" && city
                               ? "border-green-200 bg-green-50 text-green-800 cursor-not-allowed"
                               : "border-slate-200 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
-                          }`}
+                            }`}
                         />
                       </div>
                     </div>
@@ -760,11 +745,10 @@ export default function AuctionModal({
                             value={zipCode}
                             onChange={(e) => handleZipCodeChange(e.target.value)}
                             placeholder="Enter zip code"
-                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${
-                              errors.zipCode || locationError
-                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]" 
-                                : "border-slate-200"
-                            }`}
+                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${errors.zipCode || locationError
+                              ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
+                              : "border-slate-200"
+                              }`}
                             style={{ fontSize: "16px" }}
                           />
                           {locationStatus === "loading" && (
@@ -801,11 +785,10 @@ export default function AuctionModal({
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
                             placeholder="Enter last name"
-                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${
-                              errors.lastName 
-                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]" 
-                                : "border-slate-200"
-                            }`}
+                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${errors.lastName
+                              ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
+                              : "border-slate-200"
+                              }`}
                           />
                         </div>
                       </ReusableTooltip>
@@ -843,13 +826,12 @@ export default function AuctionModal({
                             }}
                             pattern="[0-9]*"
                             placeholder="Enter phone number"
-                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${
-                              errors.phone 
-                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]" 
-                                : "border-slate-200"
-                            }`}
+                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${errors.phone
+                              ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
+                              : "border-slate-200"
+                              }`}
                           />
-                        
+
                         </div>
                       </ReusableTooltip>
                     </div>
@@ -879,11 +861,10 @@ export default function AuctionModal({
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             placeholder="Confirm password"
-                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${
-                              errors.confirmPassword || errors.passwordMismatch
-                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]" 
-                                : "border-slate-200"
-                            }`}
+                            className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)] ${errors.confirmPassword || errors.passwordMismatch
+                              ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.5)]"
+                              : "border-slate-200"
+                              }`}
                           />
                           <button
                             type="button"
@@ -929,13 +910,12 @@ export default function AuctionModal({
                             locationStatus === "loading" ||
                             (locationStatus === "succeeded" && state)
                           }
-                          className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow ${
-                            locationStatus === "loading"
-                              ? "border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed"
-                              : locationStatus === "succeeded" && state
+                          className={`h-11 w-full rounded-md border px-9 py-2 text-base outline-none ring-0 transition-shadow ${locationStatus === "loading"
+                            ? "border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed"
+                            : locationStatus === "succeeded" && state
                               ? "border-green-200 bg-green-50 text-green-800 cursor-not-allowed"
                               : "border-slate-200 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.5)]"
-                          }`}
+                            }`}
                         />
                       </div>
                     </div>
@@ -958,9 +938,8 @@ export default function AuctionModal({
                           type="checkbox"
                           checked={auctionConsent}
                           onChange={(e) => setAuctionConsent(e.target.checked)}
-                          className={`h-4 w-4 cursor-pointer text-orange-600 border-slate-300 rounded focus:ring-orange-500 focus:ring-2 ${
-                            errors.auctionConsent ? 'border-red-300' : ''
-                          }`}
+                          className={`h-4 w-4 cursor-pointer text-orange-600 border-slate-300 rounded focus:ring-orange-500 focus:ring-2 ${errors.auctionConsent ? 'border-red-300' : ''
+                            }`}
                         />
                       </div>
                       <div className="flex-1">
@@ -1002,9 +981,8 @@ export default function AuctionModal({
                           type="checkbox"
                           checked={registerConsent}
                           onChange={(e) => setRegisterConsent(e.target.checked)}
-                          className={`h-4 w-4 cursor-pointer text-orange-600 border-slate-300 rounded focus:ring-orange-500 focus:ring-2 ${
-                            errors.registerConsent ? 'border-red-300' : ''
-                          }`}
+                          className={`h-4 w-4 cursor-pointer text-orange-600 border-slate-300 rounded focus:ring-orange-500 focus:ring-2 ${errors.registerConsent ? 'border-red-300' : ''
+                            }`}
                         />
                       </div>
                       <div className="flex-1">
@@ -1053,20 +1031,9 @@ export default function AuctionModal({
                           (emailValidation.isValidating ||
                             emailValidation.isDisposable === true ||
                             emailValidation.isRegistered === true));
-                      
-                      console.log('🔘 [AuctionModal] Submit button state:', {
-                        isDisabled,
-                        modalState: modalState.isLoading,
-                        auctionConsent,
-                        registerConsent,
-                        emailValidation: {
-                          isValidating: emailValidation.isValidating,
-                          isDisposable: emailValidation.isDisposable,
-                          isRegistered: emailValidation.isRegistered,
-                          isValid: emailValidation.isValid
-                        }
-                      });
-                      
+
+
+
                       return isDisabled;
                     })()}
                     className="cursor-pointer w-full h-12 sm:h-11 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-base font-semibold shadow-lg shadow-orange-500/20  disabled:opacity-50 disabled:cursor-not-allowed"
