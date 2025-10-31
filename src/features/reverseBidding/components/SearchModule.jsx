@@ -11,6 +11,7 @@ import {
     SelectItem,
 } from '../../../components/ui/select';
 import { Button } from '../../../components/ui/button';
+import { Input } from '../../../components/ui/input';
 
 export default function SearchModule() {
     const dispatch = useDispatch();
@@ -20,6 +21,8 @@ export default function SearchModule() {
         make: filters.make || '',
         model: filters.model || '',
         year: filters.year || '',
+        budgetMin: filters.budgetMin ? String(filters.budgetMin) : '',
+        budgetMax: filters.budgetMax ? String(filters.budgetMax) : '',
     });
 
     const makeToModels = {
@@ -45,8 +48,13 @@ export default function SearchModule() {
     const valid = useMemo(() => !!(local.make && local.model && local.year), [local]);
 
     const onSearch = async () => {
-        dispatch(setFilters(local));
-        await dispatch(fetchMockCarsThunk(local));
+        const filtersToDispatch = {
+            ...local,
+            budgetMin: local.budgetMin ? Number(local.budgetMin) : null,
+            budgetMax: local.budgetMax ? Number(local.budgetMax) : null,
+        };
+        dispatch(setFilters(filtersToDispatch));
+        await dispatch(fetchMockCarsThunk(filtersToDispatch));
         navigate('/reverse-bidding/results');
     };
 
@@ -66,15 +74,15 @@ export default function SearchModule() {
                 <span className="inline-flex items-center rounded-full bg-white/10 text-white/90 text-[10px] sm:text-xs px-2.5 py-1 border border-white/15">Reverse Bidding</span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
                 <Select
                     value={local.make}
                     onValueChange={(value) => {
                         setLocal((prev) => ({ ...prev, make: value, model: '' }));
                     }}
                 >
-                    <SelectTrigger className="bg-white/5 border-white/15 text-white focus:ring-white/20">
-                        <SelectValue placeholder="Select Make" />
+                    <SelectTrigger className="bg-white/5 border-white/15 text-white focus:ring-white/20 h-10 w-full">
+                        <SelectValue placeholder="Make" />
                     </SelectTrigger>
                     <SelectContent className="bg-neutral-900 text-white border-white/10">
                         {makes.map((m) => (
@@ -90,8 +98,8 @@ export default function SearchModule() {
                     onValueChange={(value) => setLocal((prev) => ({ ...prev, model: value }))}
                     disabled={!local.make}
                 >
-                    <SelectTrigger className="bg-white/5 border-white/15 text-white disabled:opacity-40">
-                        <SelectValue placeholder={local.make ? 'Select Model' : 'Select Make first'} />
+                    <SelectTrigger className="bg-white/5 border-white/15 text-white disabled:opacity-40 h-10 w-full">
+                        <SelectValue placeholder={local.make ? 'Model' : 'Select Make'} />
                     </SelectTrigger>
                     <SelectContent className="bg-neutral-900 text-white border-white/10">
                         {modelsForSelectedMake.map((model) => (
@@ -106,8 +114,8 @@ export default function SearchModule() {
                     value={local.year}
                     onValueChange={(value) => setLocal((prev) => ({ ...prev, year: value }))}
                 >
-                    <SelectTrigger className="bg-white/5 border-white/15 text-white">
-                        <SelectValue placeholder="Select Year" />
+                    <SelectTrigger className="bg-white/5 border-white/15 text-white h-10 w-full">
+                        <SelectValue placeholder="Year" />
                     </SelectTrigger>
                     <SelectContent className="bg-neutral-900 text-white border-white/10 max-h-64">
                         {years.map((y) => (
@@ -117,6 +125,30 @@ export default function SearchModule() {
                         ))}
                     </SelectContent>
                 </Select>
+
+                <div className="relative">
+                    <Input
+                        type="number"
+                        placeholder="Min Price"
+                        value={local.budgetMin}
+                        onChange={(e) => setLocal((prev) => ({ ...prev, budgetMin: e.target.value }))}
+                        className="bg-white/5 border-white/15 text-white placeholder:text-white/50 focus-visible:ring-white/20 h-10 w-full pr-8"
+                        min="0"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 text-sm pointer-events-none">$</span>
+                </div>
+
+                <div className="relative">
+                    <Input
+                        type="number"
+                        placeholder="Max Price"
+                        value={local.budgetMax}
+                        onChange={(e) => setLocal((prev) => ({ ...prev, budgetMax: e.target.value }))}
+                        className="bg-white/5 border-white/15 text-white placeholder:text-white/50 focus-visible:ring-white/20 h-10 w-full pr-8"
+                        min="0"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 text-sm pointer-events-none">$</span>
+                </div>
             </div>
 
             <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -128,7 +160,7 @@ export default function SearchModule() {
                     {loading.search ? 'Searching…' : 'Start Reverse Bidding →'}
                 </Button>
                 <span className="text-white/80 text-xs">
-                    {(local.year || 'Year')} • {(local.make || 'Make')} • {(local.model || 'Model')} • Budget
+                    {(local.year || 'Year')} • {(local.make || 'Make')} • {(local.model || 'Model')} • {local.budgetMin ? `$${local.budgetMin}` : 'Min'} - {local.budgetMax ? `$${local.budgetMax}` : 'Max'}
                 </span>
             </div>
         </motion.div>
