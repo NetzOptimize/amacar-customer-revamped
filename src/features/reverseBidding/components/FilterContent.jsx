@@ -34,7 +34,7 @@ export default function FilterContent({ cars = [] }) {
     const [localFilters, setLocalFilters] = useState({
         condition: filters.condition || 'new',
         make: filters.make || '',
-        model: filters.model || '',
+        models: filters.model ? (Array.isArray(filters.model) ? filters.model : [filters.model]) : [],
         year: filters.year || '',
         budgetMin: filters.budgetMin ? String(filters.budgetMin) : '',
         budgetMax: filters.budgetMax ? String(filters.budgetMax) : '',
@@ -53,7 +53,7 @@ export default function FilterContent({ cars = [] }) {
         setLocalFilters({
             condition: filters.condition || 'new',
             make: filters.make || '',
-            model: filters.model || '',
+            models: filters.model ? (Array.isArray(filters.model) ? filters.model : [filters.model]) : [],
             year: filters.year || '',
             budgetMin: filters.budgetMin ? String(filters.budgetMin) : '',
             budgetMax: filters.budgetMax ? String(filters.budgetMax) : '',
@@ -99,8 +99,10 @@ export default function FilterContent({ cars = [] }) {
         if (localFilters.make) {
             active.push({ key: 'make', label: localFilters.make, value: localFilters.make });
         }
-        if (localFilters.model) {
-            active.push({ key: 'model', label: localFilters.model, value: localFilters.model });
+        if (localFilters.models && localFilters.models.length > 0) {
+            localFilters.models.forEach((model) => {
+                active.push({ key: `model-${model}`, label: model, value: model, isModel: true });
+            });
         }
         if (localFilters.year) {
             active.push({ key: 'year', label: localFilters.year, value: localFilters.year });
@@ -119,19 +121,32 @@ export default function FilterContent({ cars = [] }) {
 
     // Handle filter change
     const handleFilterChange = async (key, value) => {
-        const updated = { ...localFilters, [key]: value };
+        const updated = { ...localFilters };
+
         if (key === 'make') {
-            updated.model = ''; // Reset model when make changes
+            updated.make = value;
+            updated.models = []; // Reset models when make changes
+        } else if (key === 'model') {
+            // Toggle model in the models array
+            const currentModels = updated.models || [];
+            if (currentModels.includes(value)) {
+                updated.models = currentModels.filter(m => m !== value);
+            } else {
+                updated.models = [...currentModels, value];
+            }
+        } else {
+            updated[key] = value;
         }
+
         setLocalFilters(updated);
 
-        // Dispatch to Redux
+        // Dispatch to Redux (use first model for backward compatibility, or null if no models)
         const filtersToDispatch = {
             ...updated,
             budgetMin: updated.budgetMin ? Number(updated.budgetMin) : null,
             budgetMax: updated.budgetMax ? Number(updated.budgetMax) : null,
             year: updated.year || null,
-            model: updated.model || null,
+            model: updated.models && updated.models.length > 0 ? updated.models[0] : null, // Use first model for API compatibility
             make: updated.make || null,
             condition: updated.condition,
             zipCode: updated.zipCode || '',
@@ -144,15 +159,17 @@ export default function FilterContent({ cars = [] }) {
     };
 
     // Remove active filter
-    const removeFilter = async (key) => {
+    const removeFilter = async (key, value = null) => {
         const updated = { ...localFilters };
         if (key === 'condition') {
             updated.condition = 'new';
         } else if (key === 'make') {
             updated.make = '';
-            updated.model = '';
-        } else if (key === 'model') {
-            updated.model = '';
+            updated.models = [];
+        } else if (key.startsWith('model-')) {
+            // Remove specific model from array
+            const modelToRemove = value || key.replace('model-', '');
+            updated.models = (updated.models || []).filter(m => m !== modelToRemove);
         } else if (key === 'year') {
             updated.year = '';
         } else if (key === 'budgetMin') {
@@ -169,7 +186,7 @@ export default function FilterContent({ cars = [] }) {
             budgetMin: updated.budgetMin ? Number(updated.budgetMin) : null,
             budgetMax: updated.budgetMax ? Number(updated.budgetMax) : null,
             year: updated.year || null,
-            model: updated.model || null,
+            model: updated.models && updated.models.length > 0 ? updated.models[0] : null,
             make: updated.make || null,
             condition: updated.condition,
             zipCode: updated.zipCode || '',
@@ -184,7 +201,7 @@ export default function FilterContent({ cars = [] }) {
         const resetFilters = {
             condition: 'new',
             make: '',
-            model: '',
+            models: [],
             year: '',
             budgetMin: '',
             budgetMax: '',
@@ -226,7 +243,7 @@ export default function FilterContent({ cars = [] }) {
                         {activeFilters.map((filter) => (
                             <motion.button
                                 key={filter.key}
-                                onClick={() => removeFilter(filter.key)}
+                                onClick={() => removeFilter(filter.key, filter.value)}
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 className="cursor-pointer inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-orange-500/20 to-orange-400/20 backdrop-blur-sm border border-orange-400/40 hover:from-orange-500/30 hover:to-orange-400/30 text-orange-700 text-xs font-semibold transition-all duration-200 hover:shadow-md group"
@@ -417,7 +434,7 @@ export default function FilterContent({ cars = [] }) {
                                     <div className="px-4 pb-4 pt-2 space-y-1.5 max-h-64 overflow-y-auto">
                                         {modelsForSelectedMake.map((model) => {
                                             const count = modelCounts[model] || 0;
-                                            const isSelected = localFilters.model === model;
+                                            const isSelected = localFilters.models && localFilters.models.includes(model);
                                             return (
                                                 <motion.div
                                                     key={model}
@@ -426,14 +443,15 @@ export default function FilterContent({ cars = [] }) {
                                                         ? 'bg-gradient-to-r from-orange-50/80 to-orange-100/60 border border-orange-300/50 shadow-sm'
                                                         : 'hover:bg-white/40 border border-transparent'
                                                         }`}
-                                                    onClick={() => handleFilterChange('model', isSelected ? '' : model)}
+                                                    onClick={() => handleFilterChange('model', model)}
                                                 >
                                                     <input
                                                         type="checkbox"
                                                         id={`model-${model}`}
                                                         checked={isSelected}
                                                         onChange={(e) => {
-                                                            handleFilterChange('model', e.target.checked ? model : '');
+                                                            e.stopPropagation();
+                                                            handleFilterChange('model', model);
                                                         }}
                                                         className={`w-4 h-4 rounded border-2 cursor-pointer transition-all ${isSelected
                                                             ? 'border-orange-500 bg-orange-500 text-white'
@@ -445,6 +463,7 @@ export default function FilterContent({ cars = [] }) {
                                                         htmlFor={`model-${model}`}
                                                         className={`text-sm cursor-pointer flex-1 flex items-center justify-between ${isSelected ? 'text-orange-900 font-semibold' : 'text-neutral-800'
                                                             }`}
+                                                        onClick={(e) => e.stopPropagation()}
                                                     >
                                                         <span>{model}</span>
                                                         {count > 0 && (
