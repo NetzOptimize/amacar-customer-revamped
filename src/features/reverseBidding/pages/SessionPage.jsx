@@ -6,6 +6,7 @@ import LeaderboardTable from '../components/LeaderboardTable';
 import BidDetailsDialog from '../components/BidDetailsDialog';
 import AcceptConfirmDialog from '../components/AcceptConfirmDialog';
 import CertificateDialog from '../components/CertificateDialog';
+import AppointmentModal from '../../../components/ui/AppointmentModal';
 import { acceptBidThunk, simulateLiveBidsThunk } from '../redux/reverseBidSlice';
 import { generateCertificatePDF } from '../utils/pdfGenerator';
 
@@ -16,6 +17,7 @@ export default function SessionPage() {
     const [viewBid, setViewBid] = useState(null);
     const [confirmBid, setConfirmBid] = useState(null);
     const [showCert, setShowCert] = useState(false);
+    const [showAppointmentModal, setShowAppointmentModal] = useState(false);
     const [timeRemaining, setTimeRemaining] = useState(4 * 60 * 60); // 4 hours in seconds
 
     // Initialize timer when session starts
@@ -65,7 +67,37 @@ export default function SessionPage() {
 
     const downloadPDF = async () => {
         await generateCertificatePDF({ id: activeSession.id, car: activeSession.car, acceptedBid: activeSession.acceptedBid });
+        // Open appointment modal after PDF download
+        setShowCert(false);
+        setShowAppointmentModal(true);
     };
+
+    const handleContinue = () => {
+        // Close certificate dialog and open appointment modal
+        setShowCert(false);
+        setShowAppointmentModal(true);
+    };
+
+    const handleAppointmentClose = (open) => {
+        if (!open) {
+            setShowAppointmentModal(false);
+        }
+    };
+
+    const handleAppointmentSubmit = () => {
+        // After appointment is scheduled, close the modal
+        setShowAppointmentModal(false);
+    };
+
+    // Get vehicle info for appointment modal
+    const vehicleInfo = activeSession?.car
+        ? `${activeSession.car.year} ${activeSession.car.make} ${activeSession.car.model}`
+        : 'Vehicle';
+
+    // Get dealer info from accepted bid
+    const dealerName = activeSession?.acceptedBid?.dealerName || 'Dealer';
+    const dealerId = activeSession?.acceptedBid?.id || activeSession?.acceptedBid?.dealerId || '';
+    const dealerEmail = activeSession?.acceptedBid?.dealerEmail || 'contact@dealer.com';
 
     return (
         <motion.div
@@ -142,7 +174,27 @@ export default function SessionPage() {
 
             <BidDetailsDialog open={!!viewBid} bid={viewBid} onClose={() => setViewBid(null)} onAccept={onAcceptFlow} />
             <AcceptConfirmDialog open={!!confirmBid} bid={confirmBid} onCancel={() => setConfirmBid(null)} onConfirm={onConfirmAccept} loading={loading.acceptance} />
-            <CertificateDialog open={showCert} session={activeSession} onDownload={downloadPDF} onContinue={() => setShowCert(false)} onClose={() => setShowCert(false)} />
+            <CertificateDialog
+                open={showCert}
+                session={activeSession}
+                onDownload={downloadPDF}
+                onContinue={handleContinue}
+                onClose={() => setShowCert(false)}
+            />
+            {showAppointmentModal && (
+                <AppointmentModal
+                    isOpen={showAppointmentModal}
+                    onClose={handleAppointmentClose}
+                    onParentClose={handleAppointmentClose}
+                    dealerName={dealerName}
+                    dealerId={dealerId}
+                    dealerEmail={dealerEmail}
+                    vehicleInfo={vehicleInfo}
+                    onAppointmentSubmit={handleAppointmentSubmit}
+                    title="Schedule Your Appointment"
+                    description={`Now that your offer of ${activeSession?.acceptedBid?.currentOffer ? `$${activeSession.acceptedBid.currentOffer.toLocaleString()}` : 'N/A'} has been accepted, let's schedule your appointment to complete the transaction.`}
+                />
+            )}
         </motion.div>
     );
 }
