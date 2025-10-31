@@ -8,7 +8,7 @@ export default function ResultsPage() {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="px-4 sm:px-6 lg:px-8 pb-8 max-w-7xl mx-auto pt-[calc(var(--header-height-mobile)+2rem)] sm:pt-[calc(var(--header-height-tablet)+2rem)] lg:pt-[calc(var(--header-height-desktop)+2rem)]"
+            className="px-4 sm:px-6 lg:px-8 pb-60 max-w-7xl mx-auto pt-[calc(var(--header-height-mobile)+2rem)] sm:pt-[calc(var(--header-height-tablet)+2rem)] lg:pt-[calc(var(--header-height-desktop)+2rem)] "
         >
             <div className="mb-6">
                 <h1 className="text-3xl font-bold tracking-tight">New and certified used vehicles for sale</h1>

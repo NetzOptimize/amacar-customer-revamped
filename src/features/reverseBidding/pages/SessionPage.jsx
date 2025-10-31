@@ -7,7 +7,7 @@ import BidDetailsDialog from '../components/BidDetailsDialog';
 import AcceptConfirmDialog from '../components/AcceptConfirmDialog';
 import CertificateDialog from '../components/CertificateDialog';
 import AppointmentModal from '../../../components/ui/AppointmentModal';
-import { acceptBidThunk, simulateLiveBidsThunk } from '../redux/reverseBidSlice';
+import { acceptBidThunk, simulateLiveBidsThunk, fetchSessionDetailsThunk, fetchLeaderboardThunk } from '../redux/reverseBidSlice';
 import { generateCertificatePDF } from '../utils/pdfGenerator';
 
 export default function SessionPage() {
@@ -20,13 +20,40 @@ export default function SessionPage() {
     const [showAppointmentModal, setShowAppointmentModal] = useState(false);
     const [timeRemaining, setTimeRemaining] = useState(4 * 60 * 60); // 4 hours in seconds
 
-    // Initialize timer when session starts
+    // Fetch session details on component mount or when sessionId changes
     useEffect(() => {
-        if (activeSession?.id === sessionId && activeSession.status === 'active') {
-            // Reset timer to 4 hours when session becomes active
-            setTimeRemaining(4 * 60 * 60);
+        if (sessionId) {
+            dispatch(fetchSessionDetailsThunk(sessionId));
         }
-    }, [activeSession?.id, activeSession?.status, sessionId]);
+    }, [dispatch, sessionId]);
+
+    // Set up polling to refresh leaderboard every 5 seconds
+    useEffect(() => {
+        if (!sessionId || (activeSession?.status !== 'running' && activeSession?.status !== 'active')) return;
+
+        const interval = setInterval(() => {
+            dispatch(fetchLeaderboardThunk(sessionId));
+        }, 5000); // Poll every 5 seconds
+
+        return () => clearInterval(interval);
+    }, [dispatch, sessionId, activeSession?.status]);
+
+    // Initialize timer from API time_remaining or calculate from expiresAt
+    useEffect(() => {
+        if (activeSession?.id === sessionId) {
+            // Use time_remaining from API if available
+            if (activeSession.timeRemaining !== undefined) {
+                setTimeRemaining(activeSession.timeRemaining);
+            } else if (activeSession.expiresAt) {
+                // Calculate remaining time from expiresAt
+                const remaining = Math.max(0, Math.floor((activeSession.expiresAt - Date.now()) / 1000));
+                setTimeRemaining(remaining);
+            } else {
+                // Fallback to 4 hours
+                setTimeRemaining(4 * 60 * 60);
+            }
+        }
+    }, [activeSession?.id, activeSession?.status, activeSession?.timeRemaining, activeSession?.expiresAt, sessionId]);
 
     // Countdown timer
     useEffect(() => {
@@ -42,11 +69,13 @@ export default function SessionPage() {
         return () => clearInterval(timer);
     }, [timeRemaining]);
 
-    useEffect(() => {
-        if (activeSession?.id === sessionId && activeSession.status === 'active') {
-            dispatch(simulateLiveBidsThunk(sessionId));
-        }
-    }, [dispatch, sessionId, activeSession?.id, activeSession?.status]);
+    // Note: Commented out simulateLiveBidsThunk as we're using real API now
+    // If you want to keep simulated updates for testing, uncomment this:
+    // useEffect(() => {
+    //     if (activeSession?.id === sessionId && (activeSession.status === 'active' || activeSession.status === 'running')) {
+    //         dispatch(simulateLiveBidsThunk(sessionId));
+    //     }
+    // }, [dispatch, sessionId, activeSession?.id, activeSession?.status]);
 
     const rows = useMemo(() => activeSession?.leaderboard || [], [activeSession]);
 

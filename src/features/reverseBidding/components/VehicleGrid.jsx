@@ -29,8 +29,8 @@ export default function VehicleGrid({ cars }) {
     const { loading, pagination, filters } = useSelector((s) => s.reverseBid);
     const [drawerOpen, setDrawerOpen] = useState(false);
 
-    const handleStart = async (car) => {
-        const res = await dispatch(startReverseBiddingThunk(car));
+    const handleStart = async (car, criteria) => {
+        const res = await dispatch(startReverseBiddingThunk({ carData: car, criteria }));
         const payload = res?.payload;
         if (payload?.sessionId) {
             navigate(`/reverse-bidding/session/${payload.sessionId}`);
@@ -255,7 +255,7 @@ export default function VehicleGrid({ cars }) {
                         </div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2 gap-6">
                                 {cars.map((c) => (
                                     <VehicleCard key={c.id} car={c} onStart={handleStart} loading={loading.session} />
                                 ))}

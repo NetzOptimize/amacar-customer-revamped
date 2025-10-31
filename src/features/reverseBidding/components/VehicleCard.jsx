@@ -112,7 +112,7 @@ export default function VehicleCard({ car, onStart, loading = false }) {
                 <div className="flex items-center gap-2 text-sm text-neutral-600">
                     <span>{location}</span>
                     {car.vin && (
-                        <span className="text-xs text-neutral-400">• VIN: {car.vin.slice(-6)}</span>
+                        <span className="text-xs text-neutral-400">• VIN: {car.vin}</span>
                     )}
                 </div>
                 <button
@@ -127,9 +127,9 @@ export default function VehicleCard({ car, onStart, loading = false }) {
             <ReverseBiddingConfirmDialog
                 open={dialogOpen}
                 onClose={() => setDialogOpen(false)}
-                onConfirm={async () => {
+                onConfirm={async (formData) => {
                     if (!loading) {
-                        await onStart(car);
+                        await onStart(car, formData);
                         // Dialog will close when navigation happens or we can close it here
                         // setDialogOpen(false); // Uncomment if needed
                     }

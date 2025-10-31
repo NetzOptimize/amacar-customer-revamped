@@ -119,21 +119,136 @@ export const fetchMockCarsThunk = createAsyncThunk(
 
 export const startReverseBiddingThunk = createAsyncThunk(
     'reverseBid/startSession',
-    async (carData, { rejectWithValue }) => {
+    async ({ carData, criteria }, { getState, rejectWithValue }) => {
         try {
-            await new Promise((r) => setTimeout(r, 600));
-            const sessionId = generateSessionId();
-            const { generateMockDealers } = await import('../utils/mockData');
-            const dealers = generateMockDealers(carData);
-            return {
-                sessionId,
-                car: carData,
-                dealers,
-                createdAt: Date.now(),
-                expiresAt: Date.now() + 24 * 60 * 60 * 1000,
+            const state = getState();
+            const filters = criteria || state.reverseBid.filters;
+
+            // Build request body
+            const requestBody = {
+                criteria: {
+                    make: carData.make || null,
+                    model: carData.model || null,
+                    year: carData.year ? (typeof carData.year === 'string' ? parseInt(carData.year, 10) : carData.year) : null,
+                    price: carData.price || filters.budgetMin || filters.budgetMax || null,
+                    new_used: filters.condition === 'used' ? 'U' : 'N',
+                    zip_code: filters.zipCode || carData.zip_code || '',
+                    radius: 50, // Default radius
+                },
+                duration_hours: 4,
             };
+
+            // Make API call
+            const response = await api.post('/sessions/start', requestBody);
+
+            if (response.data.success && response.data.data) {
+                const sessionData = response.data.data;
+
+                // For now, still generate mock dealers until dealer list API is available
+                // The API response includes session_id, criteria, eligible_vehicles_count, dealer_count, and end_time
+                const { generateMockDealers } = await import('../utils/mockData');
+                const dealers = generateMockDealers(carData);
+
+                // Parse end_time to timestamp
+                const endTime = sessionData.end_time ? new Date(sessionData.end_time).getTime() : Date.now() + 4 * 60 * 60 * 1000;
+
+                return {
+                    sessionId: String(sessionData.session_id),
+                    car: carData,
+                    dealers,
+                    createdAt: Date.now(),
+                    expiresAt: endTime,
+                    sessionData: {
+                        session_id: sessionData.session_id,
+                        eligible_vehicles_count: sessionData.eligible_vehicles_count,
+                        dealer_count: sessionData.dealer_count,
+                        end_time: sessionData.end_time,
+                    },
+                };
+            } else {
+                return rejectWithValue(response.data.message || 'Failed to start session');
+            }
         } catch (err) {
-            return rejectWithValue(err?.message || 'Failed to start session');
+            console.error('Start session API error:', err);
+            return rejectWithValue(err.response?.data?.message || err.message || 'Failed to start session');
+        }
+    }
+);
+
+export const fetchSessionDetailsThunk = createAsyncThunk(
+    'reverseBid/fetchSessionDetails',
+    async (sessionId, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/sessions/${sessionId}`);
+
+            if (response.data.success && response.data.data) {
+                const sessionData = response.data.data;
+
+                // Map API response to match component expectations
+                const leaderboard = (sessionData.leaderboard || []).map((bid, index) => ({
+                    id: bid.bid_id,
+                    dealerId: bid.dealer_id,
+                    dealerName: bid.dealer_name,
+                    currentOffer: bid.amount,
+                    perks: bid.perks || {},
+                    rank: bid.position || index + 1,
+                    distance: bid.distance || 0,
+                    location: bid.distance ? `${bid.distance} miles away` : 'Location unavailable',
+                    // Calculate savings (will need base price from session criteria)
+                    savings: 0, // Will be calculated if base price is available
+                }));
+
+                return {
+                    sessionId: String(sessionData.id),
+                    status: sessionData.status || 'running',
+                    criteria: sessionData.criteria || {},
+                    startAt: sessionData.start_at,
+                    endAt: sessionData.end_at,
+                    timeRemaining: sessionData.time_remaining || { seconds: 0, formatted: '00:00:00' },
+                    leaderboard,
+                    totalBids: sessionData.total_bids || 0,
+                    winningBidId: sessionData.winning_bid_id || null,
+                };
+            }
+            return rejectWithValue('Failed to fetch session details');
+        } catch (err) {
+            console.error('Fetch session details API error:', err);
+            return rejectWithValue(err.response?.data?.message || err.message || 'Failed to fetch session details');
+        }
+    }
+);
+
+export const fetchLeaderboardThunk = createAsyncThunk(
+    'reverseBid/fetchLeaderboard',
+    async (sessionId, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/sessions/${sessionId}/leaderboard`);
+
+            if (response.data.success && response.data.data) {
+                const leaderboardData = response.data.data;
+
+                // Map API response to match component expectations
+                const leaderboard = (leaderboardData.leaderboard || []).map((bid, index) => ({
+                    id: bid.bid_id,
+                    dealerId: bid.dealer_id,
+                    dealerName: bid.dealer_name,
+                    currentOffer: bid.amount,
+                    perks: bid.perks || {},
+                    rank: bid.position || index + 1,
+                    distance: bid.distance || 0,
+                    location: bid.distance ? `${bid.distance} miles away` : 'Location unavailable',
+                    savings: 0, // Will be calculated if base price is available
+                }));
+
+                return {
+                    leaderboard,
+                    totalBids: leaderboardData.total_bids || 0,
+                };
+            }
+            return rejectWithValue('Failed to fetch leaderboard');
+        } catch (err) {
+            console.error('Fetch leaderboard API error:', err);
+            return rejectWithValue(err.response?.data?.message || err.message || 'Failed to fetch leaderboard');
         }
     }
 );
@@ -142,21 +257,67 @@ export const acceptBidThunk = createAsyncThunk(
     'reverseBid/acceptBid',
     async ({ sessionId, bidId }, { getState, rejectWithValue }) => {
         try {
-            await new Promise((r) => setTimeout(r, 900));
+            // Find the bid in the leaderboard
             const state = getState().reverseBid;
-            const dealer = state.activeSession?.dealers?.find((d) => d.id === bidId);
-            if (!dealer) throw new Error('Bid not found');
-            const certificate = {
-                id: `CERT-${nanoid(8)}`,
-                sessionId,
-                dealerId: dealer.id,
-                dealerName: dealer.dealerName,
-                acceptedAt: Date.now(),
-                finalPrice: dealer.currentOffer,
-            };
-            return { acceptedBid: dealer, certificate };
+            const bid = state.activeSession?.leaderboard?.find((b) => b.id === bidId);
+
+            if (!bid) {
+                // Fallback: try to find in dealers (backward compatibility)
+                const dealer = state.activeSession?.dealers?.find((d) => d.id === bidId);
+                if (!dealer) {
+                    throw new Error('Bid not found');
+                }
+            }
+
+            // Make API call to accept the bid
+            const response = await api.post(`/sessions/${sessionId}/accept`, {
+                bid_id: bidId,
+            });
+
+            if (response.data.success && response.data.data) {
+                const apiData = response.data.data;
+                const certificateData = apiData.certificate_data || {};
+
+                // Map API response to match component expectations
+                const acceptedBid = bid || {
+                    id: apiData.bid_id,
+                    dealerId: certificateData.dealer?.id,
+                    dealerName: certificateData.dealer?.name || bid?.dealerName,
+                    dealerEmail: certificateData.dealer?.email,
+                    currentOffer: certificateData.bid_amount || bid?.currentOffer,
+                    perks: certificateData.perks || bid?.perks || {},
+                };
+
+                const certificate = {
+                    id: certificateData.certificate_id || apiData.certificate_id,
+                    sessionId: certificateData.session_id || apiData.session_id,
+                    bidId: certificateData.bid_id || apiData.bid_id,
+                    dealerId: certificateData.dealer?.id,
+                    dealerName: certificateData.dealer?.name,
+                    dealerEmail: certificateData.dealer?.email,
+                    customerId: certificateData.customer?.id,
+                    customerName: certificateData.customer?.name,
+                    customerEmail: certificateData.customer?.email,
+                    vehicle: certificateData.vehicle || {},
+                    bidAmount: certificateData.bid_amount,
+                    perks: certificateData.perks || {},
+                    issuedAt: certificateData.issued_at,
+                    validUntil: certificateData.valid_until,
+                    acceptedAt: certificateData.issued_at ? new Date(certificateData.issued_at).getTime() : Date.now(),
+                    finalPrice: certificateData.bid_amount || bid?.currentOffer,
+                };
+
+                return {
+                    acceptedBid,
+                    certificate,
+                    certificateData: certificateData, // Store full API response
+                };
+            } else {
+                return rejectWithValue(response.data.message || 'Failed to accept bid');
+            }
         } catch (err) {
-            return rejectWithValue(err?.message || 'Failed to accept bid');
+            console.error('Accept bid API error:', err);
+            return rejectWithValue(err.response?.data?.message || err.message || 'Failed to accept bid');
         }
     }
 );
@@ -220,9 +381,14 @@ const initialState = {
         status: 'idle',
         acceptedBid: null,
         certificate: null,
+        certificateData: null,
         appointment: null,
         createdAt: null,
         expiresAt: null,
+        criteria: null,
+        timeRemaining: null,
+        totalBids: 0,
+        winningBidId: null,
     },
     loading: { search: false, session: false, acceptance: false },
     error: null,
@@ -320,13 +486,107 @@ const reverseBidSlice = createSlice({
             })
             .addCase(acceptBidThunk.fulfilled, (state, action) => {
                 state.loading.acceptance = false;
-                state.activeSession.acceptedBid = action.payload.acceptedBid;
-                state.activeSession.certificate = action.payload.certificate;
-                state.activeSession.status = 'accepted';
+                if (action.payload) {
+                    state.activeSession.acceptedBid = action.payload.acceptedBid;
+                    state.activeSession.certificate = action.payload.certificate;
+                    state.activeSession.status = 'accepted';
+
+                    // Store full certificate data if provided
+                    if (action.payload.certificateData) {
+                        state.activeSession.certificateData = action.payload.certificateData;
+                    }
+                }
             })
             .addCase(acceptBidThunk.rejected, (state, action) => {
                 state.loading.acceptance = false;
                 state.error = action.payload || 'Acceptance failed';
+            })
+            // fetch session details
+            .addCase(fetchSessionDetailsThunk.pending, (state) => {
+                state.loading.session = true;
+                state.error = null;
+            })
+            .addCase(fetchSessionDetailsThunk.fulfilled, (state, action) => {
+                state.loading.session = false;
+                if (action.payload) {
+                    const { sessionId, status, criteria, startAt, endAt, timeRemaining, leaderboard, totalBids, winningBidId } = action.payload;
+
+                    // Update active session
+                    state.activeSession.id = sessionId;
+                    state.activeSession.status = status;
+                    state.activeSession.criteria = criteria;
+                    state.activeSession.totalBids = totalBids;
+                    state.activeSession.winningBidId = winningBidId;
+                    state.activeSession.leaderboard = leaderboard;
+
+                    // If car data doesn't exist, create it from criteria
+                    if (!state.activeSession.car && criteria) {
+                        state.activeSession.car = {
+                            make: criteria.make,
+                            model: criteria.model,
+                            year: criteria.year,
+                            price: criteria.price,
+                            images: [],
+                        };
+                    }
+
+                    // Calculate savings if we have base price
+                    if (criteria?.price && leaderboard.length > 0) {
+                        state.activeSession.leaderboard = leaderboard.map(bid => ({
+                            ...bid,
+                            savings: criteria.price - bid.currentOffer,
+                        }));
+                    }
+
+                    // Update timestamps
+                    if (startAt) {
+                        state.activeSession.createdAt = new Date(startAt).getTime();
+                    }
+                    if (endAt) {
+                        state.activeSession.expiresAt = new Date(endAt).getTime();
+                    }
+
+                    // Update time remaining from API
+                    if (timeRemaining?.seconds !== undefined) {
+                        state.activeSession.timeRemaining = timeRemaining.seconds;
+                    }
+                }
+            })
+            .addCase(fetchSessionDetailsThunk.rejected, (state, action) => {
+                state.loading.session = false;
+                state.error = action.payload || 'Failed to fetch session details';
+            })
+            // fetch leaderboard
+            .addCase(fetchLeaderboardThunk.pending, (state) => {
+                state.loading.session = true;
+            })
+            .addCase(fetchLeaderboardThunk.fulfilled, (state, action) => {
+                state.loading.session = false;
+                if (action.payload) {
+                    const { leaderboard } = action.payload;
+
+                    // Calculate savings if we have base price from criteria
+                    const criteria = state.activeSession.criteria || (state.activeSession.car ? { price: state.activeSession.car.price } : null);
+                    const basePrice = criteria?.price || state.activeSession.car?.price;
+
+                    if (basePrice && leaderboard.length > 0) {
+                        state.activeSession.leaderboard = leaderboard.map(bid => ({
+                            ...bid,
+                            savings: basePrice - bid.currentOffer,
+                        }));
+                    } else {
+                        state.activeSession.leaderboard = leaderboard;
+                    }
+
+                    // Update total bids if provided
+                    if (action.payload.totalBids !== undefined) {
+                        state.activeSession.totalBids = action.payload.totalBids;
+                    }
+                }
+            })
+            .addCase(fetchLeaderboardThunk.rejected, (state, action) => {
+                state.loading.session = false;
+                state.error = action.payload || 'Failed to fetch leaderboard';
             });
     },
 });

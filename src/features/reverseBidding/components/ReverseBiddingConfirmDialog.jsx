@@ -50,8 +50,12 @@ export default function ReverseBiddingConfirmDialog({
             condition: formData.condition,
             zipCode: formData.zipCode,
         }));
-        // Call the original onConfirm
-        onConfirm();
+        // Call the original onConfirm with formData so it can be passed to the API
+        onConfirm({
+            condition: formData.condition,
+            zipCode: formData.zipCode,
+            phone: formData.phone,
+        });
     };
 
     if (!open) return null;
