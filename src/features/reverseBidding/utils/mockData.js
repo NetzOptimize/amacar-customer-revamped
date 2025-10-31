@@ -9,6 +9,7 @@ const MODELS = {
 
 export const getMockCars = (filters = {}) => {
     const { make, model, year, budgetMin, budgetMax, condition = 'new' } = filters;
+    console.log(filters);
     const cars = Array.from({ length: 12 }).map((_, i) => {
         const mk = make || MAKES[i % MAKES.length];
         const md = model || MODELS[mk][i % MODELS[mk].length];

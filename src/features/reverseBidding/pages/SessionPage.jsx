@@ -16,6 +16,29 @@ export default function SessionPage() {
     const [viewBid, setViewBid] = useState(null);
     const [confirmBid, setConfirmBid] = useState(null);
     const [showCert, setShowCert] = useState(false);
+    const [timeRemaining, setTimeRemaining] = useState(4 * 60 * 60); // 4 hours in seconds
+
+    // Initialize timer when session starts
+    useEffect(() => {
+        if (activeSession?.id === sessionId && activeSession.status === 'active') {
+            // Reset timer to 4 hours when session becomes active
+            setTimeRemaining(4 * 60 * 60);
+        }
+    }, [activeSession?.id, activeSession?.status, sessionId]);
+
+    // Countdown timer
+    useEffect(() => {
+        if (timeRemaining <= 0) return;
+
+        const timer = setInterval(() => {
+            setTimeRemaining((prev) => {
+                if (prev <= 1) return 0;
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [timeRemaining]);
 
     useEffect(() => {
         if (activeSession?.id === sessionId && activeSession.status === 'active') {
@@ -43,23 +66,76 @@ export default function SessionPage() {
     };
 
     return (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="min-h-screen">
-            <div className="border-b border-neutral-200 bg-gradient-to-r from-neutral-50 to-white px-6 py-8">
-                <div className="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-green-50 text-green-700 text-xs font-medium animate-pulse">● Live Session</div>
-                <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mt-3">Reverse Bidding Session</h1>
-                <p className="text-neutral-600 mt-2">{rows.length} dealers competing • Accept any offer anytime</p>
-                {activeSession?.car && (
-                    <div className="mt-6 p-4 flex items-center gap-4 rounded-xl border bg-white max-w-xl">
-                        <img src={activeSession.car.images?.[0]} className="w-24 h-24 rounded-lg object-cover" />
-                        <div>
-                            <div className="font-semibold">{activeSession.car.year} {activeSession.car.make} {activeSession.car.model}</div>
-                            <div className="text-sm text-neutral-600">Session #{activeSession.id}</div>
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="min-h-screen bg-gradient-to-b from-neutral-50 to-white"
+        >
+            {/* Header Section */}
+            <div className="border-b border-neutral-200 bg-gradient-to-r from-white via-neutral-50 to-white pt-[calc(var(--header-height-mobile)+2rem)] sm:pt-[calc(var(--header-height-tablet)+2rem)] lg:pt-[calc(var(--header-height-desktop)+2rem)]">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                        <div className="w-full">
+                            <div className="flex items-center justify-between">
+                                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-neutral-900 mb-2">
+                                    Reverse Bidding Session
+                                </h1>
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/50 text-green-700 text-xs font-semibold shadow-sm animate-pulse">
+                                    <span className="relative flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                    </span>
+                                    Live Session
+                                </div>
+                            </div>
+                            <p className="text-neutral-600 text-base sm:text-lg">
+                                {rows.length} dealers competing
+                            </p>
                         </div>
                     </div>
-                )}
+
+                    {/* Vehicle Card */}
+                    {activeSession?.car && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 }}
+                            className="relative overflow-hidden rounded-2xl border border-neutral-200/50 bg-white shadow-lg hover:shadow-xl transition-shadow duration-300"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-orange-50/50 via-transparent to-transparent pointer-events-none"></div>
+                            <div className="relative p-6 flex items-center gap-6">
+                                <div className="relative flex-shrink-0">
+                                    <img
+                                        src={activeSession.car.images?.[0]}
+                                        className="w-28 h-28 sm:w-32 sm:h-32 rounded-xl object-cover border-2 border-neutral-100 shadow-md"
+                                        alt={`${activeSession.car.year} ${activeSession.car.make} ${activeSession.car.model}`}
+                                    />
+                                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-orange-500 rounded-full border-2 border-white"></div>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="text-2xl sm:text-3xl font-bold text-neutral-900 mb-1">
+                                        {activeSession.car.year} {activeSession.car.make} {activeSession.car.model}
+                                    </div>
+                                    <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-lg bg-neutral-100 text-neutral-600 text-sm font-medium">
+                                        <span className="text-xs font-semibold text-neutral-500">Session ID:</span>
+                                        <span className="font-mono">{activeSession.id}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </div>
             </div>
-            <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
-                <LeaderboardTable rows={rows} onView={setViewBid} onAccept={onAcceptFlow} />
+
+            {/* Leaderboard Section */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                >
+                    <LeaderboardTable rows={rows} onView={setViewBid} onAccept={onAcceptFlow} timeRemaining={timeRemaining} />
+                </motion.div>
             </div>
 
             <BidDetailsDialog open={!!viewBid} bid={viewBid} onClose={() => setViewBid(null)} onAccept={onAcceptFlow} />

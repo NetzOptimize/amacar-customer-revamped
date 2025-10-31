@@ -1,4 +1,4 @@
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import VehicleCard from './VehicleCard';
 import { startReverseBiddingThunk } from '../redux/reverseBidSlice';
 import { useNavigate } from 'react-router-dom';
@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 export default function VehicleGrid({ cars }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { loading } = useSelector((s) => s.reverseBid);
 
     const handleStart = async (car) => {
         const res = await dispatch(startReverseBiddingThunk(car));
@@ -27,7 +28,7 @@ export default function VehicleGrid({ cars }) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {cars.map((c) => (
-                <VehicleCard key={c.id} car={c} onStart={handleStart} />
+                <VehicleCard key={c.id} car={c} onStart={handleStart} loading={loading.session} />
             ))}
         </div>
     );
