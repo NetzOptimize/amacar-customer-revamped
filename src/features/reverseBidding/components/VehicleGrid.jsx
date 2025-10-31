@@ -3,6 +3,7 @@ import { useState } from 'react';
 import VehicleCard from './VehicleCard';
 import FilterSidebar from './FilterSidebar';
 import FilterContent from './FilterContent';
+import VehicleGridSkeleton from './skeletons/VehicleGridSkeleton';
 import { startReverseBiddingThunk, fetchMockCarsThunk, setPage } from '../redux/reverseBidSlice';
 import { useNavigate } from 'react-router-dom';
 import { Filter, X, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
@@ -252,7 +253,30 @@ export default function VehicleGrid({ cars, showFilters = true }) {
                         </div>
                     )}
 
-                    {!cars?.length ? (
+                    {/* Show skeleton only for vehicle grid when loading */}
+                    {loading.search ? (
+                        <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${showFilters ? 'lg:grid-cols-2' : 'lg:grid-cols-3'}`}>
+                            {Array.from({ length: showFilters ? 6 : 9 }).map((_, index) => (
+                                <div
+                                    key={index}
+                                    className="overflow-hidden rounded-2xl border border-neutral-200/50 bg-white shadow-lg"
+                                >
+                                    {/* Image Skeleton */}
+                                    <div className="relative h-56 bg-neutral-200/60 animate-pulse">
+                                        <div className="absolute top-4 right-4 w-16 h-6 bg-neutral-300/60 rounded-md"></div>
+                                    </div>
+
+                                    {/* Content Skeleton */}
+                                    <div className="p-5 space-y-3">
+                                        <div className="h-6 bg-neutral-200/60 rounded-lg w-3/4 animate-pulse"></div>
+                                        <div className="h-8 bg-neutral-200/60 rounded-lg w-1/2 animate-pulse"></div>
+                                        <div className="h-4 bg-neutral-200/60 rounded-lg w-full animate-pulse"></div>
+                                        <div className="h-10 bg-neutral-200/60 rounded-lg w-full animate-pulse"></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : !cars?.length ? (
                         <div className="text-center py-16">
                             <div className="text-2xl font-semibold text-neutral-700">No vehicles match your criteria</div>
                             <div className="text-neutral-500 mt-2">Adjust your filters and try again.</div>
