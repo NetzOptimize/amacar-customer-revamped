@@ -1,6 +1,7 @@
 .hero-section {
     position: relative;
-    height: 75vh; /* full screen */
+    height: 75vh;
+    /* full screen */
     min-height: 600px;
     background-size: cover;
     background-position: center;
@@ -15,7 +16,8 @@
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(15, 15, 15, 0.10); /* slightly lighter for clearer image */
+    background: rgba(15, 15, 15, 0.10);
+    /* slightly lighter for clearer image */
     z-index: 1;
 }
 
@@ -38,14 +40,14 @@
     font-weight: 800;
     line-height: 1.2;
     margin-bottom: 1rem;
-    text-shadow: 0 6px 20px rgba(0,0,0,0.6);
+    text-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
 }
 
 .hero-sub {
     font-size: 1.1rem;
     margin-bottom: 2rem;
     color: rgba(255, 255, 255, 0.9);
-    text-shadow: 0 4px 14px rgba(0,0,0,0.4);
+    text-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
 }
 
 .hero-ctas {
@@ -65,22 +67,22 @@
 }
 
 .btn-white {
-    background: rgba(255,255,255,0.14);
+    background: rgba(255, 255, 255, 0.14);
     color: #ffffff;
-    border: 1px solid rgba(255,255,255,0.25);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 .btn-white:hover {
-    background: rgba(255,255,255,0.22);
+    background: rgba(255, 255, 255, 0.22);
     transform: translateY(-1px);
 }
 
 .btn-purple {
-    background: rgba(255,255,255,0.10);
+    background: rgba(255, 255, 255, 0.10);
     color: #ffffff;
-    border: 1px solid rgba(255,255,255,0.22);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
     text-align: left;
     display: flex;
     align-items: center;
@@ -88,7 +90,7 @@
 }
 
 .btn-purple:hover {
-    background: rgba(255,255,255,0.18);
+    background: rgba(255, 255, 255, 0.18);
     transform: translateY(-1px);
 }
 
@@ -97,9 +99,11 @@
     .hero-headline {
         font-size: 1.8rem;
     }
+
     .hero-sub {
         font-size: 1rem;
     }
+
     .hero-ctas {
         flex-direction: column;
         gap: 12px;

@@ -113,7 +113,7 @@ export default function VehicleCard({ car, onStart, loading = false }) {
             animate={{ opacity: 1, y: 0 }}
         >
             <Gallery>
-                <div className="relative h-56 overflow-hidden bg-neutral-100">
+                <div className="relative h-72 overflow-hidden bg-neutral-100">
                     {imageUrl && images.length > 0 ? (
                         <>
                             {/* Render all images but only show the first one */}
@@ -140,9 +140,17 @@ export default function VehicleCard({ car, onStart, loading = false }) {
                             ))}
                         </>
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-neutral-200 text-neutral-400">
-                            <span>No Image</span>
-                        </div>
+                        <>
+                            <div className="w-full h-full flex items-center justify-center bg-neutral-200 text-neutral-400">
+                                <span>No Image</span>
+                            </div>
+                            {/* Overlay effect for missing images */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-neutral-800/70 via-neutral-700/60 to-neutral-800/70 backdrop-blur-sm flex items-center justify-center z-20">
+                                <div className="text-center px-4">
+                                    <p className="text-white text-sm font-medium">request vehicle image?</p>
+                                </div>
+                            </div>
+                        </>
                     )}
                     {/* Heart/Save Button - Top Left */}
                     <button
@@ -151,7 +159,7 @@ export default function VehicleCard({ car, onStart, loading = false }) {
                             setIsSaved(!isSaved);
                             // TODO: Implement save vehicle functionality
                         }}
-                        className={`absolute top-4 left-4 p-2 rounded-full backdrop-blur-md transition-all duration-200 hover:scale-110 z-10 ${isSaved
+                        className={`absolute top-4 left-4 p-2 rounded-full backdrop-blur-md transition-all duration-200 hover:scale-110 z-30 ${isSaved
                             ? 'bg-red-500/90 text-white shadow-lg'
                             : 'bg-white/90 text-neutral-700 hover:bg-red-50 hover:text-red-600 shadow-md'
                             }`}
@@ -160,38 +168,64 @@ export default function VehicleCard({ car, onStart, loading = false }) {
                         <Heart className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
                     </button>
                     {/* Condition Badge - Top Right */}
-                    <div className={`absolute top-4 right-4 px-2 py-1 rounded-md text-xs font-medium backdrop-blur-md text-white z-10 ${conditionColor}`}>
+                    <div className={`absolute top-4 right-4 px-2 py-1 rounded-md text-xs font-medium backdrop-blur-md text-white z-30 ${conditionColor}`}>
                         {conditionBadge}
                     </div>
                     {/* Image Count Badge - Bottom Right */}
                     {imageCount > 0 && (
-                        <div className="absolute bottom-4 right-4 px-2.5 py-1 rounded-md text-xs font-semibold backdrop-blur-md bg-black/60 text-white z-10 pointer-events-none">
+                        <div className="absolute bottom-4 right-4 px-2.5 py-1 rounded-md text-xs font-semibold backdrop-blur-md bg-black/60 text-white z-30 pointer-events-none">
                             {`1/${imageCount}`}
                         </div>
                     )}
                 </div>
             </Gallery>
             <div className="p-5 space-y-3">
-                <h3 className="text-lg font-semibold tracking-tight truncate">
+                <h3 className="text-base sm:text-lg font-semibold tracking-tight truncate">
                     {car.year} {car.make} {car.model}
                 </h3>
-                <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold">${price.toLocaleString()}</span>
-                    <span className="text-xs text-neutral-500">MSRP</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-neutral-600">
-                    <span>{location}</span>
+                {price === 0 ? (
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 ">
+                        <span className="text-lg  font-semibold text-neutral-400">Price not available</span>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                // TODO: Implement request price functionality
+                            }}
+                            className="text-xs sm:text-sm font-medium text-orange-600 hover:text-orange-700 underline cursor-pointer transition-colors whitespace-nowrap self-start sm:self-auto"
+                        >
+                            Request for price
+                        </button>
+                    </div>
+                ) : (
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-xl sm:text-2xl font-bold">${price.toLocaleString()}</span>
+                        <span className="text-xs text-neutral-500">MSRP</span>
+                    </div>
+                )}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm text-neutral-600">
+                    <span className="truncate">{location}</span>
                     {car.vin && (
-                        <span className="text-xs text-neutral-400">• VIN: {car.vin}</span>
+                        <span className="text-xs text-neutral-400 truncate">• VIN: {car.vin}</span>
                     )}
                 </div>
-                <button
-                    onClick={handleStartBidding}
-                    className="cursor-pointer w-full mt-2 inline-flex items-center justify-center rounded-lg px-3 py-2 bg-neutral-900 text-white font-medium hover:bg-neutral-800 transition-colors group/btn"
-                >
-                    <span>Start Reverse Bidding</span>
-                    <span className="ml-2 transition-transform group-hover/btn:translate-x-1">→</span>
-                </button>
+                <div className="flex flex-col sm:flex-row gap-2 mt-2">
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            // TODO: Implement view details functionality
+                        }}
+                        className="cursor-pointer w-full sm:flex-1 inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs sm:text-sm border border-neutral-300 bg-white text-neutral-700 font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors"
+                    >
+                        View details
+                    </button>
+                    <button
+                        onClick={handleStartBidding}
+                        className="cursor-pointer w-full sm:flex-1 inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs sm:text-sm bg-neutral-900 text-white font-medium hover:bg-neutral-800 transition-colors group/btn"
+                    >
+                        <span className="truncate">Start Reverse Bidding</span>
+                        <span className="ml-2 transition-transform group-hover/btn:translate-x-1 flex-shrink-0">→</span>
+                    </button>
+                </div>
             </div>
 
             <ReverseBiddingConfirmDialog
