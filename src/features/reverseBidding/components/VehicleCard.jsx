@@ -220,13 +220,13 @@ export default function VehicleCard({ car, onStart, loading = false }) {
                     >
                         View details
                     </button>
-                    <button
+                    {/* <button
                         onClick={handleStartBidding}
                         className="cursor-pointer w-full sm:flex-1 inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs sm:text-sm bg-neutral-900 text-white font-medium hover:bg-neutral-800 transition-colors group/btn"
                     >
                         <span className="truncate">Start Reverse Bidding</span>
                         <span className="ml-2 transition-transform group-hover/btn:translate-x-1 flex-shrink-0">→</span>
-                    </button>
+                    </button> */}
                 </div>
             </div>
 

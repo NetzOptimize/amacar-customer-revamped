@@ -45,7 +45,8 @@ export default function VehicleDetails() {
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const [pendingAction, setPendingAction] = useState(false);
     const { user } = useSelector((state) => state.user);
-    const { loading: sessionLoading } = useSelector((state) => state.reverseBid);
+    const { loading: reverseBidLoading } = useSelector((state) => state.reverseBid);
+    const sessionLoading = reverseBidLoading.session;
     const isLoggedIn = !!user;
 
     // Fetch vehicle details on mount
@@ -114,12 +115,21 @@ export default function VehicleDetails() {
     const primaryImage = images[0];
     const imageCount = images.length;
 
-    // Handle start bidding
-    const handleStartBidding = () => {
+    // Handle start bidding - ONLY opens the dialog, does NOT start the process
+    const handleStartBidding = (e) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        // Don't open dialog if already loading
+        if (sessionLoading) {
+            return;
+        }
         if (!isLoggedIn) {
             setPendingAction(true);
             setLoginModalOpen(true);
         } else {
+            // Just open the dialog - user must confirm in dialog to actually start
             setDialogOpen(true);
         }
     };
@@ -245,31 +255,19 @@ export default function VehicleDetails() {
                     <nav className="mb-4 text-sm text-neutral-600">
                         <div className="flex items-center gap-2 flex-wrap">
                             <Link
+                                to="/"
+                                className="hover:text-orange-600 transition-colors"
+                            >
+                                Home
+                            </Link>
+                            <ChevronRight className="w-4 h-4" />
+
+                            <Link
                                 to="/reverse-bidding/results"
                                 className="hover:text-orange-600 transition-colors"
                             >
-                                Used Cars
+                                All Cars
                             </Link>
-                            <ChevronRight className="w-4 h-4" />
-                            {vehicleData.city && vehicleData.state && (
-                                <>
-                                    <span>{vehicleData.city}, {vehicleData.state}</span>
-                                    <ChevronRight className="w-4 h-4" />
-                                </>
-                            )}
-                            {vehicleData.make && (
-                                <>
-                                    <span>{vehicleData.make}</span>
-                                    <ChevronRight className="w-4 h-4" />
-                                </>
-                            )}
-                            {vehicleData.model && (
-                                <>
-                                    <span>{vehicleData.model}</span>
-                                    <ChevronRight className="w-4 h-4" />
-                                </>
-                            )}
-                            {vehicleData.year && <span>{vehicleData.year}</span>}
                             {vehicleData.vin && (
                                 <>
                                     <ChevronRight className="w-4 h-4" />
@@ -319,11 +317,10 @@ export default function VehicleDetails() {
                             <div className="flex flex-col gap-2">
                                 <button
                                     onClick={handleStartBidding}
-                                    className="bg-neutral-900 text-white px-4 py-2 rounded-lg font-semibold hover:bg-neutral-800 transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02] group whitespace-nowrap text-sm sm:text-base"
+                                    disabled={sessionLoading || !price || price === 0}
+                                    className="bg-neutral-900 text-white px-4 py-2 rounded-lg font-semibold hover:bg-neutral-800 transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 whitespace-nowrap text-sm sm:text-base"
                                 >
-                                    <span className="flex items-center justify-center gap-2">
-                                        Start Reverse Bidding
-                                    </span>
+                                    Start Reverse Bidding
                                 </button>
                                 {price === 0 && (
                                     <button
@@ -876,7 +873,11 @@ export default function VehicleDetails() {
             {/* Dialogs */}
             <ReverseBiddingConfirmDialog
                 open={dialogOpen}
-                onClose={() => setDialogOpen(false)}
+                onClose={() => {
+                    if (!sessionLoading) {
+                        setDialogOpen(false);
+                    }
+                }}
                 onConfirm={async (formData) => {
                     if (!sessionLoading && vehicleData) {
                         // Convert vehicleData to car format expected by the thunk
@@ -904,6 +905,7 @@ export default function VehicleDetails() {
                             navigate(`/reverse-bidding/session/${payload.sessionId}`);
                         } else if (res?.error) {
                             console.error('Failed to start reverse bidding:', res.error);
+                            setDialogOpen(false); // Close dialog on error
                         }
                     }
                 }}

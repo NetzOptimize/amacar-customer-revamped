@@ -76,7 +76,7 @@ export default function ReverseBiddingConfirmDialog({
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         transition={{ duration: 0.3, ease: "easeOut" }}
-                        className="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-2 sm:mx-0 border-2 border-orange-200/50 overflow-hidden"
+                        className={`bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-2 sm:mx-0 border-2 border-orange-200/50 overflow-hidden ${loading ? 'pointer-events-none' : ''}`}
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Header with gradient background */}
