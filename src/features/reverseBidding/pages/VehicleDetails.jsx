@@ -308,7 +308,7 @@ export default function VehicleDetails() {
                                 )}
                             </div>
                         </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
+                        <div className="flex items-center gap-3 flex-shrink-0">
                             <button
                                 onClick={() => navigate('/reverse-bidding/results')}
                                 className="p-2 rounded-lg hover:bg-neutral-100 transition-colors inline-flex items-center"
@@ -316,14 +316,23 @@ export default function VehicleDetails() {
                             >
                                 <ArrowLeft className="w-5 h-5 text-neutral-700" />
                             </button>
-                            <button
-                                onClick={handleStartBidding}
-                                className="bg-neutral-900 text-white px-4 py-2 rounded-lg font-semibold hover:bg-neutral-800 transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02] group whitespace-nowrap text-sm sm:text-base"
-                            >
-                                <span className="flex items-center justify-center gap-2">
-                                    Start Reverse Bidding
-                                </span>
-                            </button>
+                            <div className="flex flex-col gap-2">
+                                <button
+                                    onClick={handleStartBidding}
+                                    className="bg-neutral-900 text-white px-4 py-2 rounded-lg font-semibold hover:bg-neutral-800 transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02] group whitespace-nowrap text-sm sm:text-base"
+                                >
+                                    <span className="flex items-center justify-center gap-2">
+                                        Start Reverse Bidding
+                                    </span>
+                                </button>
+                                {price === 0 && (
+                                    <button
+                                        className="bg-transparent border border-neutral-300 text-neutral-700 px-4 py-2 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors whitespace-nowrap text-xs sm:text-sm"
+                                    >
+                                        Request for price
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -818,13 +827,6 @@ export default function VehicleDetails() {
                             ) : (
                                 <div className="space-y-4">
                                     <div className="text-lg font-semibold text-neutral-400">Price not available</div>
-                                    <div className="pt-4 border-t border-neutral-200">
-                                        <button
-                                            className="w-full bg-transparent border-2 border-neutral-300 text-neutral-700 py-3 px-4 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors"
-                                        >
-                                            Request for price
-                                        </button>
-                                    </div>
                                 </div>
                             )}
                         </motion.div>
