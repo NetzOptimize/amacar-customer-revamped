@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import 'photoswipe/dist/photoswipe.css';
@@ -15,6 +16,7 @@ export default function VehicleCard({ car, onStart, loading = false }) {
 
     const { user } = useSelector((state) => state.user);
     const isLoggedIn = !!user;
+    const navigate = useNavigate();
 
     // Prepare images array for PhotoSwipe
     const images = useMemo(() => {
@@ -212,7 +214,7 @@ export default function VehicleCard({ car, onStart, loading = false }) {
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            // TODO: Implement view details functionality
+                            navigate(`/reverse-bidding/vehicles/${car.id}`);
                         }}
                         className="cursor-pointer w-full sm:flex-1 inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs sm:text-sm border border-neutral-300 bg-white text-neutral-700 font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors"
                     >

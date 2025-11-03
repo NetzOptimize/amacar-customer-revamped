@@ -32,6 +32,7 @@ import ScrollToTop from './components/ui/ScrollToTop.jsx';
 import ResultsPage from '@/features/reverseBidding/pages/ResultsPage.jsx';
 import SessionPage from '@/features/reverseBidding/pages/SessionPage.jsx';
 import LandingPage from '@/features/reverseBidding/pages/LandingPage.jsx';
+import VehicleDetails from '@/features/reverseBidding/pages/VehicleDetails.jsx';
 
 
 
@@ -92,6 +93,7 @@ function App() {
               <Route path="/reverse-bidding" element={<LandingPage />} />
               <Route path="/reverse-bidding/results" element={<ResultsPage />} />
               <Route path="/reverse-bidding/session/:sessionId" element={<SessionPage />} />
+              <Route path="/reverse-bidding/vehicles/:id" element={<VehicleDetails />} />
               <Route path="/auction-page" element={<AuctionPage />} />
               <Route path="/condition-assessment" element={<ConditionAssessment />} />
               <Route path="/local-auction" element={<ExteriorPhotos />} />
