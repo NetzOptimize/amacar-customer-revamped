@@ -32,6 +32,9 @@ export default function Header() {
     return location.pathname.startsWith(path);
   };
 
+  // Check if we're on vehicle details page (header should not be sticky)
+  const isVehicleDetailsPage = location.pathname.match(/^\/reverse-bidding\/vehicles\/\d+$/);
+
   const handleLoginClick = (e) => {
     console.log("Login button clicked", { e, user });
     if (e) {
@@ -67,7 +70,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="site-header">
+      <header className={`site-header ${isVehicleDetailsPage ? 'not-sticky' : ''}`}>
         <div className="container">
           <div className="header-row">
             {/* Logo Section - Responsive */}
@@ -90,17 +93,15 @@ export default function Header() {
                 Home
               </Link>
               <Link
-                className={`nav-link ${
-                  isActive("/reverse-bidding") ? "active" : ""
-                }`}
+                className={`nav-link ${isActive("/reverse-bidding") ? "active" : ""
+                  }`}
                 to="/reverse-bidding"
               >
                 Reverse Bidding
               </Link>
               <Link
-                className={`nav-link ${
-                  isActive("/testimonials") ? "active" : ""
-                }`}
+                className={`nav-link ${isActive("/testimonials") ? "active" : ""
+                  }`}
                 to="/testimonials"
               >
                 Testimonials
@@ -165,27 +166,24 @@ export default function Header() {
                 Home
               </Link>
               <Link
-                className={`nav-link-mobile ${
-                  isActive("/reverse-bidding") ? "active" : ""
-                }`}
+                className={`nav-link-mobile ${isActive("/reverse-bidding") ? "active" : ""
+                  }`}
                 to="/reverse-bidding"
                 onClick={() => setOpen(false)}
               >
                 Reverse Bidding
               </Link>
               <Link
-                className={`nav-link-mobile ${
-                  isActive("/testimonials") ? "active" : ""
-                }`}
+                className={`nav-link-mobile ${isActive("/testimonials") ? "active" : ""
+                  }`}
                 to="/testimonials"
                 onClick={() => setOpen(false)}
               >
                 Testimonials
               </Link>
               <Link
-                className={`nav-link-mobile ${
-                  isActive("/about-us") ? "active" : ""
-                }`}
+                className={`nav-link-mobile ${isActive("/about-us") ? "active" : ""
+                  }`}
                 to="/about-us"
                 onClick={() => setOpen(false)}
               >

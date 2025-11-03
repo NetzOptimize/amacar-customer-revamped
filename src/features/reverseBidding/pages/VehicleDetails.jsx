@@ -238,79 +238,92 @@ export default function VehicleDetails() {
 
     return (
         <div className="min-h-screen bg-white">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-                {/* Breadcrumbs */}
-                <nav className="mb-6 text-sm text-neutral-600">
-                    <div className="flex items-center gap-2 flex-wrap">
-                        <Link
-                            to="/reverse-bidding/results"
-                            className="hover:text-orange-600 transition-colors"
-                        >
-                            Used Cars
-                        </Link>
-                        <ChevronRight className="w-4 h-4" />
-                        {vehicleData.city && vehicleData.state && (
-                            <>
-                                <span>{vehicleData.city}, {vehicleData.state}</span>
-                                <ChevronRight className="w-4 h-4" />
-                            </>
-                        )}
-                        {vehicleData.make && (
-                            <>
-                                <span>{vehicleData.make}</span>
-                                <ChevronRight className="w-4 h-4" />
-                            </>
-                        )}
-                        {vehicleData.model && (
-                            <>
-                                <span>{vehicleData.model}</span>
-                                <ChevronRight className="w-4 h-4" />
-                            </>
-                        )}
-                        {vehicleData.year && <span>{vehicleData.year}</span>}
-                        {vehicleData.vin && (
-                            <>
-                                <ChevronRight className="w-4 h-4" />
-                                <span className="text-neutral-400">VIN: {vehicleData.vin}</span>
-                            </>
-                        )}
-                    </div>
-                </nav>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pt-6">
+                {/* Sticky Header Section with Breadcrumbs and Title */}
+                <div className="sticky top-0 z-50 bg-white border-b border-neutral-200 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 pt-6 pb-6 mb-8">
+                    {/* Breadcrumbs */}
+                    <nav className="mb-4 text-sm text-neutral-600">
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <Link
+                                to="/reverse-bidding/results"
+                                className="hover:text-orange-600 transition-colors"
+                            >
+                                Used Cars
+                            </Link>
+                            <ChevronRight className="w-4 h-4" />
+                            {vehicleData.city && vehicleData.state && (
+                                <>
+                                    <span>{vehicleData.city}, {vehicleData.state}</span>
+                                    <ChevronRight className="w-4 h-4" />
+                                </>
+                            )}
+                            {vehicleData.make && (
+                                <>
+                                    <span>{vehicleData.make}</span>
+                                    <ChevronRight className="w-4 h-4" />
+                                </>
+                            )}
+                            {vehicleData.model && (
+                                <>
+                                    <span>{vehicleData.model}</span>
+                                    <ChevronRight className="w-4 h-4" />
+                                </>
+                            )}
+                            {vehicleData.year && <span>{vehicleData.year}</span>}
+                            {vehicleData.vin && (
+                                <>
+                                    <ChevronRight className="w-4 h-4" />
+                                    <span className="text-neutral-400">VIN: {vehicleData.vin}</span>
+                                </>
+                            )}
+                        </div>
+                    </nav>
 
-                {/* Header with Back Button and Vehicle Title */}
-                <div className="mb-8">
-                    <button
-                        onClick={() => navigate('/reverse-bidding/results')}
-                        className="mb-4 p-2 rounded-lg hover:bg-neutral-100 transition-colors inline-flex items-center"
-                        aria-label="Go back"
-                    >
-                        <ArrowLeft className="w-5 h-5 text-neutral-700" />
-                    </button>
-                    <div>
-                        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-neutral-900 mb-3">
-                            {vehicleData.title || `${vehicleData.year} ${vehicleData.make} ${vehicleData.model}`}
-                        </h1>
-                        <div className="flex items-center gap-3 text-sm text-neutral-600">
-                            <span className="px-2 py-1 rounded-md text-xs font-medium bg-neutral-100">{conditionBadge}</span>
-                            {mileage && (
-                                <>
-                                    <span>•</span>
-                                    <span>{mileage.toLocaleString()} mi</span>
-                                </>
-                            )}
-                            {(mpgCity || mpgHighway) && (
-                                <>
-                                    <span>•</span>
-                                    <span>
-                                        {mpgCity && mpgHighway
-                                            ? `${mpgCity} city / ${mpgHighway} highway MPG`
-                                            : mpgCity
-                                                ? `${mpgCity} city MPG`
-                                                : `${mpgHighway} highway MPG`
-                                        }
-                                    </span>
-                                </>
-                            )}
+                    {/* Header with Back Button and Vehicle Title */}
+                    <div className="flex items-center justify-between gap-4">
+                        <div className="flex-1 min-w-0 pr-4">
+                            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-neutral-900 mb-2 truncate">
+                                {vehicleData.title || `${vehicleData.year} ${vehicleData.make} ${vehicleData.model}`}
+                            </h1>
+                            <div className="flex items-center gap-3 text-xs sm:text-sm text-neutral-600 flex-wrap">
+                                <span className="px-2 py-1 rounded-md text-xs font-medium bg-neutral-100 whitespace-nowrap">{conditionBadge}</span>
+                                {mileage && (
+                                    <>
+                                        <span>•</span>
+                                        <span className="whitespace-nowrap">{mileage.toLocaleString()} mi</span>
+                                    </>
+                                )}
+                                {(mpgCity || mpgHighway) && (
+                                    <>
+                                        <span>•</span>
+                                        <span className="whitespace-nowrap">
+                                            {mpgCity && mpgHighway
+                                                ? `${mpgCity} city / ${mpgHighway} highway MPG`
+                                                : mpgCity
+                                                    ? `${mpgCity} city MPG`
+                                                    : `${mpgHighway} highway MPG`
+                                            }
+                                        </span>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                            <button
+                                onClick={() => navigate('/reverse-bidding/results')}
+                                className="p-2 rounded-lg hover:bg-neutral-100 transition-colors inline-flex items-center"
+                                aria-label="Go back"
+                            >
+                                <ArrowLeft className="w-5 h-5 text-neutral-700" />
+                            </button>
+                            <button
+                                onClick={handleStartBidding}
+                                className="bg-neutral-900 text-white px-4 py-2 rounded-lg font-semibold hover:bg-neutral-800 transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02] group whitespace-nowrap text-sm sm:text-base"
+                            >
+                                <span className="flex items-center justify-center gap-2">
+                                    Start Reverse Bidding
+                                </span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -690,13 +703,13 @@ export default function VehicleDetails() {
                                                             margin: 0 0 1.5rem 0;
                                                         }
                                                         .vehicle-description ul li {
-                                                            padding: 0.875rem 0 0.875rem 1.5rem;
+                                                            padding: 0.5rem 0 0.5rem 1.5rem;
                                                             border-bottom: 1px solid #e5e5e5;
                                                             display: flex;
                                                             align-items: flex-start;
                                                             gap: 0.75rem;
-                                                            font-size: 0.9375rem;
-                                                            line-height: 1.5;
+                                                            font-size: 0.775rem;
+                                                            line-height: 1;
                                                             position: relative;
                                                         }
                                                         .vehicle-description ul li:last-child {
@@ -760,7 +773,7 @@ export default function VehicleDetails() {
                         <motion.div
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
-                            className="bg-white rounded-xl border border-neutral-200 p-6 shadow-lg sticky top-6 z-10"
+                            className="bg-white rounded-xl border border-neutral-200 p-6 shadow-lg"
                         >
                             <h3 className="text-lg font-semibold mb-4 text-neutral-900">Your price</h3>
                             {price ? (
@@ -793,16 +806,7 @@ export default function VehicleDetails() {
                                         List price
                                     </div>
 
-                                    <div className="space-y-3 pt-4 border-t border-neutral-200">
-                                        <button
-                                            onClick={handleStartBidding}
-                                            className="w-full bg-neutral-900 text-white py-3 px-4 rounded-lg font-semibold hover:bg-neutral-800 transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02] group"
-                                        >
-                                            <span className="flex items-center justify-center gap-2">
-                                                Start Reverse Bidding
-                                                <span className="transition-transform group-hover:translate-x-1">→</span>
-                                            </span>
-                                        </button>
+                                    <div className="pt-4 border-t border-neutral-200">
                                         <button
                                             onClick={handleStartBidding}
                                             className="w-full bg-transparent border-2 border-neutral-300 text-neutral-700 py-3 px-4 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors"
@@ -814,20 +818,13 @@ export default function VehicleDetails() {
                             ) : (
                                 <div className="space-y-4">
                                     <div className="text-lg font-semibold text-neutral-400">Price not available</div>
-                                    <button
-                                        onClick={handleStartBidding}
-                                        className="w-full bg-neutral-900 text-white py-3 px-4 rounded-lg font-semibold hover:bg-neutral-800 transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02] group"
-                                    >
-                                        <span className="flex items-center justify-center gap-2">
-                                            Start Reverse Bidding
-                                            <span className="transition-transform group-hover:translate-x-1">→</span>
-                                        </span>
-                                    </button>
-                                    <button
-                                        className="w-full text-sm text-orange-600 hover:text-orange-700 underline cursor-pointer py-2"
-                                    >
-                                        Request for price
-                                    </button>
+                                    <div className="pt-4 border-t border-neutral-200">
+                                        <button
+                                            className="w-full bg-transparent border-2 border-neutral-300 text-neutral-700 py-3 px-4 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors"
+                                        >
+                                            Request for price
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </motion.div>
