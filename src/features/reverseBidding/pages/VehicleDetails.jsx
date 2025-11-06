@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import {
     ArrowLeft,
     Heart,
-    CheckCircle2,
     MapPin,
     DollarSign,
     Calendar,
@@ -437,28 +436,8 @@ export default function VehicleDetails() {
                                 return null;
                             };
 
-                            // Extract features list for Key Highlights
-                            const extractFeatures = (desc) => {
-                                if (!desc) return [];
-                                const featuresMatch = desc.match(/<h3>Features<\/h3>[\s\S]*?<ul>([\s\S]*?)<\/ul>/i);
-                                if (featuresMatch) {
-                                    const featuresHtml = featuresMatch[1];
-                                    const featureItems = featuresHtml.match(/<li>(.*?)<\/li>/gi);
-                                    if (featureItems) {
-                                        return featureItems.map(item => {
-                                            const cleanText = item.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
-                                            return cleanText;
-                                        });
-                                    }
-                                }
-                                return [];
-                            };
-
                             const featuresSection = extractFeaturesSection(vehicleData.description);
                             const vehicleDetailsSection = extractVehicleDetailsSection(vehicleData.description);
-                            const features = vehicleData.attributes && vehicleData.attributes.length > 0
-                                ? vehicleData.attributes.map(attr => attr.name || attr.option || attr.value)
-                                : extractFeatures(vehicleData.description);
 
                             // Process sections for styling
                             const processSection = (section) => {
@@ -488,12 +467,6 @@ export default function VehicleDetails() {
                                                     className="data-[state=active]:bg-white data-[state=active]:text-orange-600 data-[state=active]:shadow-sm px-4 py-2"
                                                 >
                                                     Vehicle Overview
-                                                </TabsTrigger>
-                                                <TabsTrigger
-                                                    value="highlights"
-                                                    className="data-[state=active]:bg-white data-[state=active]:text-orange-600 data-[state=active]:shadow-sm px-4 py-2"
-                                                >
-                                                    Key Highlights
                                                 </TabsTrigger>
                                                 {vehicleDetailsSection && (
                                                     <TabsTrigger
@@ -612,24 +585,6 @@ export default function VehicleDetails() {
                                             </div>
                                         </TabsContent>
 
-                                        {/* Key Highlights Tab */}
-                                        <TabsContent value="highlights" className="p-6 m-0">
-                                            {features.length > 0 ? (
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                    {features.map((feature, index) => (
-                                                        <div key={index} className="flex items-center gap-2">
-                                                            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-                                                            <span className="text-neutral-700">{feature}</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <div className="text-center py-8 text-neutral-500">
-                                                    No highlights available
-                                                </div>
-                                            )}
-                                        </TabsContent>
-
                                         {/* Vehicle Details Tab */}
                                         {vehicleDetailsSection && (
                                             <TabsContent value="details" className="p-6 sm:p-8 m-0">
@@ -707,26 +662,33 @@ export default function VehicleDetails() {
                                                             list-style: none;
                                                             padding: 0;
                                                             margin: 0 0 1.5rem 0;
+                                                            display: grid;
+                                                            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                                                            gap: 0.75rem;
                                                         }
                                                         .vehicle-description ul li {
-                                                            padding: 0.5rem 0 0.5rem 1.5rem;
-                                                            border-bottom: 1px solid #e5e5e5;
+                                                            padding: 0.75rem 0 0.75rem 1.5rem;
+                                                            border: 1px solid #e5e5e5;
+                                                            border-radius: 0.5rem;
                                                             display: flex;
-                                                            align-items: flex-start;
+                                                            align-items: center;
                                                             gap: 0.75rem;
-                                                            font-size: 0.775rem;
-                                                            line-height: 1;
+                                                            font-size: 0.875rem;
+                                                            line-height: 1.4;
                                                             position: relative;
+                                                            background-color: #fafafa;
+                                                            transition: all 0.2s ease;
                                                         }
-                                                        .vehicle-description ul li:last-child {
-                                                            border-bottom: none;
+                                                        .vehicle-description ul li:hover {
+                                                            background-color: #f5f5f5;
+                                                            border-color: #f97316;
                                                         }
                                                         .vehicle-description .features-list li::before {
                                                             content: "✓";
                                                             color: #f97316;
                                                             font-weight: bold;
                                                             position: absolute;
-                                                            left: 0;
+                                                            left: 0.5rem;
                                                             font-size: 1rem;
                                                         }
                                                     `}</style>
