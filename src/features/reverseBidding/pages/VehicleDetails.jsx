@@ -43,6 +43,8 @@ export default function VehicleDetails() {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const [pendingAction, setPendingAction] = useState(false);
+    const [alternativeVehicles, setAlternativeVehicles] = useState(null);
+    const [loadingAlternatives, setLoadingAlternatives] = useState(false);
     const { user } = useSelector((state) => state.user);
     const { loading: reverseBidLoading } = useSelector((state) => state.reverseBid);
     const sessionLoading = reverseBidLoading.session;
@@ -82,6 +84,156 @@ export default function VehicleDetails() {
         fetchVehicleDetails();
     }, [id]);
 
+    // Function to fetch alternative vehicles
+    const fetchAlternativeVehicles = async () => {
+        if (!vehicleData) {
+            console.log('Alternative vehicles: No vehicle data available');
+            return null;
+        }
+        console.log("vehicle data" , vehicleData);
+        
+        // Extract Vehicle Details section from description
+        const extractVehicleDetailsSection = (desc) => {
+            if (!desc) return null;
+            const detailsMatch = desc.match(/<h3>Vehicle Details<\/h3>([\s\S]*?)(?=<h3>|$)/i);
+            if (detailsMatch) {
+                return detailsMatch[1];
+            }
+            return null;
+        };
+        
+        // Parse value from Vehicle Details HTML (format: <li><strong>Label:</strong> Value</li>)
+        const parseDetailValue = (detailsHtml, label) => {
+            if (!detailsHtml) return '';
+            
+            // Escape special regex characters in label
+            const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            
+            // Pattern 1: <li><strong>Label:</strong> Value</li> or <li><strong>Label</strong> Value</li>
+            const pattern1 = new RegExp(`<li[^>]*>\\s*<strong[^>]*>\\s*${escapedLabel}\\s*:?\\s*</strong>\\s*([^<]+?)\\s*</li>`, 'i');
+            let match = detailsHtml.match(pattern1);
+            if (match && match[1]) {
+                return match[1].trim();
+            }
+            
+            // Pattern 2: <strong>Label:</strong> Value (without li tags)
+            const pattern2 = new RegExp(`<strong[^>]*>\\s*${escapedLabel}\\s*:?\\s*</strong>\\s*([^<]+)`, 'i');
+            match = detailsHtml.match(pattern2);
+            if (match && match[1]) {
+                return match[1].trim();
+            }
+            
+            return '';
+        };
+        
+        // Extract Vehicle Details section from description
+        const vehicleDetailsSection = extractVehicleDetailsSection(vehicleData.description);
+        
+        // Extract required parameters from vehicleData
+        const make = vehicleData.make;
+        const model = vehicleData.model || '';
+        
+        // Extract body, transmission, and fuel_type from Vehicle Details section
+        let body = '';
+        let transmission = '';
+        let fuel_type = '';
+        
+        if (vehicleDetailsSection) {
+            // Try various label formats
+            body = parseDetailValue(vehicleDetailsSection, 'Body Type') ||
+                   parseDetailValue(vehicleDetailsSection, 'Body') ||
+                   parseDetailValue(vehicleDetailsSection, 'Body Style') ||
+                   '';
+            
+            transmission = parseDetailValue(vehicleDetailsSection, 'Transmission') ||
+                          parseDetailValue(vehicleDetailsSection, 'Trans') ||
+                          '';
+            
+            fuel_type = parseDetailValue(vehicleDetailsSection, 'Fuel Type') ||
+                       parseDetailValue(vehicleDetailsSection, 'Fuel') ||
+                       parseDetailValue(vehicleDetailsSection, 'Engine') ||
+                       '';
+        }
+        
+        // Fallback to direct fields if not found in description
+        if (!body) {
+            body = vehicleData.body_type || vehicleData.body || '';
+        }
+        if (!transmission) {
+            transmission = vehicleData.transmission || '';
+        }
+        if (!fuel_type) {
+            fuel_type = vehicleData.fuel_type || vehicleData.fuelType || vehicleData.fueltype || '';
+        }
+        
+        const price = vehicleData.price || vehicleData.regular_price || 0;
+        
+        // Log extracted values for debugging
+        console.log('Extracted vehicle parameters:', {
+            make,
+            model,
+            body,
+            transmission,
+            fuel_type,
+            price,
+            hasDescription: !!vehicleData.description,
+            hasVehicleDetailsSection: !!vehicleDetailsSection,
+            vehicleDetailsSectionLength: vehicleDetailsSection?.length || 0
+        });
+
+        // Only fetch if we have required parameters (make and price)
+        if (!make || !price || price === 0) {
+            console.log('Alternative vehicles: Missing required parameters (make or price)');
+            return null;
+        }
+
+        try {
+            setLoadingAlternatives(true);
+            
+            // Build query parameters - only include non-empty values
+            const params = new URLSearchParams();
+            params.append('make', make);
+            if (model && model.trim()) params.append('model', model.trim());
+            if (body && body.trim()) params.append('body', body.trim());
+            if (transmission && transmission.trim()) params.append('transmission', transmission.trim());
+            if (fuel_type && fuel_type.trim()) params.append('fuel_type', fuel_type.trim());
+            params.append('price', price.toString());
+
+            console.log('Fetching alternative vehicles with params:', {
+                make,
+                model: model || '(empty)',
+                body: body || '(empty)',
+                transmission: transmission || '(empty)',
+                fuel_type: fuel_type || '(empty)',
+                price
+            });
+            
+            console.log('Final URL params:', params.toString());
+
+            const response = await apiRev.get(`/vehicles/alternatives?${params.toString()}`);
+
+            if (response.data && response.data.success) {
+                const alternatives = response.data.data?.data || [];
+                setAlternativeVehicles(alternatives);
+                console.log('Alternative vehicles response:', response.data);
+                console.log('Alternative vehicles count:', alternatives.length);
+                console.log('Alternative vehicles:', alternatives);
+                return alternatives;
+            } else {
+                console.log('Alternative vehicles: No success response', response.data);
+                setAlternativeVehicles([]);
+                return [];
+            }
+        } catch (err) {
+            console.error('Error fetching alternative vehicles:', err);
+            console.error('Error details:', err.response?.data || err.message);
+            setAlternativeVehicles([]);
+            return [];
+        } finally {
+            setLoadingAlternatives(false);
+        }
+    };
+
     // Prepare images array for PhotoSwipe
     const images = useMemo(() => {
         if (!vehicleData?.images?.length) return [];
@@ -114,16 +266,22 @@ export default function VehicleDetails() {
     const primaryImage = images[0];
     const imageCount = images.length;
 
-    // Handle start bidding - ONLY opens the dialog, does NOT start the process
-    const handleStartBidding = (e) => {
+    // Handle start bidding - Fetch alternatives first, then open dialog
+    const handleStartBidding = async (e) => {
         if (e) {
             e.preventDefault();
             e.stopPropagation();
         }
-        // Don't open dialog if already loading
-        if (sessionLoading) {
+        // Don't proceed if already loading
+        if (sessionLoading || loadingAlternatives) {
             return;
         }
+
+        // Fetch alternative vehicles first
+        console.log('Start Reverse Bidding clicked - fetching alternative vehicles...');
+        await fetchAlternativeVehicles();
+
+        // Then proceed with the normal flow
         if (!isLoggedIn) {
             setPendingAction(true);
             setLoginModalOpen(true);
@@ -316,10 +474,10 @@ export default function VehicleDetails() {
                             <div className="flex flex-col gap-2">
                                 <button
                                     onClick={handleStartBidding}
-                                    disabled={sessionLoading || !price || price === 0}
+                                    disabled={sessionLoading || loadingAlternatives || !price || price === 0}
                                     className="bg-neutral-900 text-white px-4 py-2 rounded-lg font-semibold hover:bg-neutral-800 transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 whitespace-nowrap text-sm sm:text-base"
                                 >
-                                    Start Reverse Bidding
+                                    {loadingAlternatives ? 'Loading alternatives...' : 'Start Reverse Bidding'}
                                 </button>
                                 {price === 0 && (
                                     <button
@@ -777,9 +935,10 @@ export default function VehicleDetails() {
                                     <div className="pt-4 border-t border-neutral-200">
                                         <button
                                             onClick={handleStartBidding}
-                                            className="w-full bg-transparent border-2 border-neutral-300 text-neutral-700 py-3 px-4 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors"
+                                            disabled={sessionLoading || loadingAlternatives}
+                                            className="w-full bg-transparent border-2 border-neutral-300 text-neutral-700 py-3 px-4 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                            See your actual price
+                                            {loadingAlternatives ? 'Loading alternatives...' : 'See your actual price'}
                                         </button>
                                     </div>
                                 </div>
