@@ -1001,6 +1001,9 @@ export default function VehicleDetails() {
                 }}
                 onConfirm={async (formData) => {
                     if (!sessionLoading && vehicleData) {
+                        console.log('Form data submitted:', formData);
+                        console.log('Selected alternative vehicle IDs:', formData.selectedAlternatives);
+                        
                         // Convert vehicleData to car format expected by the thunk
                         const carData = {
                             id: vehicleData.id,
@@ -1019,7 +1022,7 @@ export default function VehicleDetails() {
 
                         const res = await dispatch(startReverseBiddingThunk({
                             carData,
-                            criteria: formData
+                            criteria: formData // This now includes selectedAlternatives array
                         }));
                         const payload = res?.payload;
                         if (payload?.sessionId) {
@@ -1037,7 +1040,13 @@ export default function VehicleDetails() {
                     year: vehicleData.year,
                     price: vehicleData.price || vehicleData.regular_price,
                     vin: vehicleData.vin,
+                    title: vehicleData.title,
+                    body_type: vehicleData.body_type || vehicleData.body,
+                    transmission: vehicleData.transmission,
+                    fuel_type: vehicleData.fuel_type || vehicleData.fuelType,
+                    images: vehicleData.images || [],
                 } : null}
+                alternativeVehicles={alternativeVehicles || []}
                 loading={sessionLoading}
             />
 
