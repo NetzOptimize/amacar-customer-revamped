@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -20,6 +20,8 @@ import {
     Share2,
     X
 } from 'lucide-react';
+import 'photoswipe/dist/photoswipe.css';
+import { Gallery, Item } from 'react-photoswipe-gallery';
 import { Input } from '../../../components/ui/input';
 import { Button } from '../../../components/ui/button';
 import { setFilters } from '../redux/reverseBidSlice';
@@ -139,14 +141,13 @@ export default function ReverseBiddingConfirmDialog({
     // Check if form is valid
     const isFormValid = 
         formData.zipCode?.trim() && 
-        formData.phone?.trim() &&
         formData.consent.terms &&
         formData.consent.privacy &&
         formData.consent.dataSharing;
 
     // Format currency
     const formatCurrency = (amount) => {
-        if (!amount) return '$0';
+        if (!amount || amount === 0) return null;
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: 'USD',
@@ -155,16 +156,65 @@ export default function ReverseBiddingConfirmDialog({
         }).format(amount);
     };
 
-    // Get vehicle image
-    const getVehicleImage = (vehicle) => {
-        if (vehicle.images && vehicle.images.length > 0) {
-            const primaryImage = vehicle.images.find(img => img.is_primary) || vehicle.images[0];
+    // Prepare images array for PhotoSwipe for a vehicle
+    const prepareVehicleImages = (vehicle) => {
+        if (!vehicle?.images?.length) return [];
+        
+        return vehicle.images.map((img, index) => {
+            let url = '';
+            let thumbnail = '';
+            
+            if (typeof img === 'string') {
+                url = img;
+                thumbnail = img;
+            } else if (img?.url) {
+                // Handle API format: { url: "...", is_primary: true/false }
+                url = img.url;
+                thumbnail = img.url; // Use same URL for thumbnail
+            } else if (img?.full) {
+                url = img.full;
+                thumbnail = img.thumbnail || img.medium || img.full;
+            } else if (img?.thumbnail) {
+                thumbnail = img.thumbnail;
+                url = img.url || img.medium || img.large || img.thumbnail;
+            }
+            
+            // Only return if we have a valid URL
+            if (!url) return null;
+            
+            return {
+                src: url,
+                thumbnail: thumbnail || url,
+                width: img.width || 1200,
+                height: img.height || 800,
+                alt: vehicle.title || `${vehicle.year} ${vehicle.make} ${vehicle.model}` || `Vehicle Image ${index + 1}`,
+            };
+        }).filter(Boolean); // Remove null entries
+    };
+
+    // Get primary vehicle image URL (for thumbnail display)
+    const getVehicleImageUrl = (vehicle) => {
+        if (!vehicle?.images?.length) return '';
+        
+        // First, try to find primary image
+        const primaryImage = vehicle.images.find(img => {
+            if (typeof img === 'object' && img.is_primary) return true;
+            return false;
+        });
+        
+        if (primaryImage) {
             if (typeof primaryImage === 'string') {
                 return primaryImage;
             }
-            return primaryImage?.url || primaryImage?.thumbnail || '';
+            return primaryImage.url || primaryImage.thumbnail || primaryImage.full || '';
         }
-        return '';
+        
+        // Fallback to first image
+        const firstImage = vehicle.images[0];
+        if (typeof firstImage === 'string') {
+            return firstImage;
+        }
+        return firstImage?.url || firstImage?.thumbnail || firstImage?.full || '';
     };
 
     if (!open) return null;
@@ -186,7 +236,7 @@ export default function ReverseBiddingConfirmDialog({
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         transition={{ duration: 0.3, ease: "easeOut" }}
                         className={cn(
-                            "bg-white rounded-2xl shadow-2xl max-w-6xl w-full mx-auto border-2 border-orange-200/50 overflow-hidden flex flex-col max-h-[85vh]",
+                            "bg-white rounded-2xl shadow-2xl max-w-6xl w-full mx-auto border-2 border-orange-200/50 overflow-hidden flex flex-col max-h-[70vh]",
                             loading && "pointer-events-none"
                         )}
                         onClick={(e) => e.stopPropagation()}
@@ -235,74 +285,118 @@ export default function ReverseBiddingConfirmDialog({
                                             Primary Vehicle
                                 </h3>
 
-                                        {car && (
-                                            <div className="bg-gradient-to-br from-orange-50 to-orange-100/30 rounded-xl border border-orange-200/50 p-5 space-y-4">
-                                                <div className="flex items-start gap-4">
-                                                    {getVehicleImage(car) && (
-                                                        <div className="w-24 h-24 rounded-lg overflow-hidden bg-neutral-200 flex-shrink-0">
-                                                            <img
-                                                                src={getVehicleImage(car)}
-                                                                alt={car.title || `${car.year} ${car.make} ${car.model}`}
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                        </div>
-                                                    )}
-                                                    <div className="flex-1 min-w-0">
-                                                        <h4 className="text-lg font-bold text-neutral-900 mb-2">
-                                                            {car.year} {car.make} {car.model}
-                                                        </h4>
-                                                        <div className="grid grid-cols-2 gap-2 text-sm">
-                                                            {car.price && (
-                                                                <div className="flex items-center gap-1.5 text-neutral-700">
-                                                                    <DollarSign className="w-4 h-4 text-orange-500" />
-                                                                    <span className="font-semibold">{formatCurrency(car.price)}</span>
+                                        {car && (() => {
+                                            const carImages = prepareVehicleImages(car);
+                                            const primaryImageUrl = getVehicleImageUrl(car);
+                                            const carPrice = formatCurrency(car.price);
+                                            
+                                            return (
+                                                <div className="bg-gradient-to-br from-orange-50 to-orange-100/30 rounded-xl border border-orange-200/50 p-5 space-y-4">
+                                                    <div className="flex items-start gap-4">
+                                                        {primaryImageUrl ? (
+                                                            carImages.length > 0 ? (
+                                                                <Gallery>
+                                                                    <div className="w-24 h-24 rounded-lg overflow-hidden bg-neutral-200 flex-shrink-0 cursor-pointer">
+                                                                        {carImages.map((image, imgIndex) => (
+                                                                            <Item
+                                                                                key={imgIndex}
+                                                                                original={image.src}
+                                                                                thumbnail={image.thumbnail || image.src}
+                                                                                width={image.width}
+                                                                                height={image.height}
+                                                                                alt={image.alt}
+                                                                            >
+                                                                                {({ ref, open }) => (
+                                                                                    <img
+                                                                                        ref={imgIndex === 0 ? ref : null}
+                                                                                        onClick={imgIndex === 0 ? open : undefined}
+                                                                                        src={imgIndex === 0 ? primaryImageUrl : undefined}
+                                                                                        alt={image.alt}
+                                                                                        className={`w-full h-full object-cover ${imgIndex === 0 ? 'block' : 'hidden'}`}
+                                                                                    />
+                                                                                )}
+                                                                            </Item>
+                                                                        ))}
+                                                                    </div>
+                                                                </Gallery>
+                                                            ) : (
+                                                                <div className="w-24 h-24 rounded-lg overflow-hidden bg-neutral-200 flex-shrink-0">
+                                                                    <img
+                                                                        src={primaryImageUrl}
+                                                                        alt={car.title || `${car.year} ${car.make} ${car.model}`}
+                                                                        className="w-full h-full object-cover"
+                                                                    />
                                                                 </div>
-                                                            )}
-                                                            {car.year && (
-                                                                <div className="flex items-center gap-1.5 text-neutral-700">
-                                                                    <Calendar className="w-4 h-4 text-orange-500" />
-                                                                    <span>{car.year}</span>
-                                                                </div>
-                                                            )}
+                                                            )
+                                                        ) : null}
+                                                        <div className="flex-1 min-w-0">
+                                                            <h4 className="text-lg font-bold text-neutral-900 mb-2">
+                                                                {car.year} {car.make} {car.model}
+                                                            </h4>
+                                                            <div className="grid grid-cols-2 gap-2 text-sm">
+                                                                {carPrice ? (
+                                                                    <div className="flex items-center gap-1.5 text-neutral-700">
+                                                                        <DollarSign className="w-4 h-4 text-orange-500" />
+                                                                        <span className="font-semibold">{carPrice}</span>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="flex items-center gap-1.5 text-neutral-500">
+                                                                        <DollarSign className="w-4 h-4" />
+                                                                        <span className="text-xs">Price not available</span>
+                                                                    </div>
+                                                                )}
+                                                                {car.year && (
+                                                                    <div className="flex items-center gap-1.5 text-neutral-700">
+                                                                        <Calendar className="w-4 h-4 text-orange-500" />
+                                                                        <span>{car.year}</span>
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
+                                                    
+                                                    {/* Vehicle Details Grid */}
+                                                    <div className="grid grid-cols-2 gap-3 pt-3 border-t border-orange-200/50">
+                                                        {car.vin && (
+                                                            <div className="col-span-2">
+                                                                <span className="text-xs text-neutral-500">VIN</span>
+                                                                <p className="text-sm font-medium text-neutral-900 font-mono">{car.vin}</p>
+                                                            </div>
+                                                        )}
+                                                        {car.make && (
+                                                            <div>
+                                                                <span className="text-xs text-neutral-500">Make</span>
+                                                                <p className="text-sm font-medium text-neutral-900">{car.make}</p>
+                                                            </div>
+                                                        )}
+                                                        {car.model && (
+                                                            <div>
+                                                                <span className="text-xs text-neutral-500">Model</span>
+                                                                <p className="text-sm font-medium text-neutral-900">{car.model}</p>
+                                                            </div>
+                                                        )}
+                                                        {car.body_type && (
+                                                            <div>
+                                                                <span className="text-xs text-neutral-500">Body Type</span>
+                                                                <p className="text-sm font-medium text-neutral-900">{car.body_type}</p>
+                                                            </div>
+                                                        )}
+                                                        {car.transmission && (
+                                                            <div>
+                                                                <span className="text-xs text-neutral-500">Transmission</span>
+                                                                <p className="text-sm font-medium text-neutral-900">{car.transmission}</p>
+                                                            </div>
+                                                        )}
+                                                        {car.fuel_type && (
+                                                            <div>
+                                                                <span className="text-xs text-neutral-500">Fuel Type</span>
+                                                                <p className="text-sm font-medium text-neutral-900">{car.fuel_type}</p>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                                
-                                                {/* Vehicle Details Grid */}
-                                                <div className="grid grid-cols-2 gap-3 pt-3 border-t border-orange-200/50">
-                                                    {car.make && (
-                                                        <div>
-                                                            <span className="text-xs text-neutral-500">Make</span>
-                                                            <p className="text-sm font-medium text-neutral-900">{car.make}</p>
-                                                        </div>
-                                                    )}
-                                                    {car.model && (
-                                                        <div>
-                                                            <span className="text-xs text-neutral-500">Model</span>
-                                                            <p className="text-sm font-medium text-neutral-900">{car.model}</p>
-                                                        </div>
-                                                    )}
-                                                    {car.body_type && (
-                                                        <div>
-                                                            <span className="text-xs text-neutral-500">Body Type</span>
-                                                            <p className="text-sm font-medium text-neutral-900">{car.body_type}</p>
-                                                        </div>
-                                                    )}
-                                                    {car.transmission && (
-                                                        <div>
-                                                            <span className="text-xs text-neutral-500">Transmission</span>
-                                                            <p className="text-sm font-medium text-neutral-900">{car.transmission}</p>
-                                                        </div>
-                                                    )}
-                                                    {car.fuel_type && (
-                                                        <div>
-                                                            <span className="text-xs text-neutral-500">Fuel Type</span>
-                                                            <p className="text-sm font-medium text-neutral-900">{car.fuel_type}</p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                        </div>
-                                        )}
+                                            );
+                                        })()}
                                     </motion.div>
 
                                     {/* Zip Code Input */}
@@ -402,7 +496,7 @@ export default function ReverseBiddingConfirmDialog({
                                         
                                         <div className="space-y-1">
                                             {/* Terms of Service */}
-                                            <label className="flex items-center gap-2 py-1.5 cursor-pointer group">
+                                            <label className="flex items-center gap-2 py-1 cursor-pointer group mb-0">
                                                 <div className="relative flex-shrink-0">
                                                     <input
                                                         type="checkbox"
@@ -427,7 +521,7 @@ export default function ReverseBiddingConfirmDialog({
                                             </label>
 
                                             {/* Privacy Policy */}
-                                            <label className="flex items-center gap-2 py-1.5 cursor-pointer group">
+                                            <label className="flex items-center gap-2 py-1 cursor-pointer group mb-0">
                                                 <div className="relative flex-shrink-0">
                                                     <input
                                                         type="checkbox"
@@ -452,7 +546,7 @@ export default function ReverseBiddingConfirmDialog({
                                             </label>
 
                                             {/* Data Sharing */}
-                                            <label className="flex items-center gap-2 py-1.5 cursor-pointer group">
+                                            <label className="flex items-center gap-2 py-1 cursor-pointer group mb-0">
                                                 <div className="relative flex-shrink-0">
                                                     <input
                                                         type="checkbox"
@@ -511,7 +605,9 @@ export default function ReverseBiddingConfirmDialog({
                                         <div className="space-y-3">
                                             {displayedAlternatives.map((vehicle, index) => {
                                                 const isSelected = formData.selectedAlternatives.includes(vehicle.id);
-                                                const imageUrl = getVehicleImage(vehicle);
+                                                const vehicleImages = prepareVehicleImages(vehicle);
+                                                const imageUrl = getVehicleImageUrl(vehicle);
+                                                const vehiclePrice = formatCurrency(vehicle.price);
                                                 
                                                 return (
                                                     <motion.div
@@ -545,11 +641,39 @@ export default function ReverseBiddingConfirmDialog({
                                                             {/* Vehicle Image */}
                                                             <div className="w-20 h-20 rounded-lg overflow-hidden bg-neutral-200 flex-shrink-0">
                                                                 {imageUrl ? (
-                                                                    <img
-                                                                        src={imageUrl}
-                                                                        alt={vehicle.title || `${vehicle.year} ${vehicle.make} ${vehicle.model}`}
-                                                                        className="w-full h-full object-cover"
-                                                                    />
+                                                                    vehicleImages.length > 0 ? (
+                                                                        <Gallery>
+                                                                            {vehicleImages.map((image, imgIndex) => (
+                                                                                <Item
+                                                                                    key={imgIndex}
+                                                                                    original={image.src}
+                                                                                    thumbnail={image.thumbnail || image.src}
+                                                                                    width={image.width}
+                                                                                    height={image.height}
+                                                                                    alt={image.alt}
+                                                                                >
+                                                                                    {({ ref, open }) => (
+                                                                                        <img
+                                                                                            ref={imgIndex === 0 ? ref : null}
+                                                                                            onClick={(e) => {
+                                                                                                e.stopPropagation();
+                                                                                                if (imgIndex === 0) open();
+                                                                                            }}
+                                                                                            src={imgIndex === 0 ? imageUrl : undefined}
+                                                                                            alt={image.alt}
+                                                                                            className={`w-full h-full object-cover ${imgIndex === 0 ? 'cursor-pointer block' : 'hidden'}`}
+                                                                                        />
+                                                                                    )}
+                                                                                </Item>
+                                                                            ))}
+                                                                        </Gallery>
+                                                                    ) : (
+                                                                        <img
+                                                                            src={imageUrl}
+                                                                            alt={vehicle.title || `${vehicle.year} ${vehicle.make} ${vehicle.model}`}
+                                                                            className="w-full h-full object-cover"
+                                                                        />
+                                                                    )
                                                                 ) : (
                                                                     <div className="w-full h-full flex items-center justify-center">
                                                                         <Car className="w-8 h-8 text-neutral-400" />
@@ -567,16 +691,27 @@ export default function ReverseBiddingConfirmDialog({
                                                                 </h4>
                                                                 
                                                                 <div className="space-y-1.5">
+                                                                    {vehicle.vin && (
+                                                                        <div className="text-xs text-neutral-500">
+                                                                            <span className="font-medium">VIN: </span>
+                                                                            <span className="font-mono text-neutral-700">{vehicle.vin}</span>
+                                                                        </div>
+                                                                    )}
                                                                     <div className="flex items-center gap-4 text-sm">
-                                                                        {vehicle.price && (
+                                                                        {vehiclePrice ? (
                                                                             <div className="flex items-center gap-1 text-neutral-700">
                                                                                 <DollarSign className="w-3.5 h-3.5 text-orange-500" />
-                                                                                <span className="font-semibold">{formatCurrency(vehicle.price)}</span>
+                                                                                <span className="font-semibold">{vehiclePrice}</span>
                                                                                 {vehicle.price_difference && vehicle.price_difference > 0 && (
                                                                                     <span className="text-xs text-green-600 font-medium">
                                                                                         (Save {formatCurrency(vehicle.price_difference)})
                                                                                     </span>
                                                                                 )}
+                                                                            </div>
+                                                                        ) : (
+                                                                            <div className="flex items-center gap-1 text-neutral-500">
+                                                                                <DollarSign className="w-3.5 h-3.5" />
+                                                                                <span className="text-xs font-medium">Price not available</span>
                                                                             </div>
                                                                         )}
                                                                     </div>
