@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import axios from 'axios';
 import { 
     CheckCircle2, 
     MapPin, 
@@ -18,7 +19,9 @@ import {
     FileText,
     Shield,
     Share2,
-    X
+    X,
+    Loader2,
+    AlertCircle
 } from 'lucide-react';
 import 'photoswipe/dist/photoswipe.css';
 import { Gallery, Item } from 'react-photoswipe-gallery';
@@ -26,6 +29,7 @@ import { Input } from '../../../components/ui/input';
 import { Button } from '../../../components/ui/button';
 import { setFilters } from '../redux/reverseBidSlice';
 import { cn } from '../../../lib/utils';
+import useDebounce from '../../../hooks/useDebounce';
 
 export default function ReverseBiddingConfirmDialog({
     open,
@@ -54,6 +58,17 @@ export default function ReverseBiddingConfirmDialog({
         }
     });
 
+    // State for city/state lookup
+    const [locationData, setLocationData] = useState({
+        city: '',
+        state: '',
+        loading: false,
+        error: null
+    });
+
+    // Debounce zip code input (500ms delay)
+    const debouncedZipCode = useDebounce(formData.zipCode, 500);
+
     // Initialize form data when dialog opens
     useEffect(() => {
         if (open) {
@@ -69,8 +84,85 @@ export default function ReverseBiddingConfirmDialog({
                     dataSharing: false
                 }
             });
+            // Reset location data when dialog opens
+            setLocationData({
+                city: '',
+                state: '',
+                loading: false,
+                error: null
+            });
         }
     }, [open, filters.condition, filters.zipCode, user]);
+
+    // Fetch city/state when debounced zip code changes
+    useEffect(() => {
+        const fetchCityState = async () => {
+            const zipCode = debouncedZipCode?.trim();
+            
+            // Reset state if zip code is empty
+            if (!zipCode) {
+                setLocationData({
+                    city: '',
+                    state: '',
+                    loading: false,
+                    error: null
+                });
+                return;
+            }
+
+            // Only fetch if zip code is exactly 5 digits
+            if (zipCode.length === 5 && /^\d{5}$/.test(zipCode)) {
+                setLocationData(prev => ({ ...prev, loading: true, error: null }));
+                
+                try {
+                    const response = await axios.get(
+                        `https://dealer.amacar.ai/wp-json/dealer-portal/v1/location/city-state-by-zip?zipcode=${encodeURIComponent(zipCode)}`
+                    );
+
+                    if (response.data?.success && response.data?.location) {
+                        setLocationData({
+                            city: response.data.location.city || '',
+                            state: response.data.location.state_name || '',
+                            loading: false,
+                            error: null
+                        });
+                    } else {
+                        setLocationData({
+                            city: '',
+                            state: '',
+                            loading: false,
+                            error: response.data?.message || 'Invalid zip code'
+                        });
+                    }
+                } catch (error) {
+                    setLocationData({
+                        city: '',
+                        state: '',
+                        loading: false,
+                        error: error.response?.data?.message || error.message || 'Failed to fetch location data'
+                    });
+                }
+            } else if (zipCode.length > 0 && zipCode.length < 5) {
+                // Incomplete zip code (less than 5 digits)
+                setLocationData({
+                    city: '',
+                    state: '',
+                    loading: false,
+                    error: null // Don't show error while typing
+                });
+            } else if (zipCode.length > 0) {
+                // Invalid format but not empty
+                setLocationData({
+                    city: '',
+                    state: '',
+                    loading: false,
+                    error: 'Please enter a valid 5-digit zip code'
+                });
+            }
+        };
+
+        fetchCityState();
+    }, [debouncedZipCode]);
 
     // Limit to max 4 alternative vehicles
     const displayedAlternatives = alternativeVehicles?.slice(0, 4) || [];
@@ -118,7 +210,7 @@ export default function ReverseBiddingConfirmDialog({
     // Navigate to vehicle details
     const handleViewVehicle = (vehicleId, e) => {
         e.stopPropagation();
-        navigate(`/reverse-bidding/vehicle/${vehicleId}`);
+        navigate(`/reverse-bidding/vehicles/${vehicleId}`);
     };
 
     // Handle confirm - update filters and then start bidding
@@ -410,14 +502,52 @@ export default function ReverseBiddingConfirmDialog({
                                             <MapPin className="w-3.5 h-3.5 text-orange-500" />
                                             Zip Code
                                         </label>
-                                        <Input
-                                            type="text"
-                                            placeholder="Enter zip code"
-                                            value={formData.zipCode}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, zipCode: e.target.value }))}
-                                            className="w-full bg-white border-neutral-200 focus-visible:ring-orange-500/20 h-9 text-sm"
-                                            maxLength={10}
-                                        />
+                                        <div className="relative">
+                                            <Input
+                                                type="text"
+                                                placeholder="Enter zip code"
+                                                value={formData.zipCode}
+                                                onChange={(e) => {
+                                                    const value = e.target.value.replace(/\D/g, ''); // Only allow digits
+                                                    if (value.length <= 5) {
+                                                        setFormData(prev => ({ ...prev, zipCode: value }));
+                                                    }
+                                                }}
+                                                className={cn(
+                                                    "w-full bg-white border-neutral-200 focus-visible:ring-orange-500/20 h-9 text-sm pr-8",
+                                                    locationData.error && "border-red-300 focus-visible:ring-red-500/20",
+                                                    locationData.city && locationData.state && !locationData.error && "border-green-300 focus-visible:ring-green-500/20"
+                                                )}
+                                                maxLength={5}
+                                            />
+                                            {locationData.loading && (
+                                                <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                                                    <Loader2 className="w-4 h-4 text-orange-500 animate-spin" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        
+                                        {/* Location Display / Error Message */}
+                                        {locationData.loading && formData.zipCode?.trim() && (
+                                            <p className="text-xs text-neutral-500 flex items-center gap-1">
+                                                <Loader2 className="w-3 h-3 animate-spin" />
+                                                Looking up location...
+                                            </p>
+                                        )}
+                                        
+                                        {locationData.error && !locationData.loading && (
+                                            <p className="text-xs text-red-600 flex items-center gap-1">
+                                                <AlertCircle className="w-3 h-3" />
+                                                {locationData.error}
+                                            </p>
+                                        )}
+                                        
+                                        {locationData.city && locationData.state && !locationData.error && !locationData.loading && (
+                                            <p className="text-xs text-green-700 flex items-center gap-1">
+                                                <CheckCircle2 className="w-3 h-3" />
+                                                {locationData.city}, {locationData.state}
+                                            </p>
+                                        )}
                                     </motion.div>
 
                                     {/* Dealer Preference */}
