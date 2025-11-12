@@ -220,13 +220,14 @@ export default function ReverseBiddingConfirmDialog({
             condition: formData.condition,
             zipCode: formData.zipCode,
         }));
-        // Call the original onConfirm with formData including selected alternatives
+        // Call the original onConfirm with formData including selected alternatives and consent
         onConfirm({
             condition: formData.condition,
             zipCode: formData.zipCode,
             phone: formData.phone,
             dealerPreference: formData.dealerPreference, // 'local' or 'all'
             selectedAlternatives: formData.selectedAlternatives, // Array of vehicle IDs
+            consent: formData.consent, // Include consent data
         });
     };
 

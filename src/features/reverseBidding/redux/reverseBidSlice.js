@@ -123,19 +123,33 @@ export const startReverseBiddingThunk = createAsyncThunk(
         try {
             const state = getState();
             const filters = criteria || state.reverseBid.filters;
+            const user = state.user?.user;
 
-            // Build request body
+            // Calculate start and end times
+            const startAt = new Date().toISOString();
+            const durationHours = 4;
+            const endAt = new Date(Date.now() + durationHours * 60 * 60 * 1000).toISOString();
+
+            // Get current datetime for consent timestamps
+            const currentDateTime = new Date().toISOString();
+
+            // Build request body matching database structure
             const requestBody = {
-                criteria: {
-                    make: carData.make || null,
-                    model: carData.model || null,
-                    year: carData.year ? (typeof carData.year === 'string' ? parseInt(carData.year, 10) : carData.year) : null,
-                    price: carData.price || filters.budgetMin || filters.budgetMax || null,
-                    new_used: filters.condition === 'used' ? 'U' : 'N',
-                    zip_code: filters.zipCode || carData.zip_code || '',
-                    radius: 500, // Default radius
-                },
-                duration_hours: 4,
+                customer_user_id: user?.id || null,
+                customer_contact: criteria?.phone || user?.phone || user?.meta?.phone || null,
+                primary_vehicle_id: carData.id ? parseInt(carData.id, 10) : null,
+                alternative_vehicle_ids: criteria?.selectedAlternatives && criteria.selectedAlternatives.length > 0 
+                    ? criteria.selectedAlternatives.map(id => parseInt(id, 10)) 
+                    : null,
+                start_at: startAt,
+                end_at: endAt,
+                status: 'pending',
+                dealer_preference: criteria?.dealerPreference || 'local',
+                service_terms_status: criteria?.consent?.terms ? 'accepted' : 'rejected',
+                service_terms_accepted_at: criteria?.consent?.terms ? currentDateTime : null,
+                privacy_terms_status: criteria?.consent?.privacy ? 'accepted' : 'rejected',
+                privacy_terms_accepted_at: criteria?.consent?.privacy ? currentDateTime : null,
+                zip_code: criteria?.zipCode || filters.zipCode || carData.zip_code || null,
             };
 
             // Make API call
