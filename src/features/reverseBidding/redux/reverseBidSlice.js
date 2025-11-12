@@ -267,6 +267,39 @@ export const fetchLeaderboardThunk = createAsyncThunk(
     }
 );
 
+export const fetchCustomerSessionsThunk = createAsyncThunk(
+    'reverseBid/fetchCustomerSessions',
+    async ({ status, page = 1, per_page = 20 }, { rejectWithValue }) => {
+        try {
+            const params = { page, per_page };
+            if (status) {
+                params.status = status;
+            }
+
+            const response = await api.get('/customer/sessions', { params });
+
+            if (response.data.success && response.data.data) {
+                const data = response.data.data;
+                return {
+                    sessions: data.data || [],
+                    pagination: data.pagination || {
+                        current_page: page,
+                        per_page: per_page,
+                        total_items: 0,
+                        total_pages: 1,
+                        has_next: false,
+                        has_prev: false,
+                    },
+                };
+            }
+            return rejectWithValue('Failed to fetch customer sessions');
+        } catch (err) {
+            console.error('Fetch customer sessions API error:', err);
+            return rejectWithValue(err.response?.data?.message || err.message || 'Failed to fetch customer sessions');
+        }
+    }
+);
+
 export const acceptBidThunk = createAsyncThunk(
     'reverseBid/acceptBid',
     async ({ sessionId, bidId }, { getState, rejectWithValue }) => {
@@ -404,9 +437,20 @@ const initialState = {
         totalBids: 0,
         winningBidId: null,
     },
-    loading: { search: false, session: false, acceptance: false },
+    loading: { search: false, session: false, acceptance: false, customerSessions: false },
     error: null,
     pastSessions: [],
+    customerSessions: {
+        data: [],
+        pagination: {
+            current_page: 1,
+            per_page: 20,
+            total_items: 0,
+            total_pages: 1,
+            has_next: false,
+            has_prev: false,
+        },
+    },
 };
 
 const reverseBidSlice = createSlice({
@@ -601,6 +645,22 @@ const reverseBidSlice = createSlice({
             .addCase(fetchLeaderboardThunk.rejected, (state, action) => {
                 state.loading.session = false;
                 state.error = action.payload || 'Failed to fetch leaderboard';
+            })
+            // fetch customer sessions
+            .addCase(fetchCustomerSessionsThunk.pending, (state) => {
+                state.loading.customerSessions = true;
+                state.error = null;
+            })
+            .addCase(fetchCustomerSessionsThunk.fulfilled, (state, action) => {
+                state.loading.customerSessions = false;
+                if (action.payload) {
+                    state.customerSessions.data = action.payload.sessions;
+                    state.customerSessions.pagination = action.payload.pagination;
+                }
+            })
+            .addCase(fetchCustomerSessionsThunk.rejected, (state, action) => {
+                state.loading.customerSessions = false;
+                state.error = action.payload || 'Failed to fetch customer sessions';
             });
     },
 });

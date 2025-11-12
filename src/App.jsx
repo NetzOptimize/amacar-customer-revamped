@@ -33,6 +33,7 @@ import ResultsPage from '@/features/reverseBidding/pages/ResultsPage.jsx';
 import SessionPage from '@/features/reverseBidding/pages/SessionPage.jsx';
 import LandingPage from '@/features/reverseBidding/pages/LandingPage.jsx';
 import VehicleDetails from '@/features/reverseBidding/pages/VehicleDetails.jsx';
+import ActiveSessionsPage from '@/features/reverseBidding/pages/ActiveSessionsPage.jsx';
 
 
 
@@ -42,6 +43,7 @@ function App() {
   const hideHeaderFooter =
     location.pathname.startsWith('/dashboard') ||
     location.pathname.startsWith('/auctions') ||
+    location.pathname.startsWith('/active-sessions') ||
     location.pathname.startsWith('/pending-offers') ||
     location.pathname.startsWith('/offers') ||
     location.pathname.startsWith('/accepted') ||
@@ -123,6 +125,16 @@ function App() {
                   <PrivateRoute>
                     <DashboardLayout>
                       <LiveAuctionsPage />
+                    </DashboardLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/active-sessions"
+                element={
+                  <PrivateRoute>
+                    <DashboardLayout>
+                      <ActiveSessionsPage />
                     </DashboardLayout>
                   </PrivateRoute>
                 }
