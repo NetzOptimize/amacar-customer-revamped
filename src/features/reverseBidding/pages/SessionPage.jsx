@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
     Clock, 
@@ -14,7 +14,8 @@ import {
     AlertCircle,
     Timer,
     DollarSign,
-    Sparkles
+    Sparkles,
+    ArrowLeft
 } from 'lucide-react';
 import LeaderboardTable from '../components/LeaderboardTable';
 import BidDetailsDialog from '../components/BidDetailsDialog';
@@ -27,6 +28,7 @@ import apiRev from '../../../lib/apiRev';
 
 export default function SessionPage() {
     const { sessionId } = useParams();
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const { activeSession, loading } = useSelector((s) => s.reverseBid);
     const [viewBid, setViewBid] = useState(null);
@@ -291,20 +293,29 @@ export default function SessionPage() {
                             <span className="text-xs text-neutral-500">#{sessionData.id}</span>
                         </div>
                         
-                        {/* Time Remaining Card - Compact */}
+                        {/* Time Remaining Card - Compact with All Sessions Button */}
                         {sessionData.status === 'running' && (
-                            <motion.div
-                                initial={{ scale: 0.95 }}
-                                animate={{ scale: 1 }}
-                                className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg px-3 py-2 shadow-md"
-                            >
-                                <div className="flex items-center gap-2">
-                                    <Timer className="w-4 h-4 text-white" />
-                                    <p className="text-white text-lg font-bold font-mono">
-                                        {formatTime(timeRemaining)}
-                                    </p>
-                                </div>
-                            </motion.div>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => navigate('/active-sessions')}
+                                    className="flex items-center gap-1.5 px-3 py-2 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 hover:border-orange-300 transition-all duration-200 shadow-sm h-[40px]"
+                                >
+                                    <ArrowLeft className="w-4 h-4 text-neutral-600" />
+                                    <span className="text-sm font-medium text-neutral-700">All Sessions</span>
+                                </button>
+                                <motion.div
+                                    initial={{ scale: 0.95 }}
+                                    animate={{ scale: 1 }}
+                                    className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg px-3 py-2 shadow-md h-[40px] flex items-center"
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <Timer className="w-4 h-4 text-white" />
+                                        <p className="text-white text-lg font-bold font-mono">
+                                            {formatTime(timeRemaining)}
+                                        </p>
+                                    </div>
+                                </motion.div>
+                            </div>
                         )}
                     </div>
 
@@ -375,14 +386,6 @@ export default function SessionPage() {
                                     : 'Dealers are reviewing your session and will submit bids soon'}
                             </p>
                         </div>
-                        {sessionData.status === 'running' && (
-                            <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-orange-50 border border-orange-200 rounded-lg">
-                                <Timer className="w-4 h-4 text-orange-600" />
-                                <span className="text-orange-700 font-mono font-semibold text-lg">
-                                    {formatTime(timeRemaining)}
-                                </span>
-                            </div>
-                        )}
                     </div>
                     
                     {/* Main Leaderboard Content - Takes up most of the space */}

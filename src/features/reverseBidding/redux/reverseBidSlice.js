@@ -143,7 +143,7 @@ export const startReverseBiddingThunk = createAsyncThunk(
                     : null,
                 start_at: startAt,
                 end_at: endAt,
-                status: 'pending',
+                status: 'running',
                 dealer_preference: criteria?.dealerPreference || 'local',
                 service_terms_status: criteria?.consent?.terms ? 'accepted' : 'rejected',
                 service_terms_accepted_at: criteria?.consent?.terms ? currentDateTime : null,
