@@ -31,7 +31,6 @@ const ActiveSessionsPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { customerSessions, loading } = useSelector((s) => s.reverseBid);
-  const [currentTime, setCurrentTime] = useState(Date.now());
 
   // Sorting state
   const [sortBy, setSortBy] = useState("time-asc");
@@ -47,15 +46,6 @@ const ActiveSessionsPage = () => {
   useEffect(() => {
     dispatch(fetchCustomerSessionsThunk({ status: 'running', page: 1, per_page: 100 }));
   }, [dispatch]);
-
-  // Real-time countdown timer
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -120,11 +110,12 @@ const ActiveSessionsPage = () => {
       const criteria = session.criteria || {};
       const timeRemaining = session.time_remaining || {};
       
-      // Calculate time remaining timestamp
-      let timeRemainingTimestamp = Date.now() + (timeRemaining.seconds || 0) * 1000;
-      if (session.end_at) {
-        timeRemainingTimestamp = new Date(session.end_at).getTime();
-      }
+      // Rely on API's expired flag - don't calculate client-side
+      const isExpired = timeRemaining.expired === true;
+      
+      // Use API's seconds for sorting (convert to timestamp for comparison)
+      const timeRemainingSeconds = timeRemaining.seconds || 0;
+      const timeRemainingTimestamp = Date.now() + (timeRemainingSeconds * 1000);
 
       // Get best offer from leaderboard
       const leaderboard = session.leaderboard || [];
@@ -142,14 +133,20 @@ const ActiveSessionsPage = () => {
         price: parseFloat(criteria.price || 0),
         zipCode: criteria.zip_code || session.zip_code || "N/A",
         currentBid: bestOffer || 0,
-        timeRemaining: timeRemainingTimestamp,
-        bidCount: session.total_bids || 0,
+        timeRemaining: timeRemainingTimestamp, // For sorting only
+        timeRemainingSeconds: timeRemainingSeconds, // Store original seconds from API
+        timeRemainingFormatted: timeRemaining.formatted || null, // Use formatted time from API
+        timeRemainingHours: timeRemaining.hours || 0,
+        timeRemainingMinutes: timeRemaining.minutes || 0,
+        timeRemainingSecondsRemaining: timeRemaining.seconds_remaining || 0,
+        isExpired: isExpired, // Rely on API's expired flag
+        bidCount: parseInt(session.total_bids) || 0,
         status: session.status || "pending",
         dealerPreference: session.dealer_preference || "local",
         primaryVehicleId: session.primary_vehicle_id,
         alternativeVehicleIds: session.alternative_vehicle_ids || [],
         criteria: criteria,
-        timeRemainingData: timeRemaining,
+        timeRemainingData: timeRemaining, // Store full time_remaining object
         image: vehicleImages[session.id] || null,
       };
     });
@@ -157,9 +154,14 @@ const ActiveSessionsPage = () => {
 
   const allSessions = transformSessionsData(customerSessions.data);
   
-  // Filter only running/pending sessions
+  // Filter only running/pending sessions that are not expired (rely on API's expired flag)
   const activeSessions = allSessions.filter(
-    (session) => session.status === "running" || session.status === "pending"
+    (session) => {
+      const isActiveStatus = session.status === "running" || session.status === "pending";
+      // Rely on API's expired flag, not client-side calculation
+      const isNotExpired = !session.isExpired;
+      return isActiveStatus && isNotExpired;
+    }
   );
 
   const containerVariants = {
@@ -295,23 +297,52 @@ const ActiveSessionsPage = () => {
     handleLoadMore,
   } = useLoadMore(sortedSessions, itemsPerPage);
 
-  // Format time remaining
-  const formatTimeRemaining = (timestamp) => {
-    if (!timestamp) return "N/A";
-    const remaining = Math.max(0, timestamp - currentTime);
-    if (remaining <= 0) return "Expired";
-
-    const hours = Math.floor(remaining / 3600000);
-    const minutes = Math.floor((remaining % 3600000) / 60000);
-    const seconds = Math.floor((remaining % 60000) / 1000);
-
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    } else if (minutes > 0) {
-      return `${minutes}m ${seconds}s`;
-    } else {
-      return `${seconds}s`;
-    }
+  // Component to track live countdown for each session using API's time_remaining
+  const LiveCountdown = ({ session }) => {
+    const [displayTime, setDisplayTime] = useState(() => {
+      if (session.isExpired) return "Expired";
+      if (session.timeRemainingFormatted) return session.timeRemainingFormatted;
+      return "00:00:00";
+    });
+    
+    useEffect(() => {
+      if (session.isExpired) {
+        setDisplayTime("Expired");
+        return;
+      }
+      
+      // Get initial values from API
+      const timeData = session.timeRemainingData;
+      if (!timeData || !timeData.seconds) {
+        return;
+      }
+      
+      // Store when we start counting
+      const startTime = Date.now();
+      const initialSeconds = timeData.seconds;
+      
+      // Update every second
+      const interval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const remaining = Math.max(0, initialSeconds - elapsed);
+        
+        if (remaining <= 0) {
+          setDisplayTime("Expired");
+          clearInterval(interval);
+          return;
+        }
+        
+        const h = Math.floor(remaining / 3600);
+        const m = Math.floor((remaining % 3600) / 60);
+        const s = remaining % 60;
+        
+        setDisplayTime(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`);
+      }, 1000);
+      
+      return () => clearInterval(interval);
+    }, [session.timeRemainingData, session.isExpired]);
+    
+    return <span>{displayTime}</span>;
   };
 
   // Format currency
@@ -326,7 +357,12 @@ const ActiveSessionsPage = () => {
   };
 
   // Get status badge info
-  const getStatusBadge = (status) => {
+  const getStatusBadge = (status, isExpired = false) => {
+    // If expired, show expired badge regardless of status
+    if (isExpired) {
+      return { label: "Expired", color: "bg-red-100 text-red-700 border-red-200" };
+    }
+    
     const statusMap = {
       pending: { label: "Pending", color: "bg-yellow-100 text-yellow-700 border-yellow-200" },
       running: { label: "Live", color: "bg-green-100 text-green-700 border-green-200" },
@@ -546,9 +582,15 @@ const ActiveSessionsPage = () => {
             {!isSorting && (
               <>
                 {paginatedSessions.map((session) => {
-                  const statusBadge = getStatusBadge(session.status);
-                  const isLowTime = session.timeRemaining - currentTime < 3600000; // Less than 1 hour
-                  const isCriticalTime = session.timeRemaining - currentTime < 900000; // Less than 15 minutes
+                  // Rely on API's expired flag, not client-side calculation
+                  const isExpired = session.isExpired;
+                  
+                  // Determine if low/critical time based on API's seconds
+                  const totalSeconds = session.timeRemainingSeconds || 0;
+                  const isLowTime = totalSeconds < 3600 && totalSeconds > 0; // Less than 1 hour
+                  const isCriticalTime = totalSeconds < 900 && totalSeconds > 0; // Less than 15 minutes
+                  
+                  const statusBadge = getStatusBadge(session.status, isExpired);
 
                   return (
                     <motion.div
@@ -646,21 +688,21 @@ const ActiveSessionsPage = () => {
                           </div>
                         </div>
 
-                        {/* Time Remaining */}
+                        {/* Time Remaining - Real-time countdown */}
                         <div className="flex items-center justify-between mb-4 sm:mb-5 lg:mb-4 xl:mb-6">
                           <div className="flex items-center space-x-2">
                             <Timer className={`w-4 h-4 sm:w-4 sm:h-4 lg:w-4 xl:w-5 xl:h-5 ${
-                              isCriticalTime ? 'text-red-500' : isLowTime ? 'text-orange-500' : 'text-blue-500'
+                              isExpired ? 'text-red-500' : isCriticalTime ? 'text-red-500' : isLowTime ? 'text-orange-500' : 'text-blue-500'
                             }`} />
                             <span className={`text-xs sm:text-sm lg:text-xs xl:text-sm font-semibold font-mono ${
-                              isCriticalTime ? 'text-red-600' : isLowTime ? 'text-orange-600' : 'text-blue-600'
+                              isExpired ? 'text-red-600' : isCriticalTime ? 'text-red-600' : isLowTime ? 'text-orange-600' : 'text-blue-600'
                             }`}>
-                              {formatTimeRemaining(session.timeRemaining)}
+                              <LiveCountdown session={session} />
                             </span>
                           </div>
                           <div className="text-right">
                             <p className="text-xs text-neutral-500">
-                              Time remaining
+                              {isExpired ? 'Session ended' : 'Time remaining'}
                             </p>
                           </div>
                         </div>
