@@ -32,7 +32,7 @@ export default function FilterContent({ cars = [] }) {
     });
 
     const [localFilters, setLocalFilters] = useState({
-        condition: filters.condition || 'new',
+        condition: filters.condition || 'all',
         make: filters.make || '',
         models: filters.model ? (Array.isArray(filters.model) ? filters.model : [filters.model]) : [],
         year: filters.year || '',
@@ -51,7 +51,7 @@ export default function FilterContent({ cars = [] }) {
     // Initialize from Redux filters
     useEffect(() => {
         setLocalFilters({
-            condition: filters.condition || 'new',
+            condition: filters.condition || 'all',
             make: filters.make || '',
             models: filters.model ? (Array.isArray(filters.model) ? filters.model : [filters.model]) : [],
             year: filters.year || '',
@@ -93,7 +93,7 @@ export default function FilterContent({ cars = [] }) {
     // Get active filters (all filters that are set)
     const activeFilters = useMemo(() => {
         const active = [];
-        if (localFilters.condition && localFilters.condition !== 'new') {
+        if (localFilters.condition && localFilters.condition !== 'all') {
             active.push({ key: 'condition', label: localFilters.condition === 'used' ? 'Used' : 'New & CPO', value: localFilters.condition });
         }
         if (localFilters.make) {
@@ -292,7 +292,7 @@ export default function FilterContent({ cars = [] }) {
                                             onValueChange={(value) => handleFilterChange('condition', value)}
                                         >
                                             <SelectTrigger
-                                                className={`w-full h-10 bg-white/60 backdrop-blur-sm border-2 transition-all text-neutral-900 ${localFilters.condition && localFilters.condition !== 'new'
+                                                className={`w-full h-10 bg-white/60 backdrop-blur-sm border-2 transition-all text-neutral-900 ${localFilters.condition && localFilters.condition !== 'all'
                                                     ? 'border-orange-500 bg-orange-50/80 shadow-md'
                                                     : 'border-white/40 hover:border-orange-400/50'
                                                     }`}
@@ -300,6 +300,7 @@ export default function FilterContent({ cars = [] }) {
                                                 <SelectValue placeholder="All" />
                                             </SelectTrigger>
                                             <SelectContent className="bg-white/95 backdrop-blur-xl border-white/30">
+                                                <SelectItem value="all" className="focus:bg-orange-50">All</SelectItem>
                                                 <SelectItem value="new" className="focus:bg-orange-50">New & CPO</SelectItem>
                                                 <SelectItem value="used" className="focus:bg-orange-50">Used</SelectItem>
                                             </SelectContent>

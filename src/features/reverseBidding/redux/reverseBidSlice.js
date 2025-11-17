@@ -45,6 +45,11 @@ export const fetchMockCarsThunk = createAsyncThunk(
                 params.max_price = Number(filters.budgetMax);
             }
 
+            // Send condition parameter only if it's 'new' or 'used' (not 'all')
+            if (filters.condition && filters.condition !== 'all') {
+                params.condition = filters.condition;
+            }
+
             // Get zip_code from filters or user state
             const state = getState();
             const zipCode = filters.zipCode || state.reverseBid.filters.zipCode || '';
@@ -400,7 +405,7 @@ const initialState = {
         model: null,
         budgetMin: null,
         budgetMax: null,
-        condition: 'new',
+        condition: 'all',
         zipCode: '',
     },
     filterOptions: {
