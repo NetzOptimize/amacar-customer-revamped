@@ -232,11 +232,16 @@ export default function ReverseBiddingConfirmDialog({
     };
 
     // Check if form is valid
+    // Zip code must be valid (successful API response with city and state)
+    // and both consent checkboxes must be checked
     const isFormValid = 
-        formData.zipCode?.trim() && 
+        formData.zipCode?.trim() &&
+        locationData.city &&
+        locationData.state &&
+        !locationData.error &&
+        !locationData.loading &&
         formData.consent.terms &&
-        formData.consent.privacy &&
-        formData.consent.dataSharing;
+        formData.consent.privacy;
 
     // Format currency
     const formatCurrency = (amount) => {
