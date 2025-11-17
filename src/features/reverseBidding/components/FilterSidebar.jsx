@@ -17,12 +17,6 @@ export default function FilterSidebar({ cars = [] }) {
                         </div>
                         <span className="text-sm text-orange-600 font-semibold">{cars.length} matches</span>
                     </div>
-                    <button
-                        className="cursor-pointer p-2 rounded-lg hover:bg-white/60 backdrop-blur-sm transition-colors border border-white/30 hover:border-orange-400/50 shadow-sm"
-                        title="Save search"
-                    >
-                        <Heart className="w-4 h-4 text-orange-600" />
-                    </button>
                 </div>
             </div>
 

@@ -677,7 +677,7 @@ export default function ReverseBiddingConfirmDialog({
                                             </label>
 
                                             {/* Data Sharing */}
-                                            <label className="flex items-center gap-2 py-1 cursor-pointer group mb-0">
+                                            {/* <label className="flex items-center gap-2 py-1 cursor-pointer group mb-0">
                                                 <div className="relative flex-shrink-0">
                                                     <input
                                                         type="checkbox"
@@ -699,7 +699,7 @@ export default function ReverseBiddingConfirmDialog({
                                                 <span className="text-[10px] text-neutral-600 leading-tight">
                                                     I consent to <a href="#" className="text-orange-600 hover:underline">data sharing</a> with dealers
                                                 </span>
-                                            </label>
+                                            </label> */}
                                         </div>
                                     </motion.div>
                                 </div>

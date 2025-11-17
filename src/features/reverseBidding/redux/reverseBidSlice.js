@@ -37,13 +37,12 @@ export const fetchMockCarsThunk = createAsyncThunk(
             if (filters.model) params.model = filters.model;
             if (filters.year) params.year = typeof filters.year === 'string' ? parseInt(filters.year, 10) : filters.year;
 
-            // Use budgetMin as price, or calculate average if both are provided
-            if (filters.budgetMin && filters.budgetMax) {
-                params.price = Math.floor((Number(filters.budgetMin) + Number(filters.budgetMax)) / 2);
-            } else if (filters.budgetMin) {
-                params.price = Number(filters.budgetMin);
-            } else if (filters.budgetMax) {
-                params.price = Number(filters.budgetMax);
+            // Send min_price and max_price directly
+            if (filters.budgetMin) {
+                params.min_price = Number(filters.budgetMin);
+            }
+            if (filters.budgetMax) {
+                params.max_price = Number(filters.budgetMax);
             }
 
             // Get zip_code from filters or user state
