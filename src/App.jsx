@@ -34,6 +34,8 @@ import SessionPage from '@/features/reverseBidding/pages/SessionPage.jsx';
 import LandingPage from '@/features/reverseBidding/pages/LandingPage.jsx';
 import VehicleDetails from '@/features/reverseBidding/pages/VehicleDetails.jsx';
 import ActiveSessionsPage from '@/features/reverseBidding/pages/ActiveSessionsPage.jsx';
+import ReverseBidsPage from '@/features/reverseBidding/pages/ReverseBidsPage.jsx';
+import AcceptedReverseBidsPage from '@/features/reverseBidding/pages/AcceptedReverseBidsPage.jsx';
 
 
 
@@ -44,6 +46,8 @@ function App() {
     location.pathname.startsWith('/dashboard') ||
     location.pathname.startsWith('/auctions') ||
     location.pathname.startsWith('/active-sessions') ||
+    location.pathname.startsWith('/reverse-bids') ||
+    location.pathname.startsWith('/accepted-reverse-bids') ||
     location.pathname.startsWith('/pending-offers') ||
     location.pathname.startsWith('/offers') ||
     location.pathname.startsWith('/accepted') ||
@@ -135,6 +139,26 @@ function App() {
                   <PrivateRoute>
                     <DashboardLayout>
                       <ActiveSessionsPage />
+                    </DashboardLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/reverse-bids"
+                element={
+                  <PrivateRoute>
+                    <DashboardLayout>
+                      <ReverseBidsPage />
+                    </DashboardLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/accepted-reverse-bids"
+                element={
+                  <PrivateRoute>
+                    <DashboardLayout>
+                      <AcceptedReverseBidsPage />
                     </DashboardLayout>
                   </PrivateRoute>
                 }

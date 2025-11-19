@@ -386,6 +386,52 @@ export const simulateLiveBidsThunk = createAsyncThunk(
     }
 );
 
+// Fetch reverse bids (active sessions without accepted bids)
+export const fetchReverseBidsThunk = createAsyncThunk(
+    'reverseBid/fetchReverseBids',
+    async ({ page = 1, per_page = 20 }, { rejectWithValue }) => {
+        try {
+            const response = await api.get('/customer/dashboard/reverse-bids', {
+                params: { page, per_page }
+            });
+
+            if (response.data.success && response.data.data) {
+                return {
+                    bids: response.data.data.data || [],
+                    pagination: response.data.data.pagination || {}
+                };
+            }
+            return rejectWithValue('Failed to fetch reverse bids');
+        } catch (err) {
+            console.error('Reverse bids API error:', err);
+            return rejectWithValue(err.response?.data?.message || err.message || 'Failed to fetch reverse bids');
+        }
+    }
+);
+
+// Fetch accepted reverse bids
+export const fetchAcceptedReverseBidsThunk = createAsyncThunk(
+    'reverseBid/fetchAcceptedReverseBids',
+    async ({ page = 1, per_page = 20 }, { rejectWithValue }) => {
+        try {
+            const response = await api.get('/customer/dashboard/accepted-reverse-bids', {
+                params: { page, per_page }
+            });
+
+            if (response.data.success && response.data.data) {
+                return {
+                    bids: response.data.data.data || [],
+                    pagination: response.data.data.pagination || {}
+                };
+            }
+            return rejectWithValue('Failed to fetch accepted reverse bids');
+        } catch (err) {
+            console.error('Accepted reverse bids API error:', err);
+            return rejectWithValue(err.response?.data?.message || err.message || 'Failed to fetch accepted reverse bids');
+        }
+    }
+);
+
 const initialState = {
     filters: {
         year: null,
@@ -429,10 +475,32 @@ const initialState = {
         totalBids: 0,
         winningBidId: null,
     },
-    loading: { search: false, session: false, acceptance: false, customerSessions: false },
+    loading: { search: false, session: false, acceptance: false, customerSessions: false, reverseBids: false, acceptedReverseBids: false },
     error: null,
     pastSessions: [],
     customerSessions: {
+        data: [],
+        pagination: {
+            current_page: 1,
+            per_page: 20,
+            total_items: 0,
+            total_pages: 1,
+            has_next: false,
+            has_prev: false,
+        },
+    },
+    reverseBids: {
+        data: [],
+        pagination: {
+            current_page: 1,
+            per_page: 20,
+            total_items: 0,
+            total_pages: 1,
+            has_next: false,
+            has_prev: false,
+        },
+    },
+    acceptedReverseBids: {
         data: [],
         pagination: {
             current_page: 1,
@@ -653,6 +721,38 @@ const reverseBidSlice = createSlice({
             .addCase(fetchCustomerSessionsThunk.rejected, (state, action) => {
                 state.loading.customerSessions = false;
                 state.error = action.payload || 'Failed to fetch customer sessions';
+            })
+            // fetch reverse bids
+            .addCase(fetchReverseBidsThunk.pending, (state) => {
+                state.loading.reverseBids = true;
+                state.error = null;
+            })
+            .addCase(fetchReverseBidsThunk.fulfilled, (state, action) => {
+                state.loading.reverseBids = false;
+                if (action.payload) {
+                    state.reverseBids.data = action.payload.bids;
+                    state.reverseBids.pagination = action.payload.pagination;
+                }
+            })
+            .addCase(fetchReverseBidsThunk.rejected, (state, action) => {
+                state.loading.reverseBids = false;
+                state.error = action.payload || 'Failed to fetch reverse bids';
+            })
+            // fetch accepted reverse bids
+            .addCase(fetchAcceptedReverseBidsThunk.pending, (state) => {
+                state.loading.acceptedReverseBids = true;
+                state.error = null;
+            })
+            .addCase(fetchAcceptedReverseBidsThunk.fulfilled, (state, action) => {
+                state.loading.acceptedReverseBids = false;
+                if (action.payload) {
+                    state.acceptedReverseBids.data = action.payload.bids;
+                    state.acceptedReverseBids.pagination = action.payload.pagination;
+                }
+            })
+            .addCase(fetchAcceptedReverseBidsThunk.rejected, (state, action) => {
+                state.loading.acceptedReverseBids = false;
+                state.error = action.payload || 'Failed to fetch accepted reverse bids';
             });
     },
 });
