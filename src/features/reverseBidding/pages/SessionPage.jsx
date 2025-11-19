@@ -321,6 +321,42 @@ export default function SessionPage() {
     //     }
     // }, [dispatch, sessionId, activeSession?.id, activeSession?.status]);
 
+    // Format perks for display
+    const formatPerks = (perks) => {
+        if (!perks) return null;
+        
+        if (typeof perks === 'string') {
+            try {
+                const parsed = JSON.parse(perks);
+                if (typeof parsed === 'object' && parsed !== null) {
+                    return Object.entries(parsed)
+                        .filter(([key, value]) => value !== null && value !== '')
+                        .map(([key, value]) => {
+                            // Format key nicely (e.g., "description" -> "Description")
+                            const formattedKey = key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
+                            return `${formattedKey}: ${value}`;
+                        })
+                        .join(', ');
+                }
+                return perks;
+            } catch {
+                return perks;
+            }
+        }
+        
+        if (typeof perks === 'object' && perks !== null) {
+            return Object.entries(perks)
+                .filter(([key, value]) => value !== null && value !== '')
+                .map(([key, value]) => {
+                    const formattedKey = key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
+                    return `${formattedKey}: ${value}`;
+                })
+                .join(', ');
+        }
+        
+        return null;
+    };
+
     const rows = useMemo(() => {
         if (!sessionData?.leaderboard) return [];
         return sessionData.leaderboard.map((bid, index) => {
@@ -333,6 +369,7 @@ export default function SessionPage() {
                 dealerName: bid.dealer_name || 'Unknown Dealer',
                 currentOffer: parseFloat(bid.amount || 0),
                 perks: bid.perks || {},
+                perksDisplay: formatPerks(bid.perks),
                 rank: bid.position || index + 1,
                 distance: bid.distance || 0,
                 location: bid.distance ? `${bid.distance} miles away` : 'Location unavailable',
@@ -522,7 +559,16 @@ export default function SessionPage() {
                             <span className="font-semibold text-neutral-900">
                                 {criteria.year} {criteria.make} {criteria.model}
                             </span>
-                            {criteria.zip_code && (
+                            {sessionData.location && (
+                                <span className="text-neutral-500 ml-2">
+                                    • {[
+                                        sessionData.location.city,
+                                        sessionData.location.state,
+                                        sessionData.location.zip
+                                    ].filter(Boolean).join(', ')}
+                                </span>
+                            )}
+                            {!sessionData.location && criteria.zip_code && (
                                 <span className="text-neutral-500 ml-2">• {criteria.zip_code}</span>
                             )}
                             {alternativeVehicles.length > 0 && (
