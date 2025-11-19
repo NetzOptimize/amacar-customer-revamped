@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock } from 'lucide-react';
+import { Clock, CheckCircle2 } from 'lucide-react';
 
-export default function LeaderboardTable({ rows, onView, onAccept, timeRemaining = 0, vehicleImage = null }) {
+export default function LeaderboardTable({ rows, onView, onAccept, timeRemaining = 0, vehicleImage = null, sessionStatus = 'running', isSessionClosed = false }) {
     const getRankIcon = (rank) => {
         if (rank === 1) return '🥇';
         if (rank === 2) return '🥈';
@@ -42,6 +42,8 @@ export default function LeaderboardTable({ rows, onView, onAccept, timeRemaining
                     {rows.map((r, index) => {
                         const isTopThree = r.rank <= 3;
                         const rankIcon = getRankIcon(r.rank);
+                        const isWinningBid = r.isWinningBid || false;
+                        const showAcceptButton = !isSessionClosed && sessionStatus === 'running';
 
                         return (
                             <motion.div
@@ -51,23 +53,37 @@ export default function LeaderboardTable({ rows, onView, onAccept, timeRemaining
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
                                 transition={{ duration: 0.2, delay: index * 0.05 }}
-                                className={`grid grid-cols-12 px-4 sm:px-6 lg:px-8 py-5 items-center transition-all duration-200 ${isTopThree
-                                    ? 'bg-gradient-to-r from-orange-50/30 to-transparent hover:from-orange-50/50'
-                                    : 'hover:bg-neutral-50/50'
-                                    }`}
+                                className={`grid grid-cols-12 px-4 sm:px-6 lg:px-8 py-5 items-center transition-all duration-200 ${
+                                    isWinningBid
+                                        ? 'bg-gradient-to-r from-green-50/50 to-green-50/20 border-l-4 border-green-500 hover:from-green-50/70 hover:to-green-50/30'
+                                        : isTopThree
+                                            ? 'bg-gradient-to-r from-orange-50/30 to-transparent hover:from-orange-50/50'
+                                            : 'hover:bg-neutral-50/50'
+                                }`}
                             >
                                 {/* Rank */}
                                 <div className="col-span-1">
-                                    {rankIcon ? (
-                                        <span className="text-2xl" role="img" aria-label={`Rank ${r.rank}`}>{rankIcon}</span>
-                                    ) : (
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${isTopThree
-                                            ? 'bg-orange-100 text-orange-700'
-                                            : 'bg-neutral-100 text-neutral-600'
+                                    <div className="flex flex-col items-center gap-1">
+                                        {rankIcon ? (
+                                            <span className="text-2xl" role="img" aria-label={`Rank ${r.rank}`}>{rankIcon}</span>
+                                        ) : (
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                                                isWinningBid
+                                                    ? 'bg-green-100 text-green-700'
+                                                    : isTopThree
+                                                        ? 'bg-orange-100 text-orange-700'
+                                                        : 'bg-neutral-100 text-neutral-600'
                                             }`}>
-                                            {r.rank}
-                                        </div>
-                                    )}
+                                                {r.rank}
+                                            </div>
+                                        )}
+                                        {isWinningBid && (
+                                            <div className="flex items-center gap-1 mt-0.5">
+                                                <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                                                <span className="text-xs font-semibold text-green-700">Won</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* Vehicle Image */}
@@ -98,9 +114,12 @@ export default function LeaderboardTable({ rows, onView, onAccept, timeRemaining
 
                                 {/* Current Offer */}
                                 <div className="col-span-2">
-                                    <div className="text-orange-600 font-bold text-xl">
+                                    <div className={`font-bold text-xl ${isWinningBid ? 'text-green-600' : 'text-orange-600'}`}>
                                         ${r.currentOffer.toLocaleString()}
                                     </div>
+                                    {isWinningBid && (
+                                        <div className="text-xs text-green-600 font-medium mt-0.5">Accepted</div>
+                                    )}
                                 </div>
 
                                 {/* Savings */}
@@ -145,15 +164,22 @@ export default function LeaderboardTable({ rows, onView, onAccept, timeRemaining
 
                                 {/* Time Remaining */}
                                 <div className="col-span-2">
-                                    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg font-mono font-bold text-sm ${isCriticalTime
-                                        ? 'bg-red-50 text-red-700 animate-pulse'
-                                        : isLowTime
-                                            ? 'bg-orange-50 text-orange-700'
-                                            : 'bg-blue-50 text-blue-700'
-                                        }`}>
-                                        <Clock className={`w-4 h-4 ${isCriticalTime ? 'animate-pulse' : ''}`} />
-                                        <span>{timeDisplay}</span>
-                                    </div>
+                                    {isSessionClosed ? (
+                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neutral-100 text-neutral-600 font-semibold text-sm">
+                                            <CheckCircle2 className="w-4 h-4" />
+                                            <span>Session Closed</span>
+                                        </div>
+                                    ) : (
+                                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg font-mono font-bold text-sm ${isCriticalTime
+                                            ? 'bg-red-50 text-red-700 animate-pulse'
+                                            : isLowTime
+                                                ? 'bg-orange-50 text-orange-700'
+                                                : 'bg-blue-50 text-blue-700'
+                                            }`}>
+                                            <Clock className={`w-4 h-4 ${isCriticalTime ? 'animate-pulse' : ''}`} />
+                                            <span>{timeDisplay}</span>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Actions */}
@@ -164,12 +190,19 @@ export default function LeaderboardTable({ rows, onView, onAccept, timeRemaining
                                     >
                                         View
                                     </button>
-                                    <button
-                                        onClick={() => onAccept(r)}
-                                        className="cursor-pointer px-3 py-1.5 rounded-lg bg-gradient-to-r from-neutral-900 to-neutral-800 hover:from-neutral-800 hover:to-neutral-700 text-white text-xs font-semibold transition-all duration-200 hover:shadow-lg transform hover:scale-105"
-                                    >
-                                        Accept
-                                    </button>
+                                    {showAcceptButton && !isWinningBid && (
+                                        <button
+                                            onClick={() => onAccept(r)}
+                                            className="cursor-pointer px-3 py-1.5 rounded-lg bg-gradient-to-r from-neutral-900 to-neutral-800 hover:from-neutral-800 hover:to-neutral-700 text-white text-xs font-semibold transition-all duration-200 hover:shadow-lg transform hover:scale-105"
+                                        >
+                                            Accept
+                                        </button>
+                                    )}
+                                    {isWinningBid && (
+                                        <div className="px-3 py-1.5 rounded-lg bg-green-100 text-green-700 text-xs font-semibold border border-green-200">
+                                            Accepted
+                                        </div>
+                                    )}
                                 </div>
                             </motion.div>
                         );

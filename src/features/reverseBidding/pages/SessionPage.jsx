@@ -415,9 +415,14 @@ export default function SessionPage() {
 
     const rows = useMemo(() => {
         if (!sessionData?.leaderboard) return [];
+        const winningBidId = sessionData?.winning_bid_id ? String(sessionData.winning_bid_id) : null;
+        const isSessionClosed = sessionData?.status === 'closed';
+        
         return sessionData.leaderboard.map((bid, index) => {
             const basePrice = parseFloat(sessionData.criteria?.price || 0);
             const savings = basePrice > 0 ? basePrice - parseFloat(bid.amount || 0) : 0;
+            const bidId = String(bid.bid_id || bid.id);
+            const isWinningBid = isSessionClosed && winningBidId && bidId === winningBidId;
             
             return {
                 id: bid.bid_id || bid.id,
@@ -430,9 +435,10 @@ export default function SessionPage() {
                 distance: bid.distance || 0,
                 location: bid.distance ? `${bid.distance} miles away` : 'Location unavailable',
                 savings: Math.max(0, savings),
+                isWinningBid: isWinningBid,
             };
         });
-    }, [sessionData?.leaderboard, sessionData?.criteria]);
+    }, [sessionData?.leaderboard, sessionData?.criteria, sessionData?.winning_bid_id, sessionData?.status]);
     
     // Format time remaining
     const formatTime = (seconds) => {
@@ -559,15 +565,15 @@ export default function SessionPage() {
                         </div>
                         
                         {/* Time Remaining Card - Compact with All Sessions Button */}
-                        {sessionData.status === 'running' && (
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => navigate('/active-sessions')}
-                                    className="flex items-center gap-1.5 px-3 py-2 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 hover:border-orange-300 transition-all duration-200 shadow-sm h-[40px]"
-                                >
-                                    <ArrowLeft className="w-4 h-4 text-neutral-600" />
-                                    <span className="text-sm font-medium text-neutral-700">All Sessions</span>
-                                </button>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => navigate('/active-sessions')}
+                                className="flex items-center gap-1.5 px-3 py-2 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 hover:border-orange-300 transition-all duration-200 shadow-sm h-[40px]"
+                            >
+                                <ArrowLeft className="w-4 h-4 text-neutral-600" />
+                                <span className="text-sm font-medium text-neutral-700">All Sessions</span>
+                            </button>
+                            {sessionData.status === 'running' && (
                                 <motion.div
                                     initial={{ scale: 0.95 }}
                                     animate={{ scale: 1 }}
@@ -580,8 +586,22 @@ export default function SessionPage() {
                                         </p>
                                     </div>
                                 </motion.div>
-                            </div>
-                        )}
+                            )}
+                            {sessionData.status === 'closed' && sessionData.winning_bid_id && (
+                                <motion.div
+                                    initial={{ scale: 0.95 }}
+                                    animate={{ scale: 1 }}
+                                    className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg px-3 py-2 shadow-md h-[40px] flex items-center"
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <CheckCircle2 className="w-4 h-4 text-white" />
+                                        <p className="text-white text-sm font-semibold">
+                                            Bid Accepted
+                                        </p>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Compact Stats Row */}
@@ -671,6 +691,8 @@ export default function SessionPage() {
                                 onAccept={onAcceptFlow}
                                 timeRemaining={timeRemaining}
                                 vehicleImage={primaryImage}
+                                sessionStatus={sessionData?.status}
+                                isSessionClosed={sessionData?.status === 'closed'}
                             />
                         </div>
                     ) : (
