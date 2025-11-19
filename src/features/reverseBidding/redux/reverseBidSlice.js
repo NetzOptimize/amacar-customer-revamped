@@ -306,20 +306,8 @@ export const fetchCustomerSessionsThunk = createAsyncThunk(
 
 export const acceptBidThunk = createAsyncThunk(
     'reverseBid/acceptBid',
-    async ({ sessionId, bidId }, { getState, rejectWithValue }) => {
+    async ({ sessionId, bidId, bidData }, { rejectWithValue }) => {
         try {
-            // Find the bid in the leaderboard
-            const state = getState().reverseBid;
-            const bid = state.activeSession?.leaderboard?.find((b) => b.id === bidId);
-
-            if (!bid) {
-                // Fallback: try to find in dealers (backward compatibility)
-                const dealer = state.activeSession?.dealers?.find((d) => d.id === bidId);
-                if (!dealer) {
-                    throw new Error('Bid not found');
-                }
-            }
-
             // Make API call to accept the bid
             const response = await api.post(`/sessions/${sessionId}/accept`, {
                 bid_id: bidId,
@@ -329,14 +317,14 @@ export const acceptBidThunk = createAsyncThunk(
                 const apiData = response.data.data;
                 const certificateData = apiData.certificate_data || {};
 
-                // Map API response to match component expectations
-                const acceptedBid = bid || {
+                // Use bidData passed from component, or construct from API response
+                const acceptedBid = bidData || {
                     id: apiData.bid_id,
                     dealerId: certificateData.dealer?.id,
-                    dealerName: certificateData.dealer?.name || bid?.dealerName,
+                    dealerName: certificateData.dealer?.name,
                     dealerEmail: certificateData.dealer?.email,
-                    currentOffer: certificateData.bid_amount || bid?.currentOffer,
-                    perks: certificateData.perks || bid?.perks || {},
+                    currentOffer: certificateData.bid_amount || apiData.bid_id,
+                    perks: certificateData.perks || {},
                 };
 
                 const certificate = {
@@ -355,7 +343,7 @@ export const acceptBidThunk = createAsyncThunk(
                     issuedAt: certificateData.issued_at,
                     validUntil: certificateData.valid_until,
                     acceptedAt: certificateData.issued_at ? new Date(certificateData.issued_at).getTime() : Date.now(),
-                    finalPrice: certificateData.bid_amount || bid?.currentOffer,
+                    finalPrice: certificateData.bid_amount || acceptedBid.currentOffer,
                 };
 
                 return {

@@ -4,6 +4,89 @@ import { X, MapPin, DollarSign, TrendingDown, CheckCircle2, MessageSquare, Build
 export default function BidDetailsDialog({ open, bid, onClose, onAccept }) {
     if (!open || !bid) return null;
 
+    // Parse perks if not already parsed
+    const parsePerksForDisplay = (perks) => {
+        if (!perks) return [];
+        
+        // If already an array of objects, return as is
+        if (Array.isArray(perks) && perks.length > 0 && typeof perks[0] === 'object' && perks[0].value) {
+            return perks;
+        }
+        
+        if (typeof perks === 'string') {
+            try {
+                const parsed = JSON.parse(perks);
+                if (typeof parsed === 'object' && parsed !== null) {
+                    const result = [];
+                    Object.entries(parsed).forEach(([key, value]) => {
+                        if (value !== null && value !== '') {
+                            const formattedKey = key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
+                            const valueStr = String(value);
+                            
+                            if (valueStr.includes(',')) {
+                                const items = valueStr.split(',').map(item => item.trim()).filter(item => item);
+                                items.forEach(item => {
+                                    result.push({ label: formattedKey, value: item });
+                                });
+                            } else {
+                                result.push({ label: formattedKey, value: valueStr });
+                            }
+                        }
+                    });
+                    return result;
+                }
+                if (perks.includes(',')) {
+                    return perks.split(',').map(item => ({
+                        label: 'Benefit',
+                        value: item.trim()
+                    })).filter(item => item.value);
+                }
+                return [{ label: 'Benefit', value: perks.trim() }];
+            } catch {
+                if (perks.includes(',')) {
+                    return perks.split(',').map(item => ({
+                        label: 'Benefit',
+                        value: item.trim()
+                    })).filter(item => item.value);
+                }
+                return [{ label: 'Benefit', value: perks.trim() }];
+            }
+        }
+        
+        if (Array.isArray(perks)) {
+            return perks.map(perk => ({
+                label: 'Benefit',
+                value: String(perk).trim()
+            })).filter(perk => perk.value);
+        }
+        
+        if (typeof perks === 'object' && perks !== null) {
+            const result = [];
+            Object.entries(perks).forEach(([key, value]) => {
+                if (value !== null && value !== '') {
+                    const formattedKey = key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
+                    const valueStr = String(value);
+                    
+                    if (valueStr.includes(',')) {
+                        const items = valueStr.split(',').map(item => item.trim()).filter(item => item);
+                        items.forEach(item => {
+                            result.push({ label: formattedKey, value: item });
+                        });
+                    } else {
+                        result.push({ label: formattedKey, value: valueStr });
+                    }
+                }
+            });
+            return result;
+        }
+        
+        return [];
+    };
+
+    const displayPerks = bid.perksArray && bid.perksArray.length > 0 
+        ? bid.perksArray 
+        : parsePerksForDisplay(bid.perks);
+
     return (
         <AnimatePresence>
             {open && bid && (
@@ -105,7 +188,7 @@ export default function BidDetailsDialog({ open, bid, onClose, onAccept }) {
                             </motion.div>
 
                             {/* Perks Section */}
-                            {(bid.perksDisplay || bid.perks) && (
+                            {displayPerks && displayPerks.length > 0 ? (
                                 <motion.div
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
@@ -117,48 +200,27 @@ export default function BidDetailsDialog({ open, bid, onClose, onAccept }) {
                                         Perks & Benefits
                                     </h3>
                                     <div className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
-                                        {bid.perksDisplay ? (
-                                            <div className="text-sm text-neutral-700 leading-relaxed whitespace-pre-wrap">
-                                                {bid.perksDisplay}
-                                            </div>
-                                        ) : bid.perks && Array.isArray(bid.perks) && bid.perks.length > 0 ? (
-                                            <ul className="space-y-2.5">
-                                                {bid.perks.map((perk, i) => (
-                                                    <motion.li
-                                                        key={i}
-                                                        initial={{ opacity: 0, x: -10 }}
-                                                        animate={{ opacity: 1, x: 0 }}
-                                                        transition={{ delay: 0.25 + i * 0.05 }}
-                                                        className="flex items-start gap-3 text-sm text-neutral-700"
-                                                    >
-                                                        <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                                                        <span>{perk}</span>
-                                                    </motion.li>
-                                                ))}
-                                            </ul>
-                                        ) : bid.perks && typeof bid.perks === 'object' ? (
-                                            <div className="text-sm text-neutral-700 space-y-2">
-                                                {Object.entries(bid.perks).map(([key, value], i) => (
-                                                    <motion.div
-                                                        key={i}
-                                                        initial={{ opacity: 0, x: -10 }}
-                                                        animate={{ opacity: 1, x: 0 }}
-                                                        transition={{ delay: 0.25 + i * 0.05 }}
-                                                        className="flex items-start gap-3"
-                                                    >
-                                                        <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                                                        <span>
-                                                            <span className="font-semibold capitalize">{key.replace(/_/g, ' ')}:</span> {value}
+                                        <div className="flex flex-wrap gap-2.5">
+                                            {displayPerks.map((perk, i) => (
+                                                <motion.div
+                                                    key={i}
+                                                    initial={{ opacity: 0, scale: 0.9 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    transition={{ delay: 0.25 + i * 0.05 }}
+                                                    className="group relative"
+                                                >
+                                                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-br from-orange-50 to-orange-100/50 border border-orange-200 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105">
+                                                        <CheckCircle2 className="w-4 h-4 text-orange-600 flex-shrink-0" />
+                                                        <span className="text-sm text-neutral-800 font-medium">
+                                                            {perk.value}
                                                         </span>
-                                                    </motion.div>
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <div className="text-sm text-neutral-500 italic">No perks specified</div>
-                                        )}
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </motion.div>
-                            )}
+                            ) : null}
 
                             {/* Notes Section */}
                             {bid.notes && (

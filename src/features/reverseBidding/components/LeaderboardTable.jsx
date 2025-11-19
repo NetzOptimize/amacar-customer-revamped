@@ -112,17 +112,29 @@ export default function LeaderboardTable({ rows, onView, onAccept, timeRemaining
 
                                 {/* Perks Preview - Clickable */}
                                 <div className="col-span-2">
-                                    {r.perksDisplay ? (
+                                    {r.perksArray && r.perksArray.length > 0 ? (
                                         <button
                                             onClick={() => onView(r)}
                                             className="text-left w-full group"
                                         >
-                                            <div className="text-xs text-neutral-600 line-clamp-2 group-hover:text-orange-600 transition-colors duration-200 cursor-pointer">
-                                                {r.perksDisplay.length > 60 
-                                                    ? `${r.perksDisplay.substring(0, 60)}...` 
-                                                    : r.perksDisplay}
+                                            <div className="flex flex-wrap gap-1.5 mb-1">
+                                                {r.perksArray.slice(0, 2).map((perk, idx) => (
+                                                    <span
+                                                        key={idx}
+                                                        className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200 group-hover:bg-orange-100 transition-colors duration-200"
+                                                    >
+                                                        {perk.value.length > 20 
+                                                            ? `${perk.value.substring(0, 20)}...` 
+                                                            : perk.value}
+                                                    </span>
+                                                ))}
+                                                {r.perksArray.length > 2 && (
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-neutral-100 text-neutral-600 border border-neutral-200">
+                                                        +{r.perksArray.length - 2} more
+                                                    </span>
+                                                )}
                                             </div>
-                                            <div className="text-xs text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200 mt-0.5">
+                                            <div className="text-xs text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                                 Click to view all perks →
                                             </div>
                                         </button>

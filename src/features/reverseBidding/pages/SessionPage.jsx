@@ -321,40 +321,96 @@ export default function SessionPage() {
     //     }
     // }, [dispatch, sessionId, activeSession?.id, activeSession?.status]);
 
-    // Format perks for display
-    const formatPerks = (perks) => {
-        if (!perks) return null;
+    // Parse perks into an array of objects for beautiful display
+    const parsePerks = (perks) => {
+        if (!perks) return [];
         
         if (typeof perks === 'string') {
             try {
                 const parsed = JSON.parse(perks);
                 if (typeof parsed === 'object' && parsed !== null) {
-                    return Object.entries(parsed)
-                        .filter(([key, value]) => value !== null && value !== '')
-                        .map(([key, value]) => {
-                            // Format key nicely (e.g., "description" -> "Description")
+                    const result = [];
+                    Object.entries(parsed).forEach(([key, value]) => {
+                        if (value !== null && value !== '') {
                             const formattedKey = key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
-                            return `${formattedKey}: ${value}`;
-                        })
-                        .join(', ');
+                            const valueStr = String(value);
+                            
+                            // Check if value contains commas (comma-separated list)
+                            if (valueStr.includes(',')) {
+                                // Split by comma and create individual perks
+                                const items = valueStr.split(',').map(item => item.trim()).filter(item => item);
+                                items.forEach(item => {
+                                    result.push({
+                                        label: formattedKey,
+                                        value: item
+                                    });
+                                });
+                            } else {
+                                result.push({
+                                    label: formattedKey,
+                                    value: valueStr
+                                });
+                            }
+                        }
+                    });
+                    return result;
                 }
-                return perks;
+                // If it's just a plain string, check if it has commas
+                if (perks.includes(',')) {
+                    return perks.split(',').map(item => ({
+                        label: 'Benefit',
+                        value: item.trim()
+                    })).filter(item => item.value);
+                }
+                return [{ label: 'Benefit', value: perks.trim() }];
             } catch {
-                return perks;
+                // If parsing fails, check if it's comma-separated
+                if (perks.includes(',')) {
+                    return perks.split(',').map(item => ({
+                        label: 'Benefit',
+                        value: item.trim()
+                    })).filter(item => item.value);
+                }
+                return [{ label: 'Benefit', value: perks.trim() }];
             }
         }
         
-        if (typeof perks === 'object' && perks !== null) {
-            return Object.entries(perks)
-                .filter(([key, value]) => value !== null && value !== '')
-                .map(([key, value]) => {
-                    const formattedKey = key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
-                    return `${formattedKey}: ${value}`;
-                })
-                .join(', ');
+        if (Array.isArray(perks)) {
+            return perks.map((perk, index) => ({
+                label: 'Benefit',
+                value: String(perk).trim()
+            })).filter(perk => perk.value);
         }
         
-        return null;
+        if (typeof perks === 'object' && perks !== null) {
+            const result = [];
+            Object.entries(perks).forEach(([key, value]) => {
+                if (value !== null && value !== '') {
+                    const formattedKey = key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
+                    const valueStr = String(value);
+                    
+                    // Check if value contains commas (comma-separated list)
+                    if (valueStr.includes(',')) {
+                        // Split by comma and create individual perks
+                        const items = valueStr.split(',').map(item => item.trim()).filter(item => item);
+                        items.forEach(item => {
+                            result.push({
+                                label: formattedKey,
+                                value: item
+                            });
+                        });
+                    } else {
+                        result.push({
+                            label: formattedKey,
+                            value: valueStr
+                        });
+                    }
+                }
+            });
+            return result;
+        }
+        
+        return [];
     };
 
     const rows = useMemo(() => {
@@ -369,7 +425,7 @@ export default function SessionPage() {
                 dealerName: bid.dealer_name || 'Unknown Dealer',
                 currentOffer: parseFloat(bid.amount || 0),
                 perks: bid.perks || {},
-                perksDisplay: formatPerks(bid.perks),
+                perksArray: parsePerks(bid.perks),
                 rank: bid.position || index + 1,
                 distance: bid.distance || 0,
                 location: bid.distance ? `${bid.distance} miles away` : 'Location unavailable',
@@ -409,7 +465,11 @@ export default function SessionPage() {
 
     const onConfirmAccept = async () => {
         if (!confirmBid) return;
-        const res = await dispatch(acceptBidThunk({ sessionId, bidId: confirmBid.id }));
+        const res = await dispatch(acceptBidThunk({ 
+            sessionId, 
+            bidId: confirmBid.id,
+            bidData: confirmBid // Pass the full bid data
+        }));
         if (res?.payload?.certificate) {
             setConfirmBid(null);
             setViewBid(null); // Ensure BidDetailsDialog is closed
