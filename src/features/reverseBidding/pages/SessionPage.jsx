@@ -485,7 +485,7 @@ export default function SessionPage() {
         >
             {/* Compact Header Section */}
             <div className="border-b border-neutral-200/50 bg-white/80 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-[calc(var(--header-height-mobile)+1rem)] sm:pt-[calc(var(--header-height-tablet)+1rem)] lg:pt-[calc(var(--header-height-desktop)+1rem)] pb-4">
+                <div className="mx-auto px-4 sm:px-6 lg:px-8 pt-[calc(var(--header-height-mobile)+1rem)] sm:pt-[calc(var(--header-height-tablet)+1rem)] lg:pt-[calc(var(--header-height-desktop)+1rem)] pb-4" style={{ maxWidth: '1600px' }}>
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                         <div className="flex items-center gap-3">
                             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900">
@@ -580,7 +580,7 @@ export default function SessionPage() {
             </div>
 
             {/* Leaderboard Section - Main Focus */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 min-h-[calc(100vh-300px)]">
+            <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 min-h-[calc(100vh-300px)]" style={{ maxWidth: '1600px' }}>
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
