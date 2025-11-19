@@ -436,6 +436,7 @@ export default function SessionPage() {
                 location: bid.distance ? `${bid.distance} miles away` : 'Location unavailable',
                 savings: Math.max(0, savings),
                 isWinningBid: isWinningBid,
+                productId: bid.product_id || null,
             };
         });
     }, [sessionData?.leaderboard, sessionData?.criteria, sessionData?.winning_bid_id, sessionData?.status]);
@@ -718,7 +719,13 @@ export default function SessionPage() {
                 </motion.div>
             </div>
 
-            <BidDetailsDialog open={!!viewBid} bid={viewBid} onClose={() => setViewBid(null)} onAccept={onAcceptFlow} />
+            <BidDetailsDialog 
+                open={!!viewBid} 
+                bid={viewBid} 
+                onClose={() => setViewBid(null)} 
+                onAccept={onAcceptFlow}
+                isSessionClosed={sessionData?.status === 'closed'}
+            />
             <AcceptConfirmDialog open={!!confirmBid} bid={confirmBid} onCancel={() => setConfirmBid(null)} onConfirm={onConfirmAccept} loading={loading.acceptance} />
             <CertificateDialog
                 open={showCert}

@@ -1,7 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { X, MapPin, DollarSign, TrendingDown, CheckCircle2, MessageSquare, Building2 } from 'lucide-react';
+import { X, MapPin, DollarSign, TrendingDown, CheckCircle2, MessageSquare, Building2, Car, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-export default function BidDetailsDialog({ open, bid, onClose, onAccept }) {
+export default function BidDetailsDialog({ open, bid, onClose, onAccept, isSessionClosed = false }) {
+    const navigate = useNavigate();
     if (!open || !bid) return null;
 
     // Parse perks if not already parsed
@@ -243,18 +245,28 @@ export default function BidDetailsDialog({ open, bid, onClose, onAccept }) {
 
                         {/* Footer with Action Buttons */}
                         <div className="p-6 border-t border-neutral-200 bg-white flex flex-col sm:flex-row items-center justify-end gap-3">
+                            {!isSessionClosed && (
+                                <button
+                                    onClick={() => onAccept(bid)}
+                                    className="cursor-pointer px-6 py-2.5 bg-gradient-to-r from-neutral-900 to-neutral-800 hover:from-neutral-800 hover:to-neutral-700 text-white rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 w-full sm:w-auto hover:shadow-lg transform hover:scale-105"
+                                >
+                                    <CheckCircle2 className="w-4 h-4" />
+                                    Accept Offer
+                                </button>
+                            )}
                             <button
-                                onClick={onClose}
-                                className="cursor-pointer px-6 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl font-medium transition-all duration-200 w-full sm:w-auto"
+                                onClick={() => {
+                                    if (bid.productId) {
+                                        navigate(`/reverse-bidding/vehicles/${bid.productId}`);
+                                        onClose();
+                                    }
+                                }}
+                                disabled={!bid.productId}
+                                className="cursor-pointer px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 disabled:from-neutral-300 disabled:to-neutral-400 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 w-full sm:w-auto hover:shadow-lg transform hover:scale-105 disabled:transform-none"
                             >
-                                Close
-                            </button>
-                            <button
-                                onClick={() => onAccept(bid)}
-                                className="cursor-pointer px-6 py-2.5 bg-gradient-to-r from-neutral-900 to-neutral-800 hover:from-neutral-800 hover:to-neutral-700 text-white rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 w-full sm:w-auto hover:shadow-lg transform hover:scale-105"
-                            >
-                                <CheckCircle2 className="w-4 h-4" />
-                                Accept Offer
+                                <Car className="w-4 h-4" />
+                                View Vehicle
+                                <ArrowRight className="w-4 h-4" />
                             </button>
                         </div>
                     </motion.div>
