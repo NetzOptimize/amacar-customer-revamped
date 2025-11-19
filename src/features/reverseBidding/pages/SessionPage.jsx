@@ -98,25 +98,193 @@ export default function SessionPage() {
         fetchSessionData();
     }, [sessionId]);
 
-    // Set up polling to refresh session data every 5 seconds
+    // Set up SSE connection for real-time updates
     useEffect(() => {
-        if (!sessionId || sessionData?.status !== 'running') return;
+        if (!sessionId) return;
+        
+        // Only connect if session is running
+        if (sessionData?.status !== 'running') return;
 
-        const interval = setInterval(async () => {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            console.error('No auth token found for SSE connection');
+            return;
+        }
+
+        // Build SSE URL with token as query parameter (EventSource doesn't support custom headers)
+        const baseURL = import.meta.env.VITE_BASE_URL_REVERSE_BID || '';
+        const sseUrl = `${baseURL}/sse/session/${sessionId}?token=${encodeURIComponent(token)}`;
+        
+        // Create EventSource connection
+        const eventSource = new EventSource(sseUrl);
+        let reconnectTimeout = null;
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5;
+        let fallbackInterval = null;
+        let isConnected = false;
+
+        // Handle connection opened
+        eventSource.onopen = () => {
+            console.log('SSE connection opened for session', sessionId);
+            reconnectAttempts = 0; // Reset on successful connection
+            isConnected = true;
+        };
+
+        // Handle leaderboard updates
+        eventSource.addEventListener('leaderboard_updated', (event) => {
             try {
-                const response = await apiRev.get(`/sessions/${sessionId}`);
-                if (response.data?.success && response.data?.data) {
-                    setSessionData(response.data.data);
-                    if (response.data.data.time_remaining) {
-                        setTimeRemaining(response.data.data.time_remaining.seconds || 0);
-                    }
+                const data = JSON.parse(event.data);
+                if (data.session_id === parseInt(sessionId) && data.leaderboard) {
+                    // Update session data with new leaderboard
+                    setSessionData(prev => ({
+                        ...prev,
+                        leaderboard: data.leaderboard,
+                        total_bids: data.leaderboard?.length || 0
+                    }));
                 }
             } catch (err) {
-                console.error('Error refreshing session:', err);
+                console.error('Error parsing leaderboard_updated event:', err);
             }
-        }, 5000); // Poll every 5 seconds
+        });
 
-        return () => clearInterval(interval);
+        // Handle bid received
+        eventSource.addEventListener('bid_received', (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.session_id === parseInt(sessionId)) {
+                    // Refresh session data to get updated leaderboard
+                    apiRev.get(`/sessions/${sessionId}`)
+                        .then(response => {
+                            if (response.data?.success && response.data?.data) {
+                                setSessionData(response.data.data);
+                                if (response.data.data.time_remaining) {
+                                    setTimeRemaining(response.data.data.time_remaining.seconds || 0);
+                                }
+                            }
+                        })
+                        .catch(err => console.error('Error refreshing session after bid:', err));
+                }
+            } catch (err) {
+                console.error('Error parsing bid_received event:', err);
+            }
+        });
+
+        // Handle bid revised
+        eventSource.addEventListener('bid_revised', (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.session_id === parseInt(sessionId)) {
+                    // Refresh session data to get updated leaderboard
+                    apiRev.get(`/sessions/${sessionId}`)
+                        .then(response => {
+                            if (response.data?.success && response.data?.data) {
+                                setSessionData(response.data.data);
+                                if (response.data.data.time_remaining) {
+                                    setTimeRemaining(response.data.data.time_remaining.seconds || 0);
+                                }
+                            }
+                        })
+                        .catch(err => console.error('Error refreshing session after bid revision:', err));
+                }
+            } catch (err) {
+                console.error('Error parsing bid_revised event:', err);
+            }
+        });
+
+        // Handle session ended
+        eventSource.addEventListener('session_ended', (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.session_id === parseInt(sessionId)) {
+                    // Refresh session data to get final status
+                    apiRev.get(`/sessions/${sessionId}`)
+                        .then(response => {
+                            if (response.data?.success && response.data?.data) {
+                                setSessionData(response.data.data);
+                            }
+                        })
+                        .catch(err => console.error('Error refreshing session after end:', err));
+                }
+            } catch (err) {
+                console.error('Error parsing session_ended event:', err);
+            }
+        });
+
+        // Handle connected event
+        eventSource.addEventListener('connected', (event) => {
+            console.log('SSE connected event received');
+            isConnected = true;
+        });
+
+        // Handle disconnected event
+        eventSource.addEventListener('disconnected', (event) => {
+            console.log('SSE disconnected event received');
+            isConnected = false;
+        });
+
+        // Handle heartbeat (keep connection alive)
+        eventSource.addEventListener('heartbeat', (event) => {
+            // Connection is alive, no action needed
+        });
+
+        // Handle connection errors
+        eventSource.onerror = (error) => {
+            // Only handle error if connection was previously open (to avoid handling initial connection errors)
+            if (eventSource.readyState === EventSource.CLOSED) {
+                console.error('SSE connection closed:', error);
+                isConnected = false;
+                
+                // Close the connection
+                eventSource.close();
+                
+                // Attempt to reconnect if we haven't exceeded max attempts
+                if (reconnectAttempts < maxReconnectAttempts) {
+                    reconnectAttempts++;
+                    const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 10000); // Exponential backoff, max 10s
+                    
+                    reconnectTimeout = setTimeout(() => {
+                        console.log(`Attempting to reconnect SSE (attempt ${reconnectAttempts}/${maxReconnectAttempts})...`);
+                        // The effect will re-run when sessionData changes, creating a new connection
+                        // For now, just refresh the session data to trigger re-render
+                        apiRev.get(`/sessions/${sessionId}`)
+                            .then(response => {
+                                if (response.data?.success && response.data?.data) {
+                                    setSessionData(response.data.data);
+                                }
+                            })
+                            .catch(() => {});
+                    }, delay);
+                } else {
+                    console.error('Max SSE reconnection attempts reached. Falling back to polling.');
+                    // Fallback to polling if SSE fails completely
+                    fallbackInterval = setInterval(async () => {
+                        try {
+                            const response = await apiRev.get(`/sessions/${sessionId}`);
+                            if (response.data?.success && response.data?.data) {
+                                setSessionData(response.data.data);
+                                if (response.data.data.time_remaining) {
+                                    setTimeRemaining(response.data.data.time_remaining.seconds || 0);
+                                }
+                            }
+                        } catch (err) {
+                            console.error('Error in fallback polling:', err);
+                        }
+                    }, 5000);
+                }
+            }
+        };
+
+        // Cleanup function
+        return () => {
+            if (reconnectTimeout) {
+                clearTimeout(reconnectTimeout);
+            }
+            if (fallbackInterval) {
+                clearInterval(fallbackInterval);
+            }
+            eventSource.close();
+            console.log('SSE connection closed for session', sessionId);
+        };
     }, [sessionId, sessionData?.status]);
 
     // Update timer from session data
