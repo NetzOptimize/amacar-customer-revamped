@@ -6,9 +6,9 @@ export default function FilterSidebar({ cars = [] }) {
     const { filters } = useSelector((s) => s.reverseBid);
 
     return (
-        <div className="w-full lg:w-80 flex-shrink-0 backdrop-blur-xl bg-white/80 border-r border-white/20 lg:sticky lg:top-[calc(var(--header-height-desktop)+2rem)] lg:self-start flex flex-col shadow-lg">
+        <div className="w-full lg:w-80 flex-shrink-0 backdrop-blur-xl bg-white/80 border-r border-white/20 lg:sticky lg:top-[calc(var(--header-height-desktop)+2rem)] lg:self-start lg:h-[calc(100vh-var(--header-height-desktop)-2rem)] flex flex-col shadow-lg">
             {/* Header - Fixed */}
-            <div className="flex-shrink-0 p-6 pb-4 border-b border-white/20 space-y-4 bg-gradient-to-b from-white/60 to-white/40 backdrop-blur-sm">
+            <div className="flex-shrink-0 p-6 pb-4 border-b border-white/20 space-y-4 bg-gradient-to-b from-white/60 to-white/40 backdrop-blur-sm z-10">
                 <div className="flex items-center justify-between">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
@@ -20,8 +20,10 @@ export default function FilterSidebar({ cars = [] }) {
                 </div>
             </div>
 
-            {/* Filter Content */}
-            <FilterContent cars={cars} />
+            {/* Filter Content - Scrollable */}
+            <div className="flex-1 overflow-y-auto overflow-x-hidden">
+                <FilterContent cars={cars} />
+            </div>
         </div>
     );
 }

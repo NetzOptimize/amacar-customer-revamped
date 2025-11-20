@@ -226,7 +226,7 @@ export default function VehicleGrid({ cars, showFilters = true }) {
     return (
         <>
             <div className={`flex flex-col ${showFilters ? 'lg:flex-row gap-0' : ''}`}>
-                {/* Filter Sidebar - Desktop */}
+                {/* Filter Sidebar - Desktop - Sticky */}
                 {showFilters && (
                     <div className="hidden lg:block lg:flex-shrink-0">
                         <FilterSidebar cars={cars} />
