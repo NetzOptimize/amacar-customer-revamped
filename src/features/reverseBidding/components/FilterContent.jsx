@@ -39,6 +39,7 @@ export default function FilterContent({ cars = [] }) {
         budgetMin: filters.budgetMin ? String(filters.budgetMin) : '',
         budgetMax: filters.budgetMax ? String(filters.budgetMax) : '',
         zipCode: filters.zipCode || user?.zip_code || user?.meta?.zip_code || '',
+        extraFilters: filters.extraFilters || {},
     });
 
     const toggleSection = (section) => {
@@ -58,8 +59,9 @@ export default function FilterContent({ cars = [] }) {
             budgetMin: filters.budgetMin ? String(filters.budgetMin) : '',
             budgetMax: filters.budgetMax ? String(filters.budgetMax) : '',
             zipCode: filters.zipCode || user?.zip_code || user?.meta?.zip_code || '',
+            extraFilters: filters.extraFilters || {},
         });
-    }, [filters.make, filters.model, filters.year, filters.budgetMin, filters.budgetMax, filters.condition, filters.zipCode, user]);
+    }, [filters.make, filters.model, filters.year, filters.budgetMin, filters.budgetMax, filters.condition, filters.zipCode, filters.extraFilters, user]);
 
     // Get makes from API
     const makes = useMemo(() => {
@@ -90,6 +92,14 @@ export default function FilterContent({ cars = [] }) {
         return counts;
     }, [cars, localFilters.make]);
 
+    // Format filter key to readable label (e.g., "exterior_color" -> "Exterior Color")
+    const formatFilterLabel = (key) => {
+        return key
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    };
+
     // Get active filters (all filters that are set)
     const activeFilters = useMemo(() => {
         const active = [];
@@ -116,6 +126,21 @@ export default function FilterContent({ cars = [] }) {
         if (localFilters.zipCode) {
             active.push({ key: 'zipCode', label: `ZIP: ${localFilters.zipCode}`, value: localFilters.zipCode });
         }
+        // Add extra filters
+        if (localFilters.extraFilters && Object.keys(localFilters.extraFilters).length > 0) {
+            Object.entries(localFilters.extraFilters).forEach(([filterKey, values]) => {
+                if (Array.isArray(values) && values.length > 0) {
+                    values.forEach((value) => {
+                        active.push({ 
+                            key: `extra-${filterKey}-${value}`, 
+                            label: `${formatFilterLabel(filterKey)}: ${value}`, 
+                            value, 
+                            filterKey 
+                        });
+                    });
+                }
+            });
+        }
         return active;
     }, [localFilters]);
 
@@ -134,6 +159,28 @@ export default function FilterContent({ cars = [] }) {
             } else {
                 updated.models = [...currentModels, value];
             }
+        } else if (key.startsWith('extra-')) {
+            // Handle extra filter changes (format: "extra-{filterKey}-{value}")
+            const parts = key.split('-');
+            if (parts.length >= 3) {
+                const filterKey = parts[1];
+                const filterValue = parts.slice(2).join('-'); // Handle values with hyphens
+                const currentValues = updated.extraFilters[filterKey] || [];
+                
+                if (currentValues.includes(filterValue)) {
+                    // Remove value
+                    updated.extraFilters = {
+                        ...updated.extraFilters,
+                        [filterKey]: currentValues.filter(v => v !== filterValue)
+                    };
+                } else {
+                    // Add value
+                    updated.extraFilters = {
+                        ...updated.extraFilters,
+                        [filterKey]: [...currentValues, filterValue]
+                    };
+                }
+            }
         } else {
             updated[key] = value;
         }
@@ -150,6 +197,7 @@ export default function FilterContent({ cars = [] }) {
             make: updated.make || null,
             condition: updated.condition,
             zipCode: updated.zipCode || '',
+            extraFilters: updated.extraFilters || {},
         };
 
         dispatch(setFilters(filtersToDispatch));
@@ -159,7 +207,7 @@ export default function FilterContent({ cars = [] }) {
     };
 
     // Remove active filter
-    const removeFilter = async (key, value = null) => {
+    const removeFilter = async (key, value = null, filterKey = null) => {
         const updated = { ...localFilters };
         if (key === 'condition') {
             updated.condition = 'new';
@@ -170,6 +218,18 @@ export default function FilterContent({ cars = [] }) {
             // Remove specific model from array
             const modelToRemove = value || key.replace('model-', '');
             updated.models = (updated.models || []).filter(m => m !== modelToRemove);
+        } else if (key.startsWith('extra-')) {
+            // Remove extra filter
+            const parts = key.split('-');
+            if (parts.length >= 3 && filterKey) {
+                const filterKeyToRemove = filterKey;
+                const filterValueToRemove = value || parts.slice(2).join('-');
+                const currentValues = updated.extraFilters[filterKeyToRemove] || [];
+                updated.extraFilters = {
+                    ...updated.extraFilters,
+                    [filterKeyToRemove]: currentValues.filter(v => v !== filterValueToRemove)
+                };
+            }
         } else if (key === 'year') {
             updated.year = '';
         } else if (key === 'budgetMin') {
@@ -190,6 +250,7 @@ export default function FilterContent({ cars = [] }) {
             make: updated.make || null,
             condition: updated.condition,
             zipCode: updated.zipCode || '',
+            extraFilters: updated.extraFilters || {},
         };
 
         dispatch(setFilters(filtersToDispatch));
@@ -206,6 +267,7 @@ export default function FilterContent({ cars = [] }) {
             budgetMin: '',
             budgetMax: '',
             zipCode: user?.zip_code || user?.meta?.zip_code || '',
+            extraFilters: {},
         };
         setLocalFilters(resetFilters);
 
@@ -217,6 +279,7 @@ export default function FilterContent({ cars = [] }) {
             budgetMin: null,
             budgetMax: null,
             zipCode: resetFilters.zipCode,
+            extraFilters: {},
         };
 
         dispatch(setFilters(filtersToDispatch));
@@ -243,7 +306,7 @@ export default function FilterContent({ cars = [] }) {
                         {activeFilters.map((filter) => (
                             <motion.button
                                 key={filter.key}
-                                onClick={() => removeFilter(filter.key, filter.value)}
+                                onClick={() => removeFilter(filter.key, filter.value, filter.filterKey)}
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 className="cursor-pointer inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-orange-500/20 to-orange-400/20 backdrop-blur-sm border border-orange-400/40 hover:from-orange-500/30 hover:to-orange-400/30 text-orange-700 text-xs font-semibold transition-all duration-200 hover:shadow-md group"
@@ -543,6 +606,98 @@ export default function FilterContent({ cars = [] }) {
                         )}
                     </AnimatePresence>
                 </div>
+
+                {/* Extra Features - Dynamic sections from API */}
+                {filterOptions.extraFeatures && Object.keys(filterOptions.extraFeatures).length > 0 && (
+                    <>
+                        {Object.entries(filterOptions.extraFeatures).map(([filterKey, filterValues]) => {
+                            if (!filterValues || filterValues.length === 0) return null;
+                            
+                            const sectionKey = `extra-${filterKey}`;
+                            const isExpanded = expandedSections[sectionKey] ?? false;
+                            const selectedValues = localFilters.extraFilters[filterKey] || [];
+                            
+                            return (
+                                <div key={filterKey} className="bg-white/40 backdrop-blur-sm border border-white/30 rounded-xl overflow-hidden shadow-sm">
+                                    <button
+                                        onClick={() => toggleSection(sectionKey)}
+                                        className="cursor-pointer w-full px-4 py-3 flex items-center justify-between hover:bg-white/30 transition-colors"
+                                    >
+                                        <h3 className="text-sm font-bold text-neutral-900 uppercase tracking-wider flex items-center gap-2">
+                                            <div className="w-1.5 h-5 bg-gradient-to-b from-orange-500 to-orange-400 rounded-full shadow-sm"></div>
+                                            {formatFilterLabel(filterKey)}
+                                        </h3>
+                                        {isExpanded ? (
+                                            <ChevronUp className="w-4 h-4 text-orange-600" />
+                                        ) : (
+                                            <ChevronDown className="w-4 h-4 text-orange-600" />
+                                        )}
+                                    </button>
+                                    <AnimatePresence>
+                                        {isExpanded && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: 'auto', opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.3 }}
+                                                className="overflow-hidden"
+                                            >
+                                                <div className="px-4 pb-4 pt-2 space-y-1.5 max-h-64 overflow-y-auto">
+                                                    {filterValues.map((item) => {
+                                                        const value = typeof item === 'object' ? item.value : item;
+                                                        const count = typeof item === 'object' ? item.count : null;
+                                                        const isSelected = selectedValues.includes(String(value));
+                                                        
+                                                        return (
+                                                            <motion.div
+                                                                key={value}
+                                                                whileHover={{ scale: 1.02 }}
+                                                                className={`flex items-center gap-2.5 p-2.5 rounded-lg transition-all cursor-pointer backdrop-blur-sm ${isSelected
+                                                                    ? 'bg-gradient-to-r from-orange-50/80 to-orange-100/60 border border-orange-300/50 shadow-sm'
+                                                                    : 'hover:bg-white/40 border border-transparent'
+                                                                    }`}
+                                                                onClick={() => handleFilterChange(`extra-${filterKey}-${value}`, value)}
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    id={`extra-${filterKey}-${value}`}
+                                                                    checked={isSelected}
+                                                                    onChange={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleFilterChange(`extra-${filterKey}-${value}`, value);
+                                                                    }}
+                                                                    className={`w-4 h-4 rounded border-2 cursor-pointer transition-all ${isSelected
+                                                                        ? 'border-orange-500 bg-orange-500 text-white'
+                                                                        : 'border-white/60 text-orange-500 focus:ring-orange-500/30'
+                                                                        }`}
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                />
+                                                                <label
+                                                                    htmlFor={`extra-${filterKey}-${value}`}
+                                                                    className={`text-sm cursor-pointer flex-1 flex items-center justify-between ${isSelected ? 'text-orange-900 font-semibold' : 'text-neutral-800'
+                                                                        }`}
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                >
+                                                                    <span>{value}</span>
+                                                                    {count !== null && count !== undefined && (
+                                                                        <span className={`text-xs px-2 py-0.5 rounded font-semibold ${isSelected ? 'bg-orange-200/80 text-orange-800' : 'bg-white/60 text-orange-700'
+                                                                            }`}>
+                                                                            {count.toLocaleString()}
+                                                                        </span>
+                                                                    )}
+                                                                </label>
+                                                            </motion.div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                            );
+                        })}
+                    </>
+                )}
             </div>
         </div>
     );

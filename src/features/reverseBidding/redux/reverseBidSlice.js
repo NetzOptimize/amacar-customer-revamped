@@ -16,6 +16,7 @@ export const fetchFiltersThunk = createAsyncThunk(
                     makes: data.makes || {},
                     years: data.years || [],
                     priceRange: data.price_range || { min: 0, max: 100000 },
+                    extraFeatures: data.extra_features || {},
                 };
             }
             return rejectWithValue('Failed to fetch filters');
@@ -55,6 +56,17 @@ export const fetchMockCarsThunk = createAsyncThunk(
             const zipCode = filters.zipCode || state.reverseBid.filters.zipCode || '';
             if (zipCode) {
                 params.zip_code = zipCode;
+            }
+
+            // Add extra filters (from extraFeatures)
+            if (filters.extraFilters && Object.keys(filters.extraFilters).length > 0) {
+                Object.entries(filters.extraFilters).forEach(([filterKey, values]) => {
+                    if (Array.isArray(values) && values.length > 0) {
+                        // Send as comma-separated string or array depending on backend expectation
+                        // For now, sending as comma-separated string
+                        params[filterKey] = values.join(',');
+                    }
+                });
             }
 
             // Default radius is 50 (as per API docs)
@@ -441,11 +453,13 @@ const initialState = {
         budgetMax: null,
         condition: 'all',
         zipCode: '',
+        extraFilters: {}, // Store extra filter selections like { body: ['SUV', 'Sedan'], exterior_color: ['Black'], etc. }
     },
     filterOptions: {
         makes: {},
         years: [],
         priceRange: { min: 0, max: 100000 },
+        extraFeatures: {},
         loading: false,
         error: null,
     },
@@ -551,6 +565,7 @@ const reverseBidSlice = createSlice({
                     state.filterOptions.makes = action.payload.makes || {};
                     state.filterOptions.years = action.payload.years || [];
                     state.filterOptions.priceRange = action.payload.priceRange || { min: 0, max: 100000 };
+                    state.filterOptions.extraFeatures = action.payload.extraFeatures || {};
                 }
             })
             .addCase(fetchFiltersThunk.rejected, (state, action) => {
