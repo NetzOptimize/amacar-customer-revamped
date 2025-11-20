@@ -17,7 +17,8 @@ import {
     Clock,
     FileText,
     Tag,
-    ChevronRight
+    ChevronRight,
+    CheckCircle2
 } from 'lucide-react';
 import 'photoswipe/dist/photoswipe.css';
 import { Gallery, Item } from 'react-photoswipe-gallery';
@@ -266,6 +267,9 @@ export default function VehicleDetails() {
     const primaryImage = images[0];
     const imageCount = images.length;
 
+    // Check if vehicle is sold
+    const isSold = vehicleData?.inventory_status === 'sold';
+
     // Handle start bidding - Fetch alternatives first, then open dialog
     const handleStartBidding = async (e) => {
         if (e) {
@@ -472,19 +476,31 @@ export default function VehicleDetails() {
                                 <ArrowLeft className="w-5 h-5 text-neutral-700" />
                             </button>
                             <div className="flex flex-col gap-2">
-                                <button
-                                    onClick={handleStartBidding}
-                                    disabled={sessionLoading || loadingAlternatives || !price || price === 0}
-                                    className="bg-neutral-900 text-white px-4 py-2 rounded-lg font-semibold hover:bg-neutral-800 transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 whitespace-nowrap text-sm sm:text-base"
-                                >
-                                    {loadingAlternatives ? 'Loading alternatives...' : 'Start Reverse Bidding'}
-                                </button>
-                                {price === 0 && (
+                                {isSold ? (
                                     <button
-                                        className="bg-transparent border border-neutral-300 text-neutral-700 px-4 py-2 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors whitespace-nowrap text-xs sm:text-sm"
+                                        disabled
+                                        className="bg-neutral-300 text-neutral-600 px-4 py-2 rounded-lg font-semibold cursor-not-allowed whitespace-nowrap text-sm sm:text-base flex items-center justify-center gap-2"
                                     >
-                                        Request for price
+                                        <CheckCircle2 className="w-4 h-4" />
+                                        Already Sold
                                     </button>
+                                ) : (
+                                    <>
+                                        <button
+                                            onClick={handleStartBidding}
+                                            disabled={sessionLoading || loadingAlternatives || !price || price === 0}
+                                            className="bg-neutral-900 text-white px-4 py-2 rounded-lg font-semibold hover:bg-neutral-800 transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 whitespace-nowrap text-sm sm:text-base"
+                                        >
+                                            {loadingAlternatives ? 'Loading alternatives...' : 'Start Reverse Bidding'}
+                                        </button>
+                                        {price === 0 && (
+                                            <button
+                                                className="bg-transparent border border-neutral-300 text-neutral-700 px-4 py-2 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors whitespace-nowrap text-xs sm:text-sm"
+                                            >
+                                                Request for price
+                                            </button>
+                                        )}
+                                    </>
                                 )}
                             </div>
                         </div>
@@ -933,13 +949,23 @@ export default function VehicleDetails() {
                                     </div>
 
                                     <div className="pt-4 border-t border-neutral-200">
-                                        <button
-                                            onClick={handleStartBidding}
-                                            disabled={sessionLoading || loadingAlternatives}
-                                            className="w-full bg-transparent border-2 border-neutral-300 text-neutral-700 py-3 px-4 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            {loadingAlternatives ? 'Loading alternatives...' : 'See your actual price'}
-                                        </button>
+                                        {isSold ? (
+                                            <button
+                                                disabled
+                                                className="w-full bg-neutral-100 border-2 border-neutral-200 text-neutral-600 py-3 px-4 rounded-lg font-medium cursor-not-allowed flex items-center justify-center gap-2"
+                                            >
+                                                <CheckCircle2 className="w-4 h-4" />
+                                                Already Sold
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={handleStartBidding}
+                                                disabled={sessionLoading || loadingAlternatives}
+                                                className="w-full bg-transparent border-2 border-neutral-300 text-neutral-700 py-3 px-4 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                {loadingAlternatives ? 'Loading alternatives...' : 'See your actual price'}
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             ) : (
