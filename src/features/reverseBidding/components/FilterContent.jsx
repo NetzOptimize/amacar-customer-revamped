@@ -94,6 +94,14 @@ export default function FilterContent({ cars = [] }) {
 
     // Format filter key to readable label (e.g., "exterior_color" -> "Exterior Color")
     const formatFilterLabel = (key) => {
+        // Special case: convert "series" to "Trim"
+        if (key === 'series') {
+            return 'Trim';
+        }
+        // Special case: convert "series_detail" to "Trim Detail"
+        if (key === 'series_detail') {
+            return 'Trim Detail';
+        }
         return key
             .split('_')
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
