@@ -18,14 +18,16 @@ import {
   Award,
   MapPin,
   TrendingDown,
+  CheckCircle,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCustomerSessionsThunk } from "../redux/reverseBidSlice";
+import { fetchCustomerSessionsThunk, acceptBidThunk } from "../redux/reverseBidSlice";
 import useLoadMore from "../../../hooks/useLoadMore";
 import LoadMore from "../../../components/ui/load-more";
 import LiveAuctionsSkeleton from "../../../components/skeletons/LiveAuctionsSkeleton";
 import LiveAuctionsSortingSkeleton from "@/components/skeletons/LiveAuctionsSortingSkeleton";
 import apiRev from "../../../lib/apiRev";
+import AcceptConfirmDialog from "../components/AcceptConfirmDialog";
 
 const ActiveSessionsPage = () => {
   const dispatch = useDispatch();
@@ -38,6 +40,11 @@ const ActiveSessionsPage = () => {
   const [isSorting, setIsSorting] = useState(false);
   const [sortProgress, setSortProgress] = useState(0);
   const dropdownRef = useRef(null);
+
+  // Accept offer dialog state
+  const [acceptDialogOpen, setAcceptDialogOpen] = useState(false);
+  const [selectedBid, setSelectedBid] = useState(null);
+  const [selectedSessionId, setSelectedSessionId] = useState(null);
 
   // Load more configuration
   const itemsPerPage = 6;
@@ -148,6 +155,7 @@ const ActiveSessionsPage = () => {
         criteria: criteria,
         timeRemainingData: timeRemaining, // Store full time_remaining object
         image: vehicleImages[session.id] || null,
+        leaderboard: leaderboard, // Store full leaderboard for best bid details
       };
     });
   };
@@ -378,6 +386,68 @@ const ActiveSessionsPage = () => {
 
   const handleRefresh = () => {
     dispatch(fetchCustomerSessionsThunk({ status: 'running', page: 1, per_page: 100 }));
+  };
+
+  // Handle opening accept offer dialog
+  const handleOpenAcceptDialog = (session, e) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    
+    if (!session.leaderboard || session.leaderboard.length === 0) {
+      return;
+    }
+
+    // Find the best bid (lowest amount)
+    const bestBid = session.leaderboard.reduce((min, bid) => {
+      const bidAmount = parseFloat(bid.amount || 0);
+      const minAmount = parseFloat(min.amount || 0);
+      return bidAmount < minAmount ? bid : min;
+    }, session.leaderboard[0]);
+
+    // Format bid data for dialog
+    const bidData = {
+      bidId: bestBid.bid_id || bestBid.id,
+      dealerName: bestBid.dealer_name || 'Unknown Dealer',
+      currentOffer: parseFloat(bestBid.amount || 0),
+    };
+
+    setSelectedBid(bidData);
+    setSelectedSessionId(session.sessionId);
+    setAcceptDialogOpen(true);
+  };
+
+  // Handle closing accept offer dialog
+  const handleCloseAcceptDialog = () => {
+    if (!loading.acceptance) {
+      setAcceptDialogOpen(false);
+      setSelectedBid(null);
+      setSelectedSessionId(null);
+    }
+  };
+
+  // Handle accepting the offer
+  const handleAcceptOffer = async () => {
+    if (!selectedBid || !selectedSessionId) return;
+
+    try {
+      const result = await dispatch(acceptBidThunk({
+        sessionId: selectedSessionId,
+        bidId: selectedBid.bidId,
+        bidData: selectedBid,
+      }));
+
+      if (acceptBidThunk.fulfilled.match(result)) {
+        // Close dialog first
+        handleCloseAcceptDialog();
+        // Redirect to accepted reverse bids page
+        navigate('/accepted-reverse-bids');
+      } else {
+        console.error('Failed to accept offer:', result.error);
+      }
+    } catch (error) {
+      console.error('Error accepting offer:', error);
+    }
   };
 
   // Loading state
@@ -662,6 +732,16 @@ const ActiveSessionsPage = () => {
                             </span>
                           </div>
 
+                          {/* Total Saving Badge - Only show if there's a best offer */}
+                          {session.currentBid > 0 && session.price > session.currentBid && (
+                            <div className="inline-flex items-center gap-1 sm:gap-1.5 lg:gap-1 xl:gap-2 bg-orange-50 text-orange-700 px-2 sm:px-2.5 lg:px-2 xl:px-3 py-1.5 sm:py-1.5 lg:py-1.5 xl:py-2 rounded-full border border-orange-200">
+                              <TrendingDown className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-3 xl:w-4 xl:h-4" />
+                              <span className="text-xs sm:text-sm lg:text-xs xl:text-sm font-semibold">
+                                Save: {formatCurrency(session.price - session.currentBid)}
+                              </span>
+                            </div>
+                          )}
+
                           {/* Best Offer Badge */}
                           {session.currentBid > 0 ? (
                             <div className="inline-flex items-center gap-1 sm:gap-1.5 lg:gap-1 xl:gap-2 bg-green-50 text-green-700 px-2 sm:px-2.5 lg:px-2 xl:px-3 py-1.5 sm:py-1.5 lg:py-1.5 xl:py-2 rounded-full border border-green-200">
@@ -689,7 +769,7 @@ const ActiveSessionsPage = () => {
                         </div>
 
                         {/* Time Remaining - Real-time countdown */}
-                        <div className="flex items-center justify-between mb-4 sm:mb-5 lg:mb-4 xl:mb-6">
+                        <div className="flex items-center justify-start mb-4 sm:mb-5 lg:mb-4 xl:mb-6">
                           <div className="flex items-center space-x-2">
                             <Timer className={`w-4 h-4 sm:w-4 sm:h-4 lg:w-4 xl:w-5 xl:h-5 ${
                               isExpired ? 'text-red-500' : isCriticalTime ? 'text-red-500' : isLowTime ? 'text-orange-500' : 'text-blue-500'
@@ -699,11 +779,6 @@ const ActiveSessionsPage = () => {
                             }`}>
                               <LiveCountdown session={session} />
                             </span>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-xs text-neutral-500">
-                              {isExpired ? 'Session ended' : 'Time remaining'}
-                            </p>
                           </div>
                         </div>
 
@@ -717,7 +792,15 @@ const ActiveSessionsPage = () => {
                             className="cursor-pointer flex-1 py-2 sm:py-2.5 lg:py-2 xl:py-2.5 px-3 sm:px-3.5 lg:px-3 xl:px-4 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition-colors duration-200 flex items-center justify-center space-x-1 sm:space-x-1.5 lg:space-x-1 xl:space-x-2 text-xs sm:text-sm lg:text-xs xl:text-sm"
                           >
                             <Eye className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-3 xl:w-4 xl:h-4" />
-                            <span>View Session</span>
+                            <span>View Offers</span>
+                          </button>
+                          <button
+                            onClick={(e) => handleOpenAcceptDialog(session, e)}
+                            disabled={session.currentBid === 0 || isExpired}
+                            className="cursor-pointer flex-1 py-2 sm:py-2.5 lg:py-2 xl:py-2.5 px-3 sm:px-3.5 lg:px-3 xl:px-4 bg-green-500 hover:bg-green-600 disabled:bg-neutral-300 disabled:cursor-not-allowed text-white rounded-xl font-medium transition-colors duration-200 flex items-center justify-center space-x-1 sm:space-x-1.5 lg:space-x-1 xl:space-x-2 text-xs sm:text-sm lg:text-xs xl:text-sm"
+                          >
+                            <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-3 xl:w-4 xl:h-4" />
+                            <span>Accept Offer</span>
                           </button>
                         </div>
                       </div>
@@ -800,6 +883,15 @@ const ActiveSessionsPage = () => {
           </motion.div>
         )}
       </div>
+
+      {/* Accept Offer Dialog */}
+      <AcceptConfirmDialog
+        open={acceptDialogOpen}
+        bid={selectedBid}
+        onCancel={handleCloseAcceptDialog}
+        onConfirm={handleAcceptOffer}
+        loading={loading.acceptance || false}
+      />
     </div>
   );
 };
