@@ -1,6 +1,6 @@
 .hero-section {
     position: relative;
-    height: 75vh;
+    /* height: 75vh; */
     /* full screen */
     min-height: 600px;
     background-size: cover;

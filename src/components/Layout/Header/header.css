@@ -106,7 +106,7 @@
 .nav-desktop {
     display: none;
     align-items: center;
-    gap: 2rem;
+    gap: 2.5rem;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -387,6 +387,7 @@
     
     .actions-desktop {
         display: flex;
+        gap: 0.75rem;
     }
     
     .mobile-menu-toggle {
@@ -410,10 +411,14 @@
 /* Large Desktop (1280px+) */
 @media (min-width: 1280px) {
     .nav-desktop {
-        gap: 3rem;
+        gap: 3.5rem;
     }
     
     .logo {
         width: 130px;
+    }
+    
+    .actions-desktop {
+        gap: 1rem;
     }
 }
