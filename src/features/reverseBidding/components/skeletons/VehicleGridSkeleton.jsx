@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 
-export default function VehicleGridSkeleton({ showFilters = true, cardsPerRow = 2 }) {
+export default function VehicleGridSkeleton({ showFilters = true, cardsPerRow = 3 }) {
     const cardCount = cardsPerRow === 3 ? 9 : 6; // Show more cards for 3-column layout
     
     return (
@@ -22,7 +22,7 @@ export default function VehicleGridSkeleton({ showFilters = true, cardsPerRow = 
 
             {/* Vehicle Grid Skeleton */}
             <div className={`${showFilters ? 'flex-1 lg:pl-6' : 'w-full'}`}>
-                <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${showFilters ? 'lg:grid-cols-2' : 'lg:grid-cols-3'}`}>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {Array.from({ length: cardCount }).map((_, index) => (
                         <motion.div
                             key={index}

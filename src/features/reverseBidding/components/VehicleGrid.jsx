@@ -255,7 +255,7 @@ export default function VehicleGrid({ cars, showFilters = true }) {
 
                     {/* Show skeleton only for vehicle grid when loading */}
                     {loading.search ? (
-                        <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${showFilters ? 'lg:grid-cols-2' : 'lg:grid-cols-3'}`}>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {Array.from({ length: showFilters ? 6 : 9 }).map((_, index) => (
                                 <div
                                     key={index}
