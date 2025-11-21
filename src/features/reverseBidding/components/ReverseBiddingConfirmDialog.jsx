@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import axios from 'axios';
 import { 
@@ -40,7 +39,6 @@ export default function ReverseBiddingConfirmDialog({
     loading = false
 }) {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
     const { filters } = useSelector((s) => s.reverseBid);
     const { user } = useSelector((s) => s.user);
 
@@ -207,10 +205,11 @@ export default function ReverseBiddingConfirmDialog({
         }));
     };
 
-    // Navigate to vehicle details
+    // Open vehicle details in new tab
     const handleViewVehicle = (vehicleId, e) => {
         e.stopPropagation();
-        navigate(`/reverse-bidding/vehicles/${vehicleId}`);
+        const url = `/reverse-bidding/vehicles/${vehicleId}`;
+        window.open(url, '_blank', 'noopener,noreferrer');
     };
 
     // Handle confirm - update filters and then start bidding
@@ -617,6 +616,9 @@ export default function ReverseBiddingConfirmDialog({
                                                 </div>
                                             </label>
                                         </div>
+                                        <p className="text-[10px] text-neutral-500 italic mt-1.5">
+                                            You'll receive lower offers from different dealers
+                                        </p>
                                     </motion.div>
 
                                     {/* Consent Checkboxes - Ultra Compact */}
@@ -820,8 +822,7 @@ export default function ReverseBiddingConfirmDialog({
                                                             {/* Vehicle Info */}
                                                             <div className="flex-1 min-w-0">
                                                                 <h4 
-                                                                    className="text-base font-bold text-neutral-900 mb-1.5 hover:text-orange-600 transition-colors cursor-pointer truncate"
-                                                                    onClick={(e) => handleViewVehicle(vehicle.id, e)}
+                                                                    className="text-base font-bold text-neutral-900 mb-1.5 truncate"
                                                                 >
                                                                     {vehicle.year} {vehicle.make} {vehicle.model}
                                                                 </h4>
