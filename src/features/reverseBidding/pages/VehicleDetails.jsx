@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     ArrowLeft,
     Heart,
@@ -18,6 +18,7 @@ import {
     FileText,
     Tag,
     ChevronRight,
+    ChevronLeft,
     CheckCircle2
 } from 'lucide-react';
 import 'photoswipe/dist/photoswipe.css';
@@ -46,6 +47,7 @@ export default function VehicleDetails() {
     const [pendingAction, setPendingAction] = useState(false);
     const [alternativeVehicles, setAlternativeVehicles] = useState(null);
     const [loadingAlternatives, setLoadingAlternatives] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0); // Track current carousel image
     const { user } = useSelector((state) => state.user);
     const { loading: reverseBidLoading } = useSelector((state) => state.reverseBid);
     const sessionLoading = reverseBidLoading.session;
@@ -266,6 +268,29 @@ export default function VehicleDetails() {
 
     const primaryImage = images[0];
     const imageCount = images.length;
+
+    // Reset carousel to first image when images change
+    useEffect(() => {
+        if (images.length > 0) {
+            setCurrentImageIndex(0);
+        }
+    }, [images.length]);
+
+    // Carousel navigation functions
+    const goToNext = (e) => {
+        e?.stopPropagation();
+        setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    };
+
+    const goToPrevious = (e) => {
+        e?.stopPropagation();
+        setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    };
+
+    const goToImage = (index, e) => {
+        e?.stopPropagation();
+        setCurrentImageIndex(index);
+    };
 
     // Check if vehicle is sold
     const isSold = vehicleData?.inventory_status === 'sold';
@@ -511,32 +536,97 @@ export default function VehicleDetails() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
                     {/* Left Column - Images and Details */}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Image Gallery */}
+                        {/* Image Gallery with Carousel */}
                         <Gallery>
-                            <div className="relative bg-neutral-100 rounded-xl overflow-hidden">
+                            <div className="relative bg-neutral-100 rounded-xl overflow-hidden group/image-container">
                                 {primaryImage && images.length > 0 ? (
                                     <div className="relative aspect-[4/3]">
-                                        {images.map((image, index) => (
-                                            <Item
-                                                key={`gallery-${index}`}
-                                                original={image.src}
-                                                thumbnail={image.thumbnail || image.src}
-                                                width={image.width}
-                                                height={image.height}
-                                                alt={image.alt}
-                                            >
-                                                {({ ref, open }) => (
-                                                    <img
-                                                        ref={ref}
-                                                        onClick={open}
-                                                        src={index === 0 ? image.src : image.thumbnail || image.src}
+                                        {/* Carousel Image Display */}
+                                        <AnimatePresence mode="wait">
+                                            {images.map((image, index) => {
+                                                if (index !== currentImageIndex) return null;
+                                                
+                                                return (
+                                                    <Item
+                                                        key={`gallery-${index}`}
+                                                        original={image.src}
+                                                        thumbnail={image.thumbnail || image.src}
+                                                        width={image.width}
+                                                        height={image.height}
                                                         alt={image.alt}
-                                                        className={`w-full h-full object-cover cursor-pointer ${index === 0 ? 'block' : 'hidden'}`}
-                                                        loading={index === 0 ? 'eager' : 'lazy'}
-                                                    />
+                                                    >
+                                                        {({ ref, open }) => (
+                                                            <motion.img
+                                                                ref={ref}
+                                                                onClick={open}
+                                                                key={index}
+                                                                src={image.src}
+                                                                alt={image.alt}
+                                                                initial={{ opacity: 0, scale: 1.1 }}
+                                                                animate={{ opacity: 1, scale: 1 }}
+                                                                exit={{ opacity: 0, scale: 0.95 }}
+                                                                transition={{ duration: 0.3, ease: "easeInOut" }}
+                                                                className="w-full h-full object-cover transition-transform duration-700 group-hover/image-container:scale-110 cursor-pointer"
+                                                                loading={index === 0 ? 'eager' : 'lazy'}
+                                                            />
+                                                        )}
+                                                    </Item>
+                                                );
+                                            })}
+                                        </AnimatePresence>
+
+                                        {/* Navigation Arrows - Only show if more than 1 image */}
+                                        {images.length > 1 && (
+                                            <>
+                                                {/* Previous Button */}
+                                                <button
+                                                    onClick={goToPrevious}
+                                                    className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/90 backdrop-blur-md text-neutral-700 hover:bg-white hover:text-orange-600 shadow-lg transition-all duration-200 hover:scale-110 opacity-0 group-hover/image-container:opacity-100 z-30"
+                                                    aria-label="Previous image"
+                                                >
+                                                    <ChevronLeft className="w-5 h-5" />
+                                                </button>
+
+                                                {/* Next Button */}
+                                                <button
+                                                    onClick={goToNext}
+                                                    className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/90 backdrop-blur-md text-neutral-700 hover:bg-white hover:text-orange-600 shadow-lg transition-all duration-200 hover:scale-110 opacity-0 group-hover/image-container:opacity-100 z-30"
+                                                    aria-label="Next image"
+                                                >
+                                                    <ChevronRight className="w-5 h-5" />
+                                                </button>
+                                            </>
+                                        )}
+
+                                        {/* Carousel Navigation Bar - Bottom Center */}
+                                        {images.length > 1 && (
+                                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent p-4 z-30">
+                                                <div className="flex items-center justify-center">
+                                                    {/* Image Counter */}
+                                                    <div className="px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-semibold">
+                                                        {currentImageIndex + 1}/{images.length}
+                                                    </div>
+                                                </div>
+
+                                                {/* Dot Indicators */}
+                                                {images.length <= 20 && (
+                                                    <div className="flex items-center justify-center gap-2 mt-3">
+                                                        {images.map((_, index) => (
+                                                            <button
+                                                                key={index}
+                                                                onClick={(e) => goToImage(index, e)}
+                                                                className={`h-2 rounded-full transition-all duration-200 ${
+                                                                    index === currentImageIndex
+                                                                        ? 'bg-white w-8'
+                                                                        : 'bg-white/40 w-2 hover:bg-white/60'
+                                                                }`}
+                                                                aria-label={`Go to image ${index + 1}`}
+                                                            />
+                                                        ))}
+                                                    </div>
                                                 )}
-                                            </Item>
-                                        ))}
+                                            </div>
+                                        )}
 
                                         {/* Heart Button */}
                                         <button
@@ -544,7 +634,7 @@ export default function VehicleDetails() {
                                                 e.stopPropagation();
                                                 setIsSaved(!isSaved);
                                             }}
-                                            className={`absolute top-4 left-4 p-2 rounded-full backdrop-blur-md transition-all duration-200 hover:scale-110 z-30 ${isSaved
+                                            className={`absolute top-4 left-4 p-2 rounded-full backdrop-blur-md transition-all duration-200 hover:scale-110 z-40 ${isSaved
                                                 ? 'bg-red-500/90 text-white shadow-lg'
                                                 : 'bg-white/90 text-neutral-700 hover:bg-red-50 hover:text-red-600 shadow-md'
                                                 }`}
@@ -554,16 +644,9 @@ export default function VehicleDetails() {
                                         </button>
 
                                         {/* Condition Badge */}
-                                        <div className={`absolute top-4 right-4 px-3 py-1.5 rounded-md text-sm font-medium backdrop-blur-md text-white z-30 ${conditionColor}`}>
+                                        <div className={`absolute top-4 right-4 px-3 py-1.5 rounded-md text-sm font-medium backdrop-blur-md text-white z-40 ${conditionColor}`}>
                                             {conditionBadge}
                                         </div>
-
-                                        {/* Image Count */}
-                                        {imageCount > 1 && (
-                                            <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-md text-sm font-semibold backdrop-blur-md bg-black/60 text-white z-30">
-                                                Show all photos ({imageCount})
-                                            </div>
-                                        )}
                                     </div>
                                 ) : (
                                     <div className="aspect-[4/3] flex items-center justify-center bg-neutral-200 text-neutral-400">
