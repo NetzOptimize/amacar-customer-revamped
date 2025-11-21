@@ -270,6 +270,23 @@ export default function VehicleCard({ car, onStart, loading = false }) {
                 <h3 className="text-base sm:text-lg font-semibold tracking-tight truncate">
                     {car.year} {car.make} {car.model}
                 </h3>
+                {/* Trim and Mileage */}
+                {(car.series || car.mileage || car.odometer) && (
+                    <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-neutral-600">
+                        {car.series && (
+                            <span className="truncate">
+                                <span className="font-medium text-neutral-700">Trim:</span> {car.series}
+                            </span>
+                        )}
+                        {(car.mileage || car.odometer) && (
+                            <span className="truncate flex items-center gap-1">
+                                {car.series && <span className="text-neutral-400">•</span>}
+                                <span className="font-medium text-neutral-700">Mileage:</span>
+                                <span>{((car.mileage || car.odometer) || 0).toLocaleString()} mi</span>
+                            </span>
+                        )}
+                    </div>
+                )}
                 {price === 0 ? (
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 ">
                         <span className="text-lg  font-semibold text-neutral-400">Price not available</span>

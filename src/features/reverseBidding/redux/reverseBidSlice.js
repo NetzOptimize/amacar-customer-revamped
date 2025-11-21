@@ -114,6 +114,9 @@ export const fetchMockCarsThunk = createAsyncThunk(
                     is_reverse_biddable: vehicle.is_reverse_biddable,
                     images: vehicle.images || [], // Already in the correct format
                     url: vehicle.url,
+                    series: vehicle.series, // Trim/Series information
+                    mileage: vehicle.mileage, // Mileage from API
+                    odometer: vehicle.odometer, // Odometer (fallback for mileage)
                 }));
 
                 // Get available filters from API response (dynamic counts based on current search)
