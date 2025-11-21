@@ -59,12 +59,16 @@ export const fetchMockCarsThunk = createAsyncThunk(
             }
 
             // Add extra filters (from extraFeatures)
+            // These are filters like body, transmission, exterior_color, interior_color, etc.
             if (filters.extraFilters && Object.keys(filters.extraFilters).length > 0) {
                 Object.entries(filters.extraFilters).forEach(([filterKey, values]) => {
-                    if (Array.isArray(values) && values.length > 0) {
-                        // Send as comma-separated string or array depending on backend expectation
-                        // For now, sending as comma-separated string
-                        params[filterKey] = values.join(',');
+                    // Ensure values is an array and has items
+                    const filterValues = Array.isArray(values) ? values : (values ? [values] : []);
+                    
+                    if (filterValues.length > 0) {
+                        // Send as comma-separated string for backend processing
+                        // Backend can split this into an array if needed
+                        params[filterKey] = filterValues.join(',');
                     }
                 });
             }
@@ -112,8 +116,11 @@ export const fetchMockCarsThunk = createAsyncThunk(
                     url: vehicle.url,
                 }));
 
-                // Return vehicles and pagination
-                return { vehicles, pagination };
+                // Get available filters from API response (dynamic counts based on current search)
+                const availableFilters = response.data.data.available_filters || {};
+
+                // Return vehicles, pagination, and available filters
+                return { vehicles, pagination, availableFilters };
             } else {
                 // Return empty array if API indicates no vehicles found
                 if (response.data.message?.toLowerCase().includes('no vehicles') ||
@@ -459,7 +466,8 @@ const initialState = {
         makes: {},
         years: [],
         priceRange: { min: 0, max: 100000 },
-        extraFeatures: {},
+        extraFeatures: {}, // Initial filters from /vehicles/filters endpoint
+        availableFilters: {}, // Dynamic filters with counts from search results
         loading: false,
         error: null,
     },
@@ -582,6 +590,10 @@ const reverseBidSlice = createSlice({
                 if (action.payload) {
                     state.searchResults = action.payload.vehicles || [];
                     state.pagination = action.payload.pagination || state.pagination;
+                    // Update available filters with dynamic counts from search results
+                    if (action.payload.availableFilters) {
+                        state.filterOptions.availableFilters = action.payload.availableFilters;
+                    }
                 } else {
                     state.searchResults = [];
                 }

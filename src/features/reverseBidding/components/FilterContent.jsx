@@ -507,7 +507,14 @@ export default function FilterContent({ cars = [] }) {
                                                         ? 'bg-gradient-to-r from-orange-50/80 to-orange-100/60 border border-orange-300/50 shadow-sm'
                                                         : 'hover:bg-white/40 border border-transparent'
                                                         }`}
-                                                    onClick={() => handleFilterChange('model', model)}
+                                                    onClick={(e) => {
+                                                        // Prevent event from bubbling up to parent accordion
+                                                        e.stopPropagation();
+                                                        // Only handle click if not clicking on checkbox or label directly
+                                                        if (e.target.type !== 'checkbox' && e.target.tagName !== 'LABEL' && e.target.tagName !== 'INPUT') {
+                                                            handleFilterChange('model', model);
+                                                        }
+                                                    }}
                                                 >
                                                     <input
                                                         type="checkbox"
@@ -521,13 +528,17 @@ export default function FilterContent({ cars = [] }) {
                                                             ? 'border-orange-500 bg-orange-500 text-white'
                                                             : 'border-white/60 text-orange-500 focus:ring-orange-500/30'
                                                             }`}
-                                                        onClick={(e) => e.stopPropagation()}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                        }}
                                                     />
                                                     <label
                                                         htmlFor={`model-${model}`}
                                                         className={`text-sm cursor-pointer flex-1 flex items-center justify-between ${isSelected ? 'text-orange-900 font-semibold' : 'text-neutral-800'
                                                             }`}
-                                                        onClick={(e) => e.stopPropagation()}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                        }}
                                                     >
                                                         <span>{model}</span>
                                                         {count > 0 && (
@@ -608,14 +619,36 @@ export default function FilterContent({ cars = [] }) {
                 </div>
 
                 {/* Extra Features - Dynamic sections from API */}
-                {filterOptions.extraFeatures && Object.keys(filterOptions.extraFeatures).length > 0 && (
-                    <>
-                        {Object.entries(filterOptions.extraFeatures).map(([filterKey, filterValues]) => {
+                {/* Use availableFilters (from search) if available, otherwise fall back to extraFeatures (initial) */}
+                {(() => {
+                    const filtersToDisplay = filterOptions.availableFilters && Object.keys(filterOptions.availableFilters).length > 0 
+                        ? filterOptions.availableFilters 
+                        : filterOptions.extraFeatures;
+                    
+                    if (!filtersToDisplay || Object.keys(filtersToDisplay).length === 0) return null;
+                    
+                    return (
+                        <>
+                            {Object.entries(filtersToDisplay).map(([filterKey, filterValues]) => {
                             if (!filterValues || filterValues.length === 0) return null;
                             
                             const sectionKey = `extra-${filterKey}`;
                             const isExpanded = expandedSections[sectionKey] ?? false;
                             const selectedValues = localFilters.extraFilters[filterKey] || [];
+                            
+                            // Filter out options with 0 count, but keep selected values even if count is 0
+                            // This allows users to see their selected filters even if they result in 0 matches
+                            const validValues = filterValues.filter(item => {
+                                const value = typeof item === 'object' ? item.value : item;
+                                const count = typeof item === 'object' ? item.count : null;
+                                const isSelected = selectedValues.includes(String(value));
+                                
+                                // Show if selected OR if count > 0 (or count is null for initial filters)
+                                return isSelected || (count === null || count > 0);
+                            });
+                            
+                            // Don't render filter section if no valid options
+                            if (validValues.length === 0) return null;
                             
                             return (
                                 <div key={filterKey} className="bg-white/40 backdrop-blur-sm border border-white/30 rounded-xl overflow-hidden shadow-sm">
@@ -643,7 +676,7 @@ export default function FilterContent({ cars = [] }) {
                                                 className="overflow-hidden"
                                             >
                                                 <div className="px-4 pb-4 pt-2 space-y-1.5 max-h-64 overflow-y-auto">
-                                                    {filterValues.map((item) => {
+                                                    {validValues.map((item) => {
                                                         const value = typeof item === 'object' ? item.value : item;
                                                         const count = typeof item === 'object' ? item.count : null;
                                                         const isSelected = selectedValues.includes(String(value));
@@ -656,7 +689,14 @@ export default function FilterContent({ cars = [] }) {
                                                                     ? 'bg-gradient-to-r from-orange-50/80 to-orange-100/60 border border-orange-300/50 shadow-sm'
                                                                     : 'hover:bg-white/40 border border-transparent'
                                                                     }`}
-                                                                onClick={() => handleFilterChange(`extra-${filterKey}-${value}`, value)}
+                                                                onClick={(e) => {
+                                                                    // Prevent event from bubbling up to parent accordion
+                                                                    e.stopPropagation();
+                                                                    // Only handle click if not clicking on checkbox or label directly
+                                                                    if (e.target.type !== 'checkbox' && e.target.tagName !== 'LABEL' && e.target.tagName !== 'INPUT') {
+                                                                        handleFilterChange(`extra-${filterKey}-${value}`, value);
+                                                                    }
+                                                                }}
                                                             >
                                                                 <input
                                                                     type="checkbox"
@@ -670,13 +710,17 @@ export default function FilterContent({ cars = [] }) {
                                                                         ? 'border-orange-500 bg-orange-500 text-white'
                                                                         : 'border-white/60 text-orange-500 focus:ring-orange-500/30'
                                                                         }`}
-                                                                    onClick={(e) => e.stopPropagation()}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                    }}
                                                                 />
                                                                 <label
                                                                     htmlFor={`extra-${filterKey}-${value}`}
                                                                     className={`text-sm cursor-pointer flex-1 flex items-center justify-between ${isSelected ? 'text-orange-900 font-semibold' : 'text-neutral-800'
                                                                         }`}
-                                                                    onClick={(e) => e.stopPropagation()}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                    }}
                                                                 >
                                                                     <span>{value}</span>
                                                                     {count !== null && count !== undefined && (
@@ -695,9 +739,10 @@ export default function FilterContent({ cars = [] }) {
                                     </AnimatePresence>
                                 </div>
                             );
-                        })}
-                    </>
-                )}
+                            })}
+                        </>
+                    );
+                })()}
             </div>
         </div>
     );
