@@ -485,15 +485,25 @@ export default function SessionPage() {
     };
 
     const downloadPDF = async () => {
+        // Get certificate data from Redux state
+        const certificateData = activeSession?.certificateData || null;
+        
         const sessionForPDF = {
             id: sessionData?.id,
-            car: {
+            car: certificateData?.vehicle ? {
+                year: certificateData.vehicle.year,
+                make: certificateData.vehicle.make,
+                model: certificateData.vehicle.model,
+                title: certificateData.vehicle.title,
+                images: certificateData.vehicle.images || []
+            } : {
                 year: criteria.year,
                 make: criteria.make,
                 model: criteria.model,
                 images: primaryVehicle?.images || []
             },
-            acceptedBid: confirmBid
+            acceptedBid: confirmBid,
+            certificateData: certificateData
         };
         await generateCertificatePDF(sessionForPDF);
         // Open appointment modal after PDF download
@@ -731,13 +741,20 @@ export default function SessionPage() {
                 open={showCert}
                 session={{
                     id: sessionData?.id,
-                    car: {
+                    car: activeSession?.certificateData?.vehicle ? {
+                        year: activeSession.certificateData.vehicle.year,
+                        make: activeSession.certificateData.vehicle.make,
+                        model: activeSession.certificateData.vehicle.model,
+                        title: activeSession.certificateData.vehicle.title,
+                        images: activeSession.certificateData.vehicle.images || []
+                    } : {
                         year: criteria.year,
                         make: criteria.make,
                         model: criteria.model,
                         images: primaryVehicle?.images || []
                     },
-                    acceptedBid: confirmBid
+                    acceptedBid: confirmBid,
+                    certificateData: activeSession?.certificateData || null
                 }}
                 onDownload={downloadPDF}
                 onContinue={handleContinue}
