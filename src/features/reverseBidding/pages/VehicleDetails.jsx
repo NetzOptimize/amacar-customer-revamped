@@ -1045,11 +1045,10 @@ export default function VehicleDetails() {
                                             </button>
                                         ) : (
                                             <button
-                                                onClick={handleStartBidding}
-                                                disabled={sessionLoading || loadingAlternatives}
-                                                className="w-full bg-transparent border-2 border-neutral-300 text-neutral-700 py-3 px-4 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                onClick={() => setDealerContactModalOpen(true)}
+                                                className="w-full bg-transparent border-2 border-neutral-300 text-neutral-700 py-3 px-4 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors"
                                             >
-                                                {loadingAlternatives ? 'Loading alternatives...' : 'See your actual price'}
+                                                Contact dealer
                                             </button>
                                         )}
                                     </div>
@@ -1057,6 +1056,14 @@ export default function VehicleDetails() {
                             ) : (
                                 <div className="space-y-4">
                                     <div className="text-lg font-semibold text-neutral-400">Price not available</div>
+                                    {!isSold && (
+                                        <button
+                                            onClick={() => setDealerContactModalOpen(true)}
+                                            className="w-full bg-transparent border-2 border-neutral-300 text-neutral-700 py-3 px-4 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors"
+                                        >
+                                            Request for price
+                                        </button>
+                                    )}
                                 </div>
                             )}
                         </motion.div>
