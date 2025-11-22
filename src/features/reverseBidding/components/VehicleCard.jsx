@@ -7,6 +7,7 @@ import 'photoswipe/dist/photoswipe.css';
 import { Gallery, Item } from 'react-photoswipe-gallery';
 import ReverseBiddingConfirmDialog from './ReverseBiddingConfirmDialog';
 import LoginModal from '../../../components/ui/LoginModal';
+import DealerContactModal from './DealerContactModal';
 
 export default function VehicleCard({ car, onStart, loading = false }) {
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -14,6 +15,7 @@ export default function VehicleCard({ car, onStart, loading = false }) {
     const [pendingAction, setPendingAction] = useState(false); // Track if we need to open dialog after login
     const [isSaved, setIsSaved] = useState(false); // Track if vehicle is saved
     const [currentImageIndex, setCurrentImageIndex] = useState(0); // Track current carousel image
+    const [dealerContactModalOpen, setDealerContactModalOpen] = useState(false); // Track dealer contact modal
 
     const { user } = useSelector((state) => state.user);
     const isLoggedIn = !!user;
@@ -293,7 +295,7 @@ export default function VehicleCard({ car, onStart, loading = false }) {
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
-                                // TODO: Implement request price functionality
+                                setDealerContactModalOpen(true);
                             }}
                             className="text-xs sm:text-sm font-medium text-orange-600 hover:text-orange-700 underline cursor-pointer transition-colors whitespace-nowrap self-start sm:self-auto"
                         >
@@ -351,6 +353,18 @@ export default function VehicleCard({ car, onStart, loading = false }) {
                 onClose={handleLoginModalClose}
                 title="Login Required"
                 description="Please log in to start reverse bidding on this vehicle"
+            />
+
+            <DealerContactModal
+                open={dealerContactModalOpen}
+                onClose={() => setDealerContactModalOpen(false)}
+                dealerContact={car.dealer_contact}
+                vehicleInfo={{
+                    year: car.year,
+                    make: car.make,
+                    model: car.model,
+                    series: car.series
+                }}
             />
         </motion.div>
     );

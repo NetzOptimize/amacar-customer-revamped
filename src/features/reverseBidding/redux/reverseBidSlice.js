@@ -117,6 +117,7 @@ export const fetchMockCarsThunk = createAsyncThunk(
                     series: vehicle.series, // Trim/Series information
                     mileage: vehicle.mileage, // Mileage from API
                     odometer: vehicle.odometer, // Odometer (fallback for mileage)
+                    dealer_contact: vehicle.dealer_contact || null, // Dealer contact information (email, phone, name)
                 }));
 
                 // Get available filters from API response (dynamic counts based on current search)

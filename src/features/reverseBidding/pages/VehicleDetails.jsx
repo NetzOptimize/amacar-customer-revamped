@@ -32,6 +32,7 @@ import {
 import apiRev from '../../../lib/apiRev';
 import ReverseBiddingConfirmDialog from '../components/ReverseBiddingConfirmDialog';
 import LoginModal from '../../../components/ui/LoginModal';
+import DealerContactModal from '../components/DealerContactModal';
 import { startReverseBiddingThunk } from '../redux/reverseBidSlice';
 
 export default function VehicleDetails() {
@@ -48,6 +49,7 @@ export default function VehicleDetails() {
     const [alternativeVehicles, setAlternativeVehicles] = useState(null);
     const [loadingAlternatives, setLoadingAlternatives] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0); // Track current carousel image
+    const [dealerContactModalOpen, setDealerContactModalOpen] = useState(false); // Track dealer contact modal
     const { user } = useSelector((state) => state.user);
     const { loading: reverseBidLoading } = useSelector((state) => state.reverseBid);
     const sessionLoading = reverseBidLoading.session;
@@ -520,6 +522,7 @@ export default function VehicleDetails() {
                                         </button>
                                         {price === 0 && (
                                             <button
+                                                onClick={() => setDealerContactModalOpen(true)}
                                                 className="bg-transparent border border-neutral-300 text-neutral-700 px-4 py-2 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors whitespace-nowrap text-xs sm:text-sm"
                                             >
                                                 Request for price
@@ -1164,6 +1167,22 @@ export default function VehicleDetails() {
                 onClose={handleLoginModalClose}
                 title="Login Required"
                 description="Please log in to start reverse bidding on this vehicle"
+            />
+
+            <DealerContactModal
+                open={dealerContactModalOpen}
+                onClose={() => setDealerContactModalOpen(false)}
+                dealerContact={vehicleData?.dealer_contact || vehicleData?.dealer_info ? {
+                    email: vehicleData?.dealer_info?.email || vehicleData?.dealer_contact?.email,
+                    phone: vehicleData?.dealer_info?.phone || vehicleData?.dealer_contact?.phone,
+                    name: vehicleData?.dealer_info?.name || vehicleData?.dealer_contact?.name
+                } : null}
+                vehicleInfo={vehicleData ? {
+                    year: vehicleData.year,
+                    make: vehicleData.make,
+                    model: vehicleData.model,
+                    series: vehicleData.series
+                } : null}
             />
         </div>
     );
