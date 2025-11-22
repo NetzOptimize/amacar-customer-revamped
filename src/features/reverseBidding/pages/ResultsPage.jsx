@@ -1,9 +1,41 @@
-import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import VehicleGrid from '../components/VehicleGrid';
 import { motion } from 'framer-motion';
+import { fetchMockCarsThunk, setFilters } from '../redux/reverseBidSlice';
 
 export default function ResultsPage() {
-    const { searchResults, filters } = useSelector((s) => s.reverseBid);
+    const dispatch = useDispatch();
+    const { searchResults, filters, pagination } = useSelector((s) => s.reverseBid);
+
+    // Trigger initial search on mount with default filters (at least condition: 'all')
+    useEffect(() => {
+        // Ensure we have at least condition: 'all' in filters
+        const defaultFilters = {
+            condition: filters.condition || 'all',
+            make: filters.make || null,
+            model: filters.model || null,
+            year: filters.year || null,
+            budgetMin: filters.budgetMin || null,
+            budgetMax: filters.budgetMax || null,
+            zipCode: filters.zipCode || '',
+            extraFilters: filters.extraFilters || {},
+        };
+
+        // Set filters in Redux to ensure FilterContent displays them correctly
+        if (!filters.condition || filters.condition !== defaultFilters.condition) {
+            dispatch(setFilters(defaultFilters));
+        }
+
+        // Always trigger search on mount to ensure results are loaded
+        // This handles page reloads where Redux state might be empty
+        dispatch(fetchMockCarsThunk({ 
+            filters: defaultFilters, 
+            page: 1, 
+            perPage: 20 
+        }));
+    }, []); // Empty dependency array - only run on mount
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
