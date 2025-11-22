@@ -107,7 +107,6 @@ const PendingOffersPage = () => {
             : ['/api/placeholder/400/300'],
         description: offer.title || 'Vehicle description not available',
         auctionEndTime: auctionEndTime,
-        cashOffer: parseFloat(offer.cash_offer || '0'),
         auctionStatus: offer.auction_status || 'unknown',
         bids: offer.bid || [],
         highestBidData: highestBid,
