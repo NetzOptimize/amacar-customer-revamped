@@ -20,7 +20,8 @@ import {
     Share2,
     X,
     Loader2,
-    AlertCircle
+    AlertCircle,
+    Info
 } from 'lucide-react';
 import 'photoswipe/dist/photoswipe.css';
 import { Gallery, Item } from 'react-photoswipe-gallery';
@@ -362,6 +363,21 @@ export default function ReverseBiddingConfirmDialog({
                                 >
                                     <X className="w-5 h-5 text-neutral-600" />
                                 </button>
+                            </div>
+                        </div>
+
+                        {/* Informational Banner */}
+                        <div className="bg-amber-50 border-b border-amber-200/50 px-4 py-3 flex-shrink-0">
+                            <div className="flex items-start gap-3">
+                                <Info className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                                <div className="flex-1 text-sm text-amber-900">
+                                    <p className="font-medium mb-1">
+                                        Dealers will only lower their sales price during the bidding session.
+                                    </p>
+                                    <p className="text-amber-800">
+                                        Taxes, DMV fees, and any add-ons are determined and collected by the dealership.
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
