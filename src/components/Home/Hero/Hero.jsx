@@ -91,7 +91,7 @@ export default function Hero() {
             custom={0}
             style={{ fontWeight: 600 }}
           >
-            Sell Your Car in Minutes—Let Dealers Compete for Your Best Price
+            Sell or Buy Your Car in Minutes — Let Dealers Compete for You
           </motion.h1>
 
           {/* Subheadline */}
@@ -100,7 +100,7 @@ export default function Hero() {
             variants={fadeUp}
             custom={0.2}
           >
-            Skip the haggling. Post once, get multiple competitive offers instantly.
+            Whether you're selling your car or shopping for a new or used one, Amacar brings dealerships into a competitive marketplace—so you always win.
           </motion.p>
 
           {/* Search Bar with Floating Animation */}
@@ -140,7 +140,7 @@ export default function Hero() {
             variants={fadeUp}
             custom={0.4}
           >
-            {/* Secondary Ghost Buttons */}
+            {/* Shop New Button */}
             <Button
               onClick={handleNewClick}
               variant="outline"
@@ -149,6 +149,7 @@ export default function Hero() {
               Shop New →
             </Button>
 
+            {/* Shop Used Button */}
             <Button
               onClick={handleUsedClick}
               variant="outline"
@@ -157,7 +158,7 @@ export default function Hero() {
               Shop Used →
             </Button>
 
-            {/* Primary CTA Button with Gradient */}
+            {/* Auction Your Ride Button */}
             <Button
               onClick={(e) => {
                 e.preventDefault()
@@ -165,7 +166,7 @@ export default function Hero() {
               }}
               className="flex-1 min-w-[180px] h-auto px-8 py-4 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 hover:from-cyan-600 hover:via-blue-600 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/50 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/60 text-base"
             >
-              Get Instant Offer
+              Auction Your Ride →
             </Button>
           </motion.div>
 

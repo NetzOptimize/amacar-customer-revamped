@@ -1,0 +1,127 @@
+.trusted-section {
+    padding: 80px 20px;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #f8fafc 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.trusted-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.1), transparent);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.trusted-content {
+    text-align: center;
+}
+
+.trusted-header {
+    margin-bottom: 60px;
+}
+
+.trusted-title {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.trusted-highlight {
+    color: #f97316;
+    background: linear-gradient(135deg, #f97316, #e63946);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.trusted-subtitle {
+    font-size: 1.125rem;
+    color: #64748b;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.trust-points-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.trust-point-card {
+    background: white;
+    border-radius: 16px;
+    padding: 32px 24px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.trust-point-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    border-color: rgba(249, 115, 22, 0.2);
+    transform: translateY(-4px);
+}
+
+.trust-point-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f97316, #e63946);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin: 0 auto 16px;
+    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+}
+
+.trust-point-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .trusted-section {
+        padding: 60px 16px;
+    }
+
+    .trusted-header {
+        margin-bottom: 40px;
+    }
+
+    .trust-points-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .trust-point-card {
+        padding: 24px 16px;
+    }
+
+    .trust-point-icon {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 12px;
+    }
+
+    .trust-point-text {
+        font-size: 0.9rem;
+    }
+}
+

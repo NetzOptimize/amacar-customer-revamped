@@ -8,24 +8,31 @@ export default function WhyChooseAmacar() {
     const benefits = [
         {
             id: 1,
-            title: "Maximize Value",
-            description: "Empowering sellers to get the best offer possible.",
-            icon: "💰",
+            title: "Real Dealership Competition",
+            description: "Whether selling or buying, dealerships compete for your business.",
+            icon: "🏆",
             color: "var(--brand-orange)"
         },
         {
             id: 2,
-            title: "Seamless Experience",
-            description: "Simplifying the car-selling process from start to finish",
-            icon: "🔒",
+            title: "Higher Value for Your Car & Lower Purchase Prices",
+            description: "You win on both sides of the marketplace.",
+            icon: "💰",
             color: "var(--brand-purple)"
         },
         {
             id: 3,
-            title: "Live Auction",
-            description: "Creating an advanced online auction platform that enables customers to list their vehicles for auction and attract competitive bids from participating dealerships to ensure the best market offers.",
-            icon: "🔍",
+            title: "Zero Hassle, Zero Pressure",
+            description: "Transparent, fast, and 100% online. Just visit the dealership for pickup.",
+            icon: "✨",
             color: "var(--accent)"
+        },
+        {
+            id: 4,
+            title: "Powered by Efficiency",
+            description: "Instant valuations, smart matching, and instant dealer responses.",
+            icon: "⚡",
+            color: "var(--brand-orange)"
         }
     ]
 
@@ -80,7 +87,7 @@ export default function WhyChooseAmacar() {
                     viewport={{ once: true, margin: "-100px" }}
                 >
                     <h2 className="why-choose-title">
-                        Why Choose <span className="text-[var(--brand-orange)] text-7xl font-extrabold">Amacar</span>
+                        Why Thousands Choose <span className="text-[var(--brand-orange)] text-7xl font-extrabold">Amacar</span>
                     </h2>
                     <div className="title-underline"></div>
                 </motion.div>
