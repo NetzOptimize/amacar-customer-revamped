@@ -11,6 +11,7 @@ import VideoSection from '@/components/Home/VideoSection/videoSection.jsx'
 import HeroCarousel from '@/components/Home/Carousel/Carousel.jsx'
 import HowAmacarWorks from '@/components/AboutUs/HowAmacarWorks/HowAmacarWorks.jsx'
 import HowReverseBiddingWorks from '@/components/AboutUs/HowReverseBiddingWorks/HowReverseBiddingWorks.jsx'
+import HowEachSystemWorks from '@/components/Home/HowEachSystemWorks/HowEachSystemWorks.jsx'
 import { useSelector } from 'react-redux'
 import { useEffect } from 'react'
 import Seo from '@/components/SEO/Seo'
@@ -31,13 +32,16 @@ export default function HomePage() {
             {/* Section 2: Quick Choice Panel */}
             <QuickChoicePanel />
             
-            {/* Section 3: Phase 1 - How Amacar Works (Selling) */}
+            {/* Section 3: How Each System Works (Tabbed - 3 Steps Each) */}
+            <HowEachSystemWorks />
+            
+            {/* Section 4: Phase 1 - How Amacar Works (Selling) - 5 Steps */}
             <HowAmacarWorks />
             
-            {/* Section 4: Phase 2 - How Reverse Bidding Works (Buying) */}
+            {/* Section 5: Phase 2 - How Reverse Bidding Works (Buying) - 5 Steps */}
             <HowReverseBiddingWorks />
             
-            {/* Section 5: Why Amacar (Unified) */}
+            {/* Section 6: Why Amacar (Unified) */}
             <WhyChooseAmacar />
             
             {/* Section 6: Reviews (Unified) */}
