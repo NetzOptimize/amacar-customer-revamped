@@ -304,8 +304,10 @@ export default function VehicleCard({ car, onStart, loading = false }) {
                     </div>
                 ) : (
                     <div className="flex items-baseline gap-2">
-                        <span className="text-xl sm:text-2xl font-bold">${price.toLocaleString()}</span>
-                        <span className="text-xs text-neutral-500">MSRP</span>
+                        <span className="text-xl sm:text-2xl font-bold text-neutral-900">${price.toLocaleString()}</span>
+                        <span className="text-xs text-neutral-500">
+                            {(conditionValue === 'U' || conditionValue === 'used') ? 'Listing Price' : 'MSRP'}
+                        </span>
                     </div>
                 )}
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm text-neutral-600">

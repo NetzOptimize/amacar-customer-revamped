@@ -8,29 +8,29 @@ export default function WhyChooseAmacar() {
     const benefits = [
         {
             id: 1,
-            title: "Real Dealership Competition",
-            description: "Whether selling or buying, dealerships compete for your business.",
+            title: "Professionalism",
+            description: "A smooth, transparent process whether you're selling or buying. Every offer and price is handled with accuracy and fairness.",
             icon: "🏆",
             color: "var(--brand-orange)"
         },
         {
             id: 2,
-            title: "Higher Value for Your Car & Lower Purchase Prices",
-            description: "You win on both sides of the marketplace.",
+            title: "Maximized Value",
+            description: "Sell your car for the highest price through Live Auction or buy your next car at the lowest price with Reverse Bidding. Verified dealerships compete in real time—ensuring you always get the best possible deal on either side of the marketplace.",
             icon: "💰",
             color: "var(--brand-purple)"
         },
         {
             id: 3,
-            title: "Zero Hassle, Zero Pressure",
-            description: "Transparent, fast, and 100% online. Just visit the dealership for pickup.",
-            icon: "✨",
+            title: "Security",
+            description: "Your data is protected, and only verified dealerships can bid—giving you a safe, trusted experience every time.",
+            icon: "🔒",
             color: "var(--accent)"
         },
         {
             id: 4,
-            title: "Powered by Efficiency",
-            description: "Instant valuations, smart matching, and instant dealer responses.",
+            title: "Efficiency",
+            description: "Get instant offers, compare prices fast, and complete your sale or purchase in minutes—Only visit the dealership for pickup or drop off.",
             icon: "⚡",
             color: "var(--brand-orange)"
         }

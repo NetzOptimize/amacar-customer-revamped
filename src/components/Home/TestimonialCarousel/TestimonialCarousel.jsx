@@ -15,6 +15,7 @@ export default function TestimonialCarousel() {
     const [current, setCurrent] = useState(0)
     const [count, setCount] = useState(0)
 
+    // Filter to show only customer reviews (removed dealership reviews)
     const testimonials = [
         {
             id: 1,
@@ -27,20 +28,10 @@ export default function TestimonialCarousel() {
             category: "customer"
         },
         {
-            id: 2,
-            name: "Mark G",
-            role: "Dealership",
-            date: "December 6, 2024",
-            rating: 5,
-            text: "You have access to local customers who are willing to sell you their car, let you touch and maybe drive it. In return, you have the opportunity to sell another car to the other client directly.",
-            image: "https://dealer.amacar.ai/wp-content/uploads/2024/12/close-up-portrait-of-smiling-handsome-business-man-2024-10-18-05-05-50-utc-min-1.jpg",
-            category: "dealership"
-        },
-        {
             id: 3,
             name: "Jason F",
             role: "Customer",
-            date: "December 6, 2024",
+            date: "November 22, 2024",
             rating: 5,
             text: "If you are short on time, go through Amacar. I put in all my information and got my instant cash offer easily – but the best part was the auction. With essentially no effort, I got all the info I needed from dealers while skipping the runaround, set an appointment, and walked in to sell my car for cash, hand in my keys, and sign some quick paperwork. It's never been easier.",
             image: "https://dealer.amacar.ai/wp-content/uploads/2024/12/successful-businessman-2023-11-27-05-21-29-utc-min.jpg",
@@ -50,27 +41,17 @@ export default function TestimonialCarousel() {
             id: 4,
             name: "John D",
             role: "Customer",
-            date: "December 6, 2024",
+            date: "November 15, 2024",
             rating: 5,
             text: "Selling my car through Amacar was effortless. I received competitive offers quickly from one of the most trusted online car selling websites and was able to choose the best one for me.",
             image: "https://dealer.amacar.ai/wp-content/uploads/2024/12/stately-bald-man-with-a-full-short-beard-in-a-blac-2023-11-27-05-35-31-utc-min-1.jpg",
             category: "customer"
         },
         {
-            id: 5,
-            name: "Ali J",
-            role: "Dealership",
-            date: "December 6, 2024",
-            rating: 5,
-            text: "We were getting increasingly frustrated by unexpected repair costs on our used cars bought from the online auction we previously used most. Using Amacar has allowed us to benefit from a 'local auction' platform that also allows us to verify condition before finalizing the purchase – now we can know exactly what we are buying with no surprises.",
-            image: "https://dealer.amacar.ai/wp-content/uploads/2024/12/positive-about-his-new-job-2023-11-27-05-07-30-utc-min-1.jpg",
-            category: "dealership"
-        },
-        {
             id: 6,
             name: "Jennifer K",
             role: "Customer",
-            date: "August 24, 2024",
+            date: "November 29, 2024",
             rating: 5,
             text: "Amacar should be the new normal. I'm a data nerd and being able to see the different offers I got from dealers in real time was amazing. Also, having the ability to only accept the offer I wanted made me feel like I still had the choice to do whatever was best for me and my family with this transaction.",
             image: "https://dealer.amacar.ai/wp-content/uploads/2024/08/smile-portrait-and-business-woman-in-studio-isola-2023-11-27-05-01-41-utc-min.jpg",
@@ -120,7 +101,7 @@ export default function TestimonialCarousel() {
                         What Our <span className="text-primary-500">Users</span> Say
                     </h2>
                     <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-                        Discover why thousands of customers and dealerships trust Amacar
+                        Discover why thousands of customers trust Amacar
                     </p>
                     <div className="w-20 h-1 bg-primary-500 mx-auto rounded-full mt-4"></div>
                 </div>

@@ -112,7 +112,7 @@ export default function FilterContent({ cars = [] }) {
     const activeFilters = useMemo(() => {
         const active = [];
         if (localFilters.condition && localFilters.condition !== 'all') {
-            active.push({ key: 'condition', label: localFilters.condition === 'used' ? 'Used' : 'New & CPO', value: localFilters.condition });
+            active.push({ key: 'condition', label: localFilters.condition === 'used' ? 'Used & CPO' : 'New', value: localFilters.condition });
         }
         if (localFilters.make) {
             active.push({ key: 'make', label: localFilters.make, value: localFilters.make });
@@ -372,8 +372,8 @@ export default function FilterContent({ cars = [] }) {
                                             </SelectTrigger>
                                             <SelectContent className="bg-white/95 backdrop-blur-xl border-white/30">
                                                 <SelectItem value="all" className="focus:bg-orange-50">All</SelectItem>
-                                                <SelectItem value="new" className="focus:bg-orange-50">New & CPO</SelectItem>
-                                                <SelectItem value="used" className="focus:bg-orange-50">Used</SelectItem>
+                                                <SelectItem value="new" className="focus:bg-orange-50">New</SelectItem>
+                                                <SelectItem value="used" className="focus:bg-orange-50">Used & CPO</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>

@@ -1031,7 +1031,7 @@ export default function VehicleDetails() {
                                         </div>
                                     )}
                                     <div className="text-sm text-neutral-600 font-medium">
-                                        List price
+                                        {(conditionValue === 'U' || conditionValue === 'used') ? 'Listing Price' : 'MSRP'}
                                     </div>
 
                                     <div className="pt-4 border-t border-neutral-200">

@@ -7,55 +7,53 @@ export default function HowItWorks() {
     const sellSteps = [
         {
             number: 1,
-            title: "Tell us about your car",
+            title: "Get Your Instant Online Estimate",
+            description: "Enter your vehicle details to receive a fast, accurate online valuation.",
             icon: <Car className="w-6 h-6" />
         },
         {
             number: 2,
-            title: "Dealers compete with real-time bids",
+            title: "Dealers Bid Up in Real Time",
+            description: "Verified dealerships compete by increasing their offers to win your car.",
             icon: <TrendingUp className="w-6 h-6" />
         },
         {
             number: 3,
-            title: "Choose the highest offer",
+            title: "Choose the Highest Offer & Get Paid",
+            description: "Select the top bid and complete your sale quickly and securely.",
             icon: <DollarSign className="w-6 h-6" />
-        },
-        {
-            number: 4,
-            title: "Visit the Dealership",
-            icon: <Handshake className="w-6 h-6" />
-        },
-        {
-            number: 5,
-            title: "Get paid instantly",
-            icon: <CheckCircle className="w-6 h-6" />
         }
     ]
 
     const buySteps = [
         {
             number: 1,
-            title: "Select the car you want",
+            title: "Select the Car You Want",
+            description: "Choose the model, trim, and options you're looking for.",
             icon: <Car className="w-6 h-6" />
         },
         {
             number: 2,
-            title: "Submit to Reverse Bidding",
+            title: "Request Instant Dealer Pricing",
+            description: "Dealerships receive your request instantly.",
             icon: <ArrowRight className="w-6 h-6" />
         },
         {
             number: 3,
-            title: "Dealers lower their prices",
+            title: "Reverse Bidding Begins",
+            description: "Dealers compete by lowering their prices in real time.",
             icon: <TrendingDown className="w-6 h-6" />
         },
         {
             number: 4,
-            title: "Compare offers + perks",
+            title: "Compare Offers & Dealer Free Perks",
+            description: "See discounts, warranties, and bonuses offered by dealers.",
             icon: <CheckCircle className="w-6 h-6" />
         },
         {
             number: 5,
-            title: "Lock in the lowest price",
+            title: "Lock In the Best Price",
+            description: "Choose your deal, schedule pickup, and save thousands.",
             icon: <DollarSign className="w-6 h-6" />
         }
     ]
@@ -132,7 +130,12 @@ export default function HowItWorks() {
                                     <div className="step-icon-wrapper step-icon-wrapper-sell">
                                         {step.icon}
                                     </div>
-                                    <p className="step-text">{step.title}</p>
+                                    <div className="flex-1">
+                                        <p className="step-text">{step.title}</p>
+                                        {step.description && (
+                                            <p className="step-description-text">{step.description}</p>
+                                        )}
+                                    </div>
                                 </motion.div>
                             ))}
                         </div>
@@ -177,7 +180,12 @@ export default function HowItWorks() {
                                     <div className="step-icon-wrapper step-icon-wrapper-buy">
                                         {step.icon}
                                     </div>
-                                    <p className="step-text">{step.title}</p>
+                                    <div className="flex-1">
+                                        <p className="step-text">{step.title}</p>
+                                        {step.description && (
+                                            <p className="step-description-text">{step.description}</p>
+                                        )}
+                                    </div>
                                 </motion.div>
                             ))}
                         </div>
