@@ -511,6 +511,7 @@ export default function SessionPage() {
         setShowAppointmentModal(true);
     };
 
+
     const handleContinue = () => {
         // Close certificate dialog and open appointment modal
         setShowCert(false);
