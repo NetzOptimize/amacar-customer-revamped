@@ -451,10 +451,22 @@ export default function VehicleDetails() {
                             >
                                 All Cars
                             </Link>
-                            {vehicleData.vin && (
+                            {(vehicleData.vin || vehicleData.stock_number || vehicleData.stockNumber || vehicleData.stock || vehicleData.sku) && (
                                 <>
                                     <ChevronRight className="w-4 h-4" />
-                                    <span className="text-neutral-400">VIN: {vehicleData.vin}</span>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        {vehicleData.vin && (
+                                            <span className="text-neutral-400">VIN: {vehicleData.vin}</span>
+                                        )}
+                                        {(vehicleData.stock_number || vehicleData.stockNumber || vehicleData.stock || vehicleData.sku) && (
+                                            <>
+                                                {vehicleData.vin && <span className="text-neutral-400">•</span>}
+                                                <span className="text-neutral-400">
+                                                    Stock#: {vehicleData.stock_number || vehicleData.stockNumber || vehicleData.stock || vehicleData.sku}
+                                                </span>
+                                            </>
+                                        )}
+                                    </div>
                                 </>
                             )}
                         </div>
@@ -497,35 +509,25 @@ export default function VehicleDetails() {
                             >
                                 <ArrowLeft className="w-5 h-5 text-neutral-700" />
                             </button>
-                            <div className="flex flex-col gap-2">
-                                {isSold ? (
-                                    <button
-                                        disabled
-                                        className="bg-neutral-300 text-neutral-600 px-4 py-2 rounded-lg font-semibold cursor-not-allowed whitespace-nowrap text-sm sm:text-base flex items-center justify-center gap-2"
-                                    >
-                                        <CheckCircle2 className="w-4 h-4" />
-                                        Already Sold
-                                    </button>
-                                ) : (
-                                    <>
+                            {!isSold && (
+                                <>
+                                    {price === 0 ? (
                                         <button
-                                            onClick={handleStartBidding}
-                                            disabled={sessionLoading || loadingAlternatives || !price || price === 0}
-                                            className="bg-neutral-900 text-white px-4 py-2 rounded-lg font-semibold hover:bg-neutral-800 transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 whitespace-nowrap text-sm sm:text-base"
+                                            onClick={() => setDealerContactModalOpen(true)}
+                                            className="bg-transparent border border-neutral-300 text-neutral-700 px-4 py-2 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors whitespace-nowrap text-sm"
                                         >
-                                            {loadingAlternatives ? 'Loading alternatives...' : 'Start Reverse Bidding'}
+                                            Request for price
                                         </button>
-                                        {price === 0 && (
-                                            <button
-                                                onClick={() => setDealerContactModalOpen(true)}
-                                                className="bg-transparent border border-neutral-300 text-neutral-700 px-4 py-2 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors whitespace-nowrap text-xs sm:text-sm"
-                                            >
-                                                Request for price
-                                            </button>
-                                        )}
-                                    </>
-                                )}
-                            </div>
+                                    ) : (
+                                        <button
+                                            onClick={() => setDealerContactModalOpen(true)}
+                                            className="bg-transparent border border-neutral-300 text-neutral-700 px-4 py-2 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors whitespace-nowrap text-sm"
+                                        >
+                                            Contact dealer
+                                        </button>
+                                    )}
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -745,40 +747,22 @@ export default function VehicleDetails() {
                                         {/* Vehicle Overview Tab */}
                                         <TabsContent value="overview" className="p-6 m-0">
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                {vehicleData.id && (
-                                                    <div>
-                                                        <span className="text-sm text-neutral-500">ID</span>
-                                                        <p className="font-medium">{vehicleData.id}</p>
-                                                    </div>
-                                                )}
                                                 {vehicleData.title && (
                                                     <div>
                                                         <span className="text-sm text-neutral-500">Title</span>
                                                         <p className="font-medium">{vehicleData.title}</p>
                                                     </div>
                                                 )}
-                                                {vehicleData.slug && (
+                                                {(vehicleData.stock_number || vehicleData.stockNumber || vehicleData.stock || vehicleData.sku) && (
                                                     <div>
-                                                        <span className="text-sm text-neutral-500">Slug</span>
-                                                        <p className="font-medium">{vehicleData.slug}</p>
-                                                    </div>
-                                                )}
-                                                {vehicleData.sku && (
-                                                    <div>
-                                                        <span className="text-sm text-neutral-500">SKU</span>
-                                                        <p className="font-medium">{vehicleData.sku}</p>
+                                                        <span className="text-sm text-neutral-500">Stock#</span>
+                                                        <p className="font-medium">{vehicleData.stock_number || vehicleData.stockNumber || vehicleData.stock || vehicleData.sku}</p>
                                                     </div>
                                                 )}
                                                 {vehicleData.status && (
                                                     <div>
                                                         <span className="text-sm text-neutral-500">Status</span>
                                                         <p className="font-medium capitalize">{vehicleData.status}</p>
-                                                    </div>
-                                                )}
-                                                {vehicleData.featured !== undefined && (
-                                                    <div>
-                                                        <span className="text-sm text-neutral-500">Featured</span>
-                                                        <p className="font-medium">{vehicleData.featured ? 'Yes' : 'No'}</p>
                                                     </div>
                                                 )}
                                                 {vehicleData.vin && (
@@ -1040,10 +1024,11 @@ export default function VehicleDetails() {
                                             </button>
                                         ) : (
                                             <button
-                                                onClick={() => setDealerContactModalOpen(true)}
-                                                className="w-full bg-transparent border-2 border-neutral-300 text-neutral-700 py-3 px-4 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors"
+                                                onClick={handleStartBidding}
+                                                disabled={sessionLoading || loadingAlternatives || !price || price === 0}
+                                                className="w-full bg-neutral-900 text-white py-3 px-4 rounded-lg font-semibold hover:bg-neutral-800 transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
                                             >
-                                                Contact dealer
+                                                {loadingAlternatives ? 'Loading alternatives...' : 'Start Reverse Bidding'}
                                             </button>
                                         )}
                                     </div>
@@ -1053,10 +1038,11 @@ export default function VehicleDetails() {
                                     <div className="text-lg font-semibold text-neutral-400">Price not available</div>
                                     {!isSold && (
                                         <button
-                                            onClick={() => setDealerContactModalOpen(true)}
-                                            className="w-full bg-transparent border-2 border-neutral-300 text-neutral-700 py-3 px-4 rounded-lg font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors"
+                                            onClick={handleStartBidding}
+                                            disabled={sessionLoading || loadingAlternatives}
+                                            className="w-full bg-neutral-900 text-white py-3 px-4 rounded-lg font-semibold hover:bg-neutral-800 transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
                                         >
-                                            Request for price
+                                            {loadingAlternatives ? 'Loading alternatives...' : 'Start Reverse Bidding'}
                                         </button>
                                     )}
                                 </div>
@@ -1073,13 +1059,13 @@ export default function VehicleDetails() {
                             >
                                 <h3 className="text-lg font-semibold mb-4">Dealer Information</h3>
                                 <div className="space-y-3">
-                                    {vehicleData.dealer_info.name && (
+                                    {vehicleData.dealer_info?.name && (
                                         <div>
                                             <span className="text-sm text-neutral-500">Name</span>
                                             <p className="font-medium">{vehicleData.dealer_info.name}</p>
                                         </div>
                                     )}
-                                    {vehicleData.dealer_info.email && (
+                                    {vehicleData.dealer_info?.email && (
                                         <div className="flex items-center gap-2">
                                             <Mail className="w-4 h-4 text-neutral-400" />
                                             <a
@@ -1090,10 +1076,26 @@ export default function VehicleDetails() {
                                             </a>
                                         </div>
                                     )}
-                                    {vehicleData.dealer_info.id && (
+                                    {(vehicleData.dealer_info?.phone || vehicleData.dealer_contact?.phone) && (
+                                        <div className="flex items-center gap-2">
+                                            <Phone className="w-4 h-4 text-neutral-400" />
+                                            <a
+                                                href={`tel:${vehicleData.dealer_info?.phone || vehicleData.dealer_contact?.phone}`}
+                                                className="text-sm text-orange-600 hover:text-orange-700"
+                                            >
+                                                {vehicleData.dealer_info?.phone || vehicleData.dealer_contact?.phone}
+                                            </a>
+                                        </div>
+                                    )}
+                                    {(vehicleData.city || vehicleData.state) && (
                                         <div>
-                                            <span className="text-sm text-neutral-500">Dealer ID</span>
-                                            <p className="font-medium">{vehicleData.dealer_info.id}</p>
+                                            <span className="text-sm text-neutral-500">Location</span>
+                                            <p className="font-medium">
+                                                {vehicleData.city && vehicleData.state 
+                                                    ? `${vehicleData.city}, ${vehicleData.state}`
+                                                    : vehicleData.city || vehicleData.state
+                                                }
+                                            </p>
                                         </div>
                                     )}
                                 </div>
