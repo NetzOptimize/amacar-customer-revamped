@@ -423,15 +423,10 @@ export default function VehicleDetails() {
         }
     };
 
-    // Format currency
+    // Format currency - with commas, no decimals
     const formatCurrency = (amount) => {
-        if (!amount) return null;
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(amount);
+        if (!amount && amount !== 0) return 'N/A';
+        return `$${parseFloat(amount).toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
     };
 
     return (

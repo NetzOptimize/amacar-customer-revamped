@@ -101,7 +101,7 @@ export default function VehicleCard({ car, onStart, loading = false }) {
     }
 
     // Get price - handle both price and basePrice (old structure)
-    const price = car.price || car.basePrice || 0;
+    const price = parseFloat(car.price || car.basePrice || 0);
 
     // Handle button click - check authentication first
     const handleStartBidding = () => {
@@ -304,7 +304,9 @@ export default function VehicleCard({ car, onStart, loading = false }) {
                     </div>
                 ) : (
                     <div className="flex items-baseline gap-2">
-                        <span className="text-xl sm:text-2xl font-bold text-neutral-900">${price.toLocaleString()}</span>
+                        <span className="text-xl sm:text-2xl font-bold text-neutral-900">
+                            ${Number(price).toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                        </span>
                         <span className="text-xs text-neutral-500">
                             {(conditionValue === 'U' || conditionValue === 'used') ? 'Listing Price' : 'MSRP'}
                         </span>
