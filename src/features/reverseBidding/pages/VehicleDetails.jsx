@@ -33,6 +33,7 @@ import apiRev from '../../../lib/apiRev';
 import ReverseBiddingConfirmDialog from '../components/ReverseBiddingConfirmDialog';
 import LoginModal from '../../../components/ui/LoginModal';
 import DealerContactModal from '../components/DealerContactModal';
+import VehicleDetailsSkeleton from '../../../components/skeletons/VehicleDetailsSkeleton';
 import { startReverseBiddingThunk } from '../redux/reverseBidSlice';
 
 export default function VehicleDetails() {
@@ -339,14 +340,7 @@ export default function VehicleDetails() {
     };
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-white flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-                    <p className="text-neutral-600">Loading vehicle details...</p>
-                </div>
-            </div>
-        );
+        return <VehicleDetailsSkeleton />;
     }
 
     if (error || !vehicleData) {
