@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { fetchAcceptedReverseBidsThunk } from '../redux/reverseBidSlice';
 import { generateCertificatePDFFromSession } from '../utils/pdfGenerator';
-import LiveAuctionsSkeleton from '../../../components/skeletons/LiveAuctionsSkeleton';
+import AcceptedBidsSkeleton from '../../../components/skeletons/AcceptedBidsSkeleton';
 
 export default function AcceptedReverseBidsPage() {
     const dispatch = useDispatch();
@@ -131,12 +131,12 @@ export default function AcceptedReverseBidsPage() {
     if (loading.acceptedReverseBids && acceptedReverseBids.data.length === 0) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-50">
-                <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ maxWidth: '1600px' }}>
+                <div className="mx-auto px-4 sm:px-6 lg:px-8 pt-[calc(var(--header-height-mobile)+1rem)] sm:pt-[calc(var(--header-height-tablet)+1rem)] lg:pt-[calc(var(--header-height-desktop)+2rem)] pb-8" style={{ maxWidth: '1600px' }}>
                     <div className="mb-6">
                         <h1 className="text-3xl font-bold text-neutral-900 mb-2">Accepted Reverse Bids</h1>
                         <p className="text-neutral-600">All reverse bids you have accepted</p>
                     </div>
-                    <LiveAuctionsSkeleton count={6} />
+                    <AcceptedBidsSkeleton count={6} />
                 </div>
             </div>
         );
@@ -151,7 +151,7 @@ export default function AcceptedReverseBidsPage() {
             animate={{ opacity: 1 }}
             className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-50"
         >
-            <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ maxWidth: '1600px' }}>
+            <div className="mx-auto px-4 sm:px-6 lg:px-8 pt-[calc(var(--header-height-mobile)+1rem)] sm:pt-[calc(var(--header-height-tablet)+1rem)] lg:pt-[calc(var(--header-height-desktop)+2rem)] pb-8" style={{ maxWidth: '1600px' }}>
                 {/* Header */}
                 <div className="mb-8">
                     <div className="flex items-center justify-between mb-4">
@@ -188,7 +188,11 @@ export default function AcceptedReverseBidsPage() {
                 </div>
 
                 {/* Bids Grid */}
-                {bids.length > 0 ? (
+                {loading.acceptedReverseBids && bids.length === 0 ? (
+                    <AcceptedBidsSkeleton count={6} />
+                ) : loading.acceptedReverseBids && bids.length > 0 ? (
+                    <AcceptedBidsSkeleton count={bids.length} />
+                ) : bids.length > 0 ? (
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                             {bids.map((bid, index) => {
