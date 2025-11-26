@@ -22,6 +22,7 @@ import BidDetailsDialog from '../components/BidDetailsDialog';
 import AcceptConfirmDialog from '../components/AcceptConfirmDialog';
 import CertificateDialog from '../components/CertificateDialog';
 import AppointmentModal from '../../../components/ui/AppointmentModal';
+import SessionPageSkeleton from '../../../components/skeletons/SessionPageSkeleton';
 import { acceptBidThunk, simulateLiveBidsThunk, fetchSessionDetailsThunk, fetchLeaderboardThunk } from '../redux/reverseBidSlice';
 import { generateCertificatePDFFromSession } from '../utils/pdfGenerator';
 import apiRev from '../../../lib/apiRev';
@@ -530,16 +531,9 @@ export default function SessionPage() {
         setShowAppointmentModal(false);
     };
 
-    // Early return if no session data
-    if (!sessionData) {
-        return (
-            <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-                    <p className="text-neutral-600">Loading session details...</p>
-                </div>
-            </div>
-        );
+    // Early return if no session data - show skeleton loader
+    if (!sessionData || loadingVehicles) {
+        return <SessionPageSkeleton />;
     }
 
     // Define criteria and other derived values after sessionData check
