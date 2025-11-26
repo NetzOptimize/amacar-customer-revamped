@@ -455,29 +455,82 @@ const ActiveSessionsPage = () => {
     return <LiveAuctionsSkeleton />;
   }
 
-  // Error state
+  // Error state - Improved with sticky header
   if (!loading.customerSessions && customerSessions.data.length === 0 && activeSessions.length === 0) {
     return (
-      <div className="lg:mt-16 min-h-screen bg-gradient-hero px-4 sm:px-6 lg:px-8 py-8 sm:py-6 lg:py-8">
-        <div className="max-w-8xl mx-auto">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-error/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertCircle className="w-8 h-8 text-error" />
+      <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-50">
+        {/* Sticky Header Section */}
+        <div className="border-b border-neutral-200/50 bg-white/80 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
+          <div className="mx-auto px-4 sm:px-6 lg:px-8 pt-[calc(var(--header-height-mobile)+1rem)] sm:pt-[calc(var(--header-height-tablet)+1rem)] lg:pt-[calc(var(--header-height-desktop)+1rem)] pb-4" style={{ maxWidth: '1600px' }}>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+              <div className="flex items-center gap-3">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-neutral-900 flex items-center gap-3">
+                  <Sparkles className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-orange-500" />
+                  Active Sessions
+                </h1>
               </div>
-              <h3 className="text-xl font-semibold text-neutral-800 mb-2">
-                No Active Sessions
-              </h3>
-              <p className="text-neutral-600 mb-4">
-                You don't have any active reverse bidding sessions at the moment.
-              </p>
               <button
-                onClick={() => navigate("/reverse-bidding")}
-                className="cursor-pointer btn-primary"
+                onClick={handleRefresh}
+                disabled={loading.customerSessions}
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 hover:border-orange-300 transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed h-[40px]"
               >
-                Start New Session
+                <RefreshCw className={`w-4 h-4 ${loading.customerSessions ? 'animate-spin' : ''}`} />
+                <span className="text-sm font-medium">Refresh</span>
               </button>
             </div>
+
+            {/* Description */}
+            <p className="text-sm text-neutral-600 mb-4">
+              Monitor your active reverse bidding sessions and track dealer offers in real-time.
+            </p>
+
+            {/* Stats Summary Box */}
+            <div className="bg-white rounded-xl border border-neutral-200 shadow-sm p-4 mb-4">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                    <Sparkles className="w-4 h-4 text-orange-600" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-neutral-500 font-medium">Active Sessions</div>
+                    <div className="text-lg font-bold text-neutral-900">0</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <Users className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-neutral-500 font-medium">Total Bids</div>
+                    <div className="text-lg font-bold text-neutral-900">0</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Empty State Content */}
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6" style={{ maxWidth: '1600px' }}>
+          <div className="bg-white rounded-2xl border-2 border-neutral-200 shadow-xl p-16 text-center">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="w-24 h-24 bg-gradient-to-br from-orange-100 to-orange-50 rounded-full flex items-center justify-center mb-6 shadow-lg mx-auto"
+            >
+              <AlertCircle className="w-12 h-12 text-orange-500" />
+            </motion.div>
+            <h3 className="text-2xl font-bold text-neutral-900 mb-3">No Active Sessions</h3>
+            <p className="text-base text-neutral-600 max-w-lg mx-auto mb-6">
+              You don't have any active reverse bidding sessions at the moment. Start a new session to get competitive offers from dealers.
+            </p>
+            <button
+              onClick={() => navigate("/reverse-bidding")}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
+            >
+              <Car className="w-5 h-5" />
+              Start New Session
+            </button>
           </div>
         </div>
       </div>
@@ -485,39 +538,81 @@ const ActiveSessionsPage = () => {
   }
 
   return (
-    <div className="lg:mt-16 min-h-screen bg-gradient-hero px-4 sm:px-6 lg:px-8 py-8 sm:py-6 lg:py-8">
-      <div className="max-w-8xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-50">
+      {/* Sticky Header Section */}
+      <div className="border-b border-neutral-200/50 bg-white/80 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 pt-[calc(var(--header-height-mobile)+1rem)] sm:pt-[calc(var(--header-height-tablet)+1rem)] lg:pt-[calc(var(--header-height-desktop)+1rem)] pb-4" style={{ maxWidth: '1600px' }}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-neutral-900 flex items-center gap-3">
+                <Sparkles className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-orange-500" />
+                Active Sessions
+              </h1>
+            </div>
+            <button
+              onClick={handleRefresh}
+              disabled={loading.customerSessions}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 hover:border-orange-300 transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed h-[40px]"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading.customerSessions ? 'animate-spin' : ''}`} />
+              <span className="text-sm font-medium">Refresh</span>
+            </button>
+          </div>
+
+          {/* Description */}
+          <p className="text-sm text-neutral-600 mb-4">
+            Monitor your active reverse bidding sessions and track dealer offers in real-time.
+          </p>
+
+          {/* Stats Summary Box */}
+          <div className="bg-white rounded-xl border border-neutral-200 shadow-sm p-4 mb-4">
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-orange-600" />
+                </div>
+                <div>
+                  <div className="text-xs text-neutral-500 font-medium">Active Sessions</div>
+                  <div className="text-lg font-bold text-neutral-900">{activeSessions.length}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                  <Users className="w-4 h-4 text-blue-600" />
+                </div>
+                <div>
+                  <div className="text-xs text-neutral-500 font-medium">Total Bids</div>
+                  <div className="text-lg font-bold text-neutral-900">
+                    {activeSessions.reduce((sum, session) => sum + session.bidCount, 0)}
+                  </div>
+                </div>
+              </div>
+              {activeSessions.length > 0 && activeSessions.some(s => s.currentBid > 0) && (
+                <div className="flex items-center gap-2 ml-auto">
+                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                    <Award className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-neutral-500 font-medium">Best Offer</div>
+                    <div className="text-lg font-bold text-green-600">
+                      {formatCurrency(Math.min(...activeSessions.filter(s => s.currentBid > 0).map(s => s.currentBid)))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6" style={{ maxWidth: '1600px' }}>
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
           className="mb-6 sm:mb-8"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <motion.h1
-                variants={itemVariants}
-                className="text-2xl sm:text-3xl font-bold text-neutral-800 mb-2"
-              >
-                Active Reverse Bidding Sessions
-              </motion.h1>
-              <motion.p variants={itemVariants} className="text-sm sm:text-base text-neutral-600">
-                Monitor your active reverse bidding sessions and track dealer offers in real-time.
-              </motion.p>
-            </div>
-            <motion.button
-              variants={itemVariants}
-              onClick={handleRefresh}
-              disabled={loading.customerSessions}
-              className="cursor-pointer btn-ghost flex items-center justify-center sm:justify-start space-x-2 w-full sm:w-auto"
-            >
-              <RefreshCw
-                className={`w-4 h-4 ${loading.customerSessions ? "animate-spin" : ""}`}
-              />
-              <span className="text-sm sm:text-base">Refresh</span>
-            </motion.button>
-          </div>
-        </motion.div>
 
         {/* Sorting Section */}
         {!loading.customerSessions && activeSessions.length > 0 && (
@@ -830,58 +925,28 @@ const ActiveSessionsPage = () => {
 
         {/* Empty State */}
         {!loading.customerSessions && activeSessions.length === 0 && (
-          <motion.div
-            variants={itemVariants}
-            className="flex -mt-8 sm:-mt-12 lg:-mt-16 items-center justify-center min-h-[50vh] sm:min-h-[60vh] px-4"
-          >
-            <div className="text-center max-w-sm sm:max-w-md mx-auto">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-                className="relative mb-4 sm:mb-6"
-              >
-                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary-50 to-primary-100 rounded-3xl flex items-center justify-center mx-auto shadow-soft border border-primary-200">
-                  <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-primary-500" />
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-                className="space-y-3 sm:space-y-4"
-              >
-                <h3 className="text-xl sm:text-2xl font-bold text-neutral-800 font-display">
-                  No Active Sessions
-                </h3>
-                <p className="text-sm sm:text-base text-neutral-600">
-                  Start a new reverse bidding session to get the best offers for your vehicle
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-                className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8"
-              >
-                <motion.button
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                  onClick={() => navigate("/reverse-bidding")}
-                  className="cursor-pointer w-full sm:w-60 px-4 h-12 sm:h-16 group relative bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:shadow-xl hover:shadow-primary-500/25 focus:outline-none focus:ring-4 focus:ring-primary-200"
-                >
-                  <div className="flex items-center justify-center sm:justify-between space-x-2 sm:space-x-0">
-                    <Car className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110" />
-                    <span className="text-sm sm:text-base">Start New Session</span>
-                  </div>
-                </motion.button>
-              </motion.div>
-            </div>
-          </motion.div>
+          <div className="bg-white rounded-2xl border-2 border-neutral-200 shadow-xl p-16 text-center">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="w-24 h-24 bg-gradient-to-br from-orange-100 to-orange-50 rounded-full flex items-center justify-center mb-6 shadow-lg mx-auto"
+            >
+              <AlertCircle className="w-12 h-12 text-orange-500" />
+            </motion.div>
+            <h3 className="text-2xl font-bold text-neutral-900 mb-3">No Active Sessions</h3>
+            <p className="text-base text-neutral-600 max-w-lg mx-auto mb-6">
+              You don't have any active reverse bidding sessions at the moment. Start a new session to get competitive offers from dealers.
+            </p>
+            <button
+              onClick={() => navigate("/reverse-bidding")}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
+            >
+              <Car className="w-5 h-5" />
+              Start New Session
+            </button>
+          </div>
         )}
+        </motion.div>
       </div>
 
       {/* Accept Offer Dialog */}
