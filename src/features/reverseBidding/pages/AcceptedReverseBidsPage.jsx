@@ -14,15 +14,18 @@ import {
     Car,
     AlertCircle,
     RefreshCw,
-    FileText
+    FileText,
+    Bug
 } from 'lucide-react';
 import { fetchAcceptedReverseBidsThunk } from '../redux/reverseBidSlice';
+import { generateCertificatePDFFromSession } from '../utils/pdfGenerator';
 import LiveAuctionsSkeleton from '../../../components/skeletons/LiveAuctionsSkeleton';
 
 export default function AcceptedReverseBidsPage() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { acceptedReverseBids, loading } = useSelector((s) => s.reverseBid);
+    const { user } = useSelector((s) => s.user);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 12;
 
@@ -62,6 +65,67 @@ export default function AcceptedReverseBidsPage() {
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Debug function to download certificate for a specific bid
+    const handleDebugDownload = async (bid) => {
+        try {
+            const session = bid.session || {};
+            const product = bid.product || {};
+            const location = session.location || {};
+            
+            // Build session object for PDF generation
+            const sessionForPDF = {
+                id: session.id,
+                car: {
+                    year: product.year,
+                    make: product.make,
+                    model: product.model,
+                    title: `${product.year} ${product.make} ${product.model}`,
+                    vin: product.vin || session.vin || '',
+                    stock: product.stock || product.stock_number || product.sku || '',
+                    images: session.primary_vehicle_image ? [session.primary_vehicle_image] : []
+                },
+                acceptedBid: {
+                    currentOffer: bid.amount,
+                    dealerName: bid.dealer_name || 'Unknown Dealer',
+                    dealer_phone: bid.dealer_phone || '',
+                    dealerEmail: bid.dealer_email || '',
+                    dealerLocation: location.city && location.state ? `${location.city}, ${location.state}` : ''
+                },
+                certificateData: {
+                    vehicle: {
+                        year: product.year,
+                        make: product.make,
+                        model: product.model,
+                        vin: product.vin || session.vin || '',
+                        stock: product.stock || product.stock_number || product.sku || '',
+                        city: location.city || '',
+                        state: location.state || ''
+                    },
+                    dealer: {
+                        name: bid.dealer_name || 'Unknown Dealer',
+                        phone: bid.dealer_phone || '',
+                        email: bid.dealer_email || ''
+                    },
+                    bid_amount: bid.amount,
+                    marketValue: session.criteria?.price || product.price || bid.amount,
+                    onlineMarketValue: session.criteria?.price || product.price || bid.amount,
+                    date: bid.accepted_at || new Date().toISOString()
+                },
+                criteria: session.criteria || {
+                    price: session.criteria?.price || product.price || bid.amount
+                }
+            };
+            
+            console.log('Debug: Downloading certificate for bid:', bid);
+            console.log('Debug: Session data for PDF:', sessionForPDF);
+            await generateCertificatePDFFromSession(sessionForPDF, user);
+            console.log('Debug: Certificate downloaded successfully');
+        } catch (error) {
+            console.error('Debug: Error downloading certificate:', error);
+            alert('Error generating certificate. Check console for details.');
+        }
     };
 
     if (loading.acceptedReverseBids && acceptedReverseBids.data.length === 0) {
@@ -219,15 +283,26 @@ export default function AcceptedReverseBidsPage() {
                                                 )}
                                             </div>
 
-                                            {/* Action Button */}
-                                            <button
-                                                onClick={() => handleViewSession(session.id)}
-                                                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md"
-                                            >
-                                                <Eye className="w-4 h-4" />
-                                                View Session
-                                                <ArrowRight className="w-4 h-4" />
-                                            </button>
+                                            {/* Action Buttons */}
+                                            <div className="space-y-2">
+                                                <button
+                                                    onClick={() => handleViewSession(session.id)}
+                                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                                                >
+                                                    <Eye className="w-4 h-4" />
+                                                    View Session
+                                                    <ArrowRight className="w-4 h-4" />
+                                                </button>
+                                                {/* Debug Button */}
+                                                <button
+                                                    onClick={() => handleDebugDownload(bid)}
+                                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg font-medium transition-all duration-200 border border-purple-300 text-sm"
+                                                    title="Debug: Download Certificate PDF"
+                                                >
+                                                    <Bug className="w-4 h-4" />
+                                                    Debug: Download Certificate
+                                                </button>
+                                            </div>
                                         </div>
                                     </motion.div>
                                 );

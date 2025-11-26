@@ -23,7 +23,7 @@ import AcceptConfirmDialog from '../components/AcceptConfirmDialog';
 import CertificateDialog from '../components/CertificateDialog';
 import AppointmentModal from '../../../components/ui/AppointmentModal';
 import { acceptBidThunk, simulateLiveBidsThunk, fetchSessionDetailsThunk, fetchLeaderboardThunk } from '../redux/reverseBidSlice';
-import { generateCertificatePDF } from '../utils/pdfGenerator';
+import { generateCertificatePDFFromSession } from '../utils/pdfGenerator';
 import apiRev from '../../../lib/apiRev';
 
 export default function SessionPage() {
@@ -31,6 +31,7 @@ export default function SessionPage() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { activeSession, loading } = useSelector((s) => s.reverseBid);
+    const { user } = useSelector((s) => s.user);
     const [viewBid, setViewBid] = useState(null);
     const [confirmBid, setConfirmBid] = useState(null);
     const [showCert, setShowCert] = useState(false);
@@ -505,7 +506,7 @@ export default function SessionPage() {
             acceptedBid: confirmBid,
             certificateData: certificateData
         };
-        await generateCertificatePDF(sessionForPDF);
+        await generateCertificatePDFFromSession(sessionForPDF, user);
         // Open appointment modal after PDF download
         setShowCert(false);
         setShowAppointmentModal(true);

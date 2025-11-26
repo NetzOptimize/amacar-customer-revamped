@@ -1,8 +1,23 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { X, CheckCircle2, Download, ArrowRight, FileText, Calendar, Building2, DollarSign, Hash } from 'lucide-react';
+import { X, CheckCircle2, Download, ArrowRight, FileText, Calendar, Building2, DollarSign, Hash, Bug } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { generateCertificatePDFFromSession } from '../utils/pdfGenerator';
 
 export default function CertificateDialog({ open, session, onDownload, onContinue, onClose }) {
+    const { user } = useSelector((s) => s.user);
     if (!open) return null;
+
+    // Debug function to download certificate directly
+    const handleDebugDownload = async () => {
+        try {
+            console.log('Debug: Downloading certificate with session data:', session);
+            await generateCertificatePDFFromSession(session, user);
+            console.log('Debug: Certificate downloaded successfully');
+        } catch (error) {
+            console.error('Debug: Error downloading certificate:', error);
+            alert('Error generating certificate. Check console for details.');
+        }
+    };
 
     return (
         <AnimatePresence>
@@ -109,20 +124,31 @@ export default function CertificateDialog({ open, session, onDownload, onContinu
                         </div>
 
                         {/* Footer with Actions */}
-                        <div className="p-5 border-t border-neutral-200 bg-white flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div className="p-5 border-t border-neutral-200 bg-white space-y-3">
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                                <button
+                                    onClick={onDownload}
+                                    className="cursor-pointer px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 w-full sm:w-auto"
+                                >
+                                    <Download className="w-4 h-4" />
+                                    Download PDF
+                                </button>
+                                <button
+                                    onClick={onContinue}
+                                    className="cursor-pointer px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 w-full sm:w-auto hover:shadow-lg transform hover:scale-105"
+                                >
+                                    Continue
+                                    <ArrowRight className="w-4 h-4" />
+                                </button>
+                            </div>
+                            {/* Debug Button */}
                             <button
-                                onClick={onDownload}
-                                className="cursor-pointer px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 w-full sm:w-auto"
+                                onClick={handleDebugDownload}
+                                className="w-full px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 text-sm border border-purple-300"
+                                title="Debug: Direct PDF download (bypasses normal flow)"
                             >
-                                <Download className="w-4 h-4" />
-                                Download PDF
-                            </button>
-                            <button
-                                onClick={onContinue}
-                                className="cursor-pointer px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 w-full sm:w-auto hover:shadow-lg transform hover:scale-105"
-                            >
-                                Continue
-                                <ArrowRight className="w-4 h-4" />
+                                <Bug className="w-4 h-4" />
+                                Debug: Download Certificate
                             </button>
                         </div>
                     </motion.div>
