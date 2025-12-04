@@ -1,9 +1,12 @@
-import React, { useState } from "react"
+import React, { useState, useCallback, useRef } from "react"
 import { motion } from "framer-motion"
 import { useDispatch } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import { setFilters, fetchMockCarsThunk } from "@/features/reverseBidding/redux/reverseBidSlice"
-import { Search, Star, Users } from "lucide-react"
+import { Search, Loader2 } from "lucide-react"
+import api from "@/lib/api"
+import { extractVehicleParams } from "@/services/openaiService"
+import SearchResultsDropdown from "./SearchResultsDropdown"
 
 // shadcn components
 import Modal from "@/components/ui/modal.jsx"
@@ -20,6 +23,97 @@ export default function Hero() {
 
   const [open, setOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [isSearching, setIsSearching] = useState(false)
+  const [searchResults, setSearchResults] = useState([])
+  const [extractedParams, setExtractedParams] = useState({})
+  const [showDropdown, setShowDropdown] = useState(false)
+  const searchContainerRef = useRef(null)
+
+  // Fast search: Extract params on frontend, then call simple search API
+  const performFastSearch = useCallback(async (query) => {
+    if (!query || query.trim().length < 2) {
+      setSearchResults([])
+      setExtractedParams({})
+      setShowDropdown(false)
+      return
+    }
+
+    setIsSearching(true)
+    setShowDropdown(true)
+
+    try {
+      // Step 1: Extract parameters using OpenAI on frontend
+      const params = await extractVehicleParams(query.trim())
+      setExtractedParams(params)
+
+      // Step 2: Call simple search API with extracted parameters
+      const baseURL = import.meta.env.VITE_BASE_URL || ''
+      let apiEndpoint
+      
+      if (baseURL.includes('wp-json')) {
+        apiEndpoint = baseURL.includes('car-dealer') 
+          ? `${baseURL.replace(/\/$/, '')}/vehicle/search`
+          : `${baseURL.replace(/\/$/, '')}/car-dealer/v1/vehicle/search`
+      } else {
+        const cleanBase = baseURL.replace(/\/$/, '')
+        apiEndpoint = `${cleanBase}/wp-json/car-dealer/v1/vehicle/search`
+      }
+
+      const response = await api.post(apiEndpoint, {
+        ...params,
+        limit: 10
+      })
+
+      if (response.data && response.data.success) {
+        setSearchResults(response.data.vehicles || [])
+      } else {
+        setSearchResults([])
+      }
+    } catch (error) {
+      console.error('Search Error:', error)
+      setSearchResults([])
+      setExtractedParams({})
+      // Silently fail - don't show error to user
+    } finally {
+      setIsSearching(false)
+    }
+  }, [])
+
+  // Handle click outside to close dropdown
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+        setShowDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
+  // Handle search input focus - show dropdown if we have previous results
+  const handleSearchFocus = () => {
+    if (searchResults.length > 0) {
+      setShowDropdown(true)
+    }
+  }
+
+  // Handle Enter key in search
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter' && searchQuery.trim().length >= 2) {
+      e.preventDefault()
+      performFastSearch(searchQuery)
+    }
+  }
+
+  // Handle search icon click
+  const handleSearchClick = () => {
+    if (searchQuery.trim().length >= 2) {
+      performFastSearch(searchQuery)
+    }
+  }
 
   const handleNewClick = () => {
     const filtersToDispatch = {
@@ -78,7 +172,7 @@ export default function Hero() {
 
       {/* Glassmorphic Content Container - Positioned to the Left */}
       <motion.div
-        className="relative z-[2] w-full max-w-[900px] px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-12 md:py-16 mt-[5%] md:ml-[5%] lg:ml-[5%]"
+        className="relative z-[100] w-full max-w-[900px] px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-12 md:py-16 mt-[5%] md:ml-[5%] lg:ml-[5%]"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
@@ -122,14 +216,41 @@ export default function Hero() {
               },
             }}
           >
-            <div className="relative">
+            <div className="relative z-[100]" ref={searchContainerRef}>
               <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-gray-400 z-10" />
               <Input
                 type="text"
-                placeholder="Search make, model, or type"
+                placeholder="Search make, model, or type (e.g., '2025 Mazda, Honda under $25000')"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-auto py-4 px-6 pl-16 pr-6 bg-white/98 backdrop-blur-md border-white/40 text-gray-900 placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-cyan-500/50 focus-visible:border-cyan-400 rounded-2xl shadow-inner text-base font-medium transition-all duration-300 hover:shadow-[0_6px_12px_rgba(0,0,0,0.15)] min-h-[64px]"
+                onFocus={handleSearchFocus}
+                onKeyDown={handleSearchKeyDown}
+                className="w-full h-auto py-4 px-6 pl-16 pr-16 bg-white/98 backdrop-blur-md border-white/40 text-gray-900 placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-cyan-500/50 focus-visible:border-cyan-400 rounded-2xl shadow-inner text-base font-medium transition-all duration-300 hover:shadow-[0_6px_12px_rgba(0,0,0,0.15)] min-h-[64px]"
+              />
+              
+              {/* Search Icon Button / Loading Spinner */}
+              <div className="absolute right-6 top-1/2 -translate-y-1/2 z-10">
+                {isSearching ? (
+                  <Loader2 className="h-5 w-5 text-cyan-500 animate-spin" />
+                ) : (
+                  <button
+                    onClick={handleSearchClick}
+                    disabled={searchQuery.trim().length < 2}
+                    className="p-1.5 rounded-lg transition-all duration-200 hover:bg-cyan-500/10 disabled:opacity-40 disabled:cursor-not-allowed"
+                    aria-label="Search"
+                  >
+                    <Search className="h-5 w-5 text-cyan-500 hover:text-cyan-600 transition-colors" />
+                  </button>
+                )}
+              </div>
+              
+              {/* Search Results Dropdown */}
+              <SearchResultsDropdown
+                isOpen={showDropdown}
+                vehicles={searchResults}
+                isLoading={isSearching}
+                extractedParams={extractedParams}
+                onClose={() => setShowDropdown(false)}
               />
             </div>
           </motion.div>
@@ -169,27 +290,6 @@ export default function Hero() {
               Auction Your Ride →
             </Button>
           </motion.div>
-
-          {/* Trust Indicators */}
-          <motion.div
-            className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-8 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]"
-            variants={fadeUp}
-            custom={0.5}
-          >
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
-                ))}
-              </div>
-              <span className="text-base font-medium">4.9/5</span>
-              <span className="text-base text-white/90">from 12k reviews</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Users className="h-6 w-6 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
-              <span className="text-base font-medium">Join 50,000+ happy sellers</span>
-            </div>
-          </motion.div>
         </div>
       </motion.div>
 
@@ -216,6 +316,7 @@ export default function Hero() {
           </div>
         </div>
       </Modal>
+
     </section>
   )
 }
