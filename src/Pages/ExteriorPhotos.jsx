@@ -39,6 +39,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { CheckCircle, FileText, Shield, Clock, Loader2 } from "lucide-react";
+import { analyzeImageForDamage, fileToBase64 } from "@/services/geminiService";
 export default function VehiclePhotos() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -152,6 +153,7 @@ export default function VehiclePhotos() {
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [analyzingMap, setAnalyzingMap] = useState({});
 
   useEffect(() => {
     // console.log("questions", questions);
@@ -394,6 +396,39 @@ export default function VehiclePhotos() {
       return;
     }
 
+    // Step 1: Analyze image for damage before uploading
+    let damageAnalysisResult = null;
+    try {
+      console.log("Starting damage detection analysis for:", id);
+      setAnalyzingMap((prev) => ({ ...prev, [id]: true }));
+      
+      // Convert file to base64 for Gemini API
+      const base64 = await fileToBase64(file);
+      const mimeType = file.type || 'image/jpeg';
+      
+      // Analyze image for damage
+      damageAnalysisResult = await analyzeImageForDamage(base64, mimeType);
+      console.log("Damage analysis result:", damageAnalysisResult);
+      
+      if (damageAnalysisResult.hasDamage) {
+        console.log(`Damage detected: ${damageAnalysisResult.damages.length} damage(s) found`);
+        toast.success(`Damage analysis complete: ${damageAnalysisResult.damages.length} damage(s) detected`);
+      } else {
+        console.log("No damage detected in image");
+        toast.success("Damage analysis complete: No damage detected");
+      }
+    } catch (error) {
+      console.error("Damage analysis failed:", error);
+      // Don't block upload if damage analysis fails - just log the error
+      toast.error("Damage analysis failed, but continuing with upload");
+    } finally {
+      setAnalyzingMap((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    }
+
     console.log("Setting upload state for photo:", id);
     setUploadingMap((prev) => ({ ...prev, [id]: true }));
     setProgressMap((prev) => ({ ...prev, [id]: 0 }));
@@ -424,6 +459,34 @@ export default function VehiclePhotos() {
       ).unwrap();
 
       console.log("Image upload successful:", result);
+
+      // Step 2: Save damage data to WordPress postmeta after successful upload
+      if (damageAnalysisResult && result.attachmentId) {
+        try {
+          console.log("Saving damage data to postmeta:", {
+            attachmentId: result.attachmentId,
+            productId: result.productId,
+            hasDamage: damageAnalysisResult.hasDamage,
+            damageCount: damageAnalysisResult.damages?.length || 0
+          });
+
+          const damageResponse = await api.post('/vehicle/save-damage-data', {
+            attachment_id: result.attachmentId,
+            product_id: result.productId,
+            damage_data: damageAnalysisResult
+          });
+
+          if (damageResponse.data.success) {
+            console.log("Damage data saved successfully:", damageResponse.data);
+          } else {
+            console.error("Failed to save damage data:", damageResponse.data.message);
+            toast.error("Image uploaded but damage data could not be saved");
+          }
+        } catch (error) {
+          console.error("Error saving damage data:", error);
+          toast.error("Image uploaded but damage data could not be saved");
+        }
+      }
 
       // Complete the progress to 100% when upload is successful
       completeProgress(id);
@@ -800,7 +863,25 @@ export default function VehiclePhotos() {
                       : "border-2 border-slate-200/50 opacity-90"
                   } hover:border-[#f6851f]/50 hover:shadow-lg hover:bg-orange-50/30`}
                 >
-                  {isUploadingThisPhoto ? (
+                  {analyzingMap[photo.id] ? (
+                    <div className="aspect-square sm:aspect-[4/3] lg:aspect-square flex flex-col items-center justify-center p-5 text-center">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                        className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full mb-4"
+                      />
+                      <p className="text-sm font-medium text-slate-800">
+                        Analyzing damage...
+                      </p>
+                      <p className="text-xs text-slate-600 mt-2">
+                        AI is checking for vehicle damage
+                      </p>
+                    </div>
+                  ) : isUploadingThisPhoto ? (
                     <div className="aspect-square sm:aspect-[4/3] lg:aspect-square flex flex-col items-center justify-center p-5 text-center">
                       <motion.div
                         animate={{ rotate: 360 }}
@@ -987,7 +1068,7 @@ export default function VehiclePhotos() {
                     }}
                     className="hidden"
                     id={`photo-upload-${photo.id}`}
-                    disabled={!!uploadingMap[photo.id]}
+                    disabled={!!uploadingMap[photo.id] || !!analyzingMap[photo.id]}
                   />
                 </motion.div>
               );
@@ -1052,7 +1133,25 @@ export default function VehiclePhotos() {
                     onDragLeave={handleDragLeave}
                     onDrop={(e) => handleDrop(e, photo.id)}
                   >
-                    {isUploadingThisPhoto ? (
+                    {analyzingMap[photo.id] ? (
+                      <div className="aspect-square flex flex-col items-center justify-center p-5 text-center">
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }}
+                          className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full mb-4"
+                        />
+                        <p className="text-sm font-medium text-slate-800">
+                          Analyzing damage...
+                        </p>
+                        <p className="text-xs text-slate-600 mt-2">
+                          AI is checking for vehicle damage
+                        </p>
+                      </div>
+                    ) : isUploadingThisPhoto ? (
                       <div className="aspect-square flex flex-col items-center justify-center p-5 text-center">
                         <motion.div
                           animate={{ rotate: 360 }}
@@ -1234,7 +1333,7 @@ export default function VehiclePhotos() {
                       }}
                       className="hidden"
                       id={`photo-upload-${photo.id}`}
-                      disabled={!!uploadingMap[photo.id]}
+                      disabled={!!uploadingMap[photo.id] || !!analyzingMap[photo.id]}
                     />
                   </motion.div>
                 );
