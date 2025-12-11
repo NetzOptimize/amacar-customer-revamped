@@ -450,6 +450,8 @@ const CarDetailsView = () => {
                                 src={image.url}
                                 alt={image.name || `Vehicle image ${index + 1}`}
                                 className="w-full h-full object-contain"
+                                loading={index === 0 ? "eager" : "lazy"}
+                                decoding="async"
                                 onLoad={(e) => {
                                   const img = e.target;
                                   setImageDimensions((prev) => ({

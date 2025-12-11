@@ -156,10 +156,15 @@ export default function Hero() {
 
   return (
     <section className="hero-section">
-      {/* Background Image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${bgImg})` }}
+      {/* Background Image - Optimized for LCP with fetchpriority */}
+      {/* Using img tag instead of background-image for better LCP optimization */}
+      <img
+        src={bgImg}
+        alt="Amacar - Sell or Buy Your Car"
+        className="absolute inset-0 w-full h-full object-cover object-center"
+        loading="eager"
+        fetchPriority="high"
+        decoding="async"
       />
 
       {/* Enhanced Dark Overlay with Extended Left-to-Right Gradient */}
