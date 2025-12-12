@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { useEffect } from 'react'
 import Seo from '@/components/SEO/Seo'
 import { seoData } from '@/config/seoConfig'
+import SectionSkeleton from '@/components/ui/SectionSkeleton.jsx'
 
 // Critical above-the-fold components - load immediately
 import Hero from '@/components/Home/Hero/Hero.jsx'
@@ -22,19 +23,6 @@ const ModernCarousel = lazy(() => import('@/components/Home/ModernCarousel/Moder
 const BrandLogosCarousel = lazy(() => import('@/components/Home/BrandLogosCarousel/BrandLogosCarousel.jsx'))
 const TwoColumnSection = lazy(() => import('@/components/Home/TwoColumnSection/TwoColumnSection.jsx'))
 const CarFooterSection = lazy(() => import('@/components/Home/CarFooterSection/CarFooterSection.jsx'))
-
-// Simple skeleton loader for lazy-loaded sections
-const SectionSkeleton = () => (
-  <div className="w-full py-16 bg-white">
-    <div className="max-w-7xl mx-auto px-4">
-      <div className="h-8 bg-neutral-200 rounded w-1/3 mb-8 animate-pulse"></div>
-      <div className="space-y-4">
-        <div className="h-4 bg-neutral-100 rounded animate-pulse"></div>
-        <div className="h-4 bg-neutral-100 rounded w-5/6 animate-pulse"></div>
-      </div>
-    </div>
-  </div>
-)
 export default function HomePage() {
     const { userState, loading } = useSelector((state) => state.user);
     useEffect(() => {
@@ -50,17 +38,17 @@ export default function HomePage() {
             <QuickChoicePanel />
             
             {/* Section 3: How Each System Works (Tabbed - 3 Steps Each) - Lazy loaded */}
-            <Suspense fallback={<SectionSkeleton />}>
+            <Suspense fallback={<SectionSkeleton variant="steps" />}>
               <HowEachSystemWorks />
             </Suspense>
             
             {/* Section 4: Phase 1 - How Amacar Works (Selling) - 5 Steps - Lazy loaded */}
-            <Suspense fallback={<SectionSkeleton />}>
+            <Suspense fallback={<SectionSkeleton variant="steps" />}>
               <HowAmacarWorks />
             </Suspense>
             
             {/* Section 5: Phase 2 - How Reverse Bidding Works (Buying) - 5 Steps - Lazy loaded */}
-            <Suspense fallback={<SectionSkeleton />}>
+            <Suspense fallback={<SectionSkeleton variant="steps" />}>
               <HowReverseBiddingWorks />
             </Suspense>
             
@@ -70,7 +58,7 @@ export default function HomePage() {
             </Suspense>
             
             {/* Section 6: Reviews (Unified) - Lazy loaded */}
-            <Suspense fallback={<SectionSkeleton />}>
+            <Suspense fallback={<SectionSkeleton variant="testimonials" />}>
               <TestimonialCarousel />
             </Suspense>
             
@@ -88,11 +76,11 @@ export default function HomePage() {
             <Suspense fallback={<SectionSkeleton />}>
               <VideoSection />
             </Suspense>
-            <Suspense fallback={<SectionSkeleton />}>
+            <Suspense fallback={<SectionSkeleton variant="carousel" />}>
               <ModernCarousel />
             </Suspense>
             {/* <WinWinAmacar /> */}
-            <Suspense fallback={<SectionSkeleton />}>
+            <Suspense fallback={<SectionSkeleton variant="carousel" />}>
               <BrandLogosCarousel />
             </Suspense>
             <Suspense fallback={<SectionSkeleton />}>

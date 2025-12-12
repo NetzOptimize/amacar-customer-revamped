@@ -10,6 +10,7 @@ import PrivateRoute from './components/Auth/PrivateRoute';
 import { SearchProvider } from './context/SearchContext';
 import BackToTop from './components/ui/back-to-top';
 import ScrollToTop from './components/ui/ScrollToTop.jsx';
+import PageLoader from './components/ui/PageLoader.jsx';
 
 // Lazy load all page components for code splitting
 // This reduces initial bundle size by loading routes only when needed
@@ -41,15 +42,7 @@ const ActiveSessionsPage = lazy(() => import('@/features/reverseBidding/pages/Ac
 const ReverseBidsPage = lazy(() => import('@/features/reverseBidding/pages/ReverseBidsPage.jsx'));
 const AcceptedReverseBidsPage = lazy(() => import('@/features/reverseBidding/pages/AcceptedReverseBidsPage.jsx'));
 
-// Simple loading fallback component
-const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gradient-hero">
-    <div className="text-center">
-      <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-      <p className="text-neutral-600">Loading...</p>
-    </div>
-  </div>
-);
+// PageLoader component is now imported from ui components
 
 
 
