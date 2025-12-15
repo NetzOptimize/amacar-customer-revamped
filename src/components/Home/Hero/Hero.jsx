@@ -7,6 +7,7 @@ import { Search, Loader2 } from "lucide-react"
 import api from "@/lib/api"
 import { extractVehicleParams } from "@/services/openaiService"
 import SearchResultsDropdown from "./SearchResultsDropdown"
+import bannerPlaceholder from "@/assets/banner-placeholder.png"
 
 // shadcn components
 import Modal from "@/components/ui/modal.jsx"
@@ -26,7 +27,9 @@ export default function Hero() {
   const [searchResults, setSearchResults] = useState([])
   const [extractedParams, setExtractedParams] = useState({})
   const [showDropdown, setShowDropdown] = useState(false)
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false)
   const searchContainerRef = useRef(null)
+  const videoRef = useRef(null)
 
   // Fast search: Extract params on frontend, then call simple search API
   const performFastSearch = useCallback(async (query) => {
@@ -153,21 +156,36 @@ export default function Hero() {
   }
 
 
+  // Handle video loaded event
+  const handleVideoLoaded = () => {
+    setIsVideoLoaded(true)
+  }
+
   return (
     <section className="hero-banner">
+      {/* Placeholder Image - shown until video is loaded */}
+      <img
+        src={bannerPlaceholder}
+        alt="Hero banner placeholder"
+        className={`hero-placeholder ${isVideoLoaded ? 'hero-placeholder-hidden' : ''}`}
+      />
+
       {/* Video Background */}
       <video
-        className="hero-video"
+        ref={videoRef}
+        className={`hero-video ${isVideoLoaded ? 'hero-video-loaded' : 'hero-video-loading'}`}
         autoPlay
         muted
         loop
         playsInline
         preload="auto"
+        onLoadedData={handleVideoLoaded}
+        onCanPlay={handleVideoLoaded}
       >
         <source
           src="https://dealer.amacar.ai/wp-content/uploads/2025/12/6537414-uhd_3840_2160_30fps.mp4"
           type="video/mp4"
-      />
+        />
       </video>
 
       {/* Dark Overlay */}
