@@ -74,9 +74,7 @@ export default function TestimonialCarousel() {
         api?.scrollTo(index)
     }, [api])
 
-    const getRoleColor = (role) => {
-        return role === 'Customer' ? 'text-primary-600 bg-primary-50' : 'text-accent-600 bg-accent-50';
-    };
+    // Removed getRoleColor - using inline classes now
 
     const getRoleIcon = (role) => {
         return role === 'Customer' ? <User className="w-4 h-4" /> : <Building2 className="w-4 h-4" />;
@@ -86,24 +84,24 @@ export default function TestimonialCarousel() {
         return Array.from({ length: 5 }, (_, i) => (
             <Star
                 key={i}
-                className={`w-4 h-4 ${i < rating ? 'text-warning fill-warning' : 'text-neutral-300'
+                className={`w-4 h-4 ${i < rating ? 'text-amber-500 fill-amber-500' : 'text-gray-300'
                     }`}
             />
         ));
     };
 
     return (
-        <section className="py-16 px-4 bg-gradient-to-br from-slate-50 to-white">
+        <section className="py-16 px-4 bg-white">
             <div className="max-w-6xl mx-auto p-[1rem]">
                 {/* Section Header */}
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl lg:text-4xl font-bold text-neutral-800 font-display mb-4">
-                        What Our <span className="text-primary-500">Users</span> Say
+                    <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
+                        What Our <span className="text-[#f6851f]">Users</span> Say
                     </h2>
-                    <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
+                    <p className="text-base text-gray-600 max-w-2xl mx-auto">
                         Discover why thousands of customers trust Amacar
                     </p>
-                    <div className="w-20 h-1 bg-primary-500 mx-auto rounded-full mt-4"></div>
+                    <div className="w-20 h-0.5 bg-[#f6851f] mx-auto rounded-full mt-4"></div>
                 </div>
 
                 {/* Carousel Container */}
@@ -129,17 +127,17 @@ export default function TestimonialCarousel() {
                                     key={testimonial.id}
                                     className="pl-2 md:pl-4 md:basis-1/2"
                                 >
-                                    <div className="group relative bg-white rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:shadow-primary-500/10 border border-neutral-200 overflow-hidden h-full">
+                                    <div className="group relative bg-white rounded-xl p-6 transition-all duration-200 hover:shadow-md border border-gray-200 overflow-hidden h-full">
                                         {/* Quote Icon */}
                                         <div className="flex justify-between items-start mb-4">
-                                            <Quote className="w-6 h-6 text-primary-200" />
+                                            <Quote className="w-6 h-6 text-gray-300" />
                                             <div className="flex items-center gap-1">
                                                 {renderStars(testimonial.rating)}
                                             </div>
                                         </div>
 
                                         {/* Testimonial Text */}
-                                        <p className="text-neutral-700 leading-relaxed mb-6 line-clamp-4 text-sm">
+                                        <p className="text-gray-600 leading-relaxed mb-6 line-clamp-4 text-sm">
                                             "{testimonial.text}"
                                         </p>
 
@@ -151,20 +149,19 @@ export default function TestimonialCarousel() {
                                                     alt={testimonial.name}
                                                     className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md"
                                                 />
-                                                <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center ${testimonial.role === 'Customer' ? 'bg-primary-500' : 'bg-accent-500'
-                                                    }`}>
+                                                <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center bg-[#f6851f]`}>
                                                     {getRoleIcon(testimonial.role)}
                                                 </div>
                                             </div>
                                             <div className="flex-1">
-                                                <h4 className="font-semibold text-neutral-800 text-sm">{testimonial.name}</h4>
+                                                <h4 className="font-semibold text-gray-900 text-sm">{testimonial.name}</h4>
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(testimonial.role)}`}>
+                                                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${testimonial.role === 'Customer' ? 'bg-orange-50 text-[#f6851f]' : 'bg-orange-50 text-[#f6851f]'}`}>
                                                         {getRoleIcon(testimonial.role)}
                                                         {testimonial.role}
                                                     </span>
                                                 </div>
-                                                <div className="flex items-center gap-1 text-xs text-neutral-500">
+                                                <div className="flex items-center gap-1 text-xs text-gray-500">
                                                     <Calendar className="w-3 h-3" />
                                                     <span>{testimonial.date}</span>
                                                 </div>
@@ -176,8 +173,8 @@ export default function TestimonialCarousel() {
                         </CarouselContent>
 
                         {/* Navigation Arrows */}
-                        <CarouselPrevious className="cursor-pointer absolute left-6 top-1/2 transform -translate-y-1/2 -translate-x-6 bg-white rounded-full p-4 transition-all duration-300 border border-neutral-200 hover:bg-primary-50 hover:border-primary-300 hover:text-primary-600 shadow-lg" />
-                        <CarouselNext className="cursor-pointer absolute right-6 top-1/2 transform -translate-y-1/2 translate-x-6 bg-white rounded-full p-4 transition-all duration-300 border border-neutral-200 hover:bg-primary-50 hover:border-primary-300 hover:text-primary-600 shadow-lg" />
+                        <CarouselPrevious className="cursor-pointer absolute left-6 top-1/2 transform -translate-y-1/2 -translate-x-6 bg-white rounded-full p-3 transition-all duration-200 border border-gray-200 hover:bg-gray-50 hover:border-gray-300 hover:text-[#f6851f] shadow-sm" />
+                        <CarouselNext className="cursor-pointer absolute right-6 top-1/2 transform -translate-y-1/2 translate-x-6 bg-white rounded-full p-3 transition-all duration-200 border border-gray-200 hover:bg-gray-50 hover:border-gray-300 hover:text-[#f6851f] shadow-sm" />
                     </Carousel>
 
                     {/* Dots Navigation */}
@@ -186,9 +183,9 @@ export default function TestimonialCarousel() {
                             <button
                                 key={index}
                                 onClick={() => scrollTo(index)}
-                                className={`cursor-pointer w-3 h-3 rounded-full transition-all duration-300 ${index === current - 1
-                                        ? 'bg-primary-500 scale-125'
-                                        : 'bg-neutral-300 hover:bg-neutral-400'
+                                className={`cursor-pointer w-2 h-2 rounded-full transition-all duration-200 ${index === current - 1
+                                        ? 'bg-[#f6851f] scale-125'
+                                        : 'bg-gray-300 hover:bg-gray-400'
                                     }`}
                                 aria-label={`Go to testimonial ${index + 1}`}
                             />

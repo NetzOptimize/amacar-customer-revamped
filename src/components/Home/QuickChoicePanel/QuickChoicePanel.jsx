@@ -45,8 +45,9 @@ export default function QuickChoicePanel() {
                 "Highest bid wins",
                 "Fastest way to sell your car"
             ],
-            icon: <TrendingUp className="w-8 h-8" />,
-            gradient: "from-orange-500 to-red-600",
+            icon: <TrendingUp className="w-6 h-6" />,
+            iconBg: "bg-orange-50",
+            iconColor: "text-[#f6851f]",
             buttonText: "Start Live Auction →",
             onClick: () => setAuctionOpen(true),
             color: "orange"
@@ -61,11 +62,12 @@ export default function QuickChoicePanel() {
                 "Compare offers + Dealer Free perks",
                 "Save thousands instantly"
             ],
-            icon: <TrendingDown className="w-8 h-8" />,
-            gradient: "from-blue-500 to-indigo-600",
+            icon: <TrendingDown className="w-6 h-6" />,
+            iconBg: "bg-orange-50",
+            iconColor: "text-[#f6851f]",
             buttonText: "Start Reverse Bidding →",
             onClick: handleReverseBidding,
-            color: "blue"
+            color: "orange"
         }
     ]
 
@@ -89,16 +91,16 @@ export default function QuickChoicePanel() {
                     {cards.map((card, index) => (
                         <motion.div
                             key={card.id}
-                            className={`quick-choice-card quick-choice-card-${card.color}`}
+                            className="quick-choice-card"
                             custom={index}
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true, amount: 0.2 }}
                             variants={cardVariants}
-                            whileHover={{ y: -8, transition: { duration: 0.3 } }}
+                            whileHover={{ y: -4, transition: { duration: 0.2 } }}
                         >
                             {/* Icon */}
-                            <div className={`quick-choice-icon bg-gradient-to-br ${card.gradient}`}>
+                            <div className={`quick-choice-icon ${card.iconBg} ${card.iconColor}`}>
                                 {card.icon}
                             </div>
 
@@ -109,7 +111,7 @@ export default function QuickChoicePanel() {
                             <ul className="quick-choice-features">
                                 {card.features.map((feature, idx) => (
                                     <li key={idx} className="quick-choice-feature-item">
-                                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                        <CheckCircle className="w-5 h-5 text-[#f6851f] flex-shrink-0" />
                                         <span>{feature}</span>
                                     </li>
                                 ))}
@@ -118,9 +120,9 @@ export default function QuickChoicePanel() {
                             {/* CTA Button */}
                             <motion.button
                                 onClick={card.onClick}
-                                className={`quick-choice-button quick-choice-button-${card.color}`}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
+                                className="quick-choice-button"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
                             >
                                 {card.buttonText}
                                 <ArrowRight className="w-5 h-5 ml-2" />

@@ -12,44 +12,44 @@ export default function WhyChooseAmacar() {
             number: "01",
             title: "Professionalism",
             description: "We uphold the highest standards of professionalism in every transaction.",
-            icon: <Target className="w-8 h-8" />,
-            iconBg: "bg-blue-500",
-            numberBg: "bg-blue-500",
-            accentColor: "bg-blue-500",
-            cardBg: "bg-gradient-to-br from-blue-50 to-blue-100/50"
+            icon: <Target className="w-6 h-6" />,
+            iconBg: "bg-orange-50",
+            iconColor: "text-[#f6851f]",
+            numberBg: "bg-[#f6851f]",
+            accentColor: "bg-[#f6851f]"
         },
         {
             id: 2,
             number: "02",
             title: "Maximized Value",
             description: "We uphold the highest value in the market from instant cash offer to auctioning your car.",
-            icon: <Gem className="w-8 h-8" />,
-            iconBg: "bg-green-500",
-            numberBg: "bg-green-500",
-            accentColor: "bg-green-500",
-            cardBg: "bg-gradient-to-br from-green-50 to-green-100/50"
+            icon: <Gem className="w-6 h-6" />,
+            iconBg: "bg-orange-50",
+            iconColor: "text-[#f6851f]",
+            numberBg: "bg-[#f6851f]",
+            accentColor: "bg-[#f6851f]"
         },
         {
             id: 3,
             number: "03",
             title: "Security",
             description: "Your privacy and security are paramount to us. We handle your information with the utmost confidentiality at online Auction.",
-            icon: <Lock className="w-8 h-8" />,
-            iconBg: "bg-purple-500",
-            numberBg: "bg-purple-500",
-            accentColor: "bg-purple-500",
-            cardBg: "bg-gradient-to-br from-purple-50 to-purple-100/50"
+            icon: <Lock className="w-6 h-6" />,
+            iconBg: "bg-orange-50",
+            iconColor: "text-[#f6851f]",
+            numberBg: "bg-[#f6851f]",
+            accentColor: "bg-[#f6851f]"
         },
         {
             id: 4,
             number: "04",
             title: "Efficiency",
             description: "Our streamlined online platform saves you time and effort, making selling your car effortless",
-            icon: <Zap className="w-8 h-8" />,
-            iconBg: "bg-orange-500",
-            numberBg: "bg-orange-500",
-            accentColor: "bg-orange-500",
-            cardBg: "bg-gradient-to-br from-orange-50 to-orange-100/50"
+            icon: <Zap className="w-6 h-6" />,
+            iconBg: "bg-orange-50",
+            iconColor: "text-[#f6851f]",
+            numberBg: "bg-[#f6851f]",
+            accentColor: "bg-[#f6851f]"
         }
     ]
 
@@ -104,7 +104,7 @@ export default function WhyChooseAmacar() {
                     viewport={{ once: true, margin: "-100px" }}
                 >
                     <h2 className="why-choose-title">
-                        Why Thousands Choose <span className="text-[var(--brand-orange)] text-7xl font-extrabold">Amacar</span>
+                        Why Thousands Choose <span className="text-[#f6851f]">Amacar</span>
                     </h2>
                     <div className="title-underline"></div>
                 </motion.div>
@@ -120,9 +120,9 @@ export default function WhyChooseAmacar() {
                     {benefits.map((benefit, index) => (
                         <motion.div
                             key={benefit.id}
-                            className={`benefit-card ${benefit.cardBg}`}
+                            className="benefit-card"
                             variants={itemVariants}
-                            whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                            whileHover={{ y: -2, transition: { duration: 0.2 } }}
                         >
                             {/* Number Badge - Top Right */}
                             <div className={`benefit-number ${benefit.numberBg}`}>
@@ -130,7 +130,7 @@ export default function WhyChooseAmacar() {
                             </div>
 
                             {/* Icon Square */}
-                            <div className={`benefit-icon-square ${benefit.iconBg} text-white`}>
+                            <div className={`benefit-icon-square ${benefit.iconBg} ${benefit.iconColor}`}>
                                 {benefit.icon}
                             </div>
 
@@ -138,8 +138,6 @@ export default function WhyChooseAmacar() {
                             <div className="benefit-content">
                                 <h3 className="benefit-title">{benefit.title}</h3>
                                 <p className="benefit-description">{benefit.description}</p>
-                                {/* Accent Line - Below Text */}
-                                <div className={`benefit-accent-line ${benefit.accentColor}`}></div>
                             </div>
                         </motion.div>
                     ))}

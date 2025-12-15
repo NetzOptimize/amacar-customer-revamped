@@ -160,10 +160,10 @@ const BrandLogosCarousel = ({ className = "", pauseOnHover = true }) => {
   return (
     <div className={cn("w-full py-[2rem] px-[1rem] lg:p-[3.5rem]", className)}>
       <div className="text-center mb-8">
-        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-800 mb-2">
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
           Trusted by Leading Brands
         </h2>
-        <p className="text-neutral-600 text-sm md:text-base">
+        <p className="text-gray-600 text-sm md:text-base">
           We work with the most reputable automotive brands
         </p>
       </div>
@@ -199,7 +199,7 @@ const BrandLogosCarousel = ({ className = "", pauseOnHover = true }) => {
               className="group flex-shrink-0"
             >
               <div className={cn(
-                "bg-white rounded-xl p-3 sm:p-4 md:p-6 shadow-sm border border-neutral-200 hover:shadow-md transition-all duration-300 group-hover:scale-105 flex items-center justify-center",
+                "bg-white rounded-lg p-3 sm:p-4 md:p-6 border border-gray-200 hover:shadow-md transition-all duration-200 flex items-center justify-center",
                 logoSize
               )}>
                 <img

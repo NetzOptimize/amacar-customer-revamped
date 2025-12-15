@@ -13,22 +13,10 @@
 }
 
 .why-choose-section {
-    padding: 40px 20px;
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
+    padding: 80px 20px;
+    background: #FFFFFF;
     position: relative;
     overflow: hidden;
-}
-
-.why-choose-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at 20% 80%, rgba(11, 95, 199, 0.03) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(255, 122, 89, 0.03) 0%, transparent 50%);
-    pointer-events: none;
 }
 
 .container {
@@ -45,11 +33,11 @@
 }
 
 .why-choose-title {
-    font-size: clamp(2.5rem, 5vw, 3.5rem);
-    font-weight: 400;
-    color: var(--text-primary);
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 700;
+    color: #111827;
     margin: 0 0 20px 0;
-    line-height: 1.1;
+    line-height: 1.2;
 }
 
 .title-accent {
@@ -60,25 +48,11 @@
 }
 
 .title-underline {
-    width: 100px;
-    height: 4px;
-    background: linear-gradient(90deg, var(--brand-blue), var(--accent));
+    width: 80px;
+    height: 3px;
+    background: #f6851f;
     margin: 0 auto;
     border-radius: 2px;
-    position: relative;
-}
-
-.title-underline::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 8px;
-    height: 8px;
-    background: var(--brand-blue);
-    border-radius: 50%;
-    box-shadow: 0 0 0 4px rgba(11, 95, 199, 0.1);
 }
 
 /* Grid Layout */
@@ -94,54 +68,48 @@
 /* Benefit Card */
 .benefit-card {
     position: relative;
-    border-radius: 20px;
+    border-radius: 16px;
     padding: 32px 28px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: white;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
     overflow: visible;
-    backdrop-filter: blur(10px);
 }
 
 .benefit-card:hover {
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
-    border-color: rgba(255, 255, 255, 1);
-    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #E5E7EB;
 }
 
 /* Number Badge - Top Right */
 .benefit-number {
     position: absolute;
-    top: -15px;
-    right: -15px;
-    width: 48px;
-    height: 48px;
+    top: -12px;
+    right: -12px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     font-weight: 700;
     z-index: 10;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border: 2px solid white;
 }
 
 /* Icon Square */
 .benefit-icon-square {
-    width: 64px;
-    height: 64px;
+    width: 56px;
+    height: 56px;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.benefit-icon-square svg {
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 /* Content */
@@ -151,32 +119,18 @@
 }
 
 .benefit-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
     margin: 0 0 12px 0;
-    line-height: 1.2;
+    line-height: 1.3;
 }
 
 .benefit-description {
-    font-size: 1rem;
-    color: var(--text-secondary);
+    font-size: 0.875rem;
+    color: #4B5563;
     line-height: 1.6;
-    margin: 0 0 16px 0;
-}
-
-/* Accent Line */
-.benefit-accent-line {
-    position: absolute;
-    width: 20%;
-    height: 3px;
-    border-radius: 2px;
-    opacity: 0.9;
-    margin-top: 8px;
-    initial-letter: raise;
-    right: 0;
-    left: 0;
-    margin: auto;
+    margin: 0;
 }
 
 /* CTA Section */

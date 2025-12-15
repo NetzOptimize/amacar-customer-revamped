@@ -13,7 +13,6 @@ import Modal from "@/components/ui/modal.jsx"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import bgImg from "@/assets/home_page_first_hero(12).jpg"
 import "./hero.css"
 
 
@@ -155,96 +154,75 @@ export default function Hero() {
 
 
   return (
-    <section className="hero-section">
-      {/* Background Image - Optimized for LCP with fetchpriority */}
-      {/* Using img tag instead of background-image for better LCP optimization */}
-      <img
-        src={bgImg}
-        alt="Amacar - Sell or Buy Your Car"
-        className="absolute inset-0 w-full h-full object-cover object-center"
-        loading="eager"
-        fetchPriority="high"
-        decoding="async"
-      />
-
-      {/* Enhanced Dark Overlay with Extended Left-to-Right Gradient */}
-      <div 
-        className="absolute inset-0 z-[1]"
-        // style={{
-        //   background: 'linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.60), rgba(0,0,0,0.20))'
-        // }}
-      />
-
-      {/* Glassmorphic Content Container - Positioned to the Left */}
-      <motion.div
-        className="relative z-[100] w-full max-w-[900px] px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-12 md:py-16 mt-[5%] md:ml-[5%] lg:ml-[5%]"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
+    <section className="hero-banner">
+      {/* Video Background */}
+      <video
+        className="hero-video"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
       >
-        <div className="backdrop-blur-sm bg-gradient-to-r from-black/70 via-black/40 to-transparent border border-white/10 rounded-[32px] px-8 sm:px-10 md:px-12 lg:px-16 py-10 sm:py-12 md:py-16 shadow-2xl shadow-black/50">
+        <source
+          src="https://dealer.amacar.ai/wp-content/uploads/2025/12/6537414-uhd_3840_2160_30fps.mp4"
+          type="video/mp4"
+      />
+      </video>
+
+      {/* Dark Overlay */}
+      <div className="hero-overlay" />
+
+      {/* Content Container - Centered */}
+      <div className="hero-content">
           {/* Headline */}
           <motion.h1
-            className="font-sans text-[clamp(2rem,5vw,3.5rem)] font-semibold leading-[1.1] mb-6 text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] tracking-tight"
-            variants={fadeUp}
-            custom={0}
-            style={{ fontWeight: 600 }}
+          className="hero-headline"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           >
-            Sell or Buy Your Car in Minutes — Let Dealers Compete for You
+          Sell or Buy Your Car in Minutes — Let Dealers Compete for You
           </motion.h1>
 
           {/* Subheadline */}
           <motion.p
-            className="text-lg md:text-xl mb-10 text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)] font-normal leading-relaxed max-w-2xl tracking-wide"
-            variants={fadeUp}
-            custom={0.2}
-          >
-            Whether you're selling your car or shopping for a new or used one, Amacar brings dealerships into a competitive marketplace—so you always win.
+          className="hero-subheadline"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+        >
+          Whether you're selling your car or shopping for a new or used one, Amacar brings dealerships into a competitive marketplace—so you always win.
           </motion.p>
 
-          {/* Search Bar with Floating Animation */}
+        {/* Search Bar Container */}
           <motion.div
-            className="mb-8 max-w-2xl"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            animate={{
-              y: [0, -8, 0],
-            }}
-            transition={{
-              opacity: { duration: 0.8, delay: 0.3, ease: "easeOut" },
-              y: {
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 1.1,
-              },
-            }}
+          className="search-container"
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
           >
-            <div className="relative z-[100]" ref={searchContainerRef}>
-              <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-gray-400 z-10" />
-              <Input
+          <div className="search-wrapper" ref={searchContainerRef}>
+            <Search className="search-icon" />
+            <input
                 type="text"
-                placeholder="Search make, model, or type (e.g., '2025 Mazda, Honda under $25000')"
+              placeholder="Search by make, model, or keyword..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={handleSearchFocus}
                 onKeyDown={handleSearchKeyDown}
-                className="w-full h-auto py-4 px-6 pl-16 pr-16 bg-white/98 backdrop-blur-md border-white/40 text-gray-900 placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-cyan-500/50 focus-visible:border-cyan-400 rounded-2xl shadow-inner text-base font-medium transition-all duration-300 hover:shadow-[0_6px_12px_rgba(0,0,0,0.15)] min-h-[64px]"
+              className="search-input"
               />
-              
-              {/* Search Icon Button / Loading Spinner */}
-              <div className="absolute right-6 top-1/2 -translate-y-1/2 z-10">
                 {isSearching ? (
-                  <Loader2 className="h-5 w-5 text-cyan-500 animate-spin" />
+              <Loader2 className="search-button-icon animate-spin" />
                 ) : (
                   <button
                     onClick={handleSearchClick}
                     disabled={searchQuery.trim().length < 2}
-                    className="p-1.5 rounded-lg transition-all duration-200 hover:bg-cyan-500/10 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="search-button"
                     aria-label="Search"
                   >
-                    <Search className="h-5 w-5 text-cyan-500 hover:text-cyan-600 transition-colors" />
+                →
                   </button>
                 )}
               </div>
@@ -257,46 +235,38 @@ export default function Hero() {
                 extractedParams={extractedParams}
                 onClose={() => setShowDropdown(false)}
               />
-            </div>
           </motion.div>
 
           {/* Action Buttons */}
           <motion.div
-            className="flex flex-col sm:flex-row flex-wrap gap-4 max-w-2xl mb-8"
-            variants={fadeUp}
-            custom={0.4}
-          >
-            {/* Shop New Button */}
-            <Button
+          className="action-buttons"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8, ease: "easeOut" }}
+        >
+          <button
               onClick={handleNewClick}
-              variant="outline"
-              className="flex-1 min-w-[140px] h-12 bg-transparent hover:bg-white/10 text-white font-semibold rounded-xl border-2 border-white/40 hover:border-white/40 transition-all duration-300 hover:scale-105 hover:shadow-lg backdrop-blur-sm"
+            className="btn-secondary"
             >
               Shop New →
-            </Button>
-
-            {/* Shop Used Button */}
-            <Button
+          </button>
+          <button
               onClick={handleUsedClick}
-              variant="outline"
-              className="flex-1 min-w-[140px] h-12 bg-transparent hover:bg-white/10 text-white font-semibold rounded-xl border-2 border-white/40 hover:border-white/40 transition-all duration-300 hover:scale-105 hover:shadow-lg backdrop-blur-sm"
+            className="btn-secondary"
             >
               Shop Used →
-            </Button>
-
-            {/* Auction Your Ride Button */}
-            <Button
+          </button>
+          <button
               onClick={(e) => {
                 e.preventDefault()
                 setOpen(true)
               }}
-              className="flex-1 min-w-[180px] h-auto px-8 py-4 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 hover:from-cyan-600 hover:via-blue-600 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/50 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/60 text-base"
+            className="btn-primary"
             >
               Auction Your Ride →
-            </Button>
+          </button>
           </motion.div>
         </div>
-      </motion.div>
 
       {/* Modals */}
       <Modal
@@ -305,7 +275,7 @@ export default function Hero() {
         title="Get your instant offer"
         description="Enter your car details to start the auction"
         footer={
-          <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold">
+          <Button className="w-full bg-[#f6851f] hover:bg-[#e6750f] text-white font-medium">
             Start Auction
           </Button>
         }

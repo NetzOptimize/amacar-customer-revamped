@@ -1,18 +1,8 @@
 .quick-choice-section {
     padding: 80px 20px;
-    background: linear-gradient(to bottom, #ffffff, #f8fafc);
+    background: #F9FAFB;
     position: relative;
     overflow: hidden;
-}
-
-.quick-choice-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.1), transparent);
 }
 
 .container {
@@ -35,8 +25,8 @@
 
 .title-underline {
     width: 80px;
-    height: 4px;
-    background: linear-gradient(to right, #f97316, #e63946);
+    height: 3px;
+    background: #f6851f;
     margin: 0 auto;
     border-radius: 2px;
 }
@@ -50,55 +40,28 @@
 
 .quick-choice-card {
     background: white;
-    border-radius: 24px;
+    border-radius: 16px;
     padding: 40px 32px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
-    border: 2px solid transparent;
-}
-
-.quick-choice-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(to right, #f97316, #e63946);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.quick-choice-card-orange::before {
-    background: linear-gradient(to right, #f97316, #e63946);
-}
-
-.quick-choice-card-blue::before {
-    background: linear-gradient(to right, #3b82f6, #4f46e5);
-}
-
-.quick-choice-card:hover::before {
-    opacity: 1;
 }
 
 .quick-choice-card:hover {
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-    border-color: rgba(0, 0, 0, 0.1);
-    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #E5E7EB;
 }
 
 .quick-choice-icon {
-    width: 72px;
-    height: 72px;
-    border-radius: 18px;
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
     margin-bottom: 24px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .quick-choice-card-title {
@@ -122,8 +85,8 @@
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    font-size: 1rem;
-    color: #475569;
+    font-size: 0.875rem;
+    color: #4B5563;
     line-height: 1.6;
 }
 
@@ -133,37 +96,24 @@
 
 .quick-choice-button {
     width: 100%;
-    padding: 16px 24px;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 1rem;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.875rem;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     color: white;
+    background: #f6851f;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.quick-choice-button-orange {
-    background: linear-gradient(to right, #f97316, #e63946);
-    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
-}
-
-.quick-choice-button-orange:hover {
-    background: linear-gradient(to right, #ea580c, #dc2626);
-    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
-}
-
-.quick-choice-button-blue {
-    background: linear-gradient(to right, #3b82f6, #4f46e5);
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-}
-
-.quick-choice-button-blue:hover {
-    background: linear-gradient(to right, #2563eb, #4338ca);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+.quick-choice-button:hover {
+    background: #e6750f;
+    box-shadow: 0 4px 12px rgba(246, 133, 31, 0.2);
 }
 
 @media (max-width: 768px) {
