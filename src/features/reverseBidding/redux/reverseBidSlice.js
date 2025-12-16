@@ -29,7 +29,7 @@ export const fetchFiltersThunk = createAsyncThunk(
 
 export const fetchMockCarsThunk = createAsyncThunk(
     'reverseBid/fetchCars',
-    async ({ filters, page = 1, perPage = 20 }, { rejectWithValue, getState }) => {
+    async ({ filters, page = 1, perPage = 10 }, { rejectWithValue, getState }) => {
         try {
             // Build query parameters for the API
             const params = {};
@@ -137,7 +137,7 @@ export const fetchMockCarsThunk = createAsyncThunk(
             console.error('Vehicle search API error:', err);
             // If it's a 404 or empty result, return empty array instead of error
             if (err.response?.status === 404 || err.response?.data?.message?.toLowerCase().includes('no vehicles')) {
-                return { vehicles: [], pagination: { current_page: 1, per_page: 20, total_items: 0, total_pages: 1, has_next: false, has_prev: false } };
+                return { vehicles: [], pagination: { current_page: 1, per_page: 10, total_items: 0, total_pages: 1, has_next: false, has_prev: false } };
             }
             return rejectWithValue(err.response?.data?.message || err.message || 'Failed to fetch vehicles');
         }
@@ -296,7 +296,7 @@ export const fetchLeaderboardThunk = createAsyncThunk(
 
 export const fetchCustomerSessionsThunk = createAsyncThunk(
     'reverseBid/fetchCustomerSessions',
-    async ({ status, page = 1, per_page = 20 }, { rejectWithValue }) => {
+    async ({ status, page = 1, per_page = 10 }, { rejectWithValue }) => {
         try {
             const params = { page, per_page };
             if (status) {
@@ -412,7 +412,7 @@ export const simulateLiveBidsThunk = createAsyncThunk(
 // Fetch reverse bids (active sessions without accepted bids)
 export const fetchReverseBidsThunk = createAsyncThunk(
     'reverseBid/fetchReverseBids',
-    async ({ page = 1, per_page = 20 }, { rejectWithValue }) => {
+    async ({ page = 1, per_page = 10 }, { rejectWithValue }) => {
         try {
             const response = await api.get('/customer/dashboard/reverse-bids', {
                 params: { page, per_page }
@@ -435,7 +435,7 @@ export const fetchReverseBidsThunk = createAsyncThunk(
 // Fetch accepted reverse bids
 export const fetchAcceptedReverseBidsThunk = createAsyncThunk(
     'reverseBid/fetchAcceptedReverseBids',
-    async ({ page = 1, per_page = 20 }, { rejectWithValue }) => {
+    async ({ page = 1, per_page = 10 }, { rejectWithValue }) => {
         try {
             const response = await api.get('/customer/dashboard/accepted-reverse-bids', {
                 params: { page, per_page }
@@ -478,7 +478,7 @@ const initialState = {
     searchResults: [],
     pagination: {
         current_page: 1,
-        per_page: 20,
+        per_page: 10,
         total_items: 0,
         total_pages: 1,
         has_next: false,
@@ -508,7 +508,7 @@ const initialState = {
         data: [],
         pagination: {
             current_page: 1,
-            per_page: 20,
+            per_page: 10,
             total_items: 0,
             total_pages: 1,
             has_next: false,
@@ -519,7 +519,7 @@ const initialState = {
         data: [],
         pagination: {
             current_page: 1,
-            per_page: 20,
+            per_page: 10,
             total_items: 0,
             total_pages: 1,
             has_next: false,
@@ -530,7 +530,7 @@ const initialState = {
         data: [],
         pagination: {
             current_page: 1,
-            per_page: 20,
+            per_page: 10,
             total_items: 0,
             total_pages: 1,
             has_next: false,

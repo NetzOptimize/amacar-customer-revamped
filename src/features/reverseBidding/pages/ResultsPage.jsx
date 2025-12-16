@@ -32,7 +32,7 @@ export default function ResultsPage() {
         dispatch(fetchMockCarsThunk({ 
             filters: defaultFilters, 
             page: 1, 
-            perPage: 20 
+            perPage: 10 
         }));
     }, []); // Empty dependency array - only run on mount
 

@@ -1053,10 +1053,29 @@ export default function VehicleDetails() {
                             >
                                 <h3 className="text-lg font-semibold mb-4">Dealer Information</h3>
                                 <div className="space-y-3">
+                                    {vehicleData.dealer_info?.dealership_name && (
+                                        <div>
+                                            <span className="text-sm text-neutral-500">Dealership</span>
+                                            <p className="font-medium">{vehicleData.dealer_info.dealership_name}</p>
+                                        </div>
+                                    )}
                                     {vehicleData.dealer_info?.name && (
                                         <div>
-                                            <span className="text-sm text-neutral-500">Name</span>
+                                            <span className="text-sm text-neutral-500">Contact Name</span>
                                             <p className="font-medium">{vehicleData.dealer_info.name}</p>
+                                        </div>
+                                    )}
+                                    {(vehicleData.dealer_info?.address || vehicleData.city || vehicleData.state) && (
+                                        <div className="flex items-start gap-2">
+                                            <MapPin className="w-4 h-4 text-neutral-400 mt-0.5 flex-shrink-0" />
+                                            <p className="font-medium">
+                                                {[
+                                                    vehicleData.dealer_info?.address,
+                                                    vehicleData.city && vehicleData.state 
+                                                        ? `${vehicleData.city}, ${vehicleData.state}`
+                                                        : vehicleData.city || vehicleData.state
+                                                ].filter(Boolean).join(', ')}
+                                            </p>
                                         </div>
                                     )}
                                     {vehicleData.dealer_info?.email && (
@@ -1070,26 +1089,15 @@ export default function VehicleDetails() {
                                             </a>
                                         </div>
                                     )}
-                                    {(vehicleData.dealer_info?.phone || vehicleData.dealer_contact?.phone) && (
+                                    {vehicleData.dealer_info?.phone && (
                                         <div className="flex items-center gap-2">
                                             <Phone className="w-4 h-4 text-neutral-400" />
                                             <a
-                                                href={`tel:${vehicleData.dealer_info?.phone || vehicleData.dealer_contact?.phone}`}
+                                                href={`tel:${vehicleData.dealer_info.phone}`}
                                                 className="text-sm text-orange-600 hover:text-orange-700"
                                             >
-                                                {vehicleData.dealer_info?.phone || vehicleData.dealer_contact?.phone}
+                                                {vehicleData.dealer_info.phone}
                                             </a>
-                                        </div>
-                                    )}
-                                    {(vehicleData.city || vehicleData.state) && (
-                                        <div>
-                                            <span className="text-sm text-neutral-500">Location</span>
-                                            <p className="font-medium">
-                                                {vehicleData.city && vehicleData.state 
-                                                    ? `${vehicleData.city}, ${vehicleData.state}`
-                                                    : vehicleData.city || vehicleData.state
-                                                }
-                                            </p>
                                         </div>
                                     )}
                                 </div>
@@ -1170,10 +1178,12 @@ export default function VehicleDetails() {
             <DealerContactModal
                 open={dealerContactModalOpen}
                 onClose={() => setDealerContactModalOpen(false)}
-                dealerContact={vehicleData?.dealer_contact || vehicleData?.dealer_info ? {
-                    email: vehicleData?.dealer_info?.email || vehicleData?.dealer_contact?.email,
-                    phone: vehicleData?.dealer_info?.phone || vehicleData?.dealer_contact?.phone,
-                    name: vehicleData?.dealer_info?.name || vehicleData?.dealer_contact?.name
+                dealerContact={vehicleData?.dealer_info ? {
+                    email: vehicleData.dealer_info.email,
+                    phone: vehicleData.dealer_info.phone,
+                    name: vehicleData.dealer_info.name,
+                    dealership_name: vehicleData.dealer_info.dealership_name,
+                    address: vehicleData.dealer_info.address
                 } : null}
                 vehicleInfo={vehicleData ? {
                     year: vehicleData.year,

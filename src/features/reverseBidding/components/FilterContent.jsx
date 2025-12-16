@@ -63,10 +63,26 @@ export default function FilterContent({ cars = [] }) {
         });
     }, [filters.make, filters.model, filters.year, filters.budgetMin, filters.budgetMax, filters.condition, filters.zipCode, filters.extraFilters, user]);
 
-    // Get makes from API
+    // Get makes from API - prioritize available_filters from search results
+    // This ensures users only see makes that have vehicles in current search results
     const makes = useMemo(() => {
+        // First, try to get makes from available_filters (dynamic, from search results)
+        if (filterOptions.availableFilters && filterOptions.availableFilters.make && Array.isArray(filterOptions.availableFilters.make)) {
+            // Extract values from format: [{ value: 'Toyota', count: 10 }, ...]
+            const makesFromAvailable = filterOptions.availableFilters.make
+                .map(item => typeof item === 'object' ? item.value : item)
+                .filter(Boolean)
+                .sort();
+            
+            // Only return if we have makes from available filters
+            if (makesFromAvailable.length > 0) {
+                return makesFromAvailable;
+            }
+        }
+        
+        // Fall back to static makes list (from initial filters endpoint)
         return Object.keys(filterOptions.makes || {}).sort();
-    }, [filterOptions.makes]);
+    }, [filterOptions.makes, filterOptions.availableFilters]);
 
     // Get years from API (sorted descending)
     const years = useMemo(() => {
@@ -211,7 +227,7 @@ export default function FilterContent({ cars = [] }) {
         dispatch(setFilters(filtersToDispatch));
 
         // Trigger new search (reset to page 1 when filters change)
-        await dispatch(fetchMockCarsThunk({ filters: filtersToDispatch, page: 1, perPage: 20 }));
+        await dispatch(fetchMockCarsThunk({ filters: filtersToDispatch, page: 1, perPage: 10 }));
     };
 
     // Remove active filter
@@ -262,7 +278,7 @@ export default function FilterContent({ cars = [] }) {
         };
 
         dispatch(setFilters(filtersToDispatch));
-        await dispatch(fetchMockCarsThunk({ filters: filtersToDispatch, page: 1, perPage: 20 }));
+        await dispatch(fetchMockCarsThunk({ filters: filtersToDispatch, page: 1, perPage: 10 }));
     };
 
     // Reset all filters
@@ -291,7 +307,7 @@ export default function FilterContent({ cars = [] }) {
         };
 
         dispatch(setFilters(filtersToDispatch));
-        await dispatch(fetchMockCarsThunk({ filters: filtersToDispatch, page: 1, perPage: 20 }));
+        await dispatch(fetchMockCarsThunk({ filters: filtersToDispatch, page: 1, perPage: 10 }));
     };
 
     return (
