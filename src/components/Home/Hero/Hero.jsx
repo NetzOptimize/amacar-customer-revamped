@@ -84,7 +84,14 @@ export default function Hero() {
   // Handle click outside to close dropdown
   React.useEffect(() => {
     const handleClickOutside = (event) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+      // Check if click is inside search container
+      const isInsideSearchContainer = searchContainerRef.current && searchContainerRef.current.contains(event.target)
+      
+      // Check if click is inside the dropdown (by checking for the dropdown class)
+      const isInsideDropdown = event.target.closest('.search-results-dropdown')
+      
+      // Only close if click is outside both the search container and the dropdown
+      if (!isInsideSearchContainer && !isInsideDropdown) {
         setShowDropdown(false)
       }
     }

@@ -322,7 +322,11 @@ export default function VehicleCard({ car, onStart, loading = false }) {
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/reverse-bidding/vehicles/${car.id}`);
+                            // Prioritize vehicle_id, then product_id, then id
+                            const vehicleId = car.vehicle_id || car.product_id || car.id;
+                            if (vehicleId) {
+                                navigate(`/reverse-bidding/vehicles/${vehicleId}`);
+                            }
                         }}
                         className="cursor-pointer w-full sm:flex-1 inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs sm:text-sm border border-neutral-300 bg-white text-neutral-700 font-medium hover:bg-neutral-50 hover:border-neutral-400 transition-colors"
                     >

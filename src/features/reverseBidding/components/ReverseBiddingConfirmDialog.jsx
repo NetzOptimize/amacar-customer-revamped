@@ -912,7 +912,12 @@ export default function ReverseBiddingConfirmDialog({
                                                                     variant="ghost"
                                                                     size="sm"
                                                                     className="mt-2 h-7 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50"
-                                                                    onClick={(e) => handleViewVehicle(vehicle.id, e)}
+                                                                    onClick={(e) => {
+                                                                        const vehicleId = vehicle.vehicle_id || vehicle.product_id || vehicle.id;
+                                                                        if (vehicleId) {
+                                                                            handleViewVehicle(vehicleId, e);
+                                                                        }
+                                                                    }}
                                                                 >
                                                                     View Details
                                                                     <ExternalLink className="w-3 h-3 ml-1" />

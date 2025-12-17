@@ -256,12 +256,13 @@ export default function BidDetailsDialog({ open, bid, onClose, onAccept, isSessi
                             )}
                             <button
                                 onClick={() => {
-                                    if (bid.productId) {
-                                        navigate(`/reverse-bidding/vehicles/${bid.productId}`);
+                                    const vehicleId = bid.vehicle_id || bid.productId || bid.product_id;
+                                    if (vehicleId) {
+                                        navigate(`/reverse-bidding/vehicles/${vehicleId}`);
                                         onClose();
                                     }
                                 }}
-                                disabled={!bid.productId}
+                                disabled={!bid.vehicle_id && !bid.productId && !bid.product_id}
                                 className="cursor-pointer px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 disabled:from-neutral-300 disabled:to-neutral-400 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 w-full sm:w-auto hover:shadow-lg transform hover:scale-105 disabled:transform-none"
                             >
                                 <Car className="w-4 h-4" />

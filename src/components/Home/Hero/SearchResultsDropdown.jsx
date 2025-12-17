@@ -2,6 +2,8 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Car, MapPin, Loader2, Sparkles, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setFilters, fetchMockCarsThunk } from "@/features/reverseBidding/redux/reverseBidSlice";
 
 export default function SearchResultsDropdown({
   isOpen,
@@ -11,6 +13,7 @@ export default function SearchResultsDropdown({
   onClose,
 }) {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const formatPrice = (price) => {
     if (!price) return "Price N/A";
@@ -33,9 +36,89 @@ export default function SearchResultsDropdown({
     return null;
   };
 
-  const handleVehicleClick = (vehicle) => {
+  const handleVehicleClick = (vehicle, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     onClose();
-    navigate(`/reverse-bidding/results?vin=${vehicle.vin}`);
+    // Navigate to vehicle details page using vehicle_id (prioritize vehicle_id, then product_id, then id)
+    if (vehicle.vehicle_id) {
+      navigate(`/reverse-bidding/vehicles/${vehicle.vehicle_id}`);
+    } else if (vehicle.product_id) {
+      navigate(`/reverse-bidding/vehicles/${vehicle.product_id}`);
+    } else if (vehicle.id) {
+      navigate(`/reverse-bidding/vehicles/${vehicle.id}`);
+    } else {
+      // Fallback: navigate to results with VIN if ID is not available
+      navigate(`/reverse-bidding/results?vin=${vehicle.vin}`);
+    }
+  };
+
+  // Map extractedParams to Redux filter format
+  const mapExtractedParamsToFilters = (params) => {
+    const filters = {
+      condition: 'all',
+      make: null,
+      model: null,
+      year: null,
+      budgetMin: null,
+      budgetMax: null,
+      zipCode: '',
+      extraFilters: {},
+    };
+
+    // Map new_used to condition
+    if (params.new_used === 'N') {
+      filters.condition = 'new';
+    } else if (params.new_used === 'U') {
+      filters.condition = 'used';
+    }
+
+    // Map basic filters
+    if (params.make) filters.make = params.make;
+    if (params.model) filters.model = params.model;
+    if (params.year) filters.year = String(params.year);
+    if (params.min_price) filters.budgetMin = Number(params.min_price);
+    if (params.max_price) filters.budgetMax = Number(params.max_price);
+
+    // Map extra filters
+    if (params.body) {
+      filters.extraFilters.body = Array.isArray(params.body) ? params.body : [params.body];
+    }
+    if (params.transmission) {
+      filters.extraFilters.transmission = Array.isArray(params.transmission) ? params.transmission : [params.transmission];
+    }
+    if (params.fuel) {
+      filters.extraFilters.fuel = Array.isArray(params.fuel) ? params.fuel : [params.fuel];
+    }
+    if (params.exterior_color) {
+      filters.extraFilters.exterior_color = Array.isArray(params.exterior_color) ? params.exterior_color : [params.exterior_color];
+    }
+    if (params.certified !== null && params.certified !== undefined) {
+      filters.extraFilters.certified = [String(params.certified)];
+    }
+
+    return filters;
+  };
+
+  const handleViewAllResults = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    // Map extracted parameters to Redux filter format
+    const filters = mapExtractedParamsToFilters(extractedParams);
+    
+    // Dispatch filters to Redux
+    dispatch(setFilters(filters));
+    
+    // Navigate first (this will unmount the component, so onClose isn't needed)
+    navigate('/reverse-bidding/results');
+    
+    // Fetch results with the filters (don't await - let it happen in background)
+    dispatch(fetchMockCarsThunk({ filters, page: 1, perPage: 20 }));
   };
 
   if (!isOpen) return null;
@@ -49,8 +132,12 @@ export default function SearchResultsDropdown({
           exit={{ opacity: 0, y: -10, scale: 0.95 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
           className="search-results-dropdown z-[9999]"
+          onClick={(e) => e.stopPropagation()}
         >
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden backdrop-blur-xl">
+          <div 
+            className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden backdrop-blur-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Header */}
             <div className="bg-gradient-to-r from-cyan-50 to-blue-50 px-4 py-3 border-b border-slate-200">
               <div className="flex items-center justify-between">
@@ -137,7 +224,7 @@ export default function SearchResultsDropdown({
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.03 }}
-                          onClick={() => handleVehicleClick(vehicle)}
+                          onClick={(e) => handleVehicleClick(vehicle, e)}
                           className="group px-4 py-3 hover:bg-gradient-to-r hover:from-cyan-50/50 hover:to-blue-50/50 cursor-pointer transition-all duration-200"
                         >
                           <div className="flex items-center gap-3">
@@ -206,16 +293,8 @@ export default function SearchResultsDropdown({
             {!isLoading && vehicles.length > 0 && (
               <div className="px-4 py-3 bg-slate-50 border-t border-slate-200">
                 <button
-                  onClick={() => {
-                    onClose();
-                    // Navigate to full search results
-                    const params = new URLSearchParams();
-                    if (extractedParams.make) params.append("make", extractedParams.make);
-                    if (extractedParams.model) params.append("model", extractedParams.model);
-                    if (extractedParams.year) params.append("year", extractedParams.year);
-                    if (extractedParams.max_price) params.append("max_price", extractedParams.max_price);
-                    navigate(`/reverse-bidding/results?${params.toString()}`);
-                  }}
+                  type="button"
+                  onClick={handleViewAllResults}
                   className="w-full text-center text-sm font-semibold text-cyan-600 hover:text-cyan-700 transition-colors"
                 >
                   View all results →
