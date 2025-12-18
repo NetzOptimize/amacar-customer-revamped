@@ -17,7 +17,8 @@ import {
   Plus,
   Sparkles,
   Gavel,
-  Award
+  Award,
+  ClipboardList
 } from 'lucide-react';
 import Modal from '@/components/ui/modal';
 import LogoutModal from '@/components/ui/LogoutModal';
@@ -46,6 +47,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
     { name: 'Accepted Reverse Bids', href: '/accepted-reverse-bids', icon: Award },
     { name: 'Pending Offers', href: '/pending-offers', icon: Hourglass },
     { name: 'Previous Offers', href: '/offers', icon: FileText },
+    { name: 'Appraised Vehicles', href: '/appraised-vehicles', icon: ClipboardList },
     { name: 'Accepted Offers', href: '/accepted', icon: CheckCircle },
     { name: 'My Appointments', href: '/appointments', icon: Calendar },
     {
@@ -99,7 +101,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
     // 4. Not a manual toggle
     if (isMobile && !isCollapsed && prevPathRef.current !== location.pathname && !isManualToggle) {
       // Check if current path is a dashboard page
-      const dashboardPages = ['/dashboard', '/auctions', '/active-sessions', '/reverse-bids', '/accepted-reverse-bids', '/pending-offers', '/offers', '/accepted', '/appointments', '/profile'];
+      const dashboardPages = ['/dashboard', '/auctions', '/active-sessions', '/reverse-bids', '/accepted-reverse-bids', '/pending-offers', '/offers', '/appraised-vehicles', '/accepted', '/appointments', '/profile'];
       const isDashboardPage = dashboardPages.some(page => location.pathname.startsWith(page));
       
       if (isDashboardPage) {

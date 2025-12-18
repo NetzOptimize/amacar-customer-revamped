@@ -28,6 +28,7 @@ import {
   clearImageDeleteError,
   startAuction,
   clearAuctionStartError,
+  setProductId,
 } from "@/redux/slices/carDetailsAndQuestionsSlice";
 import toast from "react-hot-toast";
 import api from "@/lib/api";
@@ -60,10 +61,20 @@ export default function VehiclePhotos() {
 
   // Mock data and handlers for standalone usage
   const data = { photos: [] };
-  const productId = useSelector(
+  const productIdFromRedux = useSelector(
     (state) => state?.carDetailsAndQuestions?.productId
   );
   const location = useLocation();
+  // Get productId from location state as fallback, then Redux
+  const productId = location.state?.productId || productIdFromRedux;
+  
+  // Set productId in Redux if passed via location state
+  useEffect(() => {
+    if (location.state?.productId && !productIdFromRedux) {
+      dispatch(setProductId(location.state.productId));
+    }
+  }, [location.state?.productId, productIdFromRedux, dispatch]);
+  
   const onChange = (newData) => {
     // console.log('Photos updated:', newData);
   };

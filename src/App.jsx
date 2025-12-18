@@ -41,6 +41,7 @@ const VehicleDetails = lazy(() => import('@/features/reverseBidding/pages/Vehicl
 const ActiveSessionsPage = lazy(() => import('@/features/reverseBidding/pages/ActiveSessionsPage.jsx'));
 const ReverseBidsPage = lazy(() => import('@/features/reverseBidding/pages/ReverseBidsPage.jsx'));
 const AcceptedReverseBidsPage = lazy(() => import('@/features/reverseBidding/pages/AcceptedReverseBidsPage.jsx'));
+const AppraisedVehiclesPage = lazy(() => import('./Pages/AppraisedVehiclesPage.jsx'));
 
 // PageLoader component is now imported from ui components
 
@@ -60,7 +61,8 @@ function App() {
     location.pathname.startsWith('/accepted') ||
     location.pathname.startsWith('/appointments') ||
     location.pathname.startsWith('/profile') ||
-    location.pathname.startsWith('/car-details');
+    location.pathname.startsWith('/car-details') ||
+    location.pathname.startsWith('/appraised-vehicles');
 
   return (
     <AuthProvider>
@@ -227,6 +229,16 @@ function App() {
                   <PrivateRoute>
                     <DashboardLayout>
                       <CarDetailsView />
+                    </DashboardLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/appraised-vehicles"
+                element={
+                  <PrivateRoute>
+                    <DashboardLayout>
+                      <AppraisedVehiclesPage />
                     </DashboardLayout>
                   </PrivateRoute>
                 }

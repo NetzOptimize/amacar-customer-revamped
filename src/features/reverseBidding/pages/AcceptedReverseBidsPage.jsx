@@ -297,15 +297,15 @@ export default function AcceptedReverseBidsPage() {
                                                     View Session
                                                     <ArrowRight className="w-4 h-4" />
                                                 </button>
-                                                {/* Debug Button */}
-                                                <button
+                                                {/* Debug Button - Commented out for now, will work on this later */}
+                                                {/* <button
                                                     onClick={() => handleDebugDownload(bid)}
                                                     className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg font-medium transition-all duration-200 border border-purple-300 text-sm"
                                                     title="Debug: Download Certificate PDF"
                                                 >
                                                     <Bug className="w-4 h-4" />
                                                     Debug: Download Certificate
-                                                </button>
+                                                </button> */}
                                             </div>
                                         </div>
                                     </motion.div>
