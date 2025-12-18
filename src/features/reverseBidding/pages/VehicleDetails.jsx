@@ -93,10 +93,8 @@ export default function VehicleDetails() {
     // Function to fetch alternative vehicles
     const fetchAlternativeVehicles = async () => {
         if (!vehicleData) {
-            console.log('Alternative vehicles: No vehicle data available');
             return null;
         }
-        console.log("vehicle data" , vehicleData);
         
         // Extract Vehicle Details section from description
         const extractVehicleDetailsSection = (desc) => {
@@ -174,22 +172,12 @@ export default function VehicleDetails() {
         
         const price = vehicleData.price || vehicleData.regular_price || 0;
         
-        // Log extracted values for debugging
-        console.log('Extracted vehicle parameters:', {
-            make,
-            model,
-            body,
-            transmission,
-            fuel_type,
-            price,
-            hasDescription: !!vehicleData.description,
-            hasVehicleDetailsSection: !!vehicleDetailsSection,
-            vehicleDetailsSectionLength: vehicleDetailsSection?.length || 0
-        });
+        // Extract condition and map to API format (new/used)
+        const conditionValue = vehicleData.new_used || vehicleData.condition || 'new';
+        const condition = (conditionValue === 'U' || conditionValue === 'used') ? 'used' : 'new';
 
         // Only fetch if we have required parameters (make and price)
         if (!make || !price || price === 0) {
-            console.log('Alternative vehicles: Missing required parameters (make or price)');
             return null;
         }
 
@@ -204,29 +192,16 @@ export default function VehicleDetails() {
             if (transmission && transmission.trim()) params.append('transmission', transmission.trim());
             if (fuel_type && fuel_type.trim()) params.append('fuel_type', fuel_type.trim());
             params.append('price', price.toString());
-
-            console.log('Fetching alternative vehicles with params:', {
-                make,
-                model: model || '(empty)',
-                body: body || '(empty)',
-                transmission: transmission || '(empty)',
-                fuel_type: fuel_type || '(empty)',
-                price
-            });
-            
-            console.log('Final URL params:', params.toString());
+            // Add condition parameter (new or used)
+            params.append('condition', condition);
 
             const response = await apiRev.get(`/vehicles/alternatives?${params.toString()}`);
 
             if (response.data && response.data.success) {
                 const alternatives = response.data.data?.data || [];
                 setAlternativeVehicles(alternatives);
-                console.log('Alternative vehicles response:', response.data);
-                console.log('Alternative vehicles count:', alternatives.length);
-                console.log('Alternative vehicles:', alternatives);
                 return alternatives;
             } else {
-                console.log('Alternative vehicles: No success response', response.data);
                 setAlternativeVehicles([]);
                 return [];
             }
@@ -310,7 +285,6 @@ export default function VehicleDetails() {
         }
 
         // Fetch alternative vehicles first
-        console.log('Start Reverse Bidding clicked - fetching alternative vehicles...');
         await fetchAlternativeVehicles();
 
         // Then proceed with the normal flow
