@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
-import { formatCurrency, formatDate } from '../lib/utils';
+import { formatCurrency, formatDate, decodeHtmlEntities } from '../lib/utils';
 import Pagination from '../components/ui/pagination';
 import AppraisedVehiclesSkeleton from '../components/skeletons/AppraisedVehiclesSkeleton';
 import {
@@ -470,7 +470,7 @@ const AppraisedVehiclesPage = () => {
                           <td className="py-4 px-4">
                             <div>
                               <div className="font-semibold text-neutral-900 text-sm">
-                                {vehicle.title || `${vehicle.year} ${vehicle.make} ${vehicle.model}`}
+                                {vehicle.title ? decodeHtmlEntities(vehicle.title) : `${vehicle.year} ${vehicle.make} ${vehicle.model}`}
                               </div>
                               <div className="text-xs text-neutral-500 mt-0.5">
                                 {vehicle.year} {vehicle.make} {vehicle.model}
@@ -595,7 +595,7 @@ const AppraisedVehiclesPage = () => {
                         {/* Vehicle Title */}
                         <div className="flex items-center justify-between">
                           <h4 className="font-semibold text-neutral-900 text-base">
-                            {vehicle.title || `${vehicle.year} ${vehicle.make} ${vehicle.model}`}
+                            {vehicle.title ? decodeHtmlEntities(vehicle.title) : `${vehicle.year} ${vehicle.make} ${vehicle.model}`}
                           </h4>
                         </div>
 

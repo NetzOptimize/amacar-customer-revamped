@@ -21,7 +21,7 @@ import {
   Shield,
   ArrowLeft,
 } from "lucide-react";
-import { formatCurrency, formatDate } from "../lib/utils";
+import { formatCurrency, formatDate, decodeHtmlEntities } from "../lib/utils";
 import api from "../lib/api";
 import { setProductId } from "../redux/slices/carDetailsAndQuestionsSlice";
 import toast from "react-hot-toast";
@@ -434,7 +434,7 @@ const CarDetailsView = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
               <div className="flex-1 min-w-0">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-800 mb-2 truncate">
-                  {basic_info?.title || "Vehicle Details"}
+                  {basic_info?.title ? decodeHtmlEntities(basic_info.title) : "Vehicle Details"}
                 </h1>
                 <p className="text-neutral-600 text-sm sm:text-base lg:text-lg">
                   Complete vehicle information and auction details

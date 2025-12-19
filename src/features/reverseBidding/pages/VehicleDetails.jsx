@@ -35,6 +35,7 @@ import LoginModal from '../../../components/ui/LoginModal';
 import DealerContactModal from '../components/DealerContactModal';
 import VehicleDetailsSkeleton from '../../../components/skeletons/VehicleDetailsSkeleton';
 import { startReverseBiddingThunk } from '../redux/reverseBidSlice';
+import { decodeHtmlEntities } from '../../../lib/utils';
 
 export default function VehicleDetails() {
     const { id } = useParams();
@@ -444,7 +445,7 @@ export default function VehicleDetails() {
                     <div className="flex items-center justify-between gap-4">
                         <div className="flex-1 min-w-0 pr-4">
                             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-neutral-900 mb-2 truncate">
-                                {vehicleData.title || `${vehicleData.year} ${vehicleData.make} ${vehicleData.model}`}
+                                {vehicleData.title ? decodeHtmlEntities(vehicleData.title) : `${vehicleData.year} ${vehicleData.make} ${vehicleData.model}`}
                             </h1>
                             <div className="flex items-center gap-3 text-xs sm:text-sm text-neutral-600 flex-wrap">
                                 <span className="px-2 py-1 rounded-md text-xs font-medium bg-neutral-100 whitespace-nowrap">{conditionBadge}</span>
@@ -718,7 +719,7 @@ export default function VehicleDetails() {
                                                 {vehicleData.title && (
                                                     <div>
                                                         <span className="text-sm text-neutral-500">Title</span>
-                                                        <p className="font-medium">{vehicleData.title}</p>
+                                                        <p className="font-medium">{decodeHtmlEntities(vehicleData.title)}</p>
                                                     </div>
                                                 )}
                                                 {(vehicleData.stock_number || vehicleData.stockNumber || vehicleData.stock || vehicleData.sku) && (
