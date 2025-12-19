@@ -217,32 +217,30 @@ export default function VehicleDetails() {
 
     // Prepare images array for PhotoSwipe
     const images = useMemo(() => {
-        if (!vehicleData?.images?.length) return [];
+        // Priority: image_gallery > image_url
+        let imageSources = [];
+        
+        if (vehicleData?.image_gallery && Array.isArray(vehicleData.image_gallery) && vehicleData.image_gallery.length > 0) {
+            imageSources = vehicleData.image_gallery;
+        } else if (vehicleData?.image_url) {
+            imageSources = [vehicleData.image_url];
+        }
 
-        return vehicleData.images.map((img, index) => {
-            let url = '';
-            let thumbnail = '';
+        if (!imageSources.length) return [];
 
-            if (typeof img === 'string') {
-                url = img;
-                thumbnail = img;
-            } else if (img?.url || img?.full) {
-                url = img.url || img.full;
-                thumbnail = img.thumbnail || img.medium || img.url || img.full;
-            } else if (img?.thumbnail) {
-                thumbnail = img.thumbnail;
-                url = img.url || img.medium || img.large || img.thumbnail;
-            }
+        return imageSources.map((img, index) => {
+            const url = typeof img === 'string' ? img : (img?.url || img?.thumbnail || '');
+            const thumbnail = url;
 
             return {
                 src: url,
-                thumbnail: thumbnail || url,
-                width: img.width || 1200,
-                height: img.height || 800,
+                thumbnail: thumbnail,
+                width: 1200,
+                height: 800,
                 alt: vehicleData.title || `Vehicle Image ${index + 1}`,
             };
         });
-    }, [vehicleData?.images, vehicleData?.title]);
+    }, [vehicleData?.image_gallery, vehicleData?.image_url, vehicleData?.title]);
 
     const primaryImage = images[0];
     const imageCount = images.length;

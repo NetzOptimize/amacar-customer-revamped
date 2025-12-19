@@ -96,29 +96,52 @@ export const fetchMockCarsThunk = createAsyncThunk(
                 };
 
                 // Map API response to match component expectations
-                const vehicles = vehiclesData.map(vehicle => ({
-                    id: vehicle.id,
-                    title: vehicle.title,
-                    vin: vehicle.vin,
-                    make: vehicle.make,
-                    model: vehicle.model,
-                    year: vehicle.year,
-                    new_used: vehicle.new_used,
-                    condition: vehicle.new_used === 'N' ? 'new' : 'used',
-                    price: vehicle.price,
-                    basePrice: vehicle.price, // For backward compatibility
-                    zip_code: vehicle.zip_code,
-                    city: vehicle.city,
-                    state: vehicle.state,
-                    owned_by: vehicle.owned_by,
-                    is_reverse_biddable: vehicle.is_reverse_biddable,
-                    images: vehicle.images || [], // Already in the correct format
-                    url: vehicle.url,
-                    series: vehicle.series, // Trim/Series information
-                    mileage: vehicle.mileage, // Mileage from API
-                    odometer: vehicle.odometer, // Odometer (fallback for mileage)
-                    dealer_contact: vehicle.dealer_contact || null, // Dealer contact information (email, phone, name)
-                }));
+                const vehicles = vehiclesData.map(vehicle => {
+                    // Convert image_url and image_gallery to images array format
+                    let images = [];
+                    if (vehicle.image_gallery && Array.isArray(vehicle.image_gallery) && vehicle.image_gallery.length > 0) {
+                        images = vehicle.image_gallery;
+                    } else if (vehicle.image_url) {
+                        images = [vehicle.image_url];
+                    }
+
+                    return {
+                        id: vehicle.id,
+                        title: vehicle.title,
+                        vin: vehicle.vin,
+                        make: vehicle.make,
+                        model: vehicle.model,
+                        year: vehicle.year,
+                        new_used: vehicle.new_used || vehicle.condition,
+                        condition: (vehicle.new_used === 'N' || vehicle.condition === 'N') ? 'new' : 'used',
+                        price: vehicle.price,
+                        basePrice: vehicle.price,
+                        zip_code: vehicle.zip_code,
+                        city: vehicle.city,
+                        state: vehicle.state,
+                        owned_by: vehicle.owned_by,
+                        is_reverse_biddable: vehicle.is_reverse_biddable,
+                        images: images,
+                        image_url: vehicle.image_url,
+                        image_gallery: vehicle.image_gallery,
+                        url: vehicle.url,
+                        series: vehicle.series,
+                        mileage: vehicle.mileage,
+                        odometer: vehicle.odometer,
+                        body_type: vehicle.body_type,
+                        transmission: vehicle.transmission,
+                        trim: vehicle.trim,
+                        door_count: vehicle.door_count,
+                        drivetrain: vehicle.drivetrain,
+                        exterior_color: vehicle.exterior_color,
+                        interior_color: vehicle.interior_color,
+                        city_mpg: vehicle.city_mpg,
+                        highway_mpg: vehicle.highway_mpg,
+                        fuel_type: vehicle.fuel_type,
+                        certified: vehicle.certified,
+                        dealer_contact: vehicle.dealer_contact || null,
+                    };
+                });
 
                 // Get available filters from API response (dynamic counts based on current search)
                 const availableFilters = response.data.data.available_filters || {};

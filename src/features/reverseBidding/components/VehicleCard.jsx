@@ -23,36 +23,31 @@ export default function VehicleCard({ car, onStart, loading = false }) {
 
     // Prepare images array for PhotoSwipe
     const images = useMemo(() => {
-        if (!car.images?.length) return [];
+        // Priority: image_gallery > image_url
+        let imageSources = [];
+        
+        if (car.image_gallery && Array.isArray(car.image_gallery) && car.image_gallery.length > 0) {
+            imageSources = car.image_gallery;
+        } else if (car.image_url) {
+            imageSources = [car.image_url];
+        }
 
-        return car.images.map((img, index) => {
-            let url = '';
-            let thumbnail = '';
+        if (!imageSources.length) return [];
 
-            if (typeof img === 'string') {
-                // Old structure: array of strings
-                url = img;
-                thumbnail = img;
-            } else if (img?.url) {
-                // New structure: object with url (full resolution)
-                url = img.url;
-                thumbnail = img.thumbnail || img.url;
-            } else if (img?.thumbnail) {
-                // New structure: object with thumbnail only
-                thumbnail = img.thumbnail;
-                url = img.url || img.thumbnail;
-            }
+        return imageSources.map((img, index) => {
+            const url = typeof img === 'string' ? img : (img?.url || img?.thumbnail || '');
+            const thumbnail = url;
 
             return {
-                src: url, // Full resolution image URL
-                thumbnail: thumbnail || url, // Thumbnail URL, fallback to full URL
-                width: img.width || 1200,
-                height: img.height || 800,
+                src: url,
+                thumbnail: thumbnail,
+                width: 1200,
+                height: 800,
                 alt: car.title || `${car.year} ${car.make} ${car.model} - Image ${index + 1}`,
-                isPrimary: img?.is_primary || index === 0, // Track primary image
+                isPrimary: index === 0,
             };
         });
-    }, [car.images, car.title, car.year, car.make, car.model]);
+    }, [car.image_gallery, car.image_url, car.title, car.year, car.make, car.model]);
 
     // Get the primary image (marked as primary or first image)
     const primaryImage = images.find(img => img.isPrimary) || images[0];

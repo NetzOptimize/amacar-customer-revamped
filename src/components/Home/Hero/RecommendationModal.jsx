@@ -46,8 +46,11 @@ export default function RecommendationModal({
   };
 
   const getVehicleImage = (vehicle) => {
-    if (vehicle.photos && Array.isArray(vehicle.photos) && vehicle.photos.length > 0) {
-      return vehicle.photos[0];
+    if (vehicle.image_url) {
+      return vehicle.image_url;
+    }
+    if (vehicle.image_gallery && Array.isArray(vehicle.image_gallery) && vehicle.image_gallery.length > 0) {
+      return vehicle.image_gallery[0];
     }
     return null;
   };
