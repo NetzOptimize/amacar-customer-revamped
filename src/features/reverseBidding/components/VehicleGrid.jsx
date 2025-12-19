@@ -47,8 +47,13 @@ export default function VehicleGrid({ cars, showFilters = true }) {
 
     const renderPaginationItems = () => {
         const items = [];
-        const { current_page, total_pages } = pagination;
+        const { current_page = 1, total_pages = 1 } = pagination || {};
         const addedPages = new Set(); // Track which pages we've already added
+        
+        // Don't render pagination if there's only 1 page or no pages
+        if (total_pages <= 1) {
+            return null;
+        }
 
         // Base button styling
         const baseButtonClass = "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
@@ -290,9 +295,8 @@ export default function VehicleGrid({ cars, showFilters = true }) {
                             </div>
 
                             {/* Pagination */}
-                            {pagination.total_pages > 1 && (
+                            {pagination && pagination.total_pages > 0 && (
                                 <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-
                                     <Pagination>
                                         <PaginationContent>
                                             {renderPaginationItems()}

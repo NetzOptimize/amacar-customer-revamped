@@ -95,7 +95,7 @@ export default function Header() {
               <Link
                 className={`nav-link ${isActive("/reverse-bidding") ? "active" : ""
                   }`}
-                to="/reverse-bidding"
+                to="/reverse-bidding/results"
               >
                 Reverse Bidding
               </Link>
