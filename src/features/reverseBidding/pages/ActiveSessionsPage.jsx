@@ -525,7 +525,7 @@ const ActiveSessionsPage = () => {
               You don't have any active reverse bidding sessions at the moment. Start a new session to get competitive offers from dealers.
             </p>
             <button
-              onClick={() => navigate("/reverse-bidding")}
+              onClick={() => navigate("/reverse-bidding/results")}
               className="inline-flex items-center gap-2 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
             >
               <Car className="w-5 h-5" />
@@ -938,7 +938,7 @@ const ActiveSessionsPage = () => {
               You don't have any active reverse bidding sessions at the moment. Start a new session to get competitive offers from dealers.
             </p>
             <button
-              onClick={() => navigate("/reverse-bidding")}
+              onClick={() => navigate("/reverse-bidding/results")}
               className="inline-flex items-center gap-2 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
             >
               <Car className="w-5 h-5" />
