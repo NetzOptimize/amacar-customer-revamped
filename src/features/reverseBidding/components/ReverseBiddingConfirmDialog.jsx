@@ -670,7 +670,7 @@ export default function ReverseBiddingConfirmDialog({
                                                     </div>
                                                 </div>
                                                 <span className="text-[10px] text-neutral-600 leading-tight">
-                                                    I agree to the <a href="#" className="text-orange-600 hover:underline">Terms of Service</a>
+                                                    I agree to the <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-orange-600 hover:underline">Terms of Service</a>
                                                 </span>
                                             </label>
 
@@ -695,7 +695,7 @@ export default function ReverseBiddingConfirmDialog({
                                                     </div>
                                                 </div>
                                                 <span className="text-[10px] text-neutral-600 leading-tight">
-                                                    I agree to the <a href="#" className="text-orange-600 hover:underline">Privacy Policy</a>
+                                                    I agree to the <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-orange-600 hover:underline">Privacy Policy</a>
                                                 </span>
                                             </label>
 
