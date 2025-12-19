@@ -385,6 +385,10 @@ export default function LoginModal({
     setTimeout(() => {
       onClose(false);
       resetModalToLogin();
+      // Redirect to dashboard after successful login
+      if (phase === "success" && !isRegisterMode && !isForgotPasswordMode) {
+        navigate('/dashboard');
+      }
     }, 2000);
   }
 

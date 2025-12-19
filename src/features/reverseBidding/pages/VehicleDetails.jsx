@@ -10,7 +10,6 @@ import {
     Calendar,
     Star,
     Phone,
-    Mail,
     Package,
     Ruler,
     Weight,
@@ -1043,25 +1042,25 @@ export default function VehicleDetails() {
                                     {(vehicleData.dealer_info?.address || vehicleData.city || vehicleData.state) && (
                                         <div className="flex items-start gap-2">
                                             <MapPin className="w-4 h-4 text-neutral-400 mt-0.5 flex-shrink-0" />
-                                            <p className="font-medium">
-                                                {[
+                                            {(() => {
+                                                const fullAddress = [
                                                     vehicleData.dealer_info?.address,
                                                     vehicleData.city && vehicleData.state 
                                                         ? `${vehicleData.city}, ${vehicleData.state}`
                                                         : vehicleData.city || vehicleData.state
-                                                ].filter(Boolean).join(', ')}
-                                            </p>
-                                        </div>
-                                    )}
-                                    {vehicleData.dealer_info?.email && (
-                                        <div className="flex items-center gap-2">
-                                            <Mail className="w-4 h-4 text-neutral-400" />
-                                            <a
-                                                href={`mailto:${vehicleData.dealer_info.email}`}
-                                                className="text-sm text-orange-600 hover:text-orange-700"
-                                            >
-                                                {vehicleData.dealer_info.email}
-                                            </a>
+                                                ].filter(Boolean).join(', ');
+                                                const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
+                                                return (
+                                                    <a
+                                                        href={googleMapsUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="font-medium text-orange-600 hover:text-orange-700 hover:underline"
+                                                    >
+                                                        {fullAddress}
+                                                    </a>
+                                                );
+                                            })()}
                                         </div>
                                     )}
                                     {vehicleData.dealer_info?.phone && (
@@ -1153,8 +1152,8 @@ export default function VehicleDetails() {
             <DealerContactModal
                 open={dealerContactModalOpen}
                 onClose={() => setDealerContactModalOpen(false)}
+                onStartReverseBidding={handleStartBidding}
                 dealerContact={vehicleData?.dealer_info ? {
-                    email: vehicleData.dealer_info.email,
                     phone: vehicleData.dealer_info.phone,
                     name: vehicleData.dealer_info.name,
                     dealership_name: vehicleData.dealer_info.dealership_name,

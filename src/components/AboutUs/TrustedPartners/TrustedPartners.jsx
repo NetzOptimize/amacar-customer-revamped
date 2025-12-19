@@ -72,7 +72,7 @@ export default function TrustedPartners() {
 
 
     return (
-        <section className="pb-24 md:pb-24 lg:pb-24 bg-gradient-to-br from-neutral-50 to-white relative overflow-hidden">
+        <section id="trusted-partners" className="pb-24 md:pb-24 lg:pb-24 bg-gradient-to-br from-neutral-50 to-white relative overflow-hidden">
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-5">
                 <div className="absolute top-10 right-20 w-24 h-24 bg-primary-500 rounded-full blur-2xl"></div>

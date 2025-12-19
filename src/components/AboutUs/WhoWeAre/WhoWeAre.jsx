@@ -65,7 +65,7 @@ export default function WhoWeAre() {
     ]
 
     return (
-        <section className="pb-16 md:pb-24 lg:pb-24 bg-white">
+        <section id="who-we-are" className="pb-16 md:pb-24 lg:pb-24 bg-white">
             <div className="container-custom">
                 {/* Section Header */}
                 <SectionHeader
@@ -143,7 +143,7 @@ export default function WhoWeAre() {
                 </div>
 
                 {/* Our Mission Section */}
-                <div className="mt-32">
+                <div id="our-mission" className="mt-32">
                     <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
                         {/* Content */}
                         <motion.div

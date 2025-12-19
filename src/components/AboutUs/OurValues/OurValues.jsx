@@ -70,7 +70,7 @@ export default function OurValues() {
     ]
 
     return (
-        <section className="pb-16 md:pb-24 lg:pb-24 bg-white relative overflow-hidden">
+        <section id="our-values" className="pb-16 md:pb-24 lg:pb-24 bg-white relative overflow-hidden">
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-5">
                 <div className="absolute top-20 left-10 w-32 h-32 bg-primary-500 rounded-full blur-3xl"></div>
