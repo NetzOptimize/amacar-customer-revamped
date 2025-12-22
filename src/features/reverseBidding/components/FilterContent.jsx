@@ -84,10 +84,27 @@ export default function FilterContent({ cars = [] }) {
         return Object.keys(filterOptions.makes || {}).sort();
     }, [filterOptions.makes, filterOptions.availableFilters]);
 
-    // Get years from API (sorted descending)
+    // Get years from API - prioritize available_filters from search results
+    // This ensures users only see years that have vehicles in current search results
     const years = useMemo(() => {
+        // First, try to get years from available_filters (dynamic, from search results)
+        if (filterOptions.availableFilters && filterOptions.availableFilters.year && Array.isArray(filterOptions.availableFilters.year)) {
+            // Extract values from format: [{ value: '2026', count: 4 }, { value: '2025', count: 6 }, ...]
+            const yearsFromAvailable = filterOptions.availableFilters.year
+                .map(item => typeof item === 'object' ? item.value : item)
+                .filter(Boolean)
+                .map(y => String(y))
+                .sort((a, b) => Number(b) - Number(a)); // Sort descending
+            
+            // Only return if we have years from available filters
+            if (yearsFromAvailable.length > 0) {
+                return yearsFromAvailable;
+            }
+        }
+        
+        // Fall back to static years list (from initial filters endpoint)
         return (filterOptions.years || []).map(y => String(y)).sort((a, b) => Number(b) - Number(a));
-    }, [filterOptions.years]);
+    }, [filterOptions.years, filterOptions.availableFilters]);
 
     // Get models for selected make from API
     const modelsForSelectedMake = useMemo(() => {
