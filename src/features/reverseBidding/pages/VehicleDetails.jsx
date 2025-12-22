@@ -217,10 +217,12 @@ export default function VehicleDetails() {
 
     // Prepare images array for PhotoSwipe
     const images = useMemo(() => {
-        // Priority: image_gallery > image_url
+        // Priority: images > image_gallery > image_url
         let imageSources = [];
         
-        if (vehicleData?.image_gallery && Array.isArray(vehicleData.image_gallery) && vehicleData.image_gallery.length > 0) {
+        if (vehicleData?.images && Array.isArray(vehicleData.images) && vehicleData.images.length > 0) {
+            imageSources = vehicleData.images;
+        } else if (vehicleData?.image_gallery && Array.isArray(vehicleData.image_gallery) && vehicleData.image_gallery.length > 0) {
             imageSources = vehicleData.image_gallery;
         } else if (vehicleData?.image_url) {
             imageSources = [vehicleData.image_url];
@@ -228,7 +230,16 @@ export default function VehicleDetails() {
 
         if (!imageSources.length) return [];
 
-        return imageSources.map((img, index) => {
+        // Sort images to put primary image first (if is_primary property exists)
+        const sortedSources = [...imageSources].sort((a, b) => {
+            if (typeof a === 'object' && typeof b === 'object') {
+                if (a.is_primary && !b.is_primary) return -1;
+                if (!a.is_primary && b.is_primary) return 1;
+            }
+            return 0;
+        });
+
+        return sortedSources.map((img, index) => {
             const url = typeof img === 'string' ? img : (img?.url || img?.thumbnail || '');
             const thumbnail = url;
 
@@ -240,7 +251,7 @@ export default function VehicleDetails() {
                 alt: vehicleData.title || `Vehicle Image ${index + 1}`,
             };
         });
-    }, [vehicleData?.image_gallery, vehicleData?.image_url, vehicleData?.title]);
+    }, [vehicleData?.images, vehicleData?.image_gallery, vehicleData?.image_url, vehicleData?.title]);
 
     const primaryImage = images[0];
     const imageCount = images.length;
@@ -507,36 +518,55 @@ export default function VehicleDetails() {
                             <div className="relative bg-neutral-100 rounded-xl overflow-hidden group/image-container">
                                 {primaryImage && images.length > 0 ? (
                                     <div className="relative aspect-[4/3]">
-                                        {/* Carousel Image Display */}
+                                        {/* Render all images as PhotoSwipe Items for gallery navigation */}
+                                        {images.map((image, index) => (
+                                            <Item
+                                                key={`gallery-${index}`}
+                                                original={image.src}
+                                                thumbnail={image.thumbnail || image.src}
+                                                width={image.width}
+                                                height={image.height}
+                                                alt={image.alt}
+                                            >
+                                                {({ ref, open }) => (
+                                                    <div
+                                                        ref={ref}
+                                                        onClick={index === currentImageIndex ? open : undefined}
+                                                        className={index === currentImageIndex 
+                                                            ? 'absolute inset-0 cursor-pointer z-10' 
+                                                            : 'absolute inset-0 opacity-0 pointer-events-none -z-10'
+                                                        }
+                                                    >
+                                                        <img
+                                                            src={image.src}
+                                                            alt={image.alt}
+                                                            className="w-full h-full"
+                                                            style={{ objectFit: 'contain' }}
+                                                            loading={index === 0 ? 'eager' : 'lazy'}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </Item>
+                                        ))}
+                                        
+                                        {/* Carousel Image Display - Visible animated layer */}
                                         <AnimatePresence mode="wait">
                                             {images.map((image, index) => {
                                                 if (index !== currentImageIndex) return null;
                                                 
                                                 return (
-                                                    <Item
-                                                        key={`gallery-${index}`}
-                                                        original={image.src}
-                                                        thumbnail={image.thumbnail || image.src}
-                                                        width={image.width}
-                                                        height={image.height}
+                                                    <motion.img
+                                                        key={`carousel-${index}`}
+                                                        src={image.src}
                                                         alt={image.alt}
-                                                    >
-                                                        {({ ref, open }) => (
-                                                            <motion.img
-                                                                ref={ref}
-                                                                onClick={open}
-                                                                key={index}
-                                                                src={image.src}
-                                                                alt={image.alt}
-                                                                initial={{ opacity: 0, scale: 1.1 }}
-                                                                animate={{ opacity: 1, scale: 1 }}
-                                                                exit={{ opacity: 0, scale: 0.95 }}
-                                                                transition={{ duration: 0.3, ease: "easeInOut" }}
-                                                                className="w-full h-full object-cover transition-transform duration-700 group-hover/image-container:scale-110 cursor-pointer"
-                                                                loading={index === 0 ? 'eager' : 'lazy'}
-                                                            />
-                                                        )}
-                                                    </Item>
+                                                        initial={{ opacity: 0, scale: 1.1 }}
+                                                        animate={{ opacity: 1, scale: 1 }}
+                                                        exit={{ opacity: 0, scale: 0.95 }}
+                                                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                                                        className="absolute inset-0 w-full h-full transition-transform duration-700 group-hover/image-container:scale-110 pointer-events-none z-20"
+                                                        style={{ objectFit: 'contain' }}
+                                                        loading={index === 0 ? 'eager' : 'lazy'}
+                                                    />
                                                 );
                                             })}
                                         </AnimatePresence>
