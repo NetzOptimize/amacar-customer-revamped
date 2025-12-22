@@ -284,7 +284,7 @@ export default function FilterContent({ cars = [] }) {
     // Reset all filters
     const handleReset = async () => {
         const resetFilters = {
-            condition: 'new',
+            condition: 'all',
             make: '',
             models: [],
             year: '',
@@ -296,7 +296,7 @@ export default function FilterContent({ cars = [] }) {
         setLocalFilters(resetFilters);
 
         const filtersToDispatch = {
-            condition: 'new',
+            condition: 'all',
             make: null,
             model: null,
             year: null,

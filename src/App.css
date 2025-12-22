@@ -26,3 +26,6 @@ span {
 }
 
 
+.pswp__img{
+  object-fit: contain;
+}
