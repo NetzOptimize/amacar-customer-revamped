@@ -14,7 +14,7 @@
 
 .how-it-works-section {
     padding: 80px 20px;
-    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    background: #F9FAFB;
     position: relative;
     overflow: hidden;
 }
@@ -45,16 +45,179 @@
 
 .title-underline {
     width: 80px;
-    height: 4px;
-    background: linear-gradient(90deg, var(--brand-blue), var(--accent));
+    height: 3px;
+    background: #f6851f;
     margin: 0 auto;
     border-radius: 2px;
-    opacity: 0;
-    transform: scaleX(0);
-    animation: scaleIn 0.6s ease forwards 0.3s;
 }
 
-/* Steps Grid */
+/* Comparison Grid - Side by Side */
+.comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 40px;
+    align-items: start;
+    margin-top: 40px;
+}
+
+.comparison-column {
+    background: white;
+    border-radius: 16px;
+    padding: 40px 32px;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.comparison-column:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #E5E7EB;
+}
+
+.comparison-column-sell {
+    border-top: 3px solid #f6851f;
+}
+
+.comparison-column-buy {
+    border-top: 3px solid #f6851f;
+}
+
+.column-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.column-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    color: white;
+}
+
+.column-icon-sell {
+    background: #f6851f;
+}
+
+.column-icon-buy {
+    background: #f6851f;
+}
+
+.column-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.3;
+}
+
+.steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.comparison-step {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 8px;
+    background: #F9FAFB;
+    transition: all 0.2s ease;
+}
+
+.comparison-step:hover {
+    background: #F3F4F6;
+}
+
+.step-number-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.step-number-badge-sell {
+    background: #f6851f;
+}
+
+.step-number-badge-buy {
+    background: #f6851f;
+}
+
+.step-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.step-icon-wrapper-sell {
+    background: #FFF7ED;
+    color: #f6851f;
+}
+
+.step-icon-wrapper-buy {
+    background: #FFF7ED;
+    color: #f6851f;
+}
+
+.step-text {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 4px 0;
+    line-height: 1.4;
+}
+
+.step-description-text {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: #4B5563;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.comparison-divider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px 0;
+}
+
+.divider-line {
+    width: 2px;
+    flex: 1;
+    background: linear-gradient(to bottom, transparent, var(--muted), transparent);
+    min-height: 40px;
+}
+
+.divider-text {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6B7280;
+    background: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #E5E7EB;
+}
+
+/* Steps Grid - Keep for backward compatibility if needed */
 .steps-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -184,6 +347,28 @@
 }
 
 /* Responsive Design */
+@media (max-width: 968px) {
+    .comparison-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+
+    .comparison-divider {
+        flex-direction: row;
+        padding: 20px 0;
+    }
+
+    .divider-line {
+        width: 100%;
+        height: 2px;
+        min-height: 2px;
+    }
+
+    .divider-text {
+        padding: 4px 12px;
+    }
+}
+
 @media (max-width: 768px) {
     .how-it-works-section {
         padding: 60px 16px;
@@ -191,6 +376,22 @@
 
     .how-it-works-header {
         margin-bottom: 40px;
+    }
+
+    .comparison-column {
+        padding: 32px 24px;
+    }
+
+    .column-title {
+        font-size: 1.25rem;
+    }
+
+    .comparison-step {
+        padding: 12px;
+    }
+
+    .step-text {
+        font-size: 0.95rem;
     }
 
     .steps-grid {

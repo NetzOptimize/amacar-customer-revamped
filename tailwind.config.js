@@ -49,6 +49,8 @@ export default {
           'bounce-gentle': 'bounceGentle 2s infinite',
           'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
           'confetti': 'confetti 0.8s ease-out',
+          'shimmer': 'shimmer 1.5s infinite',
+          'progress': 'progress 1.5s ease-in-out infinite',
         },
         keyframes: {
           fadeInUp: {
@@ -101,6 +103,25 @@ export default {
             '100%': {
               transform: 'scale(1) rotate(720deg)',
               opacity: '0',
+            },
+          },
+          shimmer: {
+            '0%': {
+              backgroundPosition: '-200% 0',
+            },
+            '100%': {
+              backgroundPosition: '200% 0',
+            },
+          },
+          progress: {
+            '0%': {
+              transform: 'translateX(-100%)',
+            },
+            '50%': {
+              transform: 'translateX(0%)',
+            },
+            '100%': {
+              transform: 'translateX(100%)',
             },
           },
         },

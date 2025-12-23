@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { motion } from "framer-motion";
 import {
   Car,
@@ -20,8 +21,11 @@ import {
   Shield,
   ArrowLeft,
 } from "lucide-react";
-import { formatCurrency, formatDate } from "../lib/utils";
+import { formatCurrency, formatDate, decodeHtmlEntities } from "../lib/utils";
 import api from "../lib/api";
+import { setProductId } from "../redux/slices/carDetailsAndQuestionsSlice";
+import toast from "react-hot-toast";
+import { Button } from "../components/ui/button";
 import {
   Carousel,
   CarouselContent,
@@ -30,15 +34,18 @@ import {
   CarouselPrevious,
 } from "../components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
+import BoundingBox from "../components/damage/BoundingBox";
 
 const CarDetailsView = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const productId = state?.productId;
   const [vehicleData, setVehicleData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [remainingTime, setRemainingTime] = useState(null);
+  const [imageDimensions, setImageDimensions] = useState({});
 
   // Fetch vehicle details
   useEffect(() => {
@@ -370,6 +377,46 @@ const CarDetailsView = () => {
     images,
   } = vehicleData;
 
+  // Check if offer is still valid (current date should be at most 7 days in future of offer_date)
+  const isOfferValid = (offerDate) => {
+    if (!offerDate) return false;
+    const offer = new Date(offerDate);
+    const now = new Date();
+    
+    // Calculate difference in milliseconds
+    const diffTime = now - offer;
+    // Convert to days
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    
+    // Offer is valid if current date is at most 7 days after offer_date
+    return diffDays >= 0 && diffDays <= 7;
+  };
+
+  // Handle auction action
+  const handleAuctionVehicle = () => {
+    if (!isOfferValid(cash_offer?.offer_date)) {
+      toast.error('This offer has expired');
+      return;
+    }
+    
+    if (!productId) {
+      toast.error('Product ID is required');
+      return;
+    }
+    
+    // Set productId in Redux
+    dispatch(setProductId(productId));
+    
+    // Navigate to local-auction page
+    navigate('/local-auction', { 
+      state: { 
+        productId: productId,
+        vin: basic_info?.vin,
+        zipCode: location?.zip_code
+      } 
+    });
+  };
+
   return (
     <div className="mt-8 lg:mt-16 min-h-screen bg-gradient-hero">
       <div className="max-w-7xl mx-auto">
@@ -387,7 +434,7 @@ const CarDetailsView = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
               <div className="flex-1 min-w-0">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-800 mb-2 truncate">
-                  {basic_info?.title || "Vehicle Details"}
+                  {basic_info?.title ? decodeHtmlEntities(basic_info.title) : "Vehicle Details"}
                 </h1>
                 <p className="text-neutral-600 text-sm sm:text-base lg:text-lg">
                   Complete vehicle information and auction details
@@ -410,7 +457,15 @@ const CarDetailsView = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
               {/* Images Carousel - Takes 2 columns */}
               {images && images.length > 0 ? (
-                <motion.div variants={itemVariants} className="lg:col-span-2">
+                <motion.div 
+                  variants={itemVariants} 
+                  className="lg:col-span-2 relative" 
+                  style={{ overflow: 'visible' }}
+                  ref={(el) => {
+                    // Store reference for tooltip positioning
+                    if (el) el.setAttribute('data-carousel-container', 'true');
+                  }}
+                >
                   <Carousel
                     className="shadow-lg w-full"
                     opts={{
@@ -428,16 +483,50 @@ const CarDetailsView = () => {
                     <CarouselContent>
                       {images.map((image, index) => (
                         <CarouselItem key={image.attachment_id || index}>
-                          <div className="aspect-[4/3] sm:aspect-[3/2] lg:aspect-[4/3] w-full rounded-lg sm:rounded-xl overflow-hidden shadow-sm">
-                            <img
-                              src={image.url}
-                              alt={image.name || `Vehicle image ${index + 1}`}
-                              className="w-full h-full object-contain"
-                              onError={(e) => {
-                                e.target.style.display = "none";
-                                e.target.nextSibling.style.display = "flex";
-                              }}
-                            />
+                          <div 
+                            className="aspect-[4/3] sm:aspect-[3/2] lg:aspect-[4/3] w-full rounded-lg sm:rounded-xl shadow-sm relative" 
+                            style={{ overflow: 'visible', position: 'relative' }}
+                            ref={(el) => {
+                              if (el) el.setAttribute('data-image-container', 'true');
+                            }}
+                          >
+                            <div className="w-full h-full rounded-lg sm:rounded-xl overflow-hidden" style={{ position: 'relative' }}>
+                              <img
+                                src={image.url}
+                                alt={image.name || `Vehicle image ${index + 1}`}
+                                className="w-full h-full object-contain"
+                                loading={index === 0 ? "eager" : "lazy"}
+                                decoding="async"
+                                onLoad={(e) => {
+                                  const img = e.target;
+                                  setImageDimensions((prev) => ({
+                                    ...prev,
+                                    [image.attachment_id]: {
+                                      width: img.clientWidth,
+                                      height: img.clientHeight,
+                                    },
+                                  }));
+                                }}
+                                onError={(e) => {
+                                  e.target.style.display = "none";
+                                  e.target.nextSibling.style.display = "flex";
+                                }}
+                              />
+                            </div>
+                            {/* Damage Bounding Boxes - Outside image container so tooltips can extend */}
+                            {image.damage_data?.hasDamage &&
+                              image.damage_data?.damages &&
+                              image.damage_data.damages.length > 0 &&
+                              imageDimensions[image.attachment_id] &&
+                              image.damage_data.damages.map((damage, damageIndex) => (
+                                <BoundingBox
+                                  key={damageIndex}
+                                  box={damage.boundingBox}
+                                  imageDims={imageDimensions[image.attachment_id]}
+                                  index={damageIndex}
+                                  description={damage.description}
+                                />
+                              ))}
                             <div
                               className="w-full h-full bg-gradient-to-br from-neutral-100 to-neutral-200 flex items-center justify-center"
                               style={{ display: "none" }}
@@ -498,27 +587,27 @@ const CarDetailsView = () => {
                       </span>
                     </div>
 
-                    <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-3 sm:p-4 rounded-lg">
-                      <p className="text-xs sm:text-sm font-medium text-neutral-600 mb-2">
-                        Started
-                      </p>
-                      <p className="text-sm sm:text-base font-semibold text-neutral-800 break-words">
-                        {auction?.auction_started_at
-                          ? formatDate(auction.auction_started_at)
-                          : "N/A"}
-                      </p>
-                    </div>
+                    {auction?.auction_started_at && (
+                      <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-3 sm:p-4 rounded-lg">
+                        <p className="text-xs sm:text-sm font-medium text-neutral-600 mb-2">
+                          Started
+                        </p>
+                        <p className="text-sm sm:text-base font-semibold text-neutral-800 break-words">
+                          {formatDate(auction.auction_started_at)}
+                        </p>
+                      </div>
+                    )}
 
-                    <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-3 sm:p-4 rounded-lg">
-                      <p className="text-xs sm:text-sm font-medium text-neutral-600 mb-2">
-                        Ends
-                      </p>
-                      <p className="text-sm sm:text-base font-semibold text-neutral-800 break-words">
-                        {auction?.auction_ends_at
-                          ? formatDate(auction.auction_ends_at)
-                          : "N/A"}
-                      </p>
-                    </div>
+                    {auction?.auction_ends_at && (
+                      <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-3 sm:p-4 rounded-lg">
+                        <p className="text-xs sm:text-sm font-medium text-neutral-600 mb-2">
+                          Ends
+                        </p>
+                        <p className="text-sm sm:text-base font-semibold text-neutral-800 break-words">
+                          {formatDate(auction.auction_ends_at)}
+                        </p>
+                      </div>
+                    )}
 
                     {auction?.is_active && (
                       <div className="bg-gradient-to-r from-red-50 to-red-100 p-3 sm:p-4 rounded-lg">
@@ -531,6 +620,25 @@ const CarDetailsView = () => {
                       </div>
                     )}
                   </div>
+
+                  {/* Auction it Button */}
+                  {cash_offer?.offer_date && (
+                    <div className="mt-4">
+                      <Button
+                        onClick={handleAuctionVehicle}
+                        variant={isOfferValid(cash_offer.offer_date) ? "default" : "outline"}
+                        size="sm"
+                        className={`w-full h-10 text-sm font-medium ${
+                          isOfferValid(cash_offer.offer_date)
+                            ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                            : 'border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-400'
+                        }`}
+                      >
+                        <Gavel className="w-4 h-4 mr-2" />
+                        {isOfferValid(cash_offer.offer_date) ? 'Auction it' : 'Offer expired'}
+                      </Button>
+                    </div>
+                  )}
                 </motion.div>
 
                 {/* Cash Offer - Highlighted */}
@@ -762,6 +870,73 @@ const CarDetailsView = () => {
                   </div>
                 </div>
               </motion.div>
+
+              {/* Damages Section */}
+              {(() => {
+                // Collect all damage data from all images
+                const allDamages = [];
+                if (images && images.length > 0) {
+                  images.forEach((image) => {
+                    if (image.damage_data?.hasDamage && image.damage_data?.damages) {
+                      image.damage_data.damages.forEach((damage) => {
+                        allDamages.push({
+                          imageName: image.name || 'Vehicle Image',
+                          description: damage.description,
+                        });
+                      });
+                    }
+                  });
+                }
+
+                // Only show section if there are damages
+                if (allDamages.length === 0) {
+                  return null;
+                }
+
+                return (
+                  <motion.div
+                    variants={itemVariants}
+                    className="lg:col-span-3 card p-4 sm:p-6"
+                  >
+                    <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-lg sm:rounded-xl flex items-center justify-center">
+                        <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
+                      </div>
+                      <div>
+                        <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-neutral-800">
+                          Damages
+                        </h2>
+                        <p className="text-sm sm:text-base text-neutral-600">
+                          AI-detected vehicle damages
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-r from-red-50 to-red-100 p-4 sm:p-6 rounded-lg">
+                      <div className="space-y-3 sm:space-y-4">
+                        {allDamages.map((damage, index) => (
+                          <div
+                            key={index}
+                            className="flex items-start gap-3 sm:gap-4 bg-white p-3 sm:p-4 rounded-lg shadow-sm"
+                          >
+                            <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-sm sm:text-base">
+                              {index + 1}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs sm:text-sm font-medium text-neutral-600 mb-1">
+                                {damage.imageName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                              </p>
+                              <p className="text-sm sm:text-base text-neutral-800">
+                                {damage.description}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })()}
 
               {/* Condition Assessment */}
               {condition_assessment && (

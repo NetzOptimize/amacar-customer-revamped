@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import userReducer from './slices/userSlice';
 import carDetailsAndQuestionsReducer from './slices/carDetailsAndQuestionsSlice';
 import offersReducer from './slices/offersSlice';
+import reverseBidReducer from '@/features/reverseBidding/redux/reverseBidSlice';
 import persistReducer from 'redux-persist/es/persistReducer';
 import { carPersistConfig, userPersistConfig } from './persistConfig';
 import persistStore from 'redux-persist/es/persistStore';
@@ -12,6 +13,7 @@ export const store = configureStore({
     user: persistReducer(userPersistConfig, userReducer),
     carDetailsAndQuestions: persistReducer(carPersistConfig, carDetailsAndQuestionsReducer),
     offers: offersReducer,
+    reverseBid: reverseBidReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

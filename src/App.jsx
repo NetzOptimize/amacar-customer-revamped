@@ -1,34 +1,49 @@
+import { lazy, Suspense } from 'react';
 import Header from './components/Layout/Header/Header.jsx';
 import Footer from './components/Layout/Footer/Footer.jsx';
 import './App.css';
 import { Toaster } from 'react-hot-toast';
-import HomePage from './Pages/HomePage.jsx';
 import { Route, Routes, useLocation } from 'react-router-dom';
-import AuctionPage from './Pages/AuctionPage.jsx';
 import DashboardLayout from './components/Layout/DashboardLayout/DashboardLayout.jsx';
-import Dashboard from './Pages/Dashboard.jsx';
-import LiveAuctionsPage from './Pages/LiveAuctionsPage.jsx';
-import PendingOffersPage from './Pages/PendingOffersPage.jsx';
-import PreviousOffersPage from './Pages/PreviousOffersPage.jsx';
-import AcceptedOffersPage from './Pages/AcceptedOffersPage.jsx';
-import MyAppointments from './Pages/MyAppointments.jsx';
-import ProfilePage from './Pages/ProfilePage.jsx';
-import ConditionAssessment from './Pages/ConditionAssessment.jsx';
-import ExteriorPhotos from './Pages/ExteriorPhotos.jsx';
-import ReviewPageById from './Pages/ReviewPageById.jsx';
-import UnauthorizedPage from './Pages/UnauthorizedPage.jsx';
-import CarDetailsView from './Pages/CarDetailsView.jsx';
-import { AuthProvider } from './provider/AuthProvider'; // Updated Redux-based AuthProvider
-import PrivateRoute from './components/Auth/PrivateRoute'; // Updated PrivateRoute
+import { AuthProvider } from './provider/AuthProvider';
+import PrivateRoute from './components/Auth/PrivateRoute';
 import { SearchProvider } from './context/SearchContext';
 import BackToTop from './components/ui/back-to-top';
-import AboutUs from './Pages/AboutUs.jsx';
-import TermsOfService from './Pages/TermsOfService.jsx';
-import PrivacyPolicy from './Pages/PrivacyPolicy.jsx';
-import CookiesPolicy from './Pages/CookiesPolicy.jsx';
-import Testimonials from './Pages/Testimonials.jsx';
-import FAQ from './Pages/FAQ.jsx';
 import ScrollToTop from './components/ui/ScrollToTop.jsx';
+import PageLoader from './components/ui/PageLoader.jsx';
+
+// Lazy load all page components for code splitting
+// This reduces initial bundle size by loading routes only when needed
+const HomePage = lazy(() => import('./Pages/HomePage.jsx'));
+const AuctionPage = lazy(() => import('./Pages/AuctionPage.jsx'));
+const Dashboard = lazy(() => import('./Pages/Dashboard.jsx'));
+const LiveAuctionsPage = lazy(() => import('./Pages/LiveAuctionsPage.jsx'));
+const PendingOffersPage = lazy(() => import('./Pages/PendingOffersPage.jsx'));
+const PreviousOffersPage = lazy(() => import('./Pages/PreviousOffersPage.jsx'));
+const AcceptedOffersPage = lazy(() => import('./Pages/AcceptedOffersPage.jsx'));
+const MyAppointments = lazy(() => import('./Pages/MyAppointments.jsx'));
+const ProfilePage = lazy(() => import('./Pages/ProfilePage.jsx'));
+const ConditionAssessment = lazy(() => import('./Pages/ConditionAssessment.jsx'));
+const ExteriorPhotos = lazy(() => import('./Pages/ExteriorPhotos.jsx'));
+const ReviewPageById = lazy(() => import('./Pages/ReviewPageById.jsx'));
+const UnauthorizedPage = lazy(() => import('./Pages/UnauthorizedPage.jsx'));
+const CarDetailsView = lazy(() => import('./Pages/CarDetailsView.jsx'));
+const AboutUs = lazy(() => import('./Pages/AboutUs.jsx'));
+const TermsOfService = lazy(() => import('./Pages/TermsOfService.jsx'));
+const PrivacyPolicy = lazy(() => import('./Pages/PrivacyPolicy.jsx'));
+const CookiesPolicy = lazy(() => import('./Pages/CookiesPolicy.jsx'));
+const Testimonials = lazy(() => import('./Pages/Testimonials.jsx'));
+const FAQ = lazy(() => import('./Pages/FAQ.jsx'));
+const ResultsPage = lazy(() => import('@/features/reverseBidding/pages/ResultsPage.jsx'));
+const SessionPage = lazy(() => import('@/features/reverseBidding/pages/SessionPage.jsx'));
+const LandingPage = lazy(() => import('@/features/reverseBidding/pages/LandingPage.jsx'));
+const VehicleDetails = lazy(() => import('@/features/reverseBidding/pages/VehicleDetails.jsx'));
+const ActiveSessionsPage = lazy(() => import('@/features/reverseBidding/pages/ActiveSessionsPage.jsx'));
+const ReverseBidsPage = lazy(() => import('@/features/reverseBidding/pages/ReverseBidsPage.jsx'));
+const AcceptedReverseBidsPage = lazy(() => import('@/features/reverseBidding/pages/AcceptedReverseBidsPage.jsx'));
+const AppraisedVehiclesPage = lazy(() => import('./Pages/AppraisedVehiclesPage.jsx'));
+
+// PageLoader component is now imported from ui components
 
 
 
@@ -38,12 +53,16 @@ function App() {
   const hideHeaderFooter =
     location.pathname.startsWith('/dashboard') ||
     location.pathname.startsWith('/auctions') ||
+    location.pathname.startsWith('/active-sessions') ||
+    location.pathname.startsWith('/reverse-bids') ||
+    location.pathname.startsWith('/accepted-reverse-bids') ||
     location.pathname.startsWith('/pending-offers') ||
     location.pathname.startsWith('/offers') ||
     location.pathname.startsWith('/accepted') ||
     location.pathname.startsWith('/appointments') ||
     location.pathname.startsWith('/profile') ||
-    location.pathname.startsWith('/car-details');
+    location.pathname.startsWith('/car-details') ||
+    location.pathname.startsWith('/appraised-vehicles');
 
   return (
     <AuthProvider>
@@ -83,9 +102,14 @@ function App() {
 
           <main className="pt-0 bg-white">
             <ScrollToTop />
-            <Routes>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
               {/* Public Routes */}
               <Route path="/" element={<HomePage />} />
+              <Route path="/reverse-bidding" element={<LandingPage />} />
+              <Route path="/reverse-bidding/results" element={<ResultsPage />} />
+              <Route path="/reverse-bidding/session/:sessionId" element={<SessionPage />} />
+              <Route path="/reverse-bidding/vehicles/:id" element={<VehicleDetails />} />
               <Route path="/auction-page" element={<AuctionPage />} />
               <Route path="/condition-assessment" element={<ConditionAssessment />} />
               <Route path="/local-auction" element={<ExteriorPhotos />} />
@@ -115,6 +139,36 @@ function App() {
                   <PrivateRoute>
                     <DashboardLayout>
                       <LiveAuctionsPage />
+                    </DashboardLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/active-sessions"
+                element={
+                  <PrivateRoute>
+                    <DashboardLayout>
+                      <ActiveSessionsPage />
+                    </DashboardLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/reverse-bids"
+                element={
+                  <PrivateRoute>
+                    <DashboardLayout>
+                      <ReverseBidsPage />
+                    </DashboardLayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/accepted-reverse-bids"
+                element={
+                  <PrivateRoute>
+                    <DashboardLayout>
+                      <AcceptedReverseBidsPage />
                     </DashboardLayout>
                   </PrivateRoute>
                 }
@@ -179,7 +233,18 @@ function App() {
                   </PrivateRoute>
                 }
               />
-            </Routes>
+              <Route
+                path="/appraised-vehicles"
+                element={
+                  <PrivateRoute>
+                    <DashboardLayout>
+                      <AppraisedVehiclesPage />
+                    </DashboardLayout>
+                  </PrivateRoute>
+                }
+              />
+              </Routes>
+            </Suspense>
           </main>
 
           {!hideHeaderFooter && <Footer />}

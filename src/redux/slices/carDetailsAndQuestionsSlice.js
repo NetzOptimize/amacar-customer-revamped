@@ -549,6 +549,9 @@ const carDetailsAndQuestionsSlice = createSlice({
       if (zip) state.stateZip = zip;
       if (product_id) state.relistVehicleId = product_id;
     },
+    setProductId: (state, action) => {
+      state.productId = action.payload;
+    },
     updateQuestion: (state, action) => {
       const { key, answer, details } = action.payload;
       const question = state.questions.find((q) => q.key === key);
@@ -868,6 +871,7 @@ export const {
   setOfferError,
   setStateVin,
   setAuctionPageData,
+  setProductId,
   addUploadedImage,
   removeUploadedImage,
   clearImageUploadError,

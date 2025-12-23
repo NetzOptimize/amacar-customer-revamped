@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import { Car, DollarSign, Calendar, TrendingUp, Clock, Users, Bell, ArrowRight, Eye } from 'lucide-react';
@@ -36,17 +36,26 @@ const Dashboard = () => {
   const user = useSelector((state) => state.user?.user);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showPasswordResetModal, setShowPasswordResetModal] = useState(false);
-  // Calculate stats from dashboard summary data
-  const stats = {
+  // Memoize stats calculation to avoid recalculation on every render
+  const stats = useMemo(() => ({
     acceptedOffers: dashboardSummary?.accepted_offers || 0,
     activeAuctions: dashboardSummary?.active_auctions || 0,
     totalVehicles: dashboardSummary?.total_vehicles || 0,
     upcomingAppointments: dashboardSummary?.upcoming_appointments || 0,
     totalBidValue: dashboardSummary?.total_bid_value || 0,
-  };
+  }), [dashboardSummary]);
 
-  // Get recent activity from dashboard summary
-  const recentActivity = dashboardSummary?.recent_activity || [];
+  // Memoize recent activity to avoid recalculation
+  const recentActivity = useMemo(() => 
+    dashboardSummary?.recent_activity || [], 
+    [dashboardSummary?.recent_activity]
+  );
+
+  // Memoize displayed auctions (first 3) to avoid re-slicing on every render
+  const displayedAuctions = useMemo(() => 
+    liveAuctions?.slice(0, 3) || [], 
+    [liveAuctions]
+  );
 
   // Fetch data on component mount
   useEffect(() => {
@@ -169,8 +178,8 @@ const Dashboard = () => {
                 </div>
 
                 <div className="space-y-4">
-                  {liveAuctions && liveAuctions.length > 0 ? (
-                    liveAuctions.slice(0, 3).map((auction) => (
+                  {displayedAuctions.length > 0 ? (
+                    displayedAuctions.map((auction) => (
                       <motion.div
                         key={auction.id}
                         className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 p-4 bg-neutral-50 rounded-xl hover:bg-neutral-100 transition-colors"
@@ -195,6 +204,8 @@ const Dashboard = () => {
                                 src={imageUrl}
                                 alt={auction.title}
                                 className="w-full h-full object-cover"
+                                loading="lazy"
+                                decoding="async"
                               />
                             ) : (
                               <Car className="w-8 h-8 text-neutral-400" />

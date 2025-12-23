@@ -46,7 +46,7 @@ export default function VideoSection() {
         </p>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="cursor-pointer btn-purple mt-4 block mx-auto md:mx-0"
+          className="btn-primary mt-2"
         >
           See your car value
         </button>
@@ -60,7 +60,16 @@ export default function VideoSection() {
         viewport={{ once: true, amount: 0.3 }}
         variants={videoVariants}
       >
-        <video className="video-element" controls loop muted playsInline>
+        {/* Video lazy loaded - preload="none" prevents auto-loading, improving initial page load */}
+        <video 
+          className="video-element" 
+          controls 
+          loop 
+          muted 
+          playsInline
+          // preload="none"
+          // loading="lazy"
+        >
           <source src={vd} type="video/mp4" />
           Your browser does not support the video tag.
         </video>

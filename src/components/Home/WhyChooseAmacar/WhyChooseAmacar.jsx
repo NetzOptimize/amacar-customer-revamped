@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
+import { Target, Gem, Lock, Zap } from 'lucide-react'
 import './why-choose-amacar.css'
 import AuctionModal from '@/components/ui/AuctionYourRideModal'
 
@@ -8,24 +9,47 @@ export default function WhyChooseAmacar() {
     const benefits = [
         {
             id: 1,
-            title: "Maximize Value",
-            description: "Empowering sellers to get the best offer possible.",
-            icon: "💰",
-            color: "var(--brand-orange)"
+            number: "01",
+            title: "Professionalism",
+            description: "We uphold the highest standards of professionalism in every transaction.",
+            icon: <Target className="w-6 h-6" />,
+            iconBg: "bg-orange-50",
+            iconColor: "text-[#f6851f]",
+            numberBg: "bg-[#f6851f]",
+            accentColor: "bg-[#f6851f]"
         },
         {
             id: 2,
-            title: "Seamless Experience",
-            description: "Simplifying the car-selling process from start to finish",
-            icon: "🔒",
-            color: "var(--brand-purple)"
+            number: "02",
+            title: "Maximized Value",
+            description: "We uphold the highest value in the market from instant cash offer to auctioning your car.",
+            icon: <Gem className="w-6 h-6" />,
+            iconBg: "bg-orange-50",
+            iconColor: "text-[#f6851f]",
+            numberBg: "bg-[#f6851f]",
+            accentColor: "bg-[#f6851f]"
         },
         {
             id: 3,
-            title: "Live Auction",
-            description: "Creating an advanced online auction platform that enables customers to list their vehicles for auction and attract competitive bids from participating dealerships to ensure the best market offers.",
-            icon: "🔍",
-            color: "var(--accent)"
+            number: "03",
+            title: "Security",
+            description: "Your privacy and security are paramount to us. We handle your information with the utmost confidentiality at online Auction.",
+            icon: <Lock className="w-6 h-6" />,
+            iconBg: "bg-orange-50",
+            iconColor: "text-[#f6851f]",
+            numberBg: "bg-[#f6851f]",
+            accentColor: "bg-[#f6851f]"
+        },
+        {
+            id: 4,
+            number: "04",
+            title: "Efficiency",
+            description: "Our streamlined online platform saves you time and effort, making selling your car effortless",
+            icon: <Zap className="w-6 h-6" />,
+            iconBg: "bg-orange-50",
+            iconColor: "text-[#f6851f]",
+            numberBg: "bg-[#f6851f]",
+            accentColor: "bg-[#f6851f]"
         }
     ]
 
@@ -80,52 +104,40 @@ export default function WhyChooseAmacar() {
                     viewport={{ once: true, margin: "-100px" }}
                 >
                     <h2 className="why-choose-title">
-                        Why Choose <span className="text-[var(--brand-orange)] text-7xl font-extrabold">Amacar</span>
+                        Why Thousands Choose <span className="text-[#f6851f]">Amacar</span>
                     </h2>
                     <div className="title-underline"></div>
                 </motion.div>
 
-                {/* Timeline Layout */}
+                {/* Grid Layout */}
                 <motion.div
-                    className="timeline-container"
+                    className="benefits-grid"
                     variants={containerVariants}
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: "-50px" }}
                 >
-                    {/* Timeline Line */}
-                    <div className="timeline-line"></div>
-
                     {benefits.map((benefit, index) => (
                         <motion.div
                             key={benefit.id}
-                            className={`timeline-item ${index % 2 === 0 ? 'left' : 'right'}`}
+                            className="benefit-card"
                             variants={itemVariants}
+                            whileHover={{ y: -2, transition: { duration: 0.2 } }}
                         >
-                            {/* Timeline Node */}
-                            <div className="timeline-node">
-                                <motion.div
-                                    className="timeline-icon"
-                                    style={{ backgroundColor: benefit.color }}
-                                    variants={iconVariants}
-                                    whileHover="hover"
-                                >
-                                    <span className="icon-emoji">{benefit.icon}</span>
-                                </motion.div>
+                            {/* Number Badge - Top Right */}
+                            <div className={`benefit-number ${benefit.numberBg}`}>
+                                {benefit.number}
+                            </div>
+
+                            {/* Icon Square */}
+                            <div className={`benefit-icon-square ${benefit.iconBg} ${benefit.iconColor}`}>
+                                {benefit.icon}
                             </div>
 
                             {/* Content */}
-                            <div className="timeline-content">
-                                <div className="content-card">
-                                    <h3 className="benefit-title">{benefit.title}</h3>
-                                    <p className="benefit-description">{benefit.description}</p>
-
-                                    {/* Decorative Accent */}
-                                    <div
-                                        className="accent-line"
-                                        style={{ backgroundColor: benefit.color }}
-                                    ></div>
-                                </div>
+                            <div className="benefit-content">
+                                <h3 className="benefit-title">{benefit.title}</h3>
+                                <p className="benefit-description">{benefit.description}</p>
                             </div>
                         </motion.div>
                     ))}

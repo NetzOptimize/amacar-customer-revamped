@@ -80,7 +80,7 @@ export default function HowAmacarWorks() {
     ]
 
     return (
-        <section className="pb-8 md:pb-12 lg:pb-16 bg-gradient-to-br from-neutral-50 via-white to-primary-50">
+        <section id="how-it-works" className="pb-8 md:pb-12 lg:pb-16 bg-gradient-to-br from-neutral-50 via-white to-primary-50">
             <div className="container-custom">
                 {/* Section Header */}
                 <SectionHeader

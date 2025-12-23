@@ -1,0 +1,111 @@
+.trusted-section {
+    padding: 80px 20px;
+    background: #F9FAFB;
+    position: relative;
+    overflow: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.trusted-content {
+    text-align: center;
+}
+
+.trusted-header {
+    margin-bottom: 60px;
+}
+
+.trusted-title {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.trusted-highlight {
+    color: #4F46E5;
+}
+
+.trusted-subtitle {
+    font-size: 1.125rem;
+    color: #64748b;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.trust-points-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.trust-point-card {
+    background: white;
+    border-radius: 12px;
+    padding: 32px 24px;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.trust-point-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #E5E7EB;
+}
+
+.trust-point-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: #f6851f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin: 0 auto 16px;
+}
+
+.trust-point-text {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #111827;
+    margin: 0;
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .trusted-section {
+        padding: 60px 16px;
+    }
+
+    .trusted-header {
+        margin-bottom: 40px;
+    }
+
+    .trust-points-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .trust-point-card {
+        padding: 24px 16px;
+    }
+
+    .trust-point-icon {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 12px;
+    }
+
+    .trust-point-text {
+        font-size: 0.9rem;
+    }
+}
+

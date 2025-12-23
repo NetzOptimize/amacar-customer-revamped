@@ -1,0 +1,141 @@
+.quick-choice-section {
+    padding: 80px 20px;
+    background: #F9FAFB;
+    position: relative;
+    overflow: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.quick-choice-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.quick-choice-title {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 16px;
+    line-height: 1.2;
+}
+
+.title-underline {
+    width: 80px;
+    height: 3px;
+    background: #f6851f;
+    margin: 0 auto;
+    border-radius: 2px;
+}
+
+.quick-choice-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 32px;
+    margin-top: 40px;
+}
+
+.quick-choice-card {
+    background: white;
+    border-radius: 16px;
+    padding: 40px 32px;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.quick-choice-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #E5E7EB;
+}
+
+.quick-choice-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.quick-choice-card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 24px;
+    line-height: 1.3;
+}
+
+.quick-choice-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 32px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.quick-choice-feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 0.875rem;
+    color: #4B5563;
+    line-height: 1.6;
+}
+
+.quick-choice-feature-item span {
+    flex: 1;
+}
+
+.quick-choice-button {
+    width: 100%;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    color: white;
+    background: #f6851f;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.quick-choice-button:hover {
+    background: #e6750f;
+    box-shadow: 0 4px 12px rgba(246, 133, 31, 0.2);
+}
+
+@media (max-width: 768px) {
+    .quick-choice-section {
+        padding: 60px 16px;
+    }
+
+    .quick-choice-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .quick-choice-card {
+        padding: 32px 24px;
+    }
+
+    .quick-choice-title {
+        font-size: 1.75rem;
+    }
+
+    .quick-choice-card-title {
+        font-size: 1.25rem;
+    }
+}
+

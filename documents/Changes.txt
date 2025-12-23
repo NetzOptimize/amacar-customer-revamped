@@ -1,0 +1,167 @@
+Hi Neeraj
+I am going over the website,
+Found few things,
+
+I came up with some Phase 1 and Phase 2 contents to make sure the page is visible for the viewers.
+
+Please view this google Doc
+
+On this section, 
+ 
+OPTION 1: Two Tabs (Best for UX)
+Tab 1: Selling Your Car (Live Auction)
+ Tab 2: Buying a Car (Reverse Bidding)
+When user clicks the tab, the 5-step flow updates.
+
+
+OPTION 2: Side-by-Side Columns
+ Left column = Sell
+ Right column = Buy
+Both have 5 step
+
+
+Dev notes:-  Proceeded according to the document.
+BUYING A CAR (Phase 2 — Reverse Bidding)
+ 01 — Select the Car You Want
+Choose the model, trim, and options you’re looking for.
+
+
+02 — Request Instant Dealer Pricing
+Dealerships receive your request instantly.
+
+
+03 — Reverse Bidding Begins
+Dealers compete by lowering their prices in real time.
+
+
+04 — Compare Offers & Dealer Free Perks
+See discounts, warranties, and bonuses offered by dealers.
+
+
+05 — Lock In the Best Price
+Choose your deal, schedule pickup, and save thousands.
+
+
+
+
+ Note: We already have phase 1 steps, we can only focus on phase 2 contents make sure both phases are organized and easy for the viewers to know what Amacar is.
+
+-------------------------------------------------------
+ 
+01 — Professionalism 
+ A smooth, transparent process whether you’re selling or buying. Every offer and price is handled with accuracy and fairness. 
+
+
+
+
+🟢 02 — Maximized Value 
+Sell your car for the highest price through Live Auction or buy your next car at the lowest price with Reverse Bidding. Verified dealerships compete in real time—ensuring you always get the best possible deal on either side of the marketplace.  
+
+
+
+
+🟣 03 — Security 
+Your data is protected, and only verified dealerships can bid—giving you a safe, trusted experience every time. 
+
+
+🟠 04 — Efficiency 
+ 
+Get instant offers, compare prices fast, and complete your sale or purchase in minutes—Only visit the dealership for pickup or drop off. 
+
+
+-----------------------------------------------------------
+FOR SELLING YOUR CAR (Live Auction)
+Step 1 — Get Your Instant Online Estimate
+Enter your vehicle details to receive a fast, accurate online valuation.
+
+
+Step 2 — Dealers Bid Up in Real Time
+Verified dealerships compete by increasing their offers to win your car.
+
+
+Step 3 — Choose the Highest Offer & Get Paid
+Select the top bid and complete your sale quickly and securely.
+
+
+FOR BUYING A CAR (Reverse Bidding)
+
+
+Step 1 — Select the Car You Want
+Pick your preferred model and instantly notify local dealerships.
+
+
+Step 2 — Dealers Lower Their Prices to Compete
+Reverse Bidding begins as dealers drop prices and add perks to earn your business.
+
+
+Step 3 — Lock In the Best Deal & Schedule Pickup
+Choose the lowest price and finalize your purchase with total transparency.
+
+
+
+
+Note: We can make it more UI Friendly? I want to make sure the contents of both phases fit here and look beautiful. 
+
+---------------------------------------------------
+
+Neeraj
+
+I want to dedicate amacar.ai only for customers, so I decided to remove the Dealer reviews from here and only keep Customer reviews.
+Could you please remove them and add them to Dealerportal.amacar.ai?
+
+Also the dates on the reviews are all the same dates, Let's put different dates one or 2 weeks apart.
+
+Later on, I will get some dealership in LA to give us their reviews so we can add them to Dealerportal.amacar.ai as a reference to persuade other dealers to join us.
+
+----------------------------------------------------
+I need to landing page here so that I can link it to facebook ads because I want customers to click on "Get Quote" and the link take them straight to Appraisal page instead of the complete page.
+
+------------------------------------------------------
+Here I see (New & CPO).
+
+I need it to be (Used & CPO) Because CPO Stands for "Certified Pre-owned) so it stands with Used Category.
+Make it like this.
+New
+Used & CPO
+
+--------------------------------------------------------------------
+
+the pricing needs to be Bold and easy to ready.
+The sample is on the right side of the pages.
+
+I need them to be like $8,750, $17,000, $17,500
+Also used cars don't have MSRP, Instead they have "Listing Price" Let's change that. 
+
+And also, New cars have MSRP, Let's make sure MSRP is visible there for the viewers. 
+
+Question: could you check if you can fix the pictures on the new cars? I don't see Pictures and MSRP Price. 
+
+Try again, and let me know , I will send an email to Cox Automotive to fix the issue and let us know. 
+
+
+I took these screenshot, as reference, Let make sure we apply the same rule across the website on all the New and Used cars. in generate. that is the Industry Standard and easy for customers to navigate through. 
+
+
+
+
+
+Certificate has too much information and it has compliance issues. 
+Here is the refine one, nothing more, nothing less. 
+This certificate reflects the competitive offer submitted by the selected dealership during the reverse-bidding process and represents the vehicle’s sales price only. Taxes, government fees, dealer documentation fees, and optional add-ons are not included and may apply at the dealership. Amacar.ai only facilitates the competitive bidding process and does not set, control, or guarantee final pricing or “out-the-door” totals.
+
+Note: If you are purchasing with cash, financing, or leasing, this amount will serve as your sales price, subject to vehicle availability at the time of purchase.
+
+Keep:
+Vehicle info
+Accepted price
+Dealer name/city/Point of Contact
+Online Certificate 
+Date
+Amacar Logo
+Hi Neeraj 
+
+Very important Note: The Speed on the website, photos and information is so low and it take time for the pictures to load. This is affect our online presence and leads and customer conversion. 
+
+How can you fix this to make sure the speed is high first. 
+
+Then let's focus on the stuff I mentioned about. 

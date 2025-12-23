@@ -73,15 +73,6 @@ export default function LoginModal({
     shouldResetEmailValidation
   );
 
-  // Debug email validation state changes
-  useEffect(() => {
-    console.log('📧 [LoginModal] Email validation state changed:', {
-      email: values.email,
-      isRegisterMode,
-      emailValidation,
-      shouldResetEmailValidation
-    });
-  }, [emailValidation, values.email, isRegisterMode, shouldResetEmailValidation]);
 
   const navigate = useNavigate();
   const isCloseDisabled =
@@ -394,6 +385,10 @@ export default function LoginModal({
     setTimeout(() => {
       onClose(false);
       resetModalToLogin();
+      // Redirect to dashboard after successful login
+      if (phase === "success" && !isRegisterMode && !isForgotPasswordMode) {
+        navigate('/dashboard');
+      }
     }, 2000);
   }
 
@@ -460,7 +455,7 @@ export default function LoginModal({
     userInfo &&
     (userInfo.user_email || userInfo.email || userInfo.username) &&
     values.email ===
-      (userInfo.user_email || userInfo.email || userInfo.username);
+    (userInfo.user_email || userInfo.email || userInfo.username);
 
   // Memoized email change handler to prevent cursor jumping
   const handleEmailChange = useCallback(
@@ -487,706 +482,681 @@ export default function LoginModal({
                 {isRegisterMode
                   ? "Create Your Account"
                   : isForgotPasswordMode && phase === "forgot"
-                  ? "Forgot Password"
-                  : isForgotPasswordMode && phase === "verify-otp"
-                  ? "Verify OTP"
-                  : isForgotPasswordMode && phase === "reset-password"
-                  ? "Reset Password"
-                  : phase === "verify-2fa"
-                  ? "Two-Factor Authentication"
-                  : title}
+                    ? "Forgot Password"
+                    : isForgotPasswordMode && phase === "verify-otp"
+                      ? "Verify OTP"
+                      : isForgotPasswordMode && phase === "reset-password"
+                        ? "Reset Password"
+                        : phase === "verify-2fa"
+                          ? "Two-Factor Authentication"
+                          : title}
               </DialogTitle>
               <DialogDescription className="text-sm text-slate-600">
                 {isRegisterMode
                   ? "Fill in the details to register a new account"
                   : phase === "forgot"
-                  ? "Enter your email to receive a verification OTP"
-                  : phase === "verify-otp"
-                  ? `We've sent a 6-digit OTP to ${values.email}. Please enter it below.`
-                  : phase === "reset-password"
-                  ? "Enter your new password"
-                  : phase === "verify-2fa"
-                  ? `We've sent a 6-digit OTP to ${twoFactorData?.username}. Please enter it below to complete your login.`
-                  : description}
+                    ? "Enter your email to receive a verification OTP"
+                    : phase === "verify-otp"
+                      ? `We've sent a 6-digit OTP to ${values.email}. Please enter it below.`
+                      : phase === "reset-password"
+                        ? "Enter your new password"
+                        : phase === "verify-2fa"
+                          ? `We've sent a 6-digit OTP to ${twoFactorData?.username}. Please enter it below to complete your login.`
+                          : description}
               </DialogDescription>
             </DialogHeader>
           </div>
 
           <div
-            className={`p-6 pt-0 ${
-              isRegisterMode ? "min-h-[480px]" : "min-h-[420px]"
-            }`}
+            className={`p-6 pt-0 ${isRegisterMode ? "min-h-[480px]" : "min-h-[420px]"
+              }`}
           >
             <AnimatePresence mode="wait">
               {(phase === "form" ||
                 phase === "forgot" ||
                 phase === "reset-password" ||
                 phase === "verify-2fa") && (
-                <motion.form
-                  key="form"
-                  onSubmit={
-                    phase === "verify-2fa" ? handle2FAOtpSubmit : handleSubmit
-                  }
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.25, ease: "easeOut" }}
-                  className={`grid ${isRegisterMode ? "gap-4" : "gap-5"}`}
-                >
-                  {/* 2FA OTP Field */}
-                  {phase === "verify-2fa" && (
-                    <div className="grid gap-2">
-                      <label
-                        htmlFor="otp"
-                        className="text-sm font-medium text-slate-800"
-                      >
-                        Enter 6-digit OTP
-                      </label>
-                      <ReusableTooltip
-                        content={errors.otp}
-                        variant="error"
-                        side="top"
-                      >
-                        <InputOTP
-                          id="otp"
-                          maxLength={6}
-                          value={values.otp || ""}
-                          onChange={(value) => {
-                            setValue("otp", value);
-                            // Clear OTP error when user starts typing
-                            if (errors.otp) {
-                              setError("otp", "");
-                            }
-                          }}
-                          className="flex gap-2"
+                  <motion.form
+                    key="form"
+                    onSubmit={
+                      phase === "verify-2fa" ? handle2FAOtpSubmit : handleSubmit
+                    }
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                    className={`grid ${isRegisterMode ? "gap-4" : "gap-5"}`}
+                  >
+                    {/* 2FA OTP Field */}
+                    {phase === "verify-2fa" && (
+                      <div className="grid gap-2">
+                        <label
+                          htmlFor="otp"
+                          className="text-sm font-medium text-slate-800"
                         >
-                          <InputOTPGroup className="flex gap-2">
-                            {Array(6)
-                              .fill(null)
-                              .map((_, i) => (
-                                <InputOTPSlot
-                                  key={i}
-                                  index={i}
-                                  className={`h-11 w-11 rounded-lg border text-center text-lg font-medium outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)] ${
-                                    errors.otp
+                          Enter 6-digit OTP
+                        </label>
+                        <ReusableTooltip
+                          content={errors.otp}
+                          variant="error"
+                          side="top"
+                        >
+                          <InputOTP
+                            id="otp"
+                            maxLength={6}
+                            value={values.otp || ""}
+                            onChange={(value) => {
+                              setValue("otp", value);
+                              // Clear OTP error when user starts typing
+                              if (errors.otp) {
+                                setError("otp", "");
+                              }
+                            }}
+                            className="flex gap-2"
+                          >
+                            <InputOTPGroup className="flex gap-2">
+                              {Array(6)
+                                .fill(null)
+                                .map((_, i) => (
+                                  <InputOTPSlot
+                                    key={i}
+                                    index={i}
+                                    className={`h-11 w-11 rounded-lg border text-center text-lg font-medium outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)] ${errors.otp
                                       ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
                                       : "border-slate-200 bg-white"
-                                  }`}
-                                />
-                              ))}
-                          </InputOTPGroup>
-                        </InputOTP>
-                      </ReusableTooltip>
-                    </div>
-                  )}
+                                      }`}
+                                  />
+                                ))}
+                            </InputOTPGroup>
+                          </InputOTP>
+                        </ReusableTooltip>
+                      </div>
+                    )}
 
-                  {/* Email Field */}
-                  {(phase === "form" || phase === "forgot") && (
-                    <div className="grid gap-2">
-                      <label
-                        htmlFor="email"
-                        className="text-sm font-medium text-slate-800"
-                      >
-                        Email Address
-                        {emailValidation.isValidating && (
-                          <span className="ml-2 text-xs text-slate-500">
-                            (Validating...)
-                          </span>
-                        )}
-                      </label>
-                      <ReusableTooltip
-                        content={
-                          errors.email ||
-                          (emailValidation.isDisposable === true &&
-                            !emailValidation.isValidating &&
-                            "Disposable email addresses are not allowed") ||
-                          (isRegisterMode &&
-                            emailValidation.isRegistered === true &&
-                            !emailValidation.isValidating &&
-                            "This email is already registered. Please use a different email or try logging in.") ||
-                          (!isRegisterMode &&
-                            emailValidation.isRegistered === false &&
-                            !emailValidation.isValidating &&
-                            "This email is not registered. Please check your email or register first.") ||
-                          (emailValidation.error &&
-                            !emailValidation.isValidating &&
-                            "Unable to verify email. Please try again.")
-                        }
-                        variant="error"
-                        side="top"
-                      >
-                        <div className="relative">
-                          <div
-                            className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 ${
-                              isEmailPrefilled
+                    {/* Email Field */}
+                    {(phase === "form" || phase === "forgot") && (
+                      <div className="grid gap-2">
+                        <label
+                          htmlFor="email"
+                          className="text-sm font-medium text-slate-800"
+                        >
+                          Email Address
+                          {emailValidation.isValidating && (
+                            <span className="ml-2 text-xs text-slate-500">
+                              (Validating...)
+                            </span>
+                          )}
+                        </label>
+                        <ReusableTooltip
+                          content={
+                            errors.email ||
+                            (emailValidation.isDisposable === true &&
+                              !emailValidation.isValidating &&
+                              "Disposable email addresses are not allowed") ||
+                            (isRegisterMode &&
+                              emailValidation.isRegistered === true &&
+                              !emailValidation.isValidating &&
+                              "This email is already registered. Please use a different email or try logging in.") ||
+                            (!isRegisterMode &&
+                              emailValidation.isRegistered === false &&
+                              !emailValidation.isValidating &&
+                              "This email is not registered. Please check your email or register first.") ||
+                            (emailValidation.error &&
+                              !emailValidation.isValidating &&
+                              "Unable to verify email. Please try again.")
+                          }
+                          variant="error"
+                          side="top"
+                        >
+                          <div className="relative">
+                            <div
+                              className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 ${isEmailPrefilled
                                 ? "text-orange-500"
                                 : emailValidation.isValid === true
-                                ? "text-green-500"
-                                : (emailValidation.isDisposable === true ||
+                                  ? "text-green-500"
+                                  : (emailValidation.isDisposable === true ||
                                     (isRegisterMode && emailValidation.isRegistered === true) ||
                                     (!isRegisterMode && emailValidation.isRegistered === false))
-                                ? "text-red-500"
-                                : "text-slate-400"
-                            }`}
-                          >
-                            <Mail className="h-4 w-4" />
-                          </div>
-                          <input
-                            key="email-input"
-                            id="email"
-                            type="email"
-                            value={values.email || ""}
-                            onChange={handleEmailChange}
-                            placeholder="user@example.com"
-                            disabled={isEmailPrefilled}
-                            className={`h-11 w-full rounded-xl border pl-9 pr-10 text-sm outline-none ring-0 transition-all duration-200 ${
-                              isEmailPrefilled
+                                    ? "text-red-500"
+                                    : "text-slate-400"
+                                }`}
+                            >
+                              <Mail className="h-4 w-4" />
+                            </div>
+                            <input
+                              key="email-input"
+                              id="email"
+                              type="email"
+                              value={values.email || ""}
+                              onChange={handleEmailChange}
+                              placeholder="user@example.com"
+                              disabled={isEmailPrefilled}
+                              className={`h-11 w-full rounded-xl border pl-9 pr-10 text-sm outline-none ring-0 transition-all duration-200 ${isEmailPrefilled
                                 ? "border-orange-200 bg-orange-50 text-orange-800 cursor-not-allowed"
                                 : emailValidation.isValid === true &&
                                   !emailValidation.isValidating
-                                ? "border-green-300 bg-green-50 focus:shadow-[0_0_0_4px_rgba(34,197,94,0.08)]"
-                                : (emailValidation.isDisposable === true ||
+                                  ? "border-green-300 bg-green-50 focus:shadow-[0_0_0_4px_rgba(34,197,94,0.08)]"
+                                  : (emailValidation.isDisposable === true ||
                                     (isRegisterMode && emailValidation.isRegistered === true) ||
                                     (!isRegisterMode && emailValidation.isRegistered === false)) &&
-                                  !emailValidation.isValidating
-                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
-                                : errors.email && !emailValidation.isValidating
-                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
-                                : "border-slate-200 bg-white focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]"
-                            }`}
-                          />
-                          {/* Validation status indicator - show in both modes */}
-                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                            {emailValidation.isValidating && (
-                              <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
-                            )}
-                            {!emailValidation.isValidating &&
-                              emailValidation.isValid === true && (
-                                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                    !emailValidation.isValidating
+                                    ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
+                                    : errors.email && !emailValidation.isValidating
+                                      ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
+                                      : "border-slate-200 bg-white focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)]"
+                                }`}
+                            />
+                            {/* Validation status indicator - show in both modes */}
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                              {emailValidation.isValidating && (
+                                <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
                               )}
-                            {!emailValidation.isValidating &&
-                              (emailValidation.isDisposable === true ||
-                                (isRegisterMode && emailValidation.isRegistered === true) ||
-                                (!isRegisterMode && emailValidation.isRegistered === false)) && (
-                                <XCircle className="h-4 w-4 text-red-500" />
+                              {!emailValidation.isValidating &&
+                                emailValidation.isValid === true && (
+                                  <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                )}
+                              {!emailValidation.isValidating &&
+                                (emailValidation.isDisposable === true ||
+                                  (isRegisterMode && emailValidation.isRegistered === true) ||
+                                  (!isRegisterMode && emailValidation.isRegistered === false)) && (
+                                  <XCircle className="h-4 w-4 text-red-500" />
+                                )}
+                            </div>
+                          </div>
+                        </ReusableTooltip>
+                      </div>
+                    )}
+
+                    {/* Registration Fields (Compact Layout) */}
+                    {isRegisterMode && phase === "form" && (
+                      <div className="space-y-3">
+                        {/* Top Row: Username and Phone */}
+                        <div className="grid grid-cols-2 gap-3">
+                          {/* Username Field */}
+                          <div className="grid gap-2">
+                            <label
+                              htmlFor="username"
+                              className="text-sm font-medium text-slate-800"
+                            >
+                              Username
+                            </label>
+                            <ReusableTooltip
+                              content={errors.username}
+                              variant="error"
+                              side="top"
+                            >
+                              <div className="relative">
+                                <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                  <User className="h-4 w-4" />
+                                </div>
+                                <input
+                                  key="username-input"
+                                  id="username"
+                                  type="text"
+                                  value={values.username || ""}
+                                  onChange={(e) =>
+                                    setValue("username", e.target.value)
+                                  }
+                                  placeholder="Username"
+                                  className={`h-10 w-full rounded-xl border pl-9 pr-3 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)] ${errors.username
+                                    ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
+                                    : "border-slate-200 bg-white"
+                                    }`}
+                                />
+                              </div>
+                            </ReusableTooltip>
+                          </div>
+
+                          {/* Phone Field */}
+                          <div className="grid gap-2">
+                            <label
+                              htmlFor="phone"
+                              className="text-sm font-medium text-slate-800"
+                            >
+                              Phone
+                            </label>
+                            <ReusableTooltip
+                              content={errors.phone}
+                              variant="error"
+                              side="top"
+                            >
+                              <div className="relative">
+                                <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                  <Phone className="h-4 w-4" />
+                                </div>
+                                <input
+                                  key="phone-input"
+                                  maxLength={10}
+                                  id="phone"
+                                  type="tel"
+                                  inputMode="numeric"
+                                  value={values.phone || ""}
+                                  onChange={(e) =>
+                                    setValue("phone", e.target.value)
+                                  }
+                                  placeholder="5551234567"
+                                  className={`h-10 w-full rounded-xl border pl-9 pr-3 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)] ${errors.phone
+                                    ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
+                                    : "border-slate-200 bg-white"
+                                    }`}
+                                />
+                              </div>
+                            </ReusableTooltip>
+                          </div>
+                        </div>
+
+                        {/* Middle Row: First Name and Last Name */}
+                        <div className="grid grid-cols-2 gap-3">
+                          {/* First Name Field */}
+                          <div className="grid gap-2">
+                            <label
+                              htmlFor="firstName"
+                              className="text-sm font-medium text-slate-800"
+                            >
+                              First Name
+                            </label>
+                            <ReusableTooltip
+                              content={errors.firstName}
+                              variant="error"
+                              side="top"
+                            >
+                              <div className="relative">
+                                <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                  <User className="h-4 w-4" />
+                                </div>
+                                <input
+                                  key="firstName-input"
+                                  id="firstName"
+                                  type="text"
+                                  value={values.firstName || ""}
+                                  onChange={(e) =>
+                                    setValue("firstName", e.target.value)
+                                  }
+                                  placeholder="First name"
+                                  className={`h-10 w-full rounded-xl border pl-9 pr-3 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)] ${errors.firstName
+                                    ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
+                                    : "border-slate-200 bg-white"
+                                    }`}
+                                />
+                              </div>
+                            </ReusableTooltip>
+                          </div>
+
+                          {/* Last Name Field */}
+                          <div className="grid gap-2">
+                            <label
+                              htmlFor="lastName"
+                              className="text-sm font-medium text-slate-800"
+                            >
+                              Last Name
+                            </label>
+                            <ReusableTooltip
+                              content={errors.lastName}
+                              variant="error"
+                              side="top"
+                            >
+                              <div className="relative">
+                                <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                  <User className="h-4 w-4" />
+                                </div>
+                                <input
+                                  key="lastName-input"
+                                  id="lastName"
+                                  type="text"
+                                  value={values.lastName || ""}
+                                  onChange={(e) =>
+                                    setValue("lastName", e.target.value)
+                                  }
+                                  placeholder="Last name"
+                                  className={`h-10 w-full rounded-xl border pl-9 pr-3 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)] ${errors.lastName
+                                    ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
+                                    : "border-slate-200 bg-white"
+                                    }`}
+                                />
+                              </div>
+                            </ReusableTooltip>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Password Field (Login/Register Mode) */}
+                    {phase === "form" && !isForgotPasswordMode && (
+                      <div className="grid gap-2">
+                        <label
+                          htmlFor="password"
+                          className="text-sm font-medium text-slate-800"
+                        >
+                          Password
+                        </label>
+                        <ReusableTooltip
+                          content={errors.password}
+                          variant="error"
+                          side="top"
+                        >
+                          <div className="relative">
+                            <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                              <Lock className="h-4 w-4" />
+                            </div>
+                            <input
+                              key="password-input"
+                              id="password"
+                              type={showPassword ? "text" : "password"}
+                              value={values.password || ""}
+                              onChange={(e) =>
+                                setValue("password", e.target.value)
+                              }
+                              placeholder="••••••••"
+                              className={`h-10 w-full rounded-xl border pl-9 pr-10 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)] ${errors.password
+                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
+                                : "border-slate-200 bg-white"
+                                }`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                            >
+                              {showPassword ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
                               )}
+                            </button>
                           </div>
-                        </div>
-                      </ReusableTooltip>
-                    </div>
-                  )}
-
-                  {/* Registration Fields (Compact Layout) */}
-                  {isRegisterMode && phase === "form" && (
-                    <div className="space-y-3">
-                      {/* Top Row: Username and Phone */}
-                      <div className="grid grid-cols-2 gap-3">
-                        {/* Username Field */}
-                        <div className="grid gap-2">
-                          <label
-                            htmlFor="username"
-                            className="text-sm font-medium text-slate-800"
-                          >
-                            Username
-                          </label>
-                          <ReusableTooltip
-                            content={errors.username}
-                            variant="error"
-                            side="top"
-                          >
-                            <div className="relative">
-                              <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                                <User className="h-4 w-4" />
-                              </div>
-                              <input
-                                key="username-input"
-                                id="username"
-                                type="text"
-                                value={values.username || ""}
-                                onChange={(e) =>
-                                  setValue("username", e.target.value)
-                                }
-                                placeholder="Username"
-                                className={`h-10 w-full rounded-xl border pl-9 pr-3 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)] ${
-                                  errors.username
-                                    ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
-                                    : "border-slate-200 bg-white"
-                                }`}
-                              />
-                            </div>
-                          </ReusableTooltip>
-                        </div>
-
-                        {/* Phone Field */}
-                        <div className="grid gap-2">
-                          <label
-                            htmlFor="phone"
-                            className="text-sm font-medium text-slate-800"
-                          >
-                            Phone
-                          </label>
-                          <ReusableTooltip
-                            content={errors.phone}
-                            variant="error"
-                            side="top"
-                          >
-                            <div className="relative">
-                              <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                                <Phone className="h-4 w-4" />
-                              </div>
-                              <input
-                                key="phone-input"
-                                maxLength={10}
-                                id="phone"
-                                type="tel"
-                                inputMode="numeric"
-                                value={values.phone || ""}
-                                onChange={(e) =>
-                                  setValue("phone", e.target.value)
-                                }
-                                placeholder="5551234567"
-                                className={`h-10 w-full rounded-xl border pl-9 pr-3 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)] ${
-                                  errors.phone
-                                    ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
-                                    : "border-slate-200 bg-white"
-                                }`}
-                              />
-                            </div>
-                          </ReusableTooltip>
-                        </div>
+                        </ReusableTooltip>
                       </div>
+                    )}
 
-                      {/* Middle Row: First Name and Last Name */}
-                      <div className="grid grid-cols-2 gap-3">
-                        {/* First Name Field */}
-                        <div className="grid gap-2">
-                          <label
-                            htmlFor="firstName"
-                            className="text-sm font-medium text-slate-800"
-                          >
-                            First Name
-                          </label>
-                          <ReusableTooltip
-                            content={errors.firstName}
-                            variant="error"
-                            side="top"
-                          >
-                            <div className="relative">
-                              <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                                <User className="h-4 w-4" />
-                              </div>
-                              <input
-                                key="firstName-input"
-                                id="firstName"
-                                type="text"
-                                value={values.firstName || ""}
-                                onChange={(e) =>
-                                  setValue("firstName", e.target.value)
-                                }
-                                placeholder="First name"
-                                className={`h-10 w-full rounded-xl border pl-9 pr-3 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)] ${
-                                  errors.firstName
-                                    ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
-                                    : "border-slate-200 bg-white"
-                                }`}
-                              />
-                            </div>
-                          </ReusableTooltip>
-                        </div>
-
-                        {/* Last Name Field */}
-                        <div className="grid gap-2">
-                          <label
-                            htmlFor="lastName"
-                            className="text-sm font-medium text-slate-800"
-                          >
-                            Last Name
-                          </label>
-                          <ReusableTooltip
-                            content={errors.lastName}
-                            variant="error"
-                            side="top"
-                          >
-                            <div className="relative">
-                              <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                                <User className="h-4 w-4" />
-                              </div>
-                              <input
-                                key="lastName-input"
-                                id="lastName"
-                                type="text"
-                                value={values.lastName || ""}
-                                onChange={(e) =>
-                                  setValue("lastName", e.target.value)
-                                }
-                                placeholder="Last name"
-                                className={`h-10 w-full rounded-xl border pl-9 pr-3 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)] ${
-                                  errors.lastName
-                                    ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
-                                    : "border-slate-200 bg-white"
-                                }`}
-                              />
-                            </div>
-                          </ReusableTooltip>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Password Field (Login/Register Mode) */}
-                  {phase === "form" && !isForgotPasswordMode && (
-                    <div className="grid gap-2">
-                      <label
-                        htmlFor="password"
-                        className="text-sm font-medium text-slate-800"
-                      >
-                        Password
-                      </label>
-                      <ReusableTooltip
-                        content={errors.password}
-                        variant="error"
-                        side="top"
-                      >
-                        <div className="relative">
-                          <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                            <Lock className="h-4 w-4" />
-                          </div>
-                          <input
-                            key="password-input"
-                            id="password"
-                            type={showPassword ? "text" : "password"}
-                            value={values.password || ""}
-                            onChange={(e) =>
-                              setValue("password", e.target.value)
-                            }
-                            placeholder="••••••••"
-                            className={`h-10 w-full rounded-xl border pl-9 pr-10 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)] ${
-                              errors.password
-                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
-                                : "border-slate-200 bg-white"
-                            }`}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                          >
-                            {showPassword ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </button>
-                        </div>
-                      </ReusableTooltip>
-                    </div>
-                  )}
-
-                  {/* New Password Field (Reset Password Mode) */}
-                  {phase === "reset-password" && (
-                    <div className="grid gap-2">
-                      <label
-                        htmlFor="newPassword"
-                        className="text-sm font-medium text-slate-800"
-                      >
-                        New Password
-                      </label>
-                      <ReusableTooltip
-                        content={errors.newPassword}
-                        variant="error"
-                        side="top"
-                      >
-                        <div className="relative">
-                          <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                            <Lock className="h-4 w-4" />
-                          </div>
-                          <input
-                            key="newPassword-input"
-                            id="newPassword"
-                            type={showNewPassword ? "text" : "password"}
-                            value={values.newPassword || ""}
-                            onChange={(e) =>
-                              setValue("newPassword", e.target.value)
-                            }
-                            placeholder="••••••••"
-                            className={`h-11 w-full rounded-xl border pl-9 pr-10 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)] ${
-                              errors.newPassword
-                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
-                                : "border-slate-200 bg-white"
-                            }`}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowNewPassword(!showNewPassword)}
-                            className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                          >
-                            {showNewPassword ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </button>
-                        </div>
-                      </ReusableTooltip>
-                    </div>
-                  )}
-
-                  {/* Confirm Password Field (Register/Reset Password Mode) */}
-                  {(isRegisterMode || phase === "reset-password") && (
-                    <div className="grid gap-2">
-                      <label
-                        htmlFor="confirmPassword"
-                        className="text-sm font-medium text-slate-800"
-                      >
-                        Confirm Password
-                      </label>
-                      <ReusableTooltip
-                        content={errors.confirmPassword}
-                        variant="error"
-                        side="top"
-                      >
-                        <div className="relative">
-                          <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                            <Lock className="h-4 w-4" />
-                          </div>
-                          <input
-                            key="confirmPassword-input"
-                            id="confirmPassword"
-                            type={showConfirmPassword ? "text" : "password"}
-                            value={values.confirmPassword || ""}
-                            onChange={(e) =>
-                              setValue("confirmPassword", e.target.value)
-                            }
-                            placeholder="••••••••"
-                            className={`h-10 w-full rounded-xl border pl-9 pr-10 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)] ${
-                              errors.confirmPassword
-                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
-                                : "border-slate-200 bg-white"
-                            }`}
-                          />
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setShowConfirmPassword(!showConfirmPassword)
-                            }
-                            className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                          >
-                            {showConfirmPassword ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </button>
-                        </div>
-                      </ReusableTooltip>
-                    </div>
-                  )}
-
-                  {/* Terms and Privacy Policy Consent (Registration Mode Only) */}
-                  {isRegisterMode && (
-                    <div className="space-y-3">
-                      {/* Terms of Use Checkbox */}
-                      <div className="flex items-start gap-3">
-                        <input
-                          type="checkbox"
-                          id="registerConsent"
-                          checked={registerConsent}
-                          onChange={(e) => setRegisterConsent(e.target.checked)}
-                          className="h-4 w-4 mt-1 flex-shrink-0 cursor-pointer text-orange-600 border-slate-300 rounded focus:ring-orange-500"
-                        />
+                    {/* New Password Field (Reset Password Mode) */}
+                    {phase === "reset-password" && (
+                      <div className="grid gap-2">
                         <label
-                          htmlFor="registerConsent"
-                          className="text-xs text-slate-700 cursor-pointer leading-relaxed"
+                          htmlFor="newPassword"
+                          className="text-sm font-medium text-slate-800"
                         >
-                          I agree to the{" "}
-                          <Link
-                            to="/terms-of-service"
-                            className="text-[#f6851f] hover:text-[#e63946] font-medium no-underline"
-                            onClick={() => onClose(false)}
-                          >
-                            Account and Auction Terms for Customers
-                          </Link>
+                          New Password
                         </label>
+                        <ReusableTooltip
+                          content={errors.newPassword}
+                          variant="error"
+                          side="top"
+                        >
+                          <div className="relative">
+                            <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                              <Lock className="h-4 w-4" />
+                            </div>
+                            <input
+                              key="newPassword-input"
+                              id="newPassword"
+                              type={showNewPassword ? "text" : "password"}
+                              value={values.newPassword || ""}
+                              onChange={(e) =>
+                                setValue("newPassword", e.target.value)
+                              }
+                              placeholder="••••••••"
+                              className={`h-11 w-full rounded-xl border pl-9 pr-10 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)] ${errors.newPassword
+                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
+                                : "border-slate-200 bg-white"
+                                }`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowNewPassword(!showNewPassword)}
+                              className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                            >
+                              {showNewPassword ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </button>
+                          </div>
+                        </ReusableTooltip>
                       </div>
+                    )}
 
-                      {/* Privacy Policy Checkbox */}
-                      <div className="flex items-start gap-3">
-                        <input
-                          type="checkbox"
-                          id="consentPrivacy"
-                          checked={privacyConsent}
-                          onChange={(e) => setPrivacyConsent(e.target.checked)}
-                          className="h-4 w-4 mt-1 flex-shrink-0 cursor-pointer text-orange-600 border-slate-300 rounded focus:ring-orange-500"
-                        />
+                    {/* Confirm Password Field (Register/Reset Password Mode) */}
+                    {(isRegisterMode || phase === "reset-password") && (
+                      <div className="grid gap-2">
                         <label
-                          htmlFor="consentPrivacy"
-                          className="text-xs text-slate-700 cursor-pointer leading-relaxed"
+                          htmlFor="confirmPassword"
+                          className="text-sm font-medium text-slate-800"
                         >
-                          I have read and agree to the{" "}
-                          <Link
-                            to="/privacy-policy"
-                            className="text-[#f6851f] hover:text-[#e63946] font-medium no-underline"
-                            onClick={() => onClose(false)}
-                          >
-                            Privacy Policy
-                          </Link>
+                          Confirm Password
                         </label>
+                        <ReusableTooltip
+                          content={errors.confirmPassword}
+                          variant="error"
+                          side="top"
+                        >
+                          <div className="relative">
+                            <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                              <Lock className="h-4 w-4" />
+                            </div>
+                            <input
+                              key="confirmPassword-input"
+                              id="confirmPassword"
+                              type={showConfirmPassword ? "text" : "password"}
+                              value={values.confirmPassword || ""}
+                              onChange={(e) =>
+                                setValue("confirmPassword", e.target.value)
+                              }
+                              placeholder="••••••••"
+                              className={`h-10 w-full rounded-xl border pl-9 pr-10 text-sm outline-none ring-0 transition-shadow focus:shadow-[0_0_0_4px_rgba(15,23,42,0.08)] ${errors.confirmPassword
+                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
+                                : "border-slate-200 bg-white"
+                                }`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setShowConfirmPassword(!showConfirmPassword)
+                              }
+                              className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                            >
+                              {showConfirmPassword ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </button>
+                          </div>
+                        </ReusableTooltip>
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {/* Register Consent Errors */}
-                  {errors.registerConsent && (
-                    <ReusableTooltip
-                      content={errors.registerConsent}
-                      variant="error"
-                      side="top"
-                    >
-                      <div className="text-xs text-red-600">
-                        {errors.registerConsent}
-                      </div>
-                    </ReusableTooltip>
-                  )}
-
-                  {errors.privacyConsent && (
-                    <ReusableTooltip
-                      content={errors.privacyConsent}
-                      variant="error"
-                      side="top"
-                    >
-                      <div className="text-xs text-red-600">
-                        {errors.privacyConsent}
-                      </div>
-                    </ReusableTooltip>
-                  )}
-
-                  {/* Submit Button */}
-                  <div className="pt-1">
-                    <button
-                      type="submit"
-                      disabled={(() => {
-                        const isDisabled = status === "loading" ||
-                          (isRegisterMode &&
-                            (!registerConsent ||
-                              !privacyConsent ||
-                              emailValidation.isValidating ||
-                              emailValidation.isDisposable === true ||
-                              emailValidation.isRegistered === true)) ||
-                          (!isRegisterMode &&
-                            (emailValidation.isValidating ||
-                              emailValidation.isDisposable === true ||
-                              emailValidation.isRegistered === false));
-                        
-                        console.log('🔘 [LoginModal] Submit button state:', {
-                          isDisabled,
-                          status,
-                          isRegisterMode,
-                          registerConsent,
-                          privacyConsent,
-                          emailValidation: {
-                            isValidating: emailValidation.isValidating,
-                            isDisposable: emailValidation.isDisposable,
-                            isRegistered: emailValidation.isRegistered,
-                            isValid: emailValidation.isValid
-                          }
-                        });
-                        
-                        return isDisabled;
-                      })()}
-                      className="cursor-pointer w-full h-11 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-sm font-semibold shadow-lg shadow-orange-500/20 transition hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {status === "loading" ? (
-                        <div className="flex items-center justify-center gap-2">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          {isRegisterMode
-                            ? "Registering..."
-                            : phase === "forgot"
-                            ? "Sending OTP..."
-                            : phase === "reset-password"
-                            ? "Updating Password..."
-                            : phase === "verify-2fa"
-                            ? "Verifying OTP..."
-                            : "Signing In..."}
+                    {/* Terms and Privacy Policy Consent (Registration Mode Only) */}
+                    {isRegisterMode && (
+                      <div className="space-y-3">
+                        {/* Terms of Use Checkbox */}
+                        <div className="flex items-start gap-3">
+                          <input
+                            type="checkbox"
+                            id="registerConsent"
+                            checked={registerConsent}
+                            onChange={(e) => setRegisterConsent(e.target.checked)}
+                            className="h-4 w-4 mt-1 flex-shrink-0 cursor-pointer text-orange-600 border-slate-300 rounded focus:ring-orange-500"
+                          />
+                          <label
+                            htmlFor="registerConsent"
+                            className="text-xs text-slate-700 cursor-pointer leading-relaxed"
+                          >
+                            I agree to the{" "}
+                            <Link
+                              to="/terms-of-service"
+                              className="text-[#f6851f] hover:text-[#e63946] font-medium no-underline"
+                              onClick={() => onClose(false)}
+                            >
+                              Account and Auction Terms for Customers
+                            </Link>
+                          </label>
                         </div>
-                      ) : emailValidation.isValidating && isRegisterMode ? (
-                        <div className="flex items-center justify-center gap-2">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Validating Email...
-                        </div>
-                      ) : isRegisterMode ? (
-                        "Register"
-                      ) : phase === "forgot" ? (
-                        "Send OTP"
-                      ) : phase === "reset-password" ? (
-                        "Update Password"
-                      ) : phase === "verify-2fa" ? (
-                        "Verify OTP"
-                      ) : (
-                        "Login"
-                      )}
-                    </button>
-                  </div>
 
-                  {/* Back to Login Link (2FA Mode Only) */}
-                  {phase === "verify-2fa" && (
-                    <div className="text-center">
+                        {/* Privacy Policy Checkbox */}
+                        <div className="flex items-start gap-3">
+                          <input
+                            type="checkbox"
+                            id="consentPrivacy"
+                            checked={privacyConsent}
+                            onChange={(e) => setPrivacyConsent(e.target.checked)}
+                            className="h-4 w-4 mt-1 flex-shrink-0 cursor-pointer text-orange-600 border-slate-300 rounded focus:ring-orange-500"
+                          />
+                          <label
+                            htmlFor="consentPrivacy"
+                            className="text-xs text-slate-700 cursor-pointer leading-relaxed"
+                          >
+                            I have read and agree to the{" "}
+                            <Link
+                              to="/privacy-policy"
+                              className="text-[#f6851f] hover:text-[#e63946] font-medium no-underline"
+                              onClick={() => onClose(false)}
+                            >
+                              Privacy Policy
+                            </Link>
+                          </label>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Register Consent Errors */}
+                    {errors.registerConsent && (
+                      <ReusableTooltip
+                        content={errors.registerConsent}
+                        variant="error"
+                        side="top"
+                      >
+                        <div className="text-xs text-red-600">
+                          {errors.registerConsent}
+                        </div>
+                      </ReusableTooltip>
+                    )}
+
+                    {errors.privacyConsent && (
+                      <ReusableTooltip
+                        content={errors.privacyConsent}
+                        variant="error"
+                        side="top"
+                      >
+                        <div className="text-xs text-red-600">
+                          {errors.privacyConsent}
+                        </div>
+                      </ReusableTooltip>
+                    )}
+
+                    {/* Submit Button */}
+                    <div className="pt-1">
                       <button
-                        type="button"
-                        onClick={handleBackToLogin}
-                        className="cursor-pointer text-sm text-slate-600 hover:text-slate-800 transition-colors underline underline-offset-2"
+                        type="submit"
+                        disabled={(() => {
+                          const isDisabled = status === "loading" ||
+                            (isRegisterMode &&
+                              (!registerConsent ||
+                                !privacyConsent ||
+                                emailValidation.isValidating ||
+                                emailValidation.isDisposable === true ||
+                                emailValidation.isRegistered === true)) ||
+                            (!isRegisterMode &&
+                              (emailValidation.isValidating ||
+                                emailValidation.isDisposable === true ||
+                                emailValidation.isRegistered === false));
+
+                          return isDisabled;
+                        })()}
+                        className="cursor-pointer w-full h-11 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-sm font-semibold shadow-lg shadow-orange-500/20 transition hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        Back to Login
+                        {status === "loading" ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            {isRegisterMode
+                              ? "Registering..."
+                              : phase === "forgot"
+                                ? "Sending OTP..."
+                                : phase === "reset-password"
+                                  ? "Updating Password..."
+                                  : phase === "verify-2fa"
+                                    ? "Verifying OTP..."
+                                    : "Signing In..."}
+                          </div>
+                        ) : emailValidation.isValidating && isRegisterMode ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Validating Email...
+                          </div>
+                        ) : isRegisterMode ? (
+                          "Register"
+                        ) : phase === "forgot" ? (
+                          "Send OTP"
+                        ) : phase === "reset-password" ? (
+                          "Update Password"
+                        ) : phase === "verify-2fa" ? (
+                          "Verify OTP"
+                        ) : (
+                          "Login"
+                        )}
                       </button>
                     </div>
-                  )}
 
-                  {/* Forgot Password Link (Login Mode Only) */}
-                  {!isRegisterMode &&
-                    phase === "form" &&
-                    !isForgotPasswordMode && (
+                    {/* Back to Login Link (2FA Mode Only) */}
+                    {phase === "verify-2fa" && (
                       <div className="text-center">
                         <button
                           type="button"
-                          onClick={handleForgotPassword}
+                          onClick={handleBackToLogin}
                           className="cursor-pointer text-sm text-slate-600 hover:text-slate-800 transition-colors underline underline-offset-2"
                         >
-                          Forgot Password?
+                          Back to Login
                         </button>
                       </div>
                     )}
 
-                  {/* Toggle Login/Register Link */}
-                  {(phase === "form" || phase === "forgot") &&
-                    !isForgotPasswordMode && (
-                      <div className="text-center">
-                        <p className="text-xs text-slate-600">
-                          {isRegisterMode
-                            ? "Already have an account?"
-                            : "Don't have an account?"}{" "}
+                    {/* Forgot Password Link (Login Mode Only) */}
+                    {!isRegisterMode &&
+                      phase === "form" &&
+                      !isForgotPasswordMode && (
+                        <div className="text-center">
                           <button
                             type="button"
-                            onClick={
-                              isRegisterMode
-                                ? handleBackToLogin
-                                : handleRegister
-                            }
-                            className="cursor-pointer text-orange-600 hover:text-orange-700 font-medium underline underline-offset-2 transition-colors"
+                            onClick={handleForgotPassword}
+                            className="cursor-pointer text-sm text-slate-600 hover:text-slate-800 transition-colors underline underline-offset-2"
                           >
-                            {isRegisterMode ? "Login" : "Register"}
+                            Forgot Password?
                           </button>
-                        </p>
-                      </div>
-                    )}
+                        </div>
+                      )}
 
-                  {/* Security Notice */}
-                  <div className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
-                    <ShieldCheck className="h-4 w-4 text-slate-700" />
-                    {phase === "verify-2fa"
-                      ? "Two-Factor Authentication provides enhanced security for your account"
-                      : "Your credentials are encrypted and secure"}
-                  </div>
-                </motion.form>
-              )}
+                    {/* Toggle Login/Register Link */}
+                    {(phase === "form" || phase === "forgot") &&
+                      !isForgotPasswordMode && (
+                        <div className="text-center">
+                          <p className="text-xs text-slate-600">
+                            {isRegisterMode
+                              ? "Already have an account?"
+                              : "Don't have an account?"}{" "}
+                            <button
+                              type="button"
+                              onClick={
+                                isRegisterMode
+                                  ? handleBackToLogin
+                                  : handleRegister
+                              }
+                              className="cursor-pointer text-orange-600 hover:text-orange-700 font-medium underline underline-offset-2 transition-colors"
+                            >
+                              {isRegisterMode ? "Login" : "Register"}
+                            </button>
+                          </p>
+                        </div>
+                      )}
+
+                    {/* Security Notice */}
+                    <div className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+                      <ShieldCheck className="h-4 w-4 text-slate-700" />
+                      {phase === "verify-2fa"
+                        ? "Two-Factor Authentication provides enhanced security for your account"
+                        : "Your credentials are encrypted and secure"}
+                    </div>
+                  </motion.form>
+                )}
 
               {phase === "loading" && (
                 <motion.div
@@ -1204,10 +1174,10 @@ export default function LoginModal({
                         {isRegisterMode
                           ? "Processing registration..."
                           : isForgotPasswordMode && phase === "reset-password"
-                          ? "Updating password..."
-                          : phase === "verify-2fa"
-                          ? "Verifying your OTP..."
-                          : "Authenticating your credentials..."}
+                            ? "Updating password..."
+                            : phase === "verify-2fa"
+                              ? "Verifying your OTP..."
+                              : "Authenticating your credentials..."}
                       </span>
                     </div>
                     <div className="h-1 w-full bg-slate-200">
@@ -1224,10 +1194,10 @@ export default function LoginModal({
                     {isRegisterMode
                       ? "process your registration"
                       : isForgotPasswordMode && phase === "reset-password"
-                      ? "update your password"
-                      : phase === "verify-2fa"
-                      ? "verify your OTP"
-                      : "verify your account"}
+                        ? "update your password"
+                        : phase === "verify-2fa"
+                          ? "verify your OTP"
+                          : "verify your account"}
                     ...
                   </div>
                 </motion.div>
@@ -1258,15 +1228,15 @@ export default function LoginModal({
                       {isRegisterMode
                         ? "Account Created!"
                         : isForgotPasswordMode
-                        ? "Password Updated!"
-                        : "Welcome back!"}
+                          ? "Password Updated!"
+                          : "Welcome back!"}
                     </h3>
                     <p className="text-sm text-slate-600">
                       {isRegisterMode
                         ? "Your account has been successfully created."
                         : isForgotPasswordMode
-                        ? "Your password has been successfully updated."
-                        : "You have been successfully logged in."}
+                          ? "Your password has been successfully updated."
+                          : "You have been successfully logged in."}
                     </p>
                   </div>
                 </motion.div>
@@ -1365,11 +1335,10 @@ export default function LoginModal({
                           <InputOTPSlot
                             key={i}
                             index={i}
-                            className={`h-11 w-11 rounded-lg border text-center text-lg font-medium outline-none ring-0 transition-shadow ${
-                              errors.otp
-                                ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
-                                : "border-slate-200 bg-white"
-                            }`}
+                            className={`h-11 w-11 rounded-lg border text-center text-lg font-medium outline-none ring-0 transition-shadow ${errors.otp
+                              ? "border-red-300 bg-red-50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
+                              : "border-slate-200 bg-white"
+                              }`}
                           />
                         ))}
                     </InputOTPGroup>

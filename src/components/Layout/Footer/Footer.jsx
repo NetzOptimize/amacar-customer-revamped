@@ -13,6 +13,45 @@ export default function Footer() {
     return location.pathname.startsWith(path);
   };
 
+  // Handle link click - scroll to top if already on the page with same hash, otherwise navigate
+  const handleLinkClick = (e, targetPath, hash = '') => {
+    const currentPath = location.pathname;
+    const currentHash = location.hash;
+    const targetHash = hash ? `#${hash}` : '';
+    
+    // If already on the same page
+    if (currentPath === targetPath) {
+      // If no hash specified (like "Our vision"), always scroll to top
+      if (!hash) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      // If already on the same page with the same hash, scroll to top
+      else if (currentHash === targetHash) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      // If on the same page but different hash, let it navigate to update the hash
+    }
+    // If on a different page, let the Link component handle navigation
+    // The AboutUs page useEffect will handle scrolling to the section
+  };
+
+  // Check if a link is active based on pathname and hash
+  const isLinkActive = (targetPath, hash = '') => {
+    const currentPath = location.pathname;
+    const currentHash = location.hash;
+    const targetHash = hash ? `#${hash}` : '';
+    
+    if (currentPath !== targetPath) return false;
+    
+    // If no hash specified, check if path matches
+    if (!hash) return true;
+    
+    // If hash specified, check if hash matches
+    return currentHash === targetHash;
+  };
+
   return (
     <footer className="px-[3%] relative bg-gradient-to-br from-white via-neutral-50 to-white text-neutral-900 overflow-hidden">
       {/* Background Pattern */}
@@ -89,20 +128,9 @@ export default function Footer() {
               <li>
                 <Link
                   to="/about-us"
+                  onClick={(e) => handleLinkClick(e, "/about-us")}
                   className={`text-lg inline-block transition-colors duration-300 ${
-                    isActive("/how-to-bid") 
-                      ? "text-primary-500 font-semibold" 
-                      : "text-neutral-600 hover:text-primary-500"
-                  }`}
-                >
-                  How to bid
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/about-us"
-                  className={`text-lg inline-block transition-colors duration-300 ${
-                    isActive("/about-us") 
+                    isLinkActive("/about-us") && !location.hash
                       ? "text-primary-500 font-semibold" 
                       : "text-neutral-600 hover:text-primary-500"
                   }`}
@@ -112,14 +140,80 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/about-us"
+                  to="/about-us#who-we-are"
+                  onClick={(e) => handleLinkClick(e, "/about-us", "who-we-are")}
                   className={`text-lg inline-block transition-colors duration-300 ${
-                    isActive("/how-to-sell") 
+                    isLinkActive("/about-us", "who-we-are") 
                       ? "text-primary-500 font-semibold" 
                       : "text-neutral-600 hover:text-primary-500"
                   }`}
                 >
-                  How to sell with us
+                  Who We Are
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/about-us#our-mission"
+                  onClick={(e) => handleLinkClick(e, "/about-us", "our-mission")}
+                  className={`text-lg inline-block transition-colors duration-300 ${
+                    isLinkActive("/about-us", "our-mission") 
+                      ? "text-primary-500 font-semibold" 
+                      : "text-neutral-600 hover:text-primary-500"
+                  }`}
+                >
+                  Our Mission
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/about-us#how-it-works"
+                  onClick={(e) => handleLinkClick(e, "/about-us", "how-it-works")}
+                  className={`text-lg inline-block transition-colors duration-300 ${
+                    isLinkActive("/about-us", "how-it-works") 
+                      ? "text-primary-500 font-semibold" 
+                      : "text-neutral-600 hover:text-primary-500"
+                  }`}
+                >
+                  How it works
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/about-us#our-values"
+                  onClick={(e) => handleLinkClick(e, "/about-us", "our-values")}
+                  className={`text-lg inline-block transition-colors duration-300 ${
+                    isLinkActive("/about-us", "our-values") 
+                      ? "text-primary-500 font-semibold" 
+                      : "text-neutral-600 hover:text-primary-500"
+                  }`}
+                >
+                  Our values
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/about-us#trusted-partners"
+                  onClick={(e) => handleLinkClick(e, "/about-us", "trusted-partners")}
+                  className={`text-lg inline-block transition-colors duration-300 ${
+                    isLinkActive("/about-us", "trusted-partners") 
+                      ? "text-primary-500 font-semibold" 
+                      : "text-neutral-600 hover:text-primary-500"
+                  }`}
+                >
+                  Trusted partners
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/about-us#why-trust-us"
+                  onClick={(e) => handleLinkClick(e, "/about-us", "why-trust-us")}
+                  className={`text-lg inline-block transition-colors duration-300 ${
+                    isLinkActive("/about-us", "why-trust-us") 
+                      ? "text-primary-500 font-semibold" 
+                      : "text-neutral-600 hover:text-primary-500"
+                  }`}
+                >
+                  Why trust us
                 </Link>
               </li>
             </ul>
