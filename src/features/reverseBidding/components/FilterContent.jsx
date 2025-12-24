@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { X, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, ChevronDown, ChevronUp, Triangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { setFilters, fetchMockCarsThunk, fetchFiltersThunk } from '../redux/reverseBidSlice';
 import {
@@ -14,7 +14,7 @@ import { Input } from '../../../components/ui/input';
 
 export default function FilterContent({ cars = [] }) {
     const dispatch = useDispatch();
-    const { filters, filterOptions } = useSelector((s) => s.reverseBid);
+    const { filters, filterOptions, pagination } = useSelector((s) => s.reverseBid);
     const { user } = useSelector((s) => s.user);
 
     // Fetch filters on component mount
@@ -26,8 +26,23 @@ export default function FilterContent({ cars = [] }) {
 
     // Expandable sections state
     const [expandedSections, setExpandedSections] = useState({
-        basics: true,
-        models: true,
+        year: false,
+        brand: false,
+        model: false,
+        trim: false,
+        body: false,
+        condition: false,
+        features: false,
+        doorCount: false,
+        transmission: false,
+        odometer: false,
+        drivetrain: false,
+        exteriorColor: false,
+        interiorColor: false,
+        cityMpg: false,
+        highwayMpg: false,
+        fuel: false,
+        price: false,
         location: false,
     });
 
@@ -36,6 +51,8 @@ export default function FilterContent({ cars = [] }) {
         make: filters.make || '',
         models: filters.model ? (Array.isArray(filters.model) ? filters.model : [filters.model]) : [],
         year: filters.year || '',
+        yearMin: filters.yearMin ? String(filters.yearMin) : '',
+        yearMax: filters.yearMax ? String(filters.yearMax) : '',
         budgetMin: filters.budgetMin ? String(filters.budgetMin) : '',
         budgetMax: filters.budgetMax ? String(filters.budgetMax) : '',
         zipCode: filters.zipCode || user?.zip_code || user?.meta?.zip_code || '',
@@ -56,12 +73,14 @@ export default function FilterContent({ cars = [] }) {
             make: filters.make || '',
             models: filters.model ? (Array.isArray(filters.model) ? filters.model : [filters.model]) : [],
             year: filters.year || '',
+            yearMin: filters.yearMin ? String(filters.yearMin) : '',
+            yearMax: filters.yearMax ? String(filters.yearMax) : '',
             budgetMin: filters.budgetMin ? String(filters.budgetMin) : '',
             budgetMax: filters.budgetMax ? String(filters.budgetMax) : '',
             zipCode: filters.zipCode || user?.zip_code || user?.meta?.zip_code || '',
             extraFilters: filters.extraFilters || {},
         });
-    }, [filters.make, filters.model, filters.year, filters.budgetMin, filters.budgetMax, filters.condition, filters.zipCode, filters.extraFilters, user]);
+    }, [filters.make, filters.model, filters.year, filters.yearMin, filters.yearMax, filters.budgetMin, filters.budgetMax, filters.condition, filters.zipCode, filters.extraFilters, user]);
 
     // Get makes from API - prioritize available_filters from search results
     // This ensures users only see makes that have vehicles in current search results
@@ -125,20 +144,34 @@ export default function FilterContent({ cars = [] }) {
         return counts;
     }, [cars, localFilters.make]);
 
-    // Format filter key to readable label (e.g., "exterior_color" -> "Exterior Color")
+    // Format filter key to readable label (e.g., "exterior_color" -> "EXTERIOR COLOR")
     const formatFilterLabel = (key) => {
-        // Special case: convert "series" to "Trim"
-        if (key === 'series') {
-            return 'Trim';
+        // Special case mappings
+        const labelMap = {
+            'series': 'TRIM',
+            'series_detail': 'TRIM DETAIL',
+            'make': 'BRAND',
+            'body': 'BODY',
+            'door_count': 'DOOR COUNT',
+            'exterior_color': 'EXTERIOR COLOR',
+            'interior_color': 'INTERIOR COLOR',
+            'city_mpg': 'CITY MPG',
+            'highway_mpg': 'HIGHWAY MPG',
+            'fuel_type': 'FUEL',
+            'transmission': 'TRANSMISSION',
+            'drivetrain': 'DRIVETRAIN',
+            'odometer': 'ODOMETER',
+        };
+        
+        if (labelMap[key]) {
+            return labelMap[key];
         }
-        // Special case: convert "series_detail" to "Trim Detail"
-        if (key === 'series_detail') {
-            return 'Trim Detail';
-        }
+        
         return key
             .split('_')
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
+            .join(' ')
+            .toUpperCase();
     };
 
     // Get active filters (all filters that are set)
@@ -155,7 +188,13 @@ export default function FilterContent({ cars = [] }) {
                 active.push({ key: `model-${model}`, label: model, value: model, isModel: true });
             });
         }
-        if (localFilters.year) {
+        if (localFilters.yearMin) {
+            active.push({ key: 'yearMin', label: `Year Min: ${localFilters.yearMin}`, value: localFilters.yearMin });
+        }
+        if (localFilters.yearMax) {
+            active.push({ key: 'yearMax', label: `Year Max: ${localFilters.yearMax}`, value: localFilters.yearMax });
+        }
+        if (localFilters.year && !localFilters.yearMin && !localFilters.yearMax) {
             active.push({ key: 'year', label: localFilters.year, value: localFilters.year });
         }
         if (localFilters.budgetMin) {
@@ -233,7 +272,9 @@ export default function FilterContent({ cars = [] }) {
             ...updated,
             budgetMin: updated.budgetMin ? Number(updated.budgetMin) : null,
             budgetMax: updated.budgetMax ? Number(updated.budgetMax) : null,
-            year: updated.year || null,
+            year: updated.year || (updated.yearMax ? updated.yearMax : null), // Use yearMax as primary year if set, otherwise use year
+            yearMin: updated.yearMin ? Number(updated.yearMin) : null,
+            yearMax: updated.yearMax ? Number(updated.yearMax) : null,
             model: updated.models && updated.models.length > 0 ? updated.models[0] : null, // Use first model for API compatibility
             make: updated.make || null,
             condition: updated.condition,
@@ -273,6 +314,10 @@ export default function FilterContent({ cars = [] }) {
             }
         } else if (key === 'year') {
             updated.year = '';
+        } else if (key === 'yearMin') {
+            updated.yearMin = '';
+        } else if (key === 'yearMax') {
+            updated.yearMax = '';
         } else if (key === 'budgetMin') {
             updated.budgetMin = '';
         } else if (key === 'budgetMax') {
@@ -286,7 +331,9 @@ export default function FilterContent({ cars = [] }) {
             ...updated,
             budgetMin: updated.budgetMin ? Number(updated.budgetMin) : null,
             budgetMax: updated.budgetMax ? Number(updated.budgetMax) : null,
-            year: updated.year || null,
+            year: updated.year || (updated.yearMax ? updated.yearMax : null),
+            yearMin: updated.yearMin ? Number(updated.yearMin) : null,
+            yearMax: updated.yearMax ? Number(updated.yearMax) : null,
             model: updated.models && updated.models.length > 0 ? updated.models[0] : null,
             make: updated.make || null,
             condition: updated.condition,
@@ -305,6 +352,8 @@ export default function FilterContent({ cars = [] }) {
             make: '',
             models: [],
             year: '',
+            yearMin: '',
+            yearMax: '',
             budgetMin: '',
             budgetMax: '',
             zipCode: user?.zip_code || user?.meta?.zip_code || '',
@@ -317,6 +366,8 @@ export default function FilterContent({ cars = [] }) {
             make: null,
             model: null,
             year: null,
+            yearMin: null,
+            yearMax: null,
             budgetMin: null,
             budgetMax: null,
             zipCode: resetFilters.zipCode,
@@ -327,11 +378,24 @@ export default function FilterContent({ cars = [] }) {
         await dispatch(fetchMockCarsThunk({ filters: filtersToDispatch, page: 1, perPage: 10 }));
     };
 
+    const matchCount = pagination?.total_items || cars.length || 0;
+
     return (
-        <div className="w-full flex flex-col">
+        <div className="w-full flex flex-col min-h-full">
+            {/* Header with Filters title and match count */}
+            {/* <div className="flex-shrink-0 px-4 sm:px-6 pt-6 pb-4">
+                <div className="flex items-center gap-2 mb-2">
+                    <Triangle className="w-4 h-4 text-orange-600 fill-orange-600 rotate-180" />
+                    <h2 className="text-lg font-bold text-neutral-800">Filters</h2>
+                </div>
+                <div className="text-sm font-semibold text-orange-600">
+                    {matchCount} {matchCount === 1 ? 'match' : 'matches'}
+                </div>
+            </div> */}
+
             {/* Active filters - Enhanced */}
             {activeFilters.length > 0 && (
-                <div className="flex-shrink-0 p-4 sm:p-6 border-b border-white/20 space-y-2 bg-gradient-to-b from-white/60 to-white/40 backdrop-blur-sm">
+                <div className="flex-shrink-0 px-4 sm:px-6 pb-4 border-b border-neutral-200 space-y-2">
                     <div className="flex items-center justify-between">
                         <span className="text-xs font-semibold text-orange-700 uppercase tracking-wide">Active Filters</span>
                         {activeFilters.length > 0 && (
@@ -361,25 +425,25 @@ export default function FilterContent({ cars = [] }) {
             )}
 
             {/* Filter Sections - Dynamic height on desktop, scrollable on mobile */}
-            <div className="flex-1 lg:flex-none px-4 sm:px-6 py-4 space-y-4 overflow-y-auto lg:overflow-visible">
-                {/* Basics - Expandable */}
-                <div className="bg-white/40 backdrop-blur-sm border border-white/30 rounded-xl overflow-hidden shadow-sm">
+            <div className="flex-1 lg:flex-none px-4 sm:px-6 py-4 space-y-2 overflow-y-auto lg:overflow-visible">
+                {/* Year - Expandable */}
+                <div className="rounded-lg overflow-hidden shadow-sm">
                     <button
-                        onClick={() => toggleSection('basics')}
-                        className="cursor-pointer w-full px-4 py-3 flex items-center justify-between hover:bg-white/30 transition-colors"
+                        onClick={() => toggleSection('year')}
+                        className="cursor-pointer w-full px-4 py-3 flex items-center justify-between hover:bg-neutral-50 transition-colors bg-white"
                     >
-                        <h3 className="text-sm font-bold text-neutral-900 uppercase tracking-wider flex items-center gap-2">
-                            <div className="w-1.5 h-5 bg-gradient-to-b from-orange-500 to-orange-400 rounded-full shadow-sm"></div>
-                            Basics
+                        <h3 className="text-sm font-bold text-neutral-800 uppercase tracking-wider flex items-center gap-2">
+                            <span className="text-orange-600 font-bold">|</span>
+                            YEARS
                         </h3>
-                        {expandedSections.basics ? (
+                        {expandedSections.year ? (
                             <ChevronUp className="w-4 h-4 text-orange-600" />
                         ) : (
                             <ChevronDown className="w-4 h-4 text-orange-600" />
                         )}
                     </button>
                     <AnimatePresence>
-                        {expandedSections.basics && (
+                        {expandedSections.year && (
                             <motion.div
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: 'auto', opacity: 1 }}
@@ -387,121 +451,31 @@ export default function FilterContent({ cars = [] }) {
                                 transition={{ duration: 0.3 }}
                                 className="overflow-hidden"
                             >
-                                <div className="px-4 pb-4 pt-2 space-y-4">
-                                    {/* New/Used */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold text-neutral-800">New/used</label>
-                                        <Select
-                                            value={localFilters.condition}
-                                            onValueChange={(value) => handleFilterChange('condition', value)}
-                                        >
-                                            <SelectTrigger
-                                                className={`w-full h-10 bg-white/60 backdrop-blur-sm border-2 transition-all text-neutral-900 ${localFilters.condition && localFilters.condition !== 'all'
-                                                    ? 'border-orange-500 bg-orange-50/80 shadow-md'
-                                                    : 'border-white/40 hover:border-orange-400/50'
-                                                    }`}
-                                            >
-                                                <SelectValue placeholder="All" />
-                                            </SelectTrigger>
-                                            <SelectContent className="bg-white/95 backdrop-blur-xl border-white/30">
-                                                <SelectItem value="all" className="focus:bg-orange-50">All</SelectItem>
-                                                <SelectItem value="new" className="focus:bg-orange-50">New</SelectItem>
-                                                <SelectItem value="used" className="focus:bg-orange-50">Used & CPO</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    {/* Make */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold text-neutral-800">Make</label>
-                                        <Select
-                                            value={localFilters.make}
-                                            onValueChange={(value) => handleFilterChange('make', value)}
-                                        >
-                                            <SelectTrigger
-                                                className={`w-full h-10 bg-white/60 backdrop-blur-sm border-2 transition-all text-neutral-900 ${localFilters.make
-                                                    ? 'border-orange-500 bg-orange-50/80 shadow-md'
-                                                    : 'border-white/40 hover:border-orange-400/50'
-                                                    }`}
-                                            >
-                                                <SelectValue placeholder="All makes" />
-                                            </SelectTrigger>
-                                            <SelectContent className="bg-white/95 backdrop-blur-xl border-white/30">
-                                                {makes.map((make) => (
-                                                    <SelectItem key={make} value={make} className="focus:bg-orange-50">
-                                                        {make}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    {/* Year */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold text-neutral-800">Year</label>
-                                        <Select
-                                            value={localFilters.year}
-                                            onValueChange={(value) => handleFilterChange('year', value)}
-                                        >
-                                            <SelectTrigger
-                                                className={`w-full h-10 bg-white/60 backdrop-blur-sm border-2 transition-all text-neutral-900 ${localFilters.year
-                                                    ? 'border-orange-500 bg-orange-50/80 shadow-md'
-                                                    : 'border-white/40 hover:border-orange-400/50'
-                                                    }`}
-                                            >
-                                                <SelectValue placeholder="All years" />
-                                            </SelectTrigger>
-                                            <SelectContent className="bg-white/95 backdrop-blur-xl border-white/30 max-h-64">
-                                                {years.map((year) => (
-                                                    <SelectItem key={year} value={year} className="focus:bg-orange-50">
-                                                        {year}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    {/* Price & Payment */}
-                                    <div className="space-y-3 pt-2">
-                                        <label className="text-sm font-semibold text-neutral-800">Price Range</label>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div className="space-y-1.5">
-                                                <label className="text-xs text-neutral-600">Min</label>
-                                                <div className="relative">
-                                                    <Input
-                                                        type="number"
-                                                        placeholder="Min"
-                                                        value={localFilters.budgetMin}
-                                                        onChange={(e) => setLocalFilters(prev => ({ ...prev, budgetMin: e.target.value }))}
-                                                        onBlur={() => handleFilterChange('budgetMin', localFilters.budgetMin)}
-                                                        className={`h-9 bg-white/60 backdrop-blur-sm border-2 pr-8 transition-all text-neutral-900 placeholder:text-neutral-500 ${localFilters.budgetMin
-                                                            ? 'border-orange-500 bg-orange-50/80 shadow-md'
-                                                            : 'border-white/40 focus-visible:border-orange-400/50 focus-visible:ring-orange-500/30'
-                                                            }`}
-                                                        min="0"
-                                                    />
-                                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-orange-600 text-xs pointer-events-none font-semibold">$</span>
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-1.5">
-                                                <label className="text-xs text-neutral-600">Max</label>
-                                                <div className="relative">
-                                                    <Input
-                                                        type="number"
-                                                        placeholder="Max"
-                                                        value={localFilters.budgetMax}
-                                                        onChange={(e) => setLocalFilters(prev => ({ ...prev, budgetMax: e.target.value }))}
-                                                        onBlur={() => handleFilterChange('budgetMax', localFilters.budgetMax)}
-                                                        className={`h-9 bg-white/60 backdrop-blur-sm border-2 pr-8 transition-all text-neutral-900 placeholder:text-neutral-500 ${localFilters.budgetMax
-                                                            ? 'border-orange-500 bg-orange-50/80 shadow-md'
-                                                            : 'border-white/40 focus-visible:border-orange-400/50 focus-visible:ring-orange-500/30'
-                                                            }`}
-                                                        min="0"
-                                                    />
-                                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-orange-600 text-xs pointer-events-none font-semibold">$</span>
-                                                </div>
-                                            </div>
+                                <div className="px-4 pb-4 pt-2 bg-white">
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <Input
+                                                type="number"
+                                                placeholder="Min"
+                                                value={localFilters.yearMin}
+                                                onChange={(e) => setLocalFilters(prev => ({ ...prev, yearMin: e.target.value }))}
+                                                onBlur={() => handleFilterChange('yearMin', localFilters.yearMin)}
+                                                className="h-10 bg-white border-2 border-neutral-300 rounded-lg text-neutral-900 placeholder:text-neutral-400 focus-visible:border-orange-500 focus-visible:ring-orange-500/30"
+                                                min="1900"
+                                                max="2100"
+                                            />
+                                        </div>
+                                        <div>
+                                            <Input
+                                                type="number"
+                                                placeholder="Max"
+                                                value={localFilters.yearMax}
+                                                onChange={(e) => setLocalFilters(prev => ({ ...prev, yearMax: e.target.value }))}
+                                                onBlur={() => handleFilterChange('yearMax', localFilters.yearMax)}
+                                                className="h-10 bg-white border-2 border-neutral-300 rounded-lg text-neutral-900 placeholder:text-neutral-400 focus-visible:border-orange-500 focus-visible:ring-orange-500/30"
+                                                min="1900"
+                                                max="2100"
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -510,25 +484,72 @@ export default function FilterContent({ cars = [] }) {
                     </AnimatePresence>
                 </div>
 
-                {/* Models (only show if make is selected) - Expandable */}
+                {/* Brand (Make) - Expandable */}
+                <div className="rounded-lg overflow-hidden shadow-sm">
+                    <button
+                        onClick={() => toggleSection('brand')}
+                        className="cursor-pointer w-full px-4 py-3 flex items-center justify-between hover:bg-neutral-50 transition-colors bg-white"
+                    >
+                        <h3 className="text-sm font-bold text-neutral-800 uppercase tracking-wider flex items-center gap-2">
+                            <span className="text-orange-600 font-bold">|</span>
+                            BRAND
+                        </h3>
+                        {expandedSections.brand ? (
+                            <ChevronUp className="w-4 h-4 text-orange-600" />
+                        ) : (
+                            <ChevronDown className="w-4 h-4 text-orange-600" />
+                        )}
+                    </button>
+                    <AnimatePresence>
+                        {expandedSections.brand && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="overflow-hidden"
+                            >
+                                <div className="px-4 pb-4 pt-2 bg-white">
+                                    <Select
+                                        value={localFilters.make}
+                                        onValueChange={(value) => handleFilterChange('make', value)}
+                                    >
+                                        <SelectTrigger className="w-full h-10 bg-white border-2 border-neutral-300 text-neutral-900">
+                                            <SelectValue placeholder="All makes" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-white border-neutral-300">
+                                            {makes.map((make) => (
+                                                <SelectItem key={make} value={make} className="focus:bg-orange-50">
+                                                    {make}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+
+                {/* Model - Expandable */}
                 {localFilters.make && modelsForSelectedMake.length > 0 && (
-                    <div className="bg-white/40 backdrop-blur-sm border border-white/30 rounded-xl overflow-hidden shadow-sm">
+                    <div className="rounded-lg overflow-hidden shadow-sm">
                         <button
-                            onClick={() => toggleSection('models')}
-                            className="cursor-pointer w-full px-4 py-3 flex items-center justify-between hover:bg-white/30 transition-colors"
+                            onClick={() => toggleSection('model')}
+                            className="cursor-pointer w-full px-4 py-3 flex items-center justify-between hover:bg-neutral-50 transition-colors bg-white"
                         >
-                            <h3 className="text-sm font-bold text-neutral-900 uppercase tracking-wider flex items-center gap-2">
-                                <div className="w-1.5 h-5 bg-gradient-to-b from-orange-500 to-orange-400 rounded-full shadow-sm"></div>
-                                {localFilters.make} models
+                            <h3 className="text-sm font-bold text-neutral-800 uppercase tracking-wider flex items-center gap-2">
+                                <span className="text-orange-600 font-bold">|</span>
+                                MODEL
                             </h3>
-                            {expandedSections.models ? (
+                            {expandedSections.model ? (
                                 <ChevronUp className="w-4 h-4 text-orange-600" />
                             ) : (
                                 <ChevronDown className="w-4 h-4 text-orange-600" />
                             )}
                         </button>
                         <AnimatePresence>
-                            {expandedSections.models && (
+                            {expandedSections.model && (
                                 <motion.div
                                     initial={{ height: 0, opacity: 0 }}
                                     animate={{ height: 'auto', opacity: 1 }}
@@ -536,7 +557,7 @@ export default function FilterContent({ cars = [] }) {
                                     transition={{ duration: 0.3 }}
                                     className="overflow-hidden"
                                 >
-                                    <div className="px-4 pb-4 pt-2 space-y-1.5 max-h-64 overflow-y-auto">
+                                    <div className="px-4 pb-4 pt-2 space-y-1.5 max-h-64 overflow-y-auto bg-white">
                                         {modelsForSelectedMake.map((model) => {
                                             const count = modelCounts[model] || 0;
                                             const isSelected = localFilters.models && localFilters.models.includes(model);
@@ -544,14 +565,12 @@ export default function FilterContent({ cars = [] }) {
                                                 <motion.div
                                                     key={model}
                                                     whileHover={{ scale: 1.02 }}
-                                                    className={`flex items-center gap-2.5 p-2.5 rounded-lg transition-all cursor-pointer backdrop-blur-sm ${isSelected
-                                                        ? 'bg-gradient-to-r from-orange-50/80 to-orange-100/60 border border-orange-300/50 shadow-sm'
-                                                        : 'hover:bg-white/40 border border-transparent'
+                                                    className={`flex items-center gap-2.5 p-2.5 rounded-lg transition-all cursor-pointer ${isSelected
+                                                        ? 'bg-orange-50 border border-orange-300'
+                                                        : 'hover:bg-neutral-50 border border-transparent'
                                                         }`}
                                                     onClick={(e) => {
-                                                        // Prevent event from bubbling up to parent accordion
                                                         e.stopPropagation();
-                                                        // Only handle click if not clicking on checkbox or label directly
                                                         if (e.target.type !== 'checkbox' && e.target.tagName !== 'LABEL' && e.target.tagName !== 'INPUT') {
                                                             handleFilterChange('model', model);
                                                         }
@@ -567,7 +586,7 @@ export default function FilterContent({ cars = [] }) {
                                                         }}
                                                         className={`w-4 h-4 rounded border-2 cursor-pointer transition-all ${isSelected
                                                             ? 'border-orange-500 bg-orange-500 text-white'
-                                                            : 'border-white/60 text-orange-500 focus:ring-orange-500/30'
+                                                            : 'border-neutral-300 text-orange-500 focus:ring-orange-500/30'
                                                             }`}
                                                         onClick={(e) => {
                                                             e.stopPropagation();
@@ -583,7 +602,7 @@ export default function FilterContent({ cars = [] }) {
                                                     >
                                                         <span>{model}</span>
                                                         {count > 0 && (
-                                                            <span className={`text-xs px-2 py-0.5 rounded font-semibold ${isSelected ? 'bg-orange-200/80 text-orange-800' : 'bg-white/60 text-orange-700'
+                                                            <span className={`text-xs px-2 py-0.5 rounded font-semibold ${isSelected ? 'bg-orange-200 text-orange-800' : 'bg-neutral-100 text-orange-700'
                                                                 }`}>
                                                                 {count}
                                                             </span>
@@ -599,24 +618,24 @@ export default function FilterContent({ cars = [] }) {
                     </div>
                 )}
 
-                {/* Location - Expandable */}
-                <div className="bg-white/40 backdrop-blur-sm border border-white/30 rounded-xl overflow-hidden shadow-sm">
+                {/* Condition - Expandable */}
+                <div className="rounded-lg overflow-hidden shadow-sm">
                     <button
-                        onClick={() => toggleSection('location')}
-                        className="cursor-pointer w-full px-4 py-3 flex items-center justify-between hover:bg-white/30 transition-colors"
+                        onClick={() => toggleSection('condition')}
+                        className="cursor-pointer w-full px-4 py-3 flex items-center justify-between hover:bg-neutral-50 transition-colors bg-white"
                     >
-                        <h3 className="text-sm font-bold text-neutral-900 uppercase tracking-wider flex items-center gap-2">
-                            <div className="w-1.5 h-5 bg-gradient-to-b from-orange-500 to-orange-400 rounded-full shadow-sm"></div>
-                            Location
+                        <h3 className="text-sm font-bold text-neutral-800 uppercase tracking-wider flex items-center gap-2">
+                            <span className="text-orange-600 font-bold">|</span>
+                            CONDITION
                         </h3>
-                        {expandedSections.location ? (
+                        {expandedSections.condition ? (
                             <ChevronUp className="w-4 h-4 text-orange-600" />
                         ) : (
                             <ChevronDown className="w-4 h-4 text-orange-600" />
                         )}
                     </button>
                     <AnimatePresence>
-                        {expandedSections.location && (
+                        {expandedSections.condition && (
                             <motion.div
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: 'auto', opacity: 1 }}
@@ -624,35 +643,20 @@ export default function FilterContent({ cars = [] }) {
                                 transition={{ duration: 0.3 }}
                                 className="overflow-hidden"
                             >
-                                <div className="px-4 pb-4 pt-2 space-y-3">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold text-neutral-800">Search within</label>
-                                        <Select defaultValue="all">
-                                            <SelectTrigger className="w-full h-10 bg-white/60 backdrop-blur-sm border-2 border-white/40 hover:border-orange-400/50 text-neutral-900">
-                                                <SelectValue placeholder="All miles from" />
-                                            </SelectTrigger>
-                                            <SelectContent className="bg-white/95 backdrop-blur-xl border-white/30">
-                                                <SelectItem value="all" className="focus:bg-orange-50">All miles from</SelectItem>
-                                                <SelectItem value="25" className="focus:bg-orange-50">25 miles</SelectItem>
-                                                <SelectItem value="50" className="focus:bg-orange-50">50 miles</SelectItem>
-                                                <SelectItem value="100" className="focus:bg-orange-50">100 miles</SelectItem>
-                                                <SelectItem value="250" className="focus:bg-orange-50">250 miles</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-semibold text-neutral-800">ZIP Code</label>
-                                        <Input
-                                            placeholder="Enter ZIP"
-                                            value={localFilters.zipCode}
-                                            onChange={(e) => setLocalFilters(prev => ({ ...prev, zipCode: e.target.value }))}
-                                            onBlur={() => handleFilterChange('zipCode', localFilters.zipCode)}
-                                            className={`h-10 bg-white/60 backdrop-blur-sm border-2 transition-all text-neutral-900 placeholder:text-neutral-500 ${localFilters.zipCode
-                                                ? 'border-orange-500 bg-orange-50/80 shadow-md'
-                                                : 'border-white/40 focus-visible:border-orange-400/50 focus-visible:ring-orange-500/30'
-                                                }`}
-                                        />
-                                    </div>
+                                <div className="px-4 pb-4 pt-2 bg-white">
+                                    <Select
+                                        value={localFilters.condition}
+                                        onValueChange={(value) => handleFilterChange('condition', value)}
+                                    >
+                                        <SelectTrigger className="w-full h-10 bg-white border-2 border-neutral-300 text-neutral-900">
+                                            <SelectValue placeholder="All" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-white border-neutral-300">
+                                            <SelectItem value="all" className="focus:bg-orange-50">All</SelectItem>
+                                            <SelectItem value="new" className="focus:bg-orange-50">New</SelectItem>
+                                            <SelectItem value="used" className="focus:bg-orange-50">Used & CPO</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </motion.div>
                         )}
@@ -668,9 +672,15 @@ export default function FilterContent({ cars = [] }) {
                     
                     if (!filtersToDisplay || Object.keys(filtersToDisplay).length === 0) return null;
                     
+                    // Exclude filters that are already hardcoded above (year, make, condition)
+                    const excludedFilters = ['year', 'make', 'condition'];
+                    
                     return (
                         <>
                             {Object.entries(filtersToDisplay).map(([filterKey, filterValues]) => {
+                            // Skip filters that are already hardcoded
+                            if (excludedFilters.includes(filterKey)) return null;
+                            
                             if (!filterValues || filterValues.length === 0) return null;
                             
                             const sectionKey = `extra-${filterKey}`;
@@ -692,13 +702,13 @@ export default function FilterContent({ cars = [] }) {
                             if (validValues.length === 0) return null;
                             
                             return (
-                                <div key={filterKey} className="bg-white/40 backdrop-blur-sm border border-white/30 rounded-xl overflow-hidden shadow-sm">
+                                <div key={filterKey} className="rounded-lg overflow-hidden shadow-sm">
                                     <button
                                         onClick={() => toggleSection(sectionKey)}
-                                        className="cursor-pointer w-full px-4 py-3 flex items-center justify-between hover:bg-white/30 transition-colors"
+                                        className="cursor-pointer w-full px-4 py-3 flex items-center justify-between hover:bg-neutral-50 transition-colors bg-white"
                                     >
-                                        <h3 className="text-sm font-bold text-neutral-900 uppercase tracking-wider flex items-center gap-2">
-                                            <div className="w-1.5 h-5 bg-gradient-to-b from-orange-500 to-orange-400 rounded-full shadow-sm"></div>
+                                        <h3 className="text-sm font-bold text-neutral-800 uppercase tracking-wider flex items-center gap-2">
+                                            <span className="text-orange-600 font-bold">|</span>
                                             {formatFilterLabel(filterKey)}
                                         </h3>
                                         {isExpanded ? (
@@ -716,7 +726,7 @@ export default function FilterContent({ cars = [] }) {
                                                 transition={{ duration: 0.3 }}
                                                 className="overflow-hidden"
                                             >
-                                                <div className="px-4 pb-4 pt-2 space-y-1.5 max-h-64 overflow-y-auto">
+                                                <div className="px-4 pb-4 pt-2 space-y-1.5 max-h-64 overflow-y-auto bg-white">
                                                     {validValues.map((item) => {
                                                         const value = typeof item === 'object' ? item.value : item;
                                                         const count = typeof item === 'object' ? item.count : null;
@@ -726,14 +736,12 @@ export default function FilterContent({ cars = [] }) {
                                                             <motion.div
                                                                 key={value}
                                                                 whileHover={{ scale: 1.02 }}
-                                                                className={`flex items-center gap-2.5 p-2.5 rounded-lg transition-all cursor-pointer backdrop-blur-sm ${isSelected
-                                                                    ? 'bg-gradient-to-r from-orange-50/80 to-orange-100/60 border border-orange-300/50 shadow-sm'
-                                                                    : 'hover:bg-white/40 border border-transparent'
+                                                                className={`flex items-center gap-2.5 p-2.5 rounded-lg transition-all cursor-pointer ${isSelected
+                                                                    ? 'bg-orange-50 border border-orange-300'
+                                                                    : 'hover:bg-neutral-50 border border-transparent'
                                                                     }`}
                                                                 onClick={(e) => {
-                                                                    // Prevent event from bubbling up to parent accordion
                                                                     e.stopPropagation();
-                                                                    // Only handle click if not clicking on checkbox or label directly
                                                                     if (e.target.type !== 'checkbox' && e.target.tagName !== 'LABEL' && e.target.tagName !== 'INPUT') {
                                                                         handleFilterChange(`extra-${filterKey}-${value}`, value);
                                                                     }
@@ -749,7 +757,7 @@ export default function FilterContent({ cars = [] }) {
                                                                     }}
                                                                     className={`w-4 h-4 rounded border-2 cursor-pointer transition-all ${isSelected
                                                                         ? 'border-orange-500 bg-orange-500 text-white'
-                                                                        : 'border-white/60 text-orange-500 focus:ring-orange-500/30'
+                                                                        : 'border-neutral-300 text-orange-500 focus:ring-orange-500/30'
                                                                         }`}
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
@@ -765,7 +773,7 @@ export default function FilterContent({ cars = [] }) {
                                                                 >
                                                                     <span>{value}</span>
                                                                     {count !== null && count !== undefined && (
-                                                                        <span className={`text-xs px-2 py-0.5 rounded font-semibold ${isSelected ? 'bg-orange-200/80 text-orange-800' : 'bg-white/60 text-orange-700'
+                                                                        <span className={`text-xs px-2 py-0.5 rounded font-semibold ${isSelected ? 'bg-orange-200 text-orange-800' : 'bg-neutral-100 text-orange-700'
                                                                             }`}>
                                                                             {count.toLocaleString()}
                                                                         </span>

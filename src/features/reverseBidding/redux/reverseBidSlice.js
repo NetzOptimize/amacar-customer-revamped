@@ -36,7 +36,18 @@ export const fetchMockCarsThunk = createAsyncThunk(
 
             if (filters.make) params.make = filters.make;
             if (filters.model) params.model = filters.model;
-            if (filters.year) params.year = typeof filters.year === 'string' ? parseInt(filters.year, 10) : filters.year;
+            
+            // Use min_year and max_year if available, otherwise fall back to year for backward compatibility
+            if (filters.yearMin) {
+                params.min_year = Number(filters.yearMin);
+            }
+            if (filters.yearMax) {
+                params.max_year = Number(filters.yearMax);
+            }
+            // Fall back to year if min_year/max_year are not set
+            if (!filters.yearMin && !filters.yearMax && filters.year) {
+                params.year = typeof filters.year === 'string' ? parseInt(filters.year, 10) : filters.year;
+            }
 
             // Send min_price and max_price directly
             if (filters.budgetMin) {
@@ -481,6 +492,8 @@ export const fetchAcceptedReverseBidsThunk = createAsyncThunk(
 const initialState = {
     filters: {
         year: null,
+        yearMin: null,
+        yearMax: null,
         make: null,
         model: null,
         budgetMin: null,
