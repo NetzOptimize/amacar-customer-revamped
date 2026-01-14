@@ -24,6 +24,7 @@ export default function Modal({
   const [vin, setVin] = useState("");
   const [zip, setZip] = useState("");
   const [errors, setErrors] = useState({ vin: "", zip: "" });
+  const [apiError, setApiError] = useState("");
   const [phase, setPhase] = useState("form"); // form | loading | success | error
   const [stepIndex, setStepIndex] = useState(0);
   const { vehicleDetails } = useSelector((state) => state.carDetailsAndQuestions);
@@ -48,6 +49,7 @@ export default function Modal({
       setVin("");
       setZip("");
       setErrors({ vin: "", zip: "" });
+      setApiError("");
       setStepIndex(0);
       onClose(false);
     }
@@ -83,6 +85,10 @@ export default function Modal({
       // setPhase("success");
       navigate("/auction-page");
     } else {
+      const message =
+        resultAction.payload ||
+        "Vehicle appraisal service is temporarily disabled on this platform. You can still browse and purchase used or new vehicles.";
+      setApiError(message);
       setPhase("error");
     }
   };
@@ -92,6 +98,7 @@ export default function Modal({
   function startProgress() {
     setPhase("loading");
     setStepIndex(0);
+    setApiError("");
     let i = 0;
     progressInterval = setInterval(() => {
       i += 1;
@@ -291,7 +298,12 @@ export default function Modal({
                 </motion.div>
                 <div className="space-y-1">
                   <h3 className="text-lg font-semibold text-slate-900">Can't fetch vehicle data!</h3>
-                  <p className="text-sm text-slate-600">Please check your VIN and ZIP code, then try again.</p>
+                  {/* <p className="text-sm text-slate-600">Please check your VIN and ZIP code, then try again.</p> */}
+                {apiError && (
+                  <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
+                    {apiError}
+                  </p>
+                )}
                 </div>
                 <div className="flex gap-3 w-full">
                   <button
