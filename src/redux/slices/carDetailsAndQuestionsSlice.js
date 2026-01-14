@@ -106,11 +106,22 @@ export const fetchVehicleDetails = createAsyncThunk(
           cityState: response.data.city_state,    // Location data from city_state
           vehicleImage: response.data.vehicle_image // Vehicle image from API response
         };
-      } else {
-        return rejectWithValue('API request failed');
       }
+
+      const fallbackMessage =
+        response.data.message ||
+        response.data.notice ||
+        'Vehicle appraisal service is temporarily disabled on this platform. You can still browse and purchase used or new vehicles.';
+
+      return rejectWithValue(fallbackMessage);
     } catch (error) {
-      return rejectWithValue(error.message);
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.notice ||
+        error.message ||
+        'Vehicle appraisal service is temporarily disabled on this platform. You can still browse and purchase used or new vehicles.';
+
+      return rejectWithValue(message);
     }
   }
 );
